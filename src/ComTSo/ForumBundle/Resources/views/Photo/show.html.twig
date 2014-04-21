@@ -1,0 +1,6 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+	<h2>{{ photo.title }}</h2>
+	<img src="{{ path('comtso_photo_source', {id: photo.id}) }}" alt="{{ photo.filename }}" title="{{ photo.title }}" width="{{ photo.width }}" height="{{ photo.height }}" />
+{% endblock %}

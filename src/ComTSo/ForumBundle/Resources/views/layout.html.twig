@@ -41,7 +41,7 @@
 								<li{{ activeMenu == 'forums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'le-bac-a-sable'}) }}">Le forum</a></li>
 								<li{{ activeMenu == 'albums' ? ' class="active"' }}><a href="#">Les albums</a></li>
 								<li{{ activeMenu == 'people' ? ' class="active"' }}><a href="{{ path('comtso_user_list') }}">Les gens</a></li>
-								<li style="display:none;"><a href="#chat" id="chat-toggle">Chat <span class="badge">2</span></a></li>
+								<li style="display:none;"><a href="#chat" id="chat-toggle">Chat</a></li>
 							</ul>
 							<ul class="nav navbar-nav navbar-right">
 								<li><a href="{{ path('comtso_user_show', {usernameCanonical: app.user.usernameCanonical}) }}"><span class="glyphicon glyphicon-user"></span> {{ app.user }}</a></li>

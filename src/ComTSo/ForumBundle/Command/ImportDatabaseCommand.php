@@ -6,6 +6,7 @@ use ComTSo\ForumBundle\Decoda\PhpEngine;
 use ComTSo\ForumBundle\Entity\ChatMessage;
 use ComTSo\ForumBundle\Entity\Comment;
 use ComTSo\ForumBundle\Entity\Message;
+use ComTSo\ForumBundle\Entity\Photo;
 use ComTSo\ForumBundle\Entity\Quote;
 use ComTSo\ForumBundle\Entity\Topic;
 use ComTSo\ForumBundle\Lib\Utils;
@@ -100,6 +101,7 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 		$this->importQuotes($users);
 		$this->importMessages($users);
 		$this->importChatMessages();
+		$this->importPhotos($users);
 	}
 
 	protected function importUsers() {
@@ -320,6 +322,56 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 		}
 		$progress->finish();
 		fclose($handle);
+	}
+	
+	protected function importPhotos($users) {
+		$this->truncateTable(get_class(new Photo));
+		$stmt = $this->em->getConnection()->executeQuery('SELECT COUNT(*) FROM photos');
+		$photoCount = $stmt->fetch(Query::HYDRATE_SINGLE_SCALAR)[0];
+		$progress = $this->getHelperSet()->get('progress');
+		$progress->start($this->output, $photoCount);
+
+		$stmt = $this->em->getConnection()->executeQuery('SELECT * FROM photos');
+		$this->output->writeln("<info>Importing Photos</info>");
+		while ($rs = $stmt->fetch(Query::HYDRATE_ARRAY)) {
+			$authorId = $rs['user_id'];
+			if (!isset($users[$authorId])) {
+				continue;
+			}
+			$id = $rs['photo_id'];
+			$filename = "{$this->getContainer()->getParameter('kernel.root_dir')}/data/photos/{$id}.jpg";
+			if (!file_exists($filename)) {
+				continue;
+			}
+			$image = new \Imagick($filename);
+			$exif = $image->getImageProperties();
+			
+			$dateCreate = DateTime::createFromFormat(DateTime::RFC3339, $exif['date:create']);
+			$dateModify = DateTime::createFromFormat(DateTime::RFC3339, $exif['date:modify']);
+			$fileModifiedAt = new DateTime;
+			$fileModifiedAt->setTimestamp(filemtime($filename));
+			
+			$photo = new Photo;
+			$photo->setFileModifiedAt($fileModifiedAt);
+			$photo->setTakenAt(min([$dateCreate, $dateModify, $fileModifiedAt]));
+			$photo->setFileSize(filesize($filename));
+			$photo->setFilename("{$id}.jpg");
+			$photo->setFileType($image->getimageformat());
+			$photo->setHeight($image->getImageHeight());
+			$photo->setWidth($image->getImageWidth());
+			$photo->setExif($exif);
+			
+			$photo->setAuthor($users[$authorId]);
+			$photo->setTitle($this->cleanText($rs['title']));
+            $createdAt = new DateTime;
+			$createdAt->setTimestamp($rs['date']);
+			$photo->setCreatedAt($createdAt);
+			$photo->setUpdatedAt($createdAt);
+			$this->em->persist($photo);
+			$this->em->flush();
+			$progress->advance();
+		}
+		$progress->finish();
 	}
 
 	/**
