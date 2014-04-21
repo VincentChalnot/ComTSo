@@ -108,18 +108,27 @@ h1 {
 	padding: 2px 5px;
 }
 
+.chat-message {
+	position: relative;
+}
+
 .chat-message p {
 	margin-bottom: 2px;
 }
 
 .chat-message time {
-	float: right;
+	position: absolute;
 	font-style: italic;
-	display:none;
+	display: none;
+	right: 0;
+	padding: 0 5px;
+	border-radius: 2px;
+	background: #fff;
+	color: #888;
 }
 
 .chat-message:hover time {
-	display: inline;
+	display: inline-block;
 }
 
 #chat-box .col-sm-2 {

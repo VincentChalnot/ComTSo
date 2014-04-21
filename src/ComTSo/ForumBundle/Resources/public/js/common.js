@@ -40,6 +40,9 @@ $(document).ready(function(){
 		$("#chat-message-new").prop('disabled', false);
 	};
 
+//	window.setInterval(function(){
+//		$.ajax(chat_url, {success: parseChatMessages});
+//	}, 10000);
 	$.ajax(chat_url, {success: parseChatMessages});
 
 	$('#chat-panel form').submit(function(e){

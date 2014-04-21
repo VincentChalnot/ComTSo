@@ -8,7 +8,7 @@ trait ContentEditable {
 	 * Body of the content
 	 *
 	 * @var string
-	 * @Doctrine\ORM\Mapping\Column(type="text")
+	 * @Doctrine\ORM\Mapping\Column(type="text", nullable=true)
 	 */
 	protected $content;
 

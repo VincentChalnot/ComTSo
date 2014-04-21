@@ -29,3 +29,15 @@ comtso_user_show:
 comtso_chat:
     pattern:  /chat
     defaults: { _controller: ComTSoForumBundle:Chat:show }
+    
+comtso_photo_source:
+    pattern:  /photos/source/{id}
+    defaults: { _controller: ComTSoForumBundle:Photo:source }
+    requirements:
+        id: "\d+"
+        
+comtso_photo_show:
+    pattern:  /photos/{id}
+    defaults: { _controller: ComTSoForumBundle:Photo:show }
+    requirements:
+        id: "\d+"
