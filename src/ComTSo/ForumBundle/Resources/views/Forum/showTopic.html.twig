@@ -1,0 +1,41 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+	<ul class="nav nav-tabs">
+		{% for f in forums %}
+			<li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: f.id}) }}">{{ f }}</a></li>
+		{% endfor %}
+	</ul>
+	<div class="topic">
+		<h3>{{ topic }}</h3>
+		<div>{{ topic.content|raw }}</div>
+		<p class="text-muted">
+			Créé par <a href="{{ path('comtso_user_show', {usernameCanonical: topic.author.usernameCanonical}) }}">{{ topic.author }}</a>
+			le {{ topic.createdAt|date('d/m/Y à H:i') }} – {{ topic.views }} vues – {{ topic.commentCount }} posts
+		</p>
+		<hr class="clear">
+		{% include 'ComTSoForumBundle:Comment:create_form.html.twig' %}
+		{% for comment in topic.comments %}
+			<hr class="clear">
+			{% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+		{% endfor %}
+	</div>
+{% endblock %}
+		
+{% block aside %}
+	<h4>Accès rapide</h4>
+	<ul class="nav nav-compact">
+		{% for t in topics %}
+			<li{{ t.id == topic.id ? ' class="active"' }}><a href="{{ path('comtso_forum_topic_show', {id: t.id, forumId: forum.id}) }}">{{ t }}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+        $(document).ready(function(){
+            $('#{{ form.content.vars.id }}').click(function(e){$(this).ckeditor();});
+        });
+	</script>
+{% endblock %}

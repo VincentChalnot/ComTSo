@@ -1,0 +1,7 @@
+{% set quote = random_quote() %}
+<blockquote>
+	<p>{{ quote.content }}</p>
+	{% if quote.originalAuthor %}
+		<footer>{{ quote.originalAuthor }}</footer>
+	{% endif %}
+</blockquote>

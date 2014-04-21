@@ -1,0 +1,31 @@
+comtso_homepage:
+    pattern:  /
+    defaults: { _controller: ComTSoForumBundle:Home:index }
+
+comtso_forum_show:
+    pattern:  /forum/{id}
+    defaults: { _controller: ComTSoForumBundle:Forum:show }
+    requirements:
+        id: "[\w-]+"
+      
+      
+comtso_forum_topic_show:
+    pattern:  /forum/{forumId}/{id}
+    defaults: { _controller: ComTSoForumBundle:Forum:showTopic }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+       
+comtso_user_list:
+    pattern:  /gens
+    defaults: { _controller: ComTSoForumBundle:User:list }
+        
+comtso_user_show:
+    pattern:  /gens/{usernameCanonical}
+    defaults: { _controller: ComTSoForumBundle:User:show }
+    requirements:
+        usernameCanonical: "[\w- ]+"
+
+comtso_chat:
+    pattern:  /chat
+    defaults: { _controller: ComTSoForumBundle:Chat:show }

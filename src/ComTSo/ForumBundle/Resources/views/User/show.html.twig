@@ -1,0 +1,29 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+	{% include 'ComTSoUserBundle:Profile:show_content.html.twig' %}
+    <h2>Messages privés</h2>
+    {% include 'ComTSoForumBundle:Comment:create_form.html.twig' %}
+    {% for comment in messages %}
+        <hr class="clear">
+        {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+    {% endfor %}
+{% endblock %}
+		
+{% block aside %}
+	<h4>Accès rapide</h4>
+	<ul class="nav nav-compact">
+		{% for u in users %}
+			<li{{ u.id == user.id ? ' class="active"' }}><a href="{{ path('comtso_user_show', {usernameCanonical: u.usernameCanonical}) }}">{{ u }}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+        $(document).ready(function(){
+            $('#{{ form.content.vars.id }}').click(function(e){$(this).ckeditor();});
+        });
+	</script>
+{% endblock %}

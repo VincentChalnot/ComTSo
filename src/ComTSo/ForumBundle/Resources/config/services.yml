@@ -1,0 +1,16 @@
+parameters:
+#        comtso_forum.example.class: ComTSo\ForumBundle\Example
+
+services:
+    twig.extension.comtso_forum:
+        class: ComTSo\ForumBundle\Twig\ForumExtension
+        arguments: [ "@service_container" ]
+        tags:
+            - { name: 'twig.extension' }
+
+    gedmo.listener.timestampable:
+        class: Gedmo\Timestampable\TimestampableListener
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]

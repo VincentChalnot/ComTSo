@@ -1,0 +1,17 @@
+{% if form is defined %}
+    <div class="post">
+        <div class="col-sm-2 col-xs-3">
+            <a class="avatar avatar-med" href="{{ path('comtso_user_show', {usernameCanonical: app.user.usernameCanonical}) }}">
+                <img src="/images/avatars/{{ app.user.usernameCanonical }}.jpg" alt="" class="img-circle" width="64" height="64">
+                <span class="username">{{ app.user }}</span>
+            </a>
+        </div>
+        <div class="col-sm-10 col-xs-9">
+            <form action="" method="post">
+                {{ form_row(form.content) }}
+                {{ form_rest(form) }}
+                <p class="text-right"><button type="submit" class="btn btn-primary">Envoyer</button></p>
+            </form>
+        </div>
+    </div>
+{% endif %}

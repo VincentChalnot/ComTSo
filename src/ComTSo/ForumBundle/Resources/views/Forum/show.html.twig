@@ -1,0 +1,29 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+	<ul class="nav nav-tabs">
+		{% for f in forums %}
+			<li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: f.id}) }}">{{ f }}</a></li>
+		{% endfor %}
+	</ul>
+	{% for topic in topics %}
+		<div class="topic">
+			<h3><a href="{{ path('comtso_forum_topic_show', {id: topic.id, forumId: forum.id}) }}" name="topic-{{ topic.id }}">{{ topic }}</a></h3>
+			<div>{{ topic.content|raw }}</div>
+			{% for comment in [] %}
+				<hr class="clear">
+				{% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+			{% endfor %}
+		</div>
+		<hr>
+	{% endfor %}
+{% endblock %}
+		
+{% block aside %}
+	<h4>Accès rapide</h4>
+	<ul class="nav nav-compact">
+		{% for topic in topics %}
+			<li><a href="#topic-{{ topic.id }}">{{ topic }}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock %}
