@@ -1,0 +1,21 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+	<div class="people">
+		{% for user in users %}
+			<a class="avatar avatar-big" href="{{ path('comtso_user_show', {usernameCanonical: user.usernameCanonical}) }}">
+				<img src="/images/avatars/{{ user.usernameCanonical }}.jpg" alt="" class="img-circle" width="128" height="128">
+				<span class="username">{{ user }}</span>
+			</a>
+		{% endfor %}
+	</div>
+{% endblock %}
+		
+{% block aside %}
+	<h4>Accès rapide</h4>
+	<ul class="nav nav-compact">
+		{% for u in users %}
+			<li><a href="{{ path('comtso_user_show', {usernameCanonical: u.usernameCanonical}) }}">{{ u }}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock %}

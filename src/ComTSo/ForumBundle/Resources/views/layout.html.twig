@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+	<meta charset="{{ _charset }}">
+	<title>{% block title %}ComTSo{% endblock %}</title>
+	{% block metas %}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="ComTSo">
+        <meta name="author" content="">
+    {% endblock %}
+	{% block stylesheets %}
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+        <link href="{{ asset('/bundles/comtsoforum/css/bootstrap-lumen.min.css') }}" type="text/css" rel="stylesheet" media="all" />
+        <link href="{{ asset('/bundles/comtsoforum/css/custom.css') }}" type="text/css" rel="stylesheet" media="all" />
+		<link href="//fonts.googleapis.com/css?family=Port+Lligat+Slab" type="text/css" rel="stylesheet">
+    {% endblock %}
+	<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+</head>
+<body>
+    <div class="container">
+		{% block main_content %}
+			{% block main_menu %}
+				<div class="navbar navbar-default hidden-print" role="navigation">
+					<div class="container-fluid">
+						<div class="navbar-header">
+							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+								<span class="sr-only">Toggle navigation</span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</button>
+							<a class="navbar-brand" href="{{ path('comtso_homepage') }}">ComTSo</a>
+						</div>
+						<div class="navbar-collapse collapse">
+							<ul class="nav navbar-nav">
+								{% set activeMenu = activeMenu is defined ? activeMenu : 'home' %}
+								<li{{ activeMenu == 'home' ? ' class="active"' }}><a href="{{ path('comtso_homepage') }}">Home</a></li>
+								<li{{ activeMenu == 'forums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'le-bac-a-sable'}) }}">Le forum</a></li>
+								<li{{ activeMenu == 'albums' ? ' class="active"' }}><a href="#">Les albums</a></li>
+								<li{{ activeMenu == 'people' ? ' class="active"' }}><a href="{{ path('comtso_user_list') }}">Les gens</a></li>
+								<li style="display:none;"><a href="#chat" id="chat-toggle">Chat <span class="badge">2</span></a></li>
+							</ul>
+							<ul class="nav navbar-nav navbar-right">
+								<li><a href="{{ path('comtso_user_show', {usernameCanonical: app.user.usernameCanonical}) }}"><span class="glyphicon glyphicon-user"></span> {{ app.user }}</a></li>
+								<li><a href="{{ path('fos_user_security_logout') }}"><span class="glyphicon glyphicon-log-out"></span></a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			{% endblock %}
+			<div class="container-fluid">
+				{% block messages %}
+					{% for name in ['error', 'warning', 'success', 'info'] %}
+						{% for message in app.session.flashBag.get(name) %}
+							<div class="alert alert-{{ name }}">
+							  <button type="button" class="close" data-dismiss="alert">&times;</button>
+							  {{ message|raw }}
+							</div>
+						{% endfor %}
+					{% endfor %}
+				{% endblock %}
+				<div class="row" id="main-content">
+					<div class="col-md-8" role="main">
+						{% block content %}{% endblock %}
+					</div>
+					<div class="col-md-4" class="hidden-print affix" role="complementary">
+						{% block aside %}{% endblock %}
+						<hr>
+						{% include 'ComTSoForumBundle:Quote:random.html.twig' %}
+					</div>
+				</div>
+				{% include 'ComTSoForumBundle:Chat:chat_panel.html.twig' %}
+			</div>
+		{% endblock %}
+    </div>
+	{% block javascripts %}
+        <script src="//code.jquery.com/jquery-2.1.0.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+		<script src="{{ asset('/bundles/comtsoforum/js/ckeditor/ckeditor.js') }}"></script>
+		<script src="{{ asset('/bundles/comtsoforum/js/ckeditor/adapters/jquery.js') }}"></script>
+		<script src="{{ asset('/bundles/comtsoforum/js/moment.min.js') }}"></script>
+		<script>
+			var chat_url = '{{ path('comtso_chat') }}';
+			var user_url = '{{ path('comtso_user_show', {usernameCanonical: '-place-holder-'}) }}';
+			$(document).ready(function(){
+				moment.lang('fr');
+			});
+		</script>
+		<script src="{{ asset('/bundles/comtsoforum/js/common.js') }}"></script>
+    {% endblock %}
+</body>
+</html>

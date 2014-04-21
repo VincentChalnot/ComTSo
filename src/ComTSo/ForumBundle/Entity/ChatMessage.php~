@@ -1,0 +1,33 @@
+<?php
+
+namespace ComTSo\ForumBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Table(name="ctso_chat_message")
+ * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\ChatMessageRepository")
+ */
+class ChatMessage {
+
+	use Behavior\Authorable;
+	use Behavior\Timestampable;
+	use Behavior\ContentEditable;
+
+	/**
+	 * @ORM\Id
+	 * @ORM\Column(type="integer")
+	 * @ORM\GeneratedValue(strategy="AUTO")
+	 */
+	protected $id;
+
+	public function getId() {
+		return $this->id;
+	}
+
+	public function setId($id) {
+		$this->id = $id;
+		return $this;
+	}
+
+}
