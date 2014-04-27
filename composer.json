@@ -7,7 +7,7 @@
         "psr-0": { "": "src/" }
     },
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.4",
         "symfony/symfony": "~2.4",
         "doctrine/orm": "~2.2,>=2.2.3",
         "doctrine/doctrine-bundle": "~1.2",
@@ -23,6 +23,8 @@
 		"friendsofsymfony/user-bundle": "~2.0@dev",
 		"mopa/bootstrap-bundle": "v3.0.0-beta3",
 		"nc/elephantio-bundle": "dev-master",
+		"liip/imagine-bundle": "1.0.*@dev",
+		"phpexiftool/phpexiftool": "0.3.*@dev",
 		"jolicode/jolitypo-bundle": "dev-master",
 		"mjohnson/decoda": "dev-master",
 		"exercise/htmlpurifier-bundle": "dev-master"

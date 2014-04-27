@@ -2,6 +2,10 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
 
+parameters:
+    kernel.data_dir: %kernel.root_dir%/data
+    comtso.photo_dir: %kernel.data_dir%/photos
+
 framework:
     #esi:             ~
     translator: ~
@@ -93,3 +97,24 @@ exercise_html_purifier:
       HTML.Trusted: true
       HTML.SafeIframe: true
       URI.SafeIframeRegexp: "\\^http://(www.youtube.com/embed/|player.vimeo.com/video/)\\"
+      
+liip_imagine:
+    driver: %imagine_driver%
+    resolvers:
+       default:
+          web_path:
+            web_root: %comtso.photo_dir%
+            cache_prefix: cache
+    loaders:
+        default:
+            filesystem:
+                data_root: %comtso.photo_dir%/originals
+    filter_sets:
+        thumbnail:
+            quality: 70
+            filters:
+                thumbnail: { size: [146, 146], mode: outbound }
+        preview:
+            quality: 80
+            filters:
+                thumbnail: { size: [730, 730], mode: inset }

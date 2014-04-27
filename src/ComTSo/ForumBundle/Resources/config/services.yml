@@ -1,5 +1,5 @@
 parameters:
-#        comtso_forum.example.class: ComTSo\ForumBundle\Example
+    phpexiftool.reader.class: PHPExiftool\Reader
 
 services:
     twig.extension.comtso_forum:
@@ -14,3 +14,15 @@ services:
             - { name: doctrine.event_subscriber, connection: default }
         calls:
             - [ setAnnotationReader, [ "@annotation_reader" ] ]
+            
+    comtso.image.uploader:
+        class: ComTSo\ForumBundle\Service\ImageUploader
+        arguments: [ "@service_container" ]
+        
+    phpexiftool.reader:
+        scope: prototype
+        class: "%phpexiftool.reader.class%"
+        factory_class: "%phpexiftool.reader.class%"
+        factory_method: create
+        arguments:
+            - "@logger"

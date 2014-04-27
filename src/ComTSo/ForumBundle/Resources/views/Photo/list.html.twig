@@ -1,0 +1,9 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+	{% spaceless %}
+		{% for photo in photos %}
+			<a href="{{ path('comtso_photo_show', {'id': photo.id}) }}">{% include 'ComTSoForumBundle:Photo:image.html.twig' with {'filter': 'thumbnail'} %}</a>
+		{% endfor %}
+	{% endspaceless %}
+{% endblock %}

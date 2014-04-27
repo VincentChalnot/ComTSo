@@ -23,6 +23,7 @@ class AppKernel extends Kernel
 			new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
 			new Joli\TypoBundle\JoliTypoBundle(),
 			new Nc\Bundle\ElephantIOBundle\NcElephantIOBundle(),
+			new Liip\ImagineBundle\LiipImagineBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
