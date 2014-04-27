@@ -2,5 +2,17 @@
 
 {% block content %}
 	<h2>{{ photo.title }}</h2>
-	<img src="{{ path('comtso_photo_source', {id: photo.id}) }}" alt="{{ photo.filename }}" title="{{ photo.title }}" width="{{ photo.width }}" height="{{ photo.height }}" />
+	{% include 'ComTSoForumBundle:Photo:image.html.twig' %}
+	<div class="text-center well">
+		<a href="{{ path('comtso_photo_source_original', {'id': photo.id, 'download': true}) }}" class="btn btn-default" target="_blank">Télécharger ({{ photo.fileSize|file_size }})</a>
+	</div>
+	<dl class="dl-horizontal">
+		<dt>Date de prise :</dt><dd>{{ photo.takenAt|date() }}</dd>
+		<dt>Taille :</dt><dd>{{ photo.fileSize|file_size }}</dd>
+		{% for key, value in photo.exif %}
+			{% if key in ['IFD0:Model', 'IFD0:Artist', 'IFD0:Copyright', 'ExifIFD:ExposureTime', 'ExifIFD:FNumber', 'ExifIFD:ISO', 'ExifIFD:FocalLength', 'Canon:LensModel'] %}
+				<dt>{{ key }} :</dt><dd>{{ value }}</dd>
+			{% endif %}
+		{% endfor %}
+	</dl>
 {% endblock %}

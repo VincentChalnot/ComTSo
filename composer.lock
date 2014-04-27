@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "e5e195e5ecc94d8de49a7ecf19a2ccf1",
+    "hash": "bf18024bbb7cfdd6ebc31152661dcfc5",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -871,6 +871,58 @@
             "time": "2014-01-12 16:34:06"
         },
         {
+            "name": "imagine/imagine",
+            "version": "v0.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/avalanche123/Imagine.git",
+                "reference": "f64ec666baaa800edcbf237db41121a569230709"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/avalanche123/Imagine/zipball/f64ec666baaa800edcbf237db41121a569230709",
+                "reference": "f64ec666baaa800edcbf237db41121a569230709",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "sami/sami": "dev-master"
+            },
+            "suggest": {
+                "ext-gd": "to use the GD implementation",
+                "ext-gmagick": "to use the Gmagick implementation",
+                "ext-imagick": "to use the Imagick implementation"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Imagine": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bulat Shakirzyanov",
+                    "email": "mallluhuct@gmail.com",
+                    "homepage": "http://avalanche123.com"
+                }
+            ],
+            "description": "Image processing for PHP 5.3",
+            "homepage": "http://imagine.readthedocs.org/",
+            "keywords": [
+                "drawing",
+                "graphics",
+                "image manipulation",
+                "image processing"
+            ],
+            "time": "2013-07-10 17:25:36"
+        },
+        {
             "name": "incenteev/composer-parameter-handler",
             "version": "v2.1.0",
             "target-dir": "Incenteev/ParameterHandler",
@@ -1142,17 +1194,88 @@
             "time": "2013-07-19 00:03:27"
         },
         {
+            "name": "liip/imagine-bundle",
+            "version": "dev-master",
+            "target-dir": "Liip/ImagineBundle",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/liip/LiipImagineBundle.git",
+                "reference": "d7d591321e98a87ff0dbd5751a8d92d1b229b163"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/liip/LiipImagineBundle/zipball/d7d591321e98a87ff0dbd5751a8d92d1b229b163",
+                "reference": "d7d591321e98a87ff0dbd5751a8d92d1b229b163",
+                "shasum": ""
+            },
+            "require": {
+                "imagine/imagine": "0.5.*",
+                "php": ">=5.3.2",
+                "symfony/filesystem": "~2.3",
+                "symfony/finder": "~2.3",
+                "symfony/framework-bundle": "~2.3",
+                "symfony/options-resolver": "~2.3"
+            },
+            "require-dev": {
+                "amazonwebservices/aws-sdk-for-php": "~1.0",
+                "aws/aws-sdk-php": "~2.4",
+                "doctrine/cache": "~1.1",
+                "ext-gd": "*",
+                "phpunit/phpunit": "~3.7",
+                "psr/log": "~1.0",
+                "symfony/browser-kit": "~2.3",
+                "symfony/console": "~2.3",
+                "symfony/yaml": "~2.3",
+                "twig/twig": "~1.0"
+            },
+            "suggest": {
+                "amazonwebservices/aws-sdk-for-php": "Add it if you'd like to use aws v1 resolver",
+                "aws/aws-sdk-php": "Add it if you'd like to use aws v2 resolver",
+                "monolog/monolog": "If you'd want to write logs",
+                "twig/twig": "If you'd want to use some handy twig filters"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev",
+                    "dev-0.x": "0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Liip\\ImagineBundle": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Liip and other contributors",
+                    "homepage": "https://github.com/liip/LiipImagineBundle/contributors"
+                }
+            ],
+            "description": "This Bundle assists in imagine manipulation using the imagine library",
+            "homepage": "http://liip.ch",
+            "keywords": [
+                "image",
+                "imagine"
+            ],
+            "time": "2014-04-25 09:09:53"
+        },
+        {
             "name": "mjohnson/decoda",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/milesj/decoda.git",
-                "reference": "2d833b0db778e8cfa0b5a516e42f2de15ee320e9"
+                "reference": "84d1c87de8fb9dcf82f8e41da79c8edea934d50e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/milesj/decoda/zipball/2d833b0db778e8cfa0b5a516e42f2de15ee320e9",
-                "reference": "2d833b0db778e8cfa0b5a516e42f2de15ee320e9",
+                "url": "https://api.github.com/repos/milesj/decoda/zipball/84d1c87de8fb9dcf82f8e41da79c8edea934d50e",
+                "reference": "84d1c87de8fb9dcf82f8e41da79c8edea934d50e",
                 "shasum": ""
             },
             "require": {
@@ -1186,20 +1309,20 @@
                 "markup",
                 "parser"
             ],
-            "time": "2014-03-30 21:09:18"
+            "time": "2014-04-16 02:53:23"
         },
         {
             "name": "monolog/monolog",
-            "version": "1.8.0",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "392ef35fd470638e08d0160d6b1cbab63cb23174"
+                "reference": "65026b610f8c19e61d7242f600530677b0466aac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/392ef35fd470638e08d0160d6b1cbab63cb23174",
-                "reference": "392ef35fd470638e08d0160d6b1cbab63cb23174",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/65026b610f8c19e61d7242f600530677b0466aac",
+                "reference": "65026b610f8c19e61d7242f600530677b0466aac",
                 "shasum": ""
             },
             "require": {
@@ -1227,7 +1350,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.8.x-dev"
+                    "dev-master": "1.9.x-dev"
                 }
             },
             "autoload": {
@@ -1254,7 +1377,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2014-03-23 19:50:26"
+            "time": "2014-04-24 13:29:03"
         },
         {
             "name": "mopa/bootstrap-bundle",
@@ -1460,6 +1583,107 @@
                 "hyphenation"
             ],
             "time": "2013-05-16 19:30:56"
+        },
+        {
+            "name": "phpexiftool/exiftool",
+            "version": "9.15",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/alchemy-fr/exiftool.git",
+                "reference": "0b05edb639d032181f3fae7df8dc1194e9210dc4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/alchemy-fr/exiftool/zipball/0b05edb639d032181f3fae7df8dc1194e9210dc4",
+                "reference": "0b05edb639d032181f3fae7df8dc1194e9210dc4",
+                "shasum": ""
+            },
+            "require": {
+                "phpexiftool/phpexiftool": "*"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Perl Licensing"
+            ],
+            "authors": [
+                {
+                    "name": "Phil Harvey",
+                    "email": "phil@owl.phy.queensu.ca",
+                    "homepage": "http://www.sno.phy.queensu.ca/~phil/exiftool/"
+                }
+            ],
+            "description": "Exiftool is a library for reading, writing and editing meta information. This package is not PHP, but required for the main PHP driver : PHP Exiftool",
+            "keywords": [
+                "exiftool",
+                "metadatas"
+            ],
+            "time": "2013-01-30 18:48:32"
+        },
+        {
+            "name": "phpexiftool/phpexiftool",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/romainneutron/PHPExiftool.git",
+                "reference": "882228cf7cfd1d37bbc7381d284f7d65ede70f7d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/romainneutron/PHPExiftool/zipball/882228cf7cfd1d37bbc7381d284f7d65ede70f7d",
+                "reference": "882228cf7cfd1d37bbc7381d284f7d65ede70f7d",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/cache": "~1.0",
+                "doctrine/collections": "~1.0",
+                "monolog/monolog": "~1.3",
+                "php": ">=5.3.3",
+                "phpexiftool/exiftool": "9.15",
+                "symfony/console": "~2.0",
+                "symfony/process": "~2.0"
+            },
+            "require-dev": {
+                "jms/serializer": "~0.10",
+                "sami/sami": "~1.0",
+                "silex/silex": "~1.0",
+                "symfony/css-selector": "~2.0",
+                "symfony/dom-crawler": "~2.0",
+                "symfony/finder": "~2.0",
+                "symfony/yaml": "~2.0"
+            },
+            "suggest": {
+                "jms/serializer": "To serialize tags",
+                "symfony/yaml": "To serialize tags in Yaml format"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "PHPExiftool": "lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Romain Neutron",
+                    "email": "imprec@gmail.com",
+                    "homepage": "http://www.lickmychip.com/"
+                }
+            ],
+            "description": "Exiftool driver for PHP",
+            "keywords": [
+                "exiftool",
+                "metadata"
+            ],
+            "time": "2013-12-04 23:26:47"
         },
         {
             "name": "psr/log",
@@ -2270,12 +2494,14 @@
         "friendsofsymfony/user-bundle": 20,
         "mopa/bootstrap-bundle": 10,
         "nc/elephantio-bundle": 20,
+        "liip/imagine-bundle": 20,
+        "phpexiftool/phpexiftool": 20,
         "jolicode/jolitypo-bundle": 20,
         "mjohnson/decoda": 20,
         "exercise/htmlpurifier-bundle": 20
     },
     "platform": {
-        "php": ">=5.3.3"
+        "php": ">=5.4"
     },
     "platform-dev": [
 

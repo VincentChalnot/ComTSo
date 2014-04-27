@@ -164,5 +164,5 @@ class Photo {
 		$this->exif = $exif;
 		return $this;
 	}
-
+	
 }

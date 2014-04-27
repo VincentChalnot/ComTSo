@@ -96,11 +96,11 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 			3 => $forumRepo->find("archives"),
 		];
 		$users = $this->importUsers();
-		$topics = $this->importTopics($forumsByOldIds, $users);
-		$this->importPosts($topics, $users);
-		$this->importQuotes($users);
-		$this->importMessages($users);
-		$this->importChatMessages();
+//		$topics = $this->importTopics($forumsByOldIds, $users);
+//		$this->importPosts($topics, $users);
+//		$this->importQuotes($users);
+//		$this->importMessages($users);
+//		$this->importChatMessages();
 		$this->importPhotos($users);
 	}
 
@@ -188,10 +188,12 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 		while ($rs = $stmt->fetch(Query::HYDRATE_ARRAY)) {
 			if (!isset($topics[$rs['topic_id']])) {
 				$this->output->writeln("<error>Unknown Topic: #{$rs['post_id']}</error>\n<info>Post #{$rs['post_id']} ({$users[$rs['user_id']]})</info>\n<comment>{$rs['text']}</comment>\n\n");
+				$progress->advance();
 				continue;
 			}
 			if (!isset($users[$rs['user_id']])) {
 				$this->output->writeln("<error>Unknown User: #{$rs['user_id']}</error>\n<info>Post #{$rs['post_id']}</info>\n<comment>{$rs['text']}</comment>\n\n");
+				$progress->advance();
 				continue;
 			}
 			$comment = new Comment;
@@ -262,6 +264,7 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 			$authorId = $rs['from'];
 			$recipiendId = $rs['to'];
 			if (!isset($users[$authorId]) || !isset($users[$recipiendId])) {
+				$progress->advance();
 				continue;
 			}
 			$message->setAuthor($users[$authorId]);
@@ -297,12 +300,14 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 		$previousMonth = null;
 		while (($line = fgets($handle)) !== false) {
 			if (!preg_match("/<strong>([^,]+),<\/strong>\s*<em>le\s*(\d+)\/(\d+)\s+(\d+):(\d+)<\/em>:\s*(.*)<br\s*\/?>/", $line, $infos)) {
+				$progress->advance();
 				continue;
 			}
 			list($line, $username, $day, $month, $hour, $minute, $content) = $infos;
 			$message = new ChatMessage;
 			$author = $this->getDoctrine()->getRepository('ComTSoUserBundle:User')->findOneByUsername($username);
 			if (!$author) {
+				$progress->advance();
 				continue;
 			}
 			if($previousMonth && $previousMonth > $month) {
@@ -336,30 +341,16 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 		while ($rs = $stmt->fetch(Query::HYDRATE_ARRAY)) {
 			$authorId = $rs['user_id'];
 			if (!isset($users[$authorId])) {
+				$progress->advance();
 				continue;
 			}
 			$id = $rs['photo_id'];
-			$filename = "{$this->getContainer()->getParameter('kernel.root_dir')}/data/photos/{$id}.jpg";
+			$filename = "{$this->getContainer()->getParameter('comtso.photo_dir')}/{$id}.jpg";
 			if (!file_exists($filename)) {
+				$progress->advance();
 				continue;
 			}
-			$image = new \Imagick($filename);
-			$exif = $image->getImageProperties();
-			
-			$dateCreate = DateTime::createFromFormat(DateTime::RFC3339, $exif['date:create']);
-			$dateModify = DateTime::createFromFormat(DateTime::RFC3339, $exif['date:modify']);
-			$fileModifiedAt = new DateTime;
-			$fileModifiedAt->setTimestamp(filemtime($filename));
-			
-			$photo = new Photo;
-			$photo->setFileModifiedAt($fileModifiedAt);
-			$photo->setTakenAt(min([$dateCreate, $dateModify, $fileModifiedAt]));
-			$photo->setFileSize(filesize($filename));
-			$photo->setFilename("{$id}.jpg");
-			$photo->setFileType($image->getimageformat());
-			$photo->setHeight($image->getImageHeight());
-			$photo->setWidth($image->getImageWidth());
-			$photo->setExif($exif);
+			$photo = $this->getContainer()->get('comtso.image.uploader')->handleFile($filename);
 			
 			$photo->setAuthor($users[$authorId]);
 			$photo->setTitle($this->cleanText($rs['title']));
