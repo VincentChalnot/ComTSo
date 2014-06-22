@@ -21,4 +21,18 @@ class CommentRepository extends EntityRepository
 		return $qb->getQuery()
 						->getResult();
 	}
+	
+	public function search($terms, $limit = 50) {
+		$qb = $this->createQueryBuilder('c');
+		$i = 0;
+		foreach ($terms as $search) {
+			$qb->andWhere("c.content LIKE :q{$i}")
+					->setParameter("q{$i}", "%{$search}%");
+			$i++;
+		}
+		$qb->addOrderBy('c.createdAt', 'DESC')
+				->setMaxResults($limit);
+		return $qb->getQuery()
+						->getResult();
+	}
 }

@@ -1,0 +1,5 @@
+{% set size = size is defined ? size : 'md' %}
+<a class="avatar avatar-{{ size }}" href="{{ author|path }}">
+	<img src="{{ author.avatar }}" alt="Avatar" title="{{ author }}" class="img-circle" width="64" height="64">
+	<span class="username">{{ author }}</span>
+</a>

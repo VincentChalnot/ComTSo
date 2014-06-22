@@ -14,6 +14,7 @@ class UserController extends BaseController {
 	public function showAction(User $user) {
 		$this->setActiveMenu('people');
 		$this->viewParameters['user'] = $user;
+		$this->viewParameters['title'] = (string) $user;
 		$this->viewParameters['users'] = $this->getRepository('ComTSoUserBundle:User')->findAll();
 		$this->viewParameters['messages'] = $this->getRepository('Message')->findConversation($this->getUser(), $user);
         
@@ -50,6 +51,7 @@ class UserController extends BaseController {
 	public function listAction() {
 		$this->setActiveMenu('people');
 		$this->viewParameters['users'] = $this->getRepository('ComTSoUserBundle:User')->findAll();
+		$this->viewParameters['title'] = 'Membres';
 		return $this->viewParameters;
 	}
 

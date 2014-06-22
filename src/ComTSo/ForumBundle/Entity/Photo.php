@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="ctso_photo")
  * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\PhotoRepository")
  */
-class Photo {
+class Photo implements Routable {
 
 	use Behavior\Authorable;
 	use Behavior\Timestampable;
@@ -25,20 +25,27 @@ class Photo {
 	/**
 	 * Original filename
 	 * @var string
-	 * @ORM\Column(type="string", length=128, nullable=true)
+	 * @ORM\Column(type="string", length=128, unique=true)
 	 */
 	protected $filename;
 
 	/**
+	 * Original filename from upload or import script
+	 * @var string
+	 * @ORM\Column(name="original_filename", type="string", length=128)
+	 */
+	protected $originalFilename;
+
+	/**
 	 * @var int
-	 * @ORM\Column(type="integer", nullable=true)
+	 * @ORM\Column(type="integer")
 	 */
 	protected $fileSize;
 
 	/**
 	 * Mime type
 	 * @var string
-	 * @ORM\Column(type="string", length=128, nullable=true)
+	 * @ORM\Column(type="string", length=128)
 	 */
 	protected $fileType;
 
@@ -163,6 +170,19 @@ class Photo {
 	public function setExif($exif) {
 		$this->exif = $exif;
 		return $this;
+	}
+	
+	public function getOriginalFilename() {
+		return $this->originalFilename;
+	}
+
+	public function setOriginalFilename($originalFilename) {
+		$this->originalFilename = $originalFilename;
+		return $this;
+	}
+	
+	public function getRoutingParameters() {
+		return ['id' => $this->getId()];
 	}
 	
 }

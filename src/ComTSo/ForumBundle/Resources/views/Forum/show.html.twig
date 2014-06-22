@@ -3,12 +3,12 @@
 {% block content %}
 	<ul class="nav nav-tabs">
 		{% for f in forums %}
-			<li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: f.id}) }}">{{ f }}</a></li>
+			<li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
 		{% endfor %}
 	</ul>
 	{% for topic in topics %}
 		<div class="topic">
-			<h3><a href="{{ path('comtso_forum_topic_show', {id: topic.id, forumId: forum.id}) }}" name="topic-{{ topic.id }}">{{ topic }}</a></h3>
+			<h3><a href="{{ topic|path }}" name="topic-{{ topic.id }}">{{ topic }}</a></h3>
 			<div>{{ topic.content|raw }}</div>
 			{% for comment in [] %}
 				<hr class="clear">

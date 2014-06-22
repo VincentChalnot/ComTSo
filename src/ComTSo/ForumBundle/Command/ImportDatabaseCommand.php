@@ -374,7 +374,8 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 	}
 
 	protected function cleanHtml($html) {
-		$html = str_replace('images/smilies/', '/images/smilies/', $html);
+		$html = str_replace(['images/smilies/', 'image.php?photo=', 'image.php?thumb='], ['/images/smilies/', '/photos/preview/', '/photos/thumbnail/'], $html);
+		$html = str_replace(['//images/smilies/', '//photos/preview/', '//photos/thumbnail/'], ['/images/smilies/', '/photos/preview/', '/photos/thumbnail/'], $html); // Just in case
 		$html = $this->typoFixer->fix($html);
 		$html = $this->htmlPurifier->purify($html);
 		return $html;

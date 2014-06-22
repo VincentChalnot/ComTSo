@@ -2,22 +2,26 @@
 <html lang="{{ app.request.locale }}">
 <head>
 	<meta charset="{{ _charset }}">
-	<title>{% block title %}ComTSo{% endblock %}</title>
+	<title>{% block title %}ComTSo{{ title is defined ? ' - ' ~ title }}{% endblock %}</title>
 	{% block metas %}
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="ComTSo">
         <meta name="author" content="">
     {% endblock %}
 	{% block stylesheets %}
-		<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" type="text/css" rel="stylesheet">
-        <link href="{{ asset('/bundles/comtsoforum/css/bootstrap-lumen.min.css') }}" type="text/css" rel="stylesheet" media="all" />
-        <link href="{{ asset('/bundles/comtsoforum/css/custom.css') }}" type="text/css" rel="stylesheet" media="all" />
+		<!--[if lt IE 10]>
+			{% javascripts 'bundles/comtsoforum/js/modernizr.custom.min.js' %}
+				<script type="text/javascript" src="{{ asset_url }}"></script>
+			{% endjavascripts %}
+		<![endif]-->
+		{% stylesheets
+				'bundles/comtsoforum/css/comtso.css'
+				'bundles/comtsoforum/css/bootstrap-lumen.min.css'
+				%}
+			<link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
+		{% endstylesheets %}
 		<link href="//fonts.googleapis.com/css?family=Port+Lligat+Slab" type="text/css" rel="stylesheet">
     {% endblock %}
-	<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-	<!--[if lt IE 9]>
-	  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
 </head>
 <body>
     <div class="container">
@@ -43,9 +47,16 @@
 								<li{{ activeMenu == 'people' ? ' class="active"' }}><a href="{{ path('comtso_user_list') }}">Les gens</a></li>
 								<li style="display:none;"><a href="#chat" id="chat-toggle">Chat</a></li>
 							</ul>
+							<form action="{{ path('comtso_search') }}" method="get" class="navbar-form navbar-left" role="search">
+								<div class="form-group">
+									<input type="text" name="q" class="form-control" placeholder="Recherche" value="{% block search_value %}{% endblock %}">
+									<span class="input-group-btn"></span>
+								</div>
+								<button type="submit" class="btn btn-default"><i class="icon-search"></i></button>
+							</form>
 							<ul class="nav navbar-nav navbar-right">
-								<li><a href="{{ path('comtso_user_show', {usernameCanonical: app.user.usernameCanonical}) }}"><span class="glyphicon glyphicon-user"></span> {{ app.user }}</a></li>
-								<li><a href="{{ path('fos_user_security_logout') }}"><span class="glyphicon glyphicon-log-out"></span></a></li>
+								<li><a href="{{ app.user|path }}"><i class="icon-user"></i> {{ app.user }}</a></li>
+								<li><a href="{{ path('fos_user_security_logout') }}"><i class="icon-log-out"></i></a></li>
 							</ul>
 						</div>
 					</div>
@@ -77,11 +88,24 @@
 		{% endblock %}
     </div>
 	{% block javascripts %}
-        <script src="//code.jquery.com/jquery-2.1.0.min.js"></script>
-        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-		<script src="{{ asset('/bundles/comtsoforum/js/ckeditor/ckeditor.js') }}"></script>
-		<script src="{{ asset('/bundles/comtsoforum/js/ckeditor/adapters/jquery.js') }}"></script>
-		<script src="{{ asset('/bundles/comtsoforum/js/moment.min.js') }}"></script>
+		<script>
+			var CKEDITOR_BASEPATH = '/bundles/comtsoforum/js/ckeditor/';
+		</script>
+		{% javascripts
+			'assets/jquery/jquery.min.js'
+			'bundles/fosjsrouting/js/router.js'
+			'@MopaBootstrapBundle/Resources/public/bootstrap-sass/vendor/assets/javascripts/bootstrap/tooltip.js'
+			'@MopaBootstrapBundle/Resources/public/bootstrap-sass/vendor/assets/javascripts/bootstrap/*.js'
+			'@MopaBootstrapBundle/Resources/public/js/mopabootstrap-collection.js'
+			'@MopaBootstrapBundle/Resources/public/js/mopabootstrap-subnav.js'
+			'bundles/comtsoforum/js/ckeditor/ckeditor.js'
+			'bundles/comtsoforum/js/ckeditor/adapters/jquery.js'
+			'bundles/comtsoforum/js/moment.min.js'
+			'bundles/comtsoforum/js/common.js'
+			%}
+			<script type="text/javascript" src="{{ asset_url }}"></script>
+		{% endjavascripts %}
+		<script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
 		<script>
 			var chat_url = '{{ path('comtso_chat') }}';
 			var user_url = '{{ path('comtso_user_show', {usernameCanonical: '-place-holder-'}) }}';
@@ -89,7 +113,6 @@
 				moment.lang('fr');
 			});
 		</script>
-		<script src="{{ asset('/bundles/comtsoforum/js/common.js') }}"></script>
     {% endblock %}
 </body>
 </html>

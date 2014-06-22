@@ -1,6 +1,10 @@
 comtso_homepage:
     pattern:  /
     defaults: { _controller: ComTSoForumBundle:Home:index }
+    
+comtso_search:
+    pattern:  /recherche
+    defaults: { _controller: ComTSoForumBundle:Search:search }
 
 comtso_forum_show:
     pattern:  /forum/{id}
@@ -9,9 +13,9 @@ comtso_forum_show:
         id: "[\w-]+"
       
       
-comtso_forum_topic_show:
+comtso_topic_show:
     pattern:  /forum/{forumId}/{id}
-    defaults: { _controller: ComTSoForumBundle:Forum:showTopic }
+    defaults: { _controller: ComTSoForumBundle:Topic:show }
     requirements:
         forumId: "[\w-]+"
         id: "\d+"
@@ -36,6 +40,13 @@ comtso_photo_source_original:
     requirements:
         id: "\d+"
         
+comtso_photo_backcompat:
+    pattern:  /photos/{filter}/{originalFilename}
+    defaults: { _controller: ComTSoForumBundle:Photo:sourceCache }
+    requirements:
+        originalFilename: "[a-z\d.]+"
+        filter: "thumbnail|preview"
+        
 comtso_photo_source_cache:
     pattern:  /cache/{filter}/{filename}
     defaults: { _controller: ComTSoForumBundle:Photo:sourceCache }
@@ -51,4 +62,14 @@ comtso_photo_show:
         
 comtso_photo_list:
     pattern:  /photos
+    defaults: { _controller: ComTSoForumBundle:Photo:list }
+        
+comtso_album_show:
+    pattern:  /albums/{id}
+    defaults: { _controller: ComTSoForumBundle:Photo:show }
+    requirements:
+        id: "\d+"
+        
+comtso_album_list:
+    pattern:  /albums
     defaults: { _controller: ComTSoForumBundle:Photo:list }

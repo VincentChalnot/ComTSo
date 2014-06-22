@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @ORM\Table(name="ctso_message")
  * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\MessageRepository")
  */
-class Message {
+class Message implements Routable {
 
 	use Behavior\Authorable;
 	use Behavior\Timestampable;
@@ -61,6 +61,10 @@ class Message {
 	public function setState($state) {
 		$this->state = $state;
 		return $this;
+	}
+	
+	public function getRoutingParameters() {
+		return ['id' => $this->getId()];
 	}
 
 }

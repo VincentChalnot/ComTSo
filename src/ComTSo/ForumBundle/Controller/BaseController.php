@@ -4,7 +4,7 @@ namespace ComTSo\ForumBundle\Controller;
 
 use ComTSo\ForumBundle\Lib\Utils;
 use ComTSo\UserBundle\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class BaseController extends Controller {
 
 	protected $viewParameters = [];
-	
+
 	/**
 	 * Get the current session or create a new one
 	 * @return Session $session
@@ -62,7 +62,7 @@ class BaseController extends Controller {
 
 	/**
 	 * Alias to return the entity manager
-	 * @return EntityManagerInterface
+	 * @return EntityManager
 	 */
 	public function getManager() {
 		return $this->getDoctrine()->getManager();
@@ -83,11 +83,11 @@ class BaseController extends Controller {
 	protected function setActiveMenu($menuId = null) {
 		$this->viewParameters['activeMenu'] = $menuId;
 	}
-	
+
 	protected function getBundleName() {
 		return $this->getRequest()->attributes->get('_template')->get('bundle');
 	}
-	
+
 	protected function cleanHtml($html) {
 		$html = $this->get('joli_typo.fixer.fr')->fix($html);
 		$html = $this->get('exercise_html_purifier.default')->purify($html);
@@ -102,7 +102,7 @@ class BaseController extends Controller {
 		}
 		return str_replace("\n", ' ', $txt);
 	}
-	
+
 	/**
 	 * 
 	 * @return User
@@ -118,4 +118,12 @@ class BaseController extends Controller {
 		}
 		return $user;
 	}
+
+	public function getConfigParameter($name, $default = null) {
+		if ($this->container->hasParameter($name)) {
+			return $this->container->getParameter($name);
+		}
+		return $default;
+	}
+
 }

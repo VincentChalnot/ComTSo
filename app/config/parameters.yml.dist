@@ -15,3 +15,5 @@ parameters:
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     imagine_driver: gd
+
+    kernel.data_dir: %kernel.root_dir%/data

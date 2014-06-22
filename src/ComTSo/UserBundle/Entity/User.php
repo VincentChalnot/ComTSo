@@ -12,7 +12,7 @@ use FOS\UserBundle\Model\User as BaseUser;
  * @ORM\Table(name="fos_user")
  * @ORM\Entity(repositoryClass="ComTSo\UserBundle\Entity\UserRepository")
  */
-class User extends BaseUser implements \JsonSerializable {
+class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\Entity\Routable {
 
 	/**
 	 * @ORM\Id
@@ -312,6 +312,10 @@ class User extends BaseUser implements \JsonSerializable {
 			'signature' => $this->getSignature(),
 			'avatar' => $this->getAvatar(),
 		];
+	}
+
+	public function getRoutingParameters() {
+		return ['usernameCanonical' => $this->getUsernameCanonical()];
 	}
 
 }

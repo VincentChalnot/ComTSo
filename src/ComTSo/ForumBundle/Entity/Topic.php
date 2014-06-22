@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="ctso_topic")
  * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\TopicRepository")
  */
-class Topic {
+class Topic implements Routable {
 
 	use Behavior\Authorable;
 	use Behavior\Timestampable;
@@ -131,5 +131,9 @@ class Topic {
 	public function setCommentCount($commentCount) {
 		$this->commentCount = $commentCount;
 		return $this;
+	}
+	
+	public function getRoutingParameters() {
+		return ['id' => $this->getId(), 'forumId' => $this->getForum()->getId()];
 	}
 }

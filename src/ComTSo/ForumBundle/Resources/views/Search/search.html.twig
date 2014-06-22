@@ -1,0 +1,26 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block search_value %}{{ original }}{% endblock %}
+
+{% block content %}
+	<h2>Résultats pour "{{ original }}"</h2>
+	{% for result in results %}
+		<div class="topic panel panel-default">
+			<div class="panel-heading">
+				<h3>{{ result.label }}</h3>
+			</div>
+			<div class="panel-body search-results">
+				{% if result.entities is defined %}
+					{% for entity in result.entities %}
+						{% if loop.index != 1 %}<hr class="clear">{% endif %}
+						{% include result.template %}
+					{% else %}
+						<p class="text-center text-muted">Aucun résultat</p>
+					{% endfor %}
+				{% else %}
+					<div class="alert alert-warning">Missing handler for {{ result.name }}</div>
+				{% endif %}
+			</div>
+		</div>
+	{% endfor %}
+{% endblock %}

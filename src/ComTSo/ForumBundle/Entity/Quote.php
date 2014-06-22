@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="ctso_quote")
  * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\QuoteRepository")
  */
-class Quote {
+class Quote implements Routable {
 
 	use Behavior\Authorable;
 	use Behavior\Timestampable;
@@ -45,5 +45,9 @@ class Quote {
 
 	public function getOriginalAuthor() {
 		return $this->originalAuthor;
+	}
+	
+	public function getRoutingParameters() {
+		return ['id' => $this->getId()];
 	}
 }

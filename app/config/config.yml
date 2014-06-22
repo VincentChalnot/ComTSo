@@ -1,10 +1,7 @@
 imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
-
-parameters:
-    kernel.data_dir: %kernel.root_dir%/data
-    comtso.photo_dir: %kernel.data_dir%/photos
+    - { resource: comtso.yml }
 
 framework:
     #esi:             ~
@@ -37,7 +34,8 @@ twig:
 assetic:
     debug:          "%kernel.debug%"
     use_controller: false
-    bundles:        []
+    bundles:
+        - ComTSoForumBundle
     #java: /usr/bin/java
     filters:
         cssrewrite: ~
@@ -76,45 +74,6 @@ fos_user:
     db_driver: orm
     firewall_name: main
     user_class: ComTSo\UserBundle\Entity\User
-    
-joli_typo:
-    presets:
-        fr:
-            fixers: [ Ellipsis, Dimension, Dash, FrenchQuotes, FrenchNoBreakSpace, CurlyQuote, Trademark ]
-            locale: fr_FR
-            
-exercise_html_purifier:
-    default:
-      HTML.TargetBlank: true
-#      AutoFormat.AutoParagraph: true
-      AutoFormat.Linkify: true
-      AutoFormat.RemoveEmpty: true
-      AutoFormat.RemoveEmpty.RemoveNbsp: true
-      AutoFormat.RemoveSpansWithoutAttributes: true
-      Core.CollectErrors: false
-#      HTML.AllowedElements:
-#      HTML.AllowedAttributes:
-      HTML.Trusted: true
-      HTML.SafeIframe: true
-      URI.SafeIframeRegexp: "\\^http://(www.youtube.com/embed/|player.vimeo.com/video/)\\"
-      
-liip_imagine:
-    driver: %imagine_driver%
-    resolvers:
-       default:
-          web_path:
-            web_root: %comtso.photo_dir%
-            cache_prefix: cache
-    loaders:
-        default:
-            filesystem:
-                data_root: %comtso.photo_dir%/originals
-    filter_sets:
-        thumbnail:
-            quality: 70
-            filters:
-                thumbnail: { size: [146, 146], mode: outbound }
-        preview:
-            quality: 80
-            filters:
-                thumbnail: { size: [730, 730], mode: inset }
+
+mopa_bootstrap:
+    form: ~

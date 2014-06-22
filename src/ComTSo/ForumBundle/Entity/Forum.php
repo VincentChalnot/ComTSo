@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="ctso_forum")
  * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\ForumRepository")
  */
-class Forum {
+class Forum implements Routable {
 
 	use Behavior\Titleable;
 	use Behavior\Timestampable;
@@ -47,6 +47,10 @@ class Forum {
 	public function setOrder($order) {
 		$this->order = $order;
 		return $this;
+	}
+	
+	public function getRoutingParameters() {
+		return ['id' => $this->getId()];
 	}
 
 }

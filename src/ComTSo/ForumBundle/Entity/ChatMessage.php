@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="ctso_chat_message")
  * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\ChatMessageRepository")
  */
-class ChatMessage implements \JsonSerializable {
+class ChatMessage implements \JsonSerializable, Routable {
 
 	use Behavior\Authorable;
 	use Behavior\Timestampable;
@@ -29,13 +29,13 @@ class ChatMessage implements \JsonSerializable {
 		$this->id = $id;
 		return $this;
 	}
-	
+
 	public function getAuthorId() {
 		if ($this->getAuthor()) {
 			return $this->getAuthor()->getId();
 		}
 	}
-	
+
 	public function jsonSerialize() {
 		return [
 			'id' => $this->getId(),
@@ -44,6 +44,10 @@ class ChatMessage implements \JsonSerializable {
 			'created_at' => $this->getCreatedAt(\DateTime::W3C),
 			'updated_at' => $this->getUpdatedAt(\DateTime::W3C),
 		];
+	}
+
+	public function getRoutingParameters() {
+		return ['id' => $this->getId()];
 	}
 
 }
