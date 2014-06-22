@@ -57,6 +57,7 @@ class ImageUploader {
 		$photo->setTakenAt(min($dates));
 		$photo->setFileSize(filesize($filePath));
 		$photo->setFilename($filename);
+		$photo->setOriginalFilename(basename($filePath));
 		$photo->setFileType($fileType);
 		$photo->setHeight($image->getSize()->getHeight());
 		$photo->setWidth($image->getSize()->getWidth());

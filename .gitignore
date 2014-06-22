@@ -5,9 +5,13 @@
 /app/data/*
 /app/logs/*
 !app/cache/.gitkeep
+!app/data/.gitkeep
 !app/logs/.gitkeep
 /build/
 /vendor/
 /bin/
-/web/js/
+/web/assets/
+/web/css/*
+/web/js/*
+/.sass-cache/
 /web/images/avatars/

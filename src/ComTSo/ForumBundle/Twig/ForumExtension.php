@@ -2,7 +2,11 @@
 
 namespace ComTSo\ForumBundle\Twig;
 
+use ComTSo\ForumBundle\Entity\Photo;
+use ComTSo\ForumBundle\Entity\Routable;
+use ComTSo\ForumBundle\Lib\Utils;
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twig_Extension;
 use Twig_Function_Method;
@@ -25,6 +29,9 @@ class ForumExtension extends Twig_Extension {
 	public function getFilters() {
 		return [
 			'file_size' => new \Twig_Filter_Method($this, 'fileSizeFormat'),
+			'highlight' => new \Twig_Filter_Method($this, 'getHighlightedText', ['is_safe' => ['html']]),
+			'path' => new \Twig_Filter_Method($this, 'getObjectPath', ['is_safe' => ['html']]),
+			'shorten' => new \Twig_Filter_Method($this, 'shorten'),
 		];
 	}
 
@@ -39,7 +46,7 @@ class ForumExtension extends Twig_Extension {
 		return $this->getDoctrine()->getRepository('ComTSoForumBundle:Quote')->findRandom();
 	}
 	
-	public function getImageSizeAttrs(\ComTSo\ForumBundle\Entity\Photo $photo, $filter) {
+	public function getImageSizeAttrs(Photo $photo, $filter) {
 		$config = $this->container->get('liip_imagine.filter.configuration')->get($filter);
 		$width = $photo->getWidth();
 		$height = $photo->getHeight();
@@ -67,6 +74,65 @@ class ForumExtension extends Twig_Extension {
 	}
 	
 	public function fileSizeFormat($size, $decimals = 1) {
-		return \ComTSo\ForumBundle\Lib\Utils::filesizeFormat($size, $decimals);
+		return Utils::filesizeFormat($size, $decimals);
+	}
+	
+	public function getHighlightedText($text, $terms) {
+		$lines = preg_split( '/\r\n?|\n|<br ?\/?>/', $text);
+		$result = '';
+		$first = true;
+		$found = false;
+		foreach ($lines as $line) {
+			$parsed = Utils::asciiFormat($line);
+			if (!$parsed) {
+				continue;
+			}
+			$found = false;
+			foreach($terms as $term) {
+				if (stripos($parsed, $term) !== false) {
+					$result .= $line;
+					$found = true;
+					$first = false;
+					break;
+				}
+			}
+			if (!$found && $first) {
+				$first = false;
+				$result .= '<p>…</p>';
+			}
+		}
+		if (!$found) {
+			$result .= '<p>…</p>';
+		}
+		foreach($terms as $term) {
+			$result = $this->highlightText($result, $term);
+		}
+		return $result;
+	}
+	
+	protected function highlightText($text, $term) {
+		$result = '';
+		$l = mb_strlen($term);
+		$parsed = Utils::asciiFormat(str_replace(['…', '«', '»'], ['.', '"', '"'], $text));
+		while (($pos = mb_stripos($parsed, $term)) !== false) {
+			$result .= mb_substr($text, 0, $pos) . '<span class="highlight">' . mb_substr($text, $pos, $l) . '</span>';
+			$text = mb_substr($text, $pos + $l);
+			$parsed = mb_substr($parsed, $pos + $l);
+		}
+		$result .= $text;
+		return $result;
+	}
+	
+	public function getObjectPath(Routable $entity, $parameters = [], $absolute = false) {
+		$class = ClassUtils::getRealClass(get_class($entity));
+		$namespace = explode('\\', $class);
+		$shortName = strtolower(array_pop($namespace));
+		$route = "comtso_{$shortName}_show";
+		$parameters = array_merge($entity->getRoutingParameters(), $parameters);
+		return $this->container->get('router')->generate($route, $parameters, $absolute);
+	}
+	
+	public function shorten($string, $len = 40) {
+		return Utils::shorten($string, $len);
 	}
 }

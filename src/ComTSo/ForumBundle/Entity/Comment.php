@@ -9,10 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="ctso_comment")
  * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\CommentRepository")
  */
-class Comment {
+class Comment implements Routable {
 
 	use Behavior\Authorable;
-	use Behavior\Timestampable;
+    use Behavior\Timestampable;
 	use Behavior\ContentEditable;
 
 	/**
@@ -52,6 +52,10 @@ class Comment {
 	 */
 	public function getTopic() {
 		return $this->topic;
+	}
+
+	public function getRoutingParameters() {
+		return ['id' => $this->getId()];
 	}
 
 }

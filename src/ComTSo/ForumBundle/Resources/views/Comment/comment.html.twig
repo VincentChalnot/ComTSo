@@ -1,17 +1,14 @@
 <div class="post" id="post-{{ comment.id }}">
 	<div class="col-sm-2 col-xs-3">
-		<a class="avatar avatar-med" href="{{ path('comtso_user_show', {usernameCanonical: comment.author.usernameCanonical}) }}">
-			<img src="{{ comment.author.avatar }}" alt="" title="{{ comment.author }}" class="img-circle" width="64" height="64">
-			<span class="username">{{ comment.author }}</span>
-		</a>
+		{% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': comment.author} %}
 	</div>
 	<div class="col-sm-10 col-xs-9">
 		{{ comment.content|raw }}
 		<p class="post-infos text-muted">
 			Posté le {{ comment.createdAt|date('d/m/Y à H:i') }}
 			{#% if app.user.id == comment.author.id or 'ROLE_ADMIN' in app.user.roles %}
-			– <a class="btn btn-xs" href="#"><span class="glyphicon glyphicon-pencil"></span> modifier</a> | 
-			<a class="btn btn-xs text-warning" href="#"><span class="glyphicon glyphicon-remove"></span> supprimer</a>
+			– <a class="btn btn-xs" href="#"><i class="icon-pencil"></i> modifier</a> | 
+			<a class="btn btn-xs text-warning" href="#"><i class="icon-remove"></i> supprimer</a>
 			{% endif %#}
 		</p>
 	</div>

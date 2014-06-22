@@ -3,7 +3,7 @@
 {% block content %}
 	{% spaceless %}
 		{% for photo in photos %}
-			<a href="{{ path('comtso_photo_show', {'id': photo.id}) }}">{% include 'ComTSoForumBundle:Photo:image.html.twig' with {'filter': 'thumbnail'} %}</a>
+			<a href="{{ photo|path }}">{% include 'ComTSoForumBundle:Photo:image.html.twig' with {'filter': 'thumbnail'} %}</a>
 		{% endfor %}
 	{% endspaceless %}
 {% endblock %}

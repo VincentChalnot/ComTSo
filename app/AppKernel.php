@@ -24,6 +24,7 @@ class AppKernel extends Kernel
 			new Joli\TypoBundle\JoliTypoBundle(),
 			new Nc\Bundle\ElephantIOBundle\NcElephantIOBundle(),
 			new Liip\ImagineBundle\LiipImagineBundle(),
+			new FOS\JsRoutingBundle\FOSJsRoutingBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

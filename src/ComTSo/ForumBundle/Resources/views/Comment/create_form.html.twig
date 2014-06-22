@@ -1,10 +1,7 @@
 {% if form is defined %}
     <div class="post">
         <div class="col-sm-2 col-xs-3">
-            <a class="avatar avatar-med" href="{{ path('comtso_user_show', {usernameCanonical: app.user.usernameCanonical}) }}">
-                <img src="/images/avatars/{{ app.user.usernameCanonical }}.jpg" alt="" class="img-circle" width="64" height="64">
-                <span class="username">{{ app.user }}</span>
-            </a>
+            {% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': app.user} %}
         </div>
         <div class="col-sm-10 col-xs-9">
             <form action="" method="post">

@@ -14,7 +14,7 @@
 	<h4>Accès rapide</h4>
 	<ul class="nav nav-compact">
 		{% for u in users %}
-			<li{{ u.id == user.id ? ' class="active"' }}><a href="{{ path('comtso_user_show', {usernameCanonical: u.usernameCanonical}) }}">{{ u }}</a></li>
+			<li{{ u.id == user.id ? ' class="active"' }}><a href="{{ u|path }}">{{ u }}</a></li>
 		{% endfor %}
 	</ul>
 {% endblock %}
