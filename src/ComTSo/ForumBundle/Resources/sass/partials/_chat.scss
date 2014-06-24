@@ -1,0 +1,38 @@
+
+.chat-message {
+	position: relative;
+	p {
+		margin-bottom: 2px;
+	}
+	time {
+		position: absolute;
+		font-style: italic;
+		display: none;
+		right: 0;
+		padding: 0 5px;
+		border-radius: 2px;
+		background: #fff;
+		color: #888;
+	}
+	&:hover time {
+		display: inline-block;
+	}
+}
+
+#chat-box .col-sm-2 {
+	padding-right: 0;
+}
+
+#chat-panel .users {
+	width: 50%;
+	text-align: right;
+	.avatar {
+		float: none;
+		display: inline;
+		img {
+			float: none;
+			display: inline;
+			margin: 2px;
+		}
+	}
+}

@@ -14,7 +14,7 @@ class HomeController extends BaseController
     {
 		$since = new \DateTime();
 		$since->sub(new \DateInterval('P6D'));
-		$comments = $this->getRepository('Comment')->findLastCreatedSince($since, 100);
+		$comments = $this->getRepository('Comment')->findLastsCreated(100, $since);
 		$topics = [];
 		foreach ($comments as $comment) {
 			$topic = $comment->getTopic();

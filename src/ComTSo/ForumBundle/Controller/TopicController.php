@@ -17,6 +17,7 @@ class TopicController extends BaseController {
 		if ($forum->getId() != $forumId) {
 			return $this->redirect($this->generateUrl('comtso_topic_show', ['id' => $topic->getId(), 'forumId' => $forum->getId()]), 304);
 		}
+		$topic->getPhotos()->initialize();
 		$this->setActiveMenu('forums');
 		$this->viewParameters['topic'] = $topic;
 		$this->viewParameters['title'] = (string) $topic;

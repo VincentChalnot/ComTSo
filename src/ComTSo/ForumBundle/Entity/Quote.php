@@ -10,9 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Quote implements Routable {
 
-	use Behavior\Authorable;
-	use Behavior\Timestampable;
-	use Behavior\ContentEditable;
+	use Behavior\Authorable,
+	 Behavior\Timestampable,
+	 Behavior\ContentEditable;
 
 	/**
 	 * @ORM\Id
@@ -20,7 +20,7 @@ class Quote implements Routable {
 	 * @ORM\GeneratedValue(strategy="AUTO")
 	 */
 	protected $id;
-	
+
 	/**
 	 * Original author of the quote (author is the user who posted it)
 	 *
@@ -37,7 +37,7 @@ class Quote implements Routable {
 		$this->id = $id;
 		return $this;
 	}
-	
+
 	public function setOriginalAuthor($text = null) {
 		$this->originalAuthor = $text;
 		return $this;
@@ -46,8 +46,9 @@ class Quote implements Routable {
 	public function getOriginalAuthor() {
 		return $this->originalAuthor;
 	}
-	
+
 	public function getRoutingParameters() {
 		return ['id' => $this->getId()];
 	}
+
 }

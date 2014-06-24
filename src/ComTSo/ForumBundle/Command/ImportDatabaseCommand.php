@@ -5,8 +5,10 @@ namespace ComTSo\ForumBundle\Command;
 use ComTSo\ForumBundle\Decoda\PhpEngine;
 use ComTSo\ForumBundle\Entity\ChatMessage;
 use ComTSo\ForumBundle\Entity\Comment;
+use ComTSo\ForumBundle\Entity\Forum;
 use ComTSo\ForumBundle\Entity\Message;
 use ComTSo\ForumBundle\Entity\Photo;
+use ComTSo\ForumBundle\Entity\PhotoTopic;
 use ComTSo\ForumBundle\Entity\Quote;
 use ComTSo\ForumBundle\Entity\Topic;
 use ComTSo\ForumBundle\Lib\Utils;
@@ -88,22 +90,38 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		$forumRepo = $this->getDoctrine()->getRepository('ComTSoForumBundle:Forum');
-		$forumsByOldIds = [
-			0 => $forumRepo->find("le-bac-a-sable"),
-			1 => $forumRepo->find("organisation"),
-			2 => $forumRepo->find("cabinet-du-dr-schtroumph"),
-			3 => $forumRepo->find("archives"),
-		];
+		$forums = $this->importForums();
 		$users = $this->importUsers();
-//		$topics = $this->importTopics($forumsByOldIds, $users);
+		$topics = $this->importTopics($forums, $users);
 //		$this->importPosts($topics, $users);
 //		$this->importQuotes($users);
 //		$this->importMessages($users);
 //		$this->importChatMessages();
-		$this->importPhotos($users);
+		$this->importPhotos($topics, $users);
 	}
 
+	protected function importForums() {
+		$this->truncateTable(get_class(new Forum));
+		$data = [
+			0 => ['id' => 'le-bac-a-sable', 'title' => 'Le Bac à Sable'],
+			1 => ['id' => 'organisation', 'title' => 'Organisation'],
+			2 => ['id' => 'cabinet-du-dr-schtroumph', 'title' => 'Cabinet du Dr. Schtroumph'],
+			3 => ['id' => 'archives', 'title' => 'Archives'],
+			4 => ['id' => 'albums', 'title' => 'Albums'],
+		];
+		$forums = [];
+		foreach ($data as $key => $value) {
+			$forum = new Forum;
+			$forum->setId($value['id']);
+			$forum->setOrder($key);
+			$forum->setTitle($value['title']);
+			$this->em->persist($forum);
+			$this->em->flush();
+			$forums[$key] = $forum;
+		}
+		return $forums;
+	}
+	
 	protected function importUsers() {
 		$this->truncateTable(get_class(new User));
 		$stmt = $this->em->getConnection()->executeQuery('SELECT * FROM users');
@@ -143,12 +161,12 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 
 	protected function importTopics($forums, $users) {
 		$this->truncateTable(get_class(new Topic));
-		$stmt = $this->em->getConnection()->executeQuery('SELECT COUNT(*) FROM topics WHERE flag = 0');
+		$stmt = $this->em->getConnection()->executeQuery('SELECT COUNT(*) FROM topics');
 		$topicCount = $stmt->fetch(Query::HYDRATE_SINGLE_SCALAR)[0];
 		$progress = $this->getHelperSet()->get('progress');
 		$progress->start($this->output, $topicCount);
 
-		$stmt = $this->em->getConnection()->executeQuery('SELECT * FROM topics WHERE flag = 0');
+		$stmt = $this->em->getConnection()->executeQuery('SELECT * FROM topics');
 		$topics = [];
 		$this->output->writeln("<info>Importing Topics</info>");
 		while ($rs = $stmt->fetch(Query::HYDRATE_ARRAY)) {
@@ -157,7 +175,11 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 			$topic->setAuthor($users[$rs['user_id']]);
 			$topic->setTitle(Utils::upperCaseFirst($this->cleanText($rs['title'])));
 			$topic->setContent($this->cleanHtml($rs['summary']));
-			$topic->setForum($forums[$rs['forum_id']]);
+			if($rs['flag']) {
+				$topic->setForum($forums[4]); // It's an album !
+			} else {
+				$topic->setForum($forums[$rs['forum_id']]);
+			}
 			$topic->setViews($rs['views']);
 			$topic->setCommentCount($rs['nbr_posts']);
 			$createdAt = new DateTime;
@@ -239,12 +261,13 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 				$userId = 2;
 			}
 			$quote->setAuthor($users[$userId]);
-			$quote->setContent($this->cleanText($rs['text']));
-			$quote->setOriginalAuthor($rs['author']);
+			$quote->setContent(Utils::upperCaseFirst($this->cleanText($rs['text'])));
+			$quote->setOriginalAuthor(Utils::upperCaseFirst($rs['author']));
 			$quote->setCreatedAt(new DateTime);
 			$quote->setUpdatedAt(new DateTime);
 			$this->em->persist($quote);
 			$this->em->flush();
+			$this->em->detach($quote);
 			$progress->advance();
 		}
 		$progress->finish();
@@ -277,6 +300,7 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 			$message->setUpdatedAt($createdAt);
 			$this->em->persist($message);
 			$this->em->flush();
+			$this->em->detach($message);
 			$progress->advance();
 		}
 		$progress->finish();
@@ -322,6 +346,7 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 			$message->setUpdatedAt($createdAt);
 			$this->em->persist($message);
 			$this->em->flush();
+			$this->em->detach($message);
 			$progress->advance();
 			$previousMonth = $month;
 		}
@@ -329,14 +354,14 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 		fclose($handle);
 	}
 	
-	protected function importPhotos($users) {
+	protected function importPhotos($topics, $users) {
 		$this->truncateTable(get_class(new Photo));
 		$stmt = $this->em->getConnection()->executeQuery('SELECT COUNT(*) FROM photos');
 		$photoCount = $stmt->fetch(Query::HYDRATE_SINGLE_SCALAR)[0];
 		$progress = $this->getHelperSet()->get('progress');
 		$progress->start($this->output, $photoCount);
 
-		$stmt = $this->em->getConnection()->executeQuery('SELECT * FROM photos');
+		$stmt = $this->em->getConnection()->executeQuery('SELECT p.*, a.topic_id FROM photos p JOIN albums a ON a.album_id = p.album_id');
 		$this->output->writeln("<info>Importing Photos</info>");
 		while ($rs = $stmt->fetch(Query::HYDRATE_ARRAY)) {
 			$authorId = $rs['user_id'];
@@ -353,13 +378,24 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 			$photo = $this->getContainer()->get('comtso.image.uploader')->handleFile($filename);
 			
 			$photo->setAuthor($users[$authorId]);
-			$photo->setTitle($this->cleanText($rs['title']));
+			$photo->setTitle(Utils::upperCaseFirst($this->cleanText($rs['title'])));
             $createdAt = new DateTime;
 			$createdAt->setTimestamp($rs['date']);
 			$photo->setCreatedAt($createdAt);
 			$photo->setUpdatedAt($createdAt);
+			
+			$topicPhoto = new PhotoTopic;
+			$topicPhoto->setAuthor($users[$authorId]);
+			$topicPhoto->setCreatedAt($createdAt);
+			$topicPhoto->setUpdatedAt($createdAt);
+			$topicPhoto->setPhoto($photo);
+			$topicPhoto->setTopic($topics[$rs['topic_id']]);
+			
 			$this->em->persist($photo);
+			$this->em->persist($topicPhoto);
 			$this->em->flush();
+			$this->em->detach($photo);
+			$this->em->detach($topicPhoto);
 			$progress->advance();
 		}
 		$progress->finish();

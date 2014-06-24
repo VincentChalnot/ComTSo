@@ -11,9 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Comment implements Routable {
 
-	use Behavior\Authorable;
-    use Behavior\Timestampable;
-	use Behavior\ContentEditable;
+	use Behavior\Authorable,
+	 Behavior\Timestampable,
+	 Behavior\ContentEditable;
 
 	/**
 	 * @ORM\Id

@@ -29,7 +29,7 @@ class ChatController extends BaseController {
 		$users = [
 			$user->getId() => $user,
 		];
-		foreach ($this->getRepository('ChatMessage')->findLasts(20) as $message) {
+		foreach ($this->getRepository('ChatMessage')->findLastsCreated(20) as $message) {
 			$messages[] = $message;
 			$users[$message->getAuthor()->getId()] = $message->getAuthor();
 		}

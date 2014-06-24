@@ -56,7 +56,7 @@
 							</form>
 							<ul class="nav navbar-nav navbar-right">
 								<li><a href="{{ app.user|path }}"><i class="icon-user"></i> {{ app.user }}</a></li>
-								<li><a href="{{ path('fos_user_security_logout') }}"><i class="icon-log-out"></i></a></li>
+								<li><a href="{{ path('fos_user_security_logout') }}"><i class="icon-signout"></i></a></li>
 							</ul>
 						</div>
 					</div>
@@ -83,7 +83,7 @@
 						{% include 'ComTSoForumBundle:Quote:random.html.twig' %}
 					</div>
 				</div>
-				{% include 'ComTSoForumBundle:Chat:chat_panel.html.twig' %}
+				{% include 'ComTSoForumBundle:ChatMessage:chat_panel.html.twig' %}
 			</div>
 		{% endblock %}
     </div>

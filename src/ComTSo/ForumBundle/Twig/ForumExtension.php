@@ -77,7 +77,19 @@ class ForumExtension extends Twig_Extension {
 		return Utils::filesizeFormat($size, $decimals);
 	}
 	
-	public function getHighlightedText($text, $terms) {
+	public function getHighlightedText($text, $terms, $skipNonMatching = false) {
+		if ($skipNonMatching) {
+			$result = $this->skipNonMatching($text, $terms);
+		} else {
+			$result = $text;
+		}
+		foreach($terms as $term) {
+			$result = $this->highlightText($result, $term);
+		}
+		return $result;
+	}
+	
+	protected function skipNonMatching($text, $terms) {
 		$lines = preg_split( '/\r\n?|\n|<br ?\/?>/', $text);
 		$result = '';
 		$first = true;
@@ -103,9 +115,6 @@ class ForumExtension extends Twig_Extension {
 		}
 		if (!$found) {
 			$result .= '<p>…</p>';
-		}
-		foreach($terms as $term) {
-			$result = $this->highlightText($result, $term);
 		}
 		return $result;
 	}

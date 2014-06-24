@@ -3,6 +3,7 @@
 namespace ComTSo\ForumBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Table(name="ctso_photo")
@@ -10,10 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Photo implements Routable {
 
-	use Behavior\Authorable;
-	use Behavior\Timestampable;
-	use Behavior\Titleable;
-	use Behavior\ContentEditable;
+	use Behavior\Authorable,
+	 Behavior\Timestampable,
+	 Behavior\Titleable,
+	 Behavior\ContentEditable;
 
 	/**
 	 * @ORM\Id
@@ -82,6 +83,21 @@ class Photo implements Routable {
 	 */
 	protected $exif;
 	
+	/**
+	 * Topics associated to this photo
+	 * @var PhotoTopic[]
+	 * @ORM\OneToMany(targetEntity="ComTSo\ForumBundle\Entity\PhotoTopic", mappedBy="photo")
+	 * @ORM\OrderBy({"createdAt" = "DESC"})
+	 */
+	protected $topics;
+	
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->topics = new ArrayCollection();
+	}
+
 	public function getId() {
 		return $this->id;
 	}
@@ -171,7 +187,7 @@ class Photo implements Routable {
 		$this->exif = $exif;
 		return $this;
 	}
-	
+
 	public function getOriginalFilename() {
 		return $this->originalFilename;
 	}
@@ -180,9 +196,38 @@ class Photo implements Routable {
 		$this->originalFilename = $originalFilename;
 		return $this;
 	}
-	
+
+	/**
+	 * Add topics
+	 *
+	 * @param Topic $topic
+	 * @return Topic
+	 */
+	public function addTopic(Topic $topic) {
+		$this->topics[] = $topic;
+		return $this;
+	}
+
+	/**
+	 * Remove topics
+	 *
+	 * @param Topic $topic
+	 */
+	public function removeTopic(Topic $topic) {
+		$this->topics->removeElement($topic);
+	}
+
+	/**
+	 * Get topics
+	 *
+	 * @return ArrayCollection 
+	 */
+	public function getTopics() {
+		return $this->topics;
+	}
+
 	public function getRoutingParameters() {
 		return ['id' => $this->getId()];
 	}
-	
+
 }
