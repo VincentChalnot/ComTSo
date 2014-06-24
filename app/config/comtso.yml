@@ -19,9 +19,6 @@ parameters:
         quote:
             name: 'ComTSoForumBundle:Quote'
             label: Citations
-        forum:
-            name: 'ComTSoForumBundle:Forum'
-            label: Forums
 
 joli_typo:
     presets:

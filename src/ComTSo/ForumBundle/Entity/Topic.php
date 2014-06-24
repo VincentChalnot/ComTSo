@@ -3,6 +3,7 @@
 namespace ComTSo\ForumBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Table(name="ctso_topic")
@@ -10,10 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Topic implements Routable {
 
-	use Behavior\Authorable;
-	use Behavior\Timestampable;
-	use Behavior\Titleable;
-	use Behavior\ContentEditable;
+	use Behavior\Authorable,
+	 Behavior\Timestampable,
+	 Behavior\Titleable,
+	 Behavior\ContentEditable;
 
 	/**
 	 * @ORM\Id
@@ -36,6 +37,14 @@ class Topic implements Routable {
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
 	 */
 	protected $comments;
+
+	/**
+	 * Comments associated to this topic
+	 * @var PhotoTopic[]
+	 * @ORM\OneToMany(targetEntity="ComTSo\ForumBundle\Entity\PhotoTopic", mappedBy="topic")
+	 * @ORM\OrderBy({"createdAt" = "DESC"})
+	 */
+	protected $photos;
 
 	/**
 	 * @ORM\Column(type="integer")
@@ -92,33 +101,34 @@ class Topic implements Routable {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->comments = new \Doctrine\Common\Collections\ArrayCollection();
+		$this->comments = new ArrayCollection();
+		$this->photos = new ArrayCollection();
 	}
 
 	/**
 	 * Add comments
 	 *
-	 * @param \ComTSo\ForumBundle\Entity\Comment $comments
+	 * @param Comment $comment
 	 * @return Topic
 	 */
-	public function addComment(\ComTSo\ForumBundle\Entity\Comment $comments) {
-		$this->comments[] = $comments;
+	public function addComment(Comment $comment) {
+		$this->comments[] = $comment;
 		return $this;
 	}
 
 	/**
 	 * Remove comments
 	 *
-	 * @param \ComTSo\ForumBundle\Entity\Comment $comments
+	 * @param Comment $comment
 	 */
-	public function removeComment(\ComTSo\ForumBundle\Entity\Comment $comments) {
-		$this->comments->removeElement($comments);
+	public function removeComment(Comment $comment) {
+		$this->comments->removeElement($comment);
 	}
 
 	/**
 	 * Get comments
 	 *
-	 * @return \Doctrine\Common\Collections\Collection 
+	 * @return ArrayCollection 
 	 */
 	public function getComments() {
 		return $this->comments;
@@ -132,8 +142,38 @@ class Topic implements Routable {
 		$this->commentCount = $commentCount;
 		return $this;
 	}
-	
+
+	/**
+	 * Add photos
+	 *
+	 * @param Photo $photo
+	 * @return Topic
+	 */
+	public function addPhoto(Photo $photo) {
+		$this->photos[] = $photo;
+		return $this;
+	}
+
+	/**
+	 * Remove photos
+	 *
+	 * @param Photo $photo
+	 */
+	public function removePhoto(Photo $photo) {
+		$this->photos->removeElement($photo);
+	}
+
+	/**
+	 * Get photos
+	 *
+	 * @return ArrayCollection 
+	 */
+	public function getPhotos() {
+		return $this->photos;
+	}
+
 	public function getRoutingParameters() {
 		return ['id' => $this->getId(), 'forumId' => $this->getForum()->getId()];
 	}
+
 }

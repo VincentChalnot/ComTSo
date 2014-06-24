@@ -12,9 +12,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class Message implements Routable {
 
-	use Behavior\Authorable;
-	use Behavior\Timestampable;
-	use Behavior\ContentEditable;
+	use Behavior\Authorable,
+	 Behavior\Timestampable,
+	 Behavior\ContentEditable;
 
 	/**
 	 * @ORM\Id
@@ -30,7 +30,7 @@ class Message implements Routable {
 	 * @ORM\ManyToOne(targetEntity="ComTSo\UserBundle\Entity\User")
 	 */
 	protected $recipient;
-	
+
 	/**
 	 * @ORM\Column(type="integer", nullable=true)
 	 */
@@ -44,7 +44,7 @@ class Message implements Routable {
 		$this->id = $id;
 		return $this;
 	}
-	
+
 	public function setRecipient(UserInterface $recipient) {
 		$this->recipient = $recipient;
 		return $this;
@@ -62,7 +62,7 @@ class Message implements Routable {
 		$this->state = $state;
 		return $this;
 	}
-	
+
 	public function getRoutingParameters() {
 		return ['id' => $this->getId()];
 	}

@@ -1,0 +1,9 @@
+{% set topic = entity %}
+<div class="topic">
+	<h3>{{ topic|highlight(query) }}</h3>
+	<div>{{ topic.content|highlight(query) }}</div>
+	<p class="text-muted">
+		Créé par <a href="{{ topic.author|path }}">{{ topic.author }}</a>
+		le {{ topic.createdAt|date('d/m/Y à H:i') }} – {{ topic.views }} vues – {{ topic.commentCount }} posts
+	</p>
+</div>

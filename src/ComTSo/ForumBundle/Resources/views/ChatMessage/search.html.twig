@@ -1,0 +1,7 @@
+{% set message = entity %}
+<div class="row chat-message">
+	<div class="col-sm-2 col-xs-1">
+		{% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': message.author, size: 'xs'} %}
+	</div>
+	<div class="col-sm-10 col-xs-10"><time class="hidden-sm">{{ message.createdAt|date('d/m/Y à H:i') }}</time><p>{{ message.content|highlight(query) }}</p></div>
+</div>

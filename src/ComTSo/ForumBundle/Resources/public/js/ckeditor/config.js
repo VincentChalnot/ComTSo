@@ -37,4 +37,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.youtube_related = false;
 	
 	config.startupFocus = true;
+	
+	config.extraPlugins = 'autosave';
+	config.autosave_delay = 10;
 };

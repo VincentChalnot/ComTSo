@@ -1,11 +1,11 @@
 {% set comment = entity %}
 <div class="post" id="post-{{ comment.id }}">
-	<div class="col-sm-2 col-xs-3">
+	<div class="col-sm-2 col-xs-3 post-side">
 		{% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': comment.author, size: 'sm'} %}
 		<a href="{{ comment.topic|path }}#post-{{ comment.id }}" class="btn btn-default btn-xs">Voir le post</a>
 	</div>
 	<div class="col-sm-10 col-xs-9">
-		{{ comment.content|highlight(query) }}
+		{{ comment.content|highlight(query, true) }}
 		<p class="text-muted">
 			Posté le {{ comment.createdAt|date('d/m/Y à H:i') }} dans <a href="{{ comment.topic|path }}">{{ comment.topic|shorten }}</a>
 		</p>

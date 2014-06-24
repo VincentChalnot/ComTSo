@@ -1,0 +1,77 @@
+
+.people .avatar {
+	display: inline-block;
+	margin: 25px;
+}
+
+.avatar {
+    text-align: center;
+    display: block;
+    position: relative;
+	
+	.username{
+		display: none;
+		position: absolute;
+		width: 100%;
+		top: 43%;
+		font-size: 1.3em;
+	}
+
+	&.avatar-sm {
+		.username{
+			top: 15%;
+			font-size: 1em;
+		}
+		img {
+			width: 32px;
+			height: 32px;
+		}
+	}
+	
+	&.avatar-md .username{
+		top: 35%;
+		font-size: 1.1em;
+	}
+
+	&.avatar-lg {
+		.username{
+			top: 38%;
+			font-size: 1.5em;
+		}
+		img {
+			width: 128px;
+			height: 128px;
+		}
+	}
+
+	&.avatar-xs {
+		text-align: right;
+		margin-bottom: 0;
+		.username{
+			position: static;
+			display: inline;
+			width: auto;
+			font-size: 1em;
+		}
+		img {
+			width: 16px;
+			height: 16px;
+			float: right;
+			margin-left: 5px;
+			margin-top: 2px;
+		}
+	}
+
+	&:hover {
+		.username{
+			display: block;
+		}
+		img{
+			opacity: 0.3;
+		}
+	}
+}
+
+@media (max-width: 768px) {
+	.avatar.avatar-xs .username{display:none}
+}

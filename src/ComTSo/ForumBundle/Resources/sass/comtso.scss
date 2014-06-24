@@ -4,6 +4,11 @@
 @import "../../../../../web/bundles/mopabootstrap/sass/font-awesome/font-awesome.scss";
 
 @import "partials/main";
+@import "partials/topic";
+@import "partials/post";
+@import "partials/photo";
+@import "partials/avatar";
+@import "partials/chat";
 
 .clear {
     clear: both;

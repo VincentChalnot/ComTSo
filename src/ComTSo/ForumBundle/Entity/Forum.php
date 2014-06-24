@@ -10,8 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Forum implements Routable {
 
-	use Behavior\Titleable;
-	use Behavior\Timestampable;
+	use Behavior\Titleable,
+	 Behavior\Timestampable;
 
 	/**
 	 * @ORM\Id
@@ -20,7 +20,7 @@ class Forum implements Routable {
 	protected $id;
 
 	/**
-	 * @ORM\Column(type="integer")
+	 * @ORM\Column(name="ord", type="integer")
 	 */
 	protected $order;
 
@@ -48,7 +48,7 @@ class Forum implements Routable {
 		$this->order = $order;
 		return $this;
 	}
-	
+
 	public function getRoutingParameters() {
 		return ['id' => $this->getId()];
 	}
