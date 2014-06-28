@@ -72,11 +72,14 @@ class ImageUploader {
 		$newfilePath = $folder.'/'.$filename;
 		if ($copy) {
 			$success = copy($filePath, $newfilePath);
+			if (!$success) {
+				throw new Exception("Unable to copy image: {$filePath} => {$newfilePath}");
+			}
 		} else {
 			$success = rename($filePath, $newfilePath);
-		}
-		if (!$success) {
-			throw new Exception('Unable to move or copy image');
+			if (!$success) {
+				throw new Exception("Unable to move image: {$filePath} => {$newfilePath}");
+			}
 		}
 		return $photo;
 	}

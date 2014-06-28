@@ -22,6 +22,7 @@ use Exception;
 use HTMLPurifier;
 use JoliTypo\Fixer;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -43,6 +44,12 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 	protected $em;
 
 	/**
+	 * Path of the photos
+	 * @var string
+	 */
+	protected $photoDir;
+	
+	/**
 	 * @var HTMLPurifier
 	 */
 	protected $htmlPurifier;
@@ -57,9 +64,12 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 	 * @var Decoda
 	 */
 	protected $decoda;
+	
+	const FLUSH_MAX = 100;
 
 	protected function configure() {
 		$this->setName('comtso:import')
+				->addArgument('photo-dir', InputArgument::REQUIRED, "The directory from which to import photos")
 				->setDescription('Import data from the old model');
 	}
 
@@ -68,6 +78,11 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 		$this->input = $input;
 		$this->output = $output;
 		$this->em = $this->getDoctrine()->getManager();
+		$photoDir = $this->input->getArgument('photo-dir');
+		if (!file_exists($photoDir)) {
+			throw new \Symfony\Component\Filesystem\Exception\FileNotFoundException("File not found: {$photoDir}");
+		}
+		$this->photoDir = rtrim(realpath($photoDir), '/');
 		$this->htmlPurifier = $this->getContainer()->get('exercise_html_purifier.default');
 		$this->typoFixer = $this->getContainer()->get('joli_typo.fixer.fr');
 		$this->decoda = new Decoda('', array(
@@ -93,10 +108,11 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 		$forums = $this->importForums();
 		$users = $this->importUsers();
 		$topics = $this->importTopics($forums, $users);
-//		$this->importPosts($topics, $users);
-//		$this->importQuotes($users);
-//		$this->importMessages($users);
-//		$this->importChatMessages();
+		$this->importPosts($topics, $users);
+		$this->importQuotes($users);
+		$this->importMessages($users);
+		$this->importChatMessages();
+		$this->importAlbums($topics, $users);
 		$this->importPhotos($topics, $users);
 	}
 
@@ -116,9 +132,9 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 			$forum->setOrder($key);
 			$forum->setTitle($value['title']);
 			$this->em->persist($forum);
-			$this->em->flush();
 			$forums[$key] = $forum;
 		}
+		$this->em->flush();
 		return $forums;
 	}
 	
@@ -153,9 +169,9 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 
 			$user->setPlainPassword($rs['pass']); // Will work with custom authenticationprovider
 			$this->em->persist($user);
-			$this->em->flush();
 			$users[$rs['user_id']] = $user;
 		}
+		$this->em->flush();
 		return $users;
 	}
 
@@ -189,10 +205,10 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 			$updatedAt->setTimestamp($rs['modification']);
 			$topic->setUpdatedAt($updatedAt);
 			$this->em->persist($topic);
-			$this->em->flush();
 			$progress->advance();
 			$topics[$rs['topic_id']] = $topic;
 		}
+		$this->em->flush();
 		$progress->finish();
 		return $topics;
 	}
@@ -204,6 +220,9 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 		$progress = $this->getHelperSet()->get('progress');
 		$progress->setBarWidth(100);
 		$progress->start($this->output, $postCount);
+		
+		$flushCounter = 0;
+		$toFlush = [];
 
 		$stmt = $this->em->getConnection()->executeQuery('SELECT * FROM posts');
 		$this->output->writeln("<info>Importing Comments</info>");
@@ -238,9 +257,20 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 			}
 			$comment->setUpdatedAt($updatedAt);
 			$this->em->persist($comment);
-			$this->em->flush();
-			$this->em->detach($comment);
 			$progress->advance();
+			
+			$flushCounter++;
+			if ($flushCounter < self::FLUSH_MAX) {
+				$toFlush[] = $comment;
+				continue;
+			}
+			$this->em->flush();
+			foreach ($toFlush as $comment) {
+				$this->em->detach($comment);
+			}
+			$toFlush = [];
+			$flushCounter = 0;
+			gc_collect_cycles();
 		}
 		$progress->finish();
 	}
@@ -322,6 +352,9 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 		$this->output->writeln("<info>Importing Chat Messages</info>");
 		$year = 2009;
 		$previousMonth = null;
+		$flushCounter = 0;
+		$toFlush = [];
+		
 		while (($line = fgets($handle)) !== false) {
 			if (!preg_match("/<strong>([^,]+),<\/strong>\s*<em>le\s*(\d+)\/(\d+)\s+(\d+):(\d+)<\/em>:\s*(.*)<br\s*\/?>/", $line, $infos)) {
 				$progress->advance();
@@ -345,21 +378,57 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 			$message->setCreatedAt($createdAt);
 			$message->setUpdatedAt($createdAt);
 			$this->em->persist($message);
-			$this->em->flush();
-			$this->em->detach($message);
 			$progress->advance();
 			$previousMonth = $month;
+			
+			$flushCounter++;
+			if ($flushCounter < self::FLUSH_MAX) {
+				$toFlush[] = $message;
+				continue;
+			}
+			$this->em->flush();
+			foreach ($toFlush as $message) {
+				$this->em->detach($message);
+			}
+			$toFlush = [];
+			$flushCounter = 0;
+			gc_collect_cycles();
 		}
 		$progress->finish();
 		fclose($handle);
 	}
 	
+	protected function importAlbums($topics, $users) {
+		$stmt = $this->em->getConnection()->executeQuery('SELECT COUNT(*) FROM albums');
+		$albumCount = $stmt->fetch(Query::HYDRATE_SINGLE_SCALAR)[0];
+		$progress = $this->getHelperSet()->get('progress');
+		$progress->start($this->output, $albumCount);
+
+		$stmt = $this->em->getConnection()->executeQuery('SELECT * FROM albums');
+		$albums = [];
+		$this->output->writeln("<info>Importing Albums (into existing topics)</info>");
+		while ($rs = $stmt->fetch(Query::HYDRATE_ARRAY)) {
+			$topic = $topics[$rs['topic_id']];
+			$topic->setAuthor($users[$rs['user_id']]);
+			$topic->setTitle(Utils::upperCaseFirst($this->cleanText($rs['title'])));
+			$topic->setContent($this->cleanHtml($rs['comment']));
+			$this->em->persist($topic);
+			$this->em->flush();
+			$progress->advance();
+		}
+		$progress->finish();
+		return $albums;
+	}
+	
 	protected function importPhotos($topics, $users) {
 		$this->truncateTable(get_class(new Photo));
+		$this->truncateTable(get_class(new PhotoTopic));
 		$stmt = $this->em->getConnection()->executeQuery('SELECT COUNT(*) FROM photos');
 		$photoCount = $stmt->fetch(Query::HYDRATE_SINGLE_SCALAR)[0];
 		$progress = $this->getHelperSet()->get('progress');
 		$progress->start($this->output, $photoCount);
+		
+		$topicOrders = [];
 
 		$stmt = $this->em->getConnection()->executeQuery('SELECT p.*, a.topic_id FROM photos p JOIN albums a ON a.album_id = p.album_id');
 		$this->output->writeln("<info>Importing Photos</info>");
@@ -370,12 +439,13 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 				continue;
 			}
 			$id = $rs['photo_id'];
-			$filename = "{$this->getContainer()->getParameter('comtso.photo_dir')}/{$id}.jpg";
+			$filename = "{$this->photoDir}/{$id}.jpg";
 			if (!file_exists($filename)) {
+				$this->output->writeln("<error>File not found: {$filename}</error>");
 				$progress->advance();
 				continue;
 			}
-			$photo = $this->getContainer()->get('comtso.image.uploader')->handleFile($filename);
+			$photo = $this->getContainer()->get('comtso.image.uploader')->handleFile($filename, true);
 			
 			$photo->setAuthor($users[$authorId]);
 			$photo->setTitle(Utils::upperCaseFirst($this->cleanText($rs['title'])));
@@ -390,6 +460,11 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 			$topicPhoto->setUpdatedAt($createdAt);
 			$topicPhoto->setPhoto($photo);
 			$topicPhoto->setTopic($topics[$rs['topic_id']]);
+			
+			if (!isset($topicOrders[$rs['topic_id']])) {
+				$topicOrders[$rs['topic_id']] = 0;
+			}
+			$topicPhoto->setOrder($topicOrders[$rs['topic_id']]++);
 			
 			$this->em->persist($photo);
 			$this->em->persist($topicPhoto);

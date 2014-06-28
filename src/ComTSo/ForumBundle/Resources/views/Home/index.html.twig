@@ -23,7 +23,7 @@
 	<h4>Accès rapide</h4>
 	<ul class="nav nav-compact">
 		{% for t in topics %}
-			<li><a href="#topic-{{ t.id }}">{{ t }}</a></li>
+			<li><a href="{{ t|path }}">{{ t }}</a></li>
 		{% endfor %}
 	</ul>
 	<h4>Forums</h4>

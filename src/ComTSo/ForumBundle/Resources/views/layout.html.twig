@@ -14,10 +14,11 @@
 				<script type="text/javascript" src="{{ asset_url }}"></script>
 			{% endjavascripts %}
 		<![endif]-->
-		{% stylesheets
-				'bundles/comtsoforum/css/comtso.css'
-				'bundles/comtsoforum/css/bootstrap-lumen.min.css'
-				%}
+		{% stylesheets	'bundles/comtsoforum/css/comtso.css'
+						'bundles/comtsoforum/css/blueimp-gallery.min.css'
+						'bundles/comtsoforum/css/bootstrap-image-gallery.min.css'
+						'bundles/comtsoforum/css/bootstrap-lumen.min.css'
+			filter='cssrewrite' %}
 			<link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
 		{% endstylesheets %}
 		<link href="//fonts.googleapis.com/css?family=Port+Lligat+Slab" type="text/css" rel="stylesheet">
@@ -43,7 +44,7 @@
 								{% set activeMenu = activeMenu is defined ? activeMenu : 'home' %}
 								<li{{ activeMenu == 'home' ? ' class="active"' }}><a href="{{ path('comtso_homepage') }}">Home</a></li>
 								<li{{ activeMenu == 'forums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'le-bac-a-sable'}) }}">Le forum</a></li>
-								<li{{ activeMenu == 'albums' ? ' class="active"' }}><a href="#">Les albums</a></li>
+								<li{{ activeMenu == 'albums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'albums'}) }}">Les albums</a></li>
 								<li{{ activeMenu == 'people' ? ' class="active"' }}><a href="{{ path('comtso_user_list') }}">Les gens</a></li>
 								<li style="display:none;"><a href="#chat" id="chat-toggle">Chat</a></li>
 							</ul>
@@ -74,6 +75,7 @@
 					{% endfor %}
 				{% endblock %}
 				<div class="row" id="main-content">
+					{% include 'ComTSoForumBundle:ChatMessage:chat_panel.html.twig' %}
 					<div class="col-md-8" role="main">
 						{% block content %}{% endblock %}
 					</div>
@@ -83,10 +85,10 @@
 						{% include 'ComTSoForumBundle:Quote:random.html.twig' %}
 					</div>
 				</div>
-				{% include 'ComTSoForumBundle:ChatMessage:chat_panel.html.twig' %}
 			</div>
 		{% endblock %}
     </div>
+	{% block end_body %}{% endblock %}
 	{% block javascripts %}
 		<script>
 			var CKEDITOR_BASEPATH = '/bundles/comtsoforum/js/ckeditor/';
@@ -100,6 +102,9 @@
 			'@MopaBootstrapBundle/Resources/public/js/mopabootstrap-subnav.js'
 			'bundles/comtsoforum/js/ckeditor/ckeditor.js'
 			'bundles/comtsoforum/js/ckeditor/adapters/jquery.js'
+			'bundles/comtsoforum/js/jquery.blueimp-gallery.min.js'
+			'bundles/comtsoforum/js/bootstrap-image-gallery.js'
+			'bundles/comtsoforum/js/jquery.lazyload.min.js'
 			'bundles/comtsoforum/js/moment.min.js'
 			'bundles/comtsoforum/js/common.js'
 			%}

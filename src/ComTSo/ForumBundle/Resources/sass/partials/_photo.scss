@@ -6,3 +6,19 @@
 		margin-top: 5px;
 	}
 }
+
+.topic-photos {
+	a {
+		display: inline-block;
+		margin: 3px;
+	}
+}
+
+.blueimp-gallery {
+	.slides>.slide>.slide-content.modal {
+		overflow-y: auto;
+	}
+	.modal-dialog {
+		max-width: none !important;
+	}
+}

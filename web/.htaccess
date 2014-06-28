@@ -54,3 +54,19 @@ DirectoryIndex app.php
         # RedirectTemp cannot be used instead
     </IfModule>
 </IfModule>
+
+
+<IfModule mod_headers.c>
+	# 1 YEAR
+	<FilesMatch ".(ico|pdf|flv|js|css|woff)$">
+		Header set Cache-Control "max-age=29030400, public"
+	</FilesMatch>
+	# 1 WEEK
+	<FilesMatch ".(jpg|jpeg|png|gif|swf)$">
+		Header set Cache-Control "max-age=604800, public"
+	</FilesMatch>
+	# 2 DAYS
+	<FilesMatch ".(xml|txt|json)$">
+		Header set Cache-Control "max-age=172800, public"
+	</FilesMatch>
+</IfModule>

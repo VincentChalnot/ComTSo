@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="ctso_photo_topic")
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\PhotoTopicRepository")
  */
 class PhotoTopic {
 
@@ -28,13 +28,13 @@ class PhotoTopic {
 	
 	/**
 	 * @var Topic
-	 * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Topic", inversedBy="photos")
+	 * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Topic", inversedBy="photos", fetch="EAGER")
 	 */
 	protected $topic;
 
 	/**
 	 * @var Photo
-	 * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Photo", inversedBy="topics")
+	 * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Photo", inversedBy="topics", fetch="EAGER")
 	 */
 	protected $photo;
 
@@ -80,4 +80,13 @@ class PhotoTopic {
 		return $this;
 	}
 
+	public function getOrder() {
+		return $this->order;
+	}
+
+	public function setOrder($order) {
+		$this->order = $order;
+		return $this;
+	}
+	
 }
