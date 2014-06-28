@@ -16,7 +16,7 @@ class TopicRepository extends BaseRepository {
 				->addSelect('p')
 				->where('e.forum = :forum')
 				->andWhere('p.order < 4 OR p.order IS NULL')
-				->addOrderBy('e.updatedAt')
+				->addOrderBy('e.updatedAt', 'DESC')
 				->setParameter('forum', $forum);
 		return $qb->getQuery()->getResult();
 	}
