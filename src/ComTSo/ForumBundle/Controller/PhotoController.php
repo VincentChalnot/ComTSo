@@ -43,20 +43,19 @@ class PhotoController extends BaseController {
 	}
 
 	protected function createImageResponse(Request $request, $filePath, Photo $photo = null, $contentDisposition = 'inline') {
-		$response = new BinaryFileResponse($filePath, 200, [], true, $contentDisposition, true, true);
+		$response = new BinaryFileResponse($filePath, 200, [], true, $contentDisposition, false, true);
 		$date = new \DateTime();
 		$date->add(new \DateInterval('P1Y'));
 		$date->setTime(0, 0, 0);
-		$response->setExpires($date);
 		
-		foreach ($request->getETags() as $etag) {
-			if ($response->getEtag() === $etag) {
-				$response = new Response(null, Response::HTTP_NOT_MODIFIED);
-				$response->setPublic();
-				$response->setExpires($date);
-				return $response;
-			}
+		if ($response->isNotModified($request)) {
+			$response = new Response(null, Response::HTTP_NOT_MODIFIED);
+			$response->setPublic();
+			$response->setExpires($date);
+			return $response;
 		}
+		
+		$response->setExpires($date);
 		
 		if ($photo) {
 			$filename = $photo->getTitle() ? Utils::slugify($photo->getTitle()).'.'.$photo->getFileType() : $photo->getFilename();
