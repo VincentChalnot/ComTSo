@@ -13,13 +13,21 @@
 			Créé par <a href="{{ topic.author|path }}">{{ topic.author }}</a>
 			le {{ topic.createdAt|date('d/m/Y à H:i') }} – {{ topic.views }} vues – {{ topic.commentCount }} posts
 		</p>
-		<hr class="clear">
 		{% spaceless %}
-			{% for photoTopic in topic.photos %}
-				{% set photo = photoTopic.photo %}
-				<a href="{{ photo|path }}">{% include 'ComTSoForumBundle:Photo:image.html.twig' with {'filter': 'thumbnail'} %}</a>
-			{% endfor %}
+			{% if topic.photos %}
+				<div class="topic-photos">
+					{% for photoTopic in topic.photos %}
+						{% set photo = photoTopic.photo %}
+						{% if photo %}
+							<a href="{{ photo|path }}" class="img-thumbnail" title="{{ photo.title }}" data-gallery data-url="{{ photo.filename | imagine_filter('large') }}">
+								{% include 'ComTSoForumBundle:Photo:image.html.twig' with {'filter': 'thumbnail'} %}
+							</a>
+						{% endif %}
+					{% endfor %}
+				</div>
+			{% endif %}
 		{% endspaceless %}
+		<hr class="clear">
 		{% include 'ComTSoForumBundle:Comment:create_form.html.twig' %}
 		{% for comment in topic.comments %}
 			<hr class="clear">
@@ -35,6 +43,10 @@
 			<li{{ t.id == topic.id ? ' class="active"' }}><a href="{{ t|path }}">{{ t }}</a></li>
 		{% endfor %}
 	</ul>
+{% endblock %}
+
+{% block end_body %}
+	{% include 'ComTSoForumBundle:Photo:gallery.html.twig' %}
 {% endblock %}
 
 {% block javascripts %}

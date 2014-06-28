@@ -45,14 +45,14 @@ comtso_photo_backcompat:
     defaults: { _controller: ComTSoForumBundle:Photo:sourceCache }
     requirements:
         originalFilename: "[a-z\d.]+"
-        filter: "thumbnail|preview"
+        filter: "thumbnail|preview|large"
         
 comtso_photo_source_cache:
     pattern:  /cache/{filter}/{filename}
     defaults: { _controller: ComTSoForumBundle:Photo:sourceCache }
     requirements:
         filename: "[a-z\d.]+"
-        filter: "thumbnail|preview"
+        filter: "thumbnail|preview|large"
         
 comtso_photo_show:
     pattern:  /photos/{id}

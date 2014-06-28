@@ -7,6 +7,7 @@ use ComTSo\ForumBundle\Lib\Utils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class PhotoController extends BaseController {
 
@@ -19,13 +20,9 @@ class PhotoController extends BaseController {
 		return $this->viewParameters;
 	}
 
-	public function sourceAction(Photo $photo) {
-		$response = new BinaryFileResponse("{$this->getConfigParameter('comtso.photo_dir')}/originals/{$photo->getFilename()}");
-		if ($this->getRequest()->get('download')) {
-			$filename = $photo->getTitle() ? Utils::slugify($photo->getTitle()).'.'.$photo->getFileType() : $photo->getFilename();
-			$response->setContentDisposition('attachment', $filename);
-		}
-		return $response;
+	public function sourceAction(Request $request, Photo $photo) {
+		$filePath = "{$this->getConfigParameter('comtso.photo_dir')}/originals/{$photo->getFilename()}";
+		return $this->createImageResponse($request, $filePath, $photo, $this->getRequest()->get('download') ? 'attachment' : 'inline');
 	}
 
 	public function sourceCacheAction(Request $request, Photo $photo, $filter) {
@@ -33,7 +30,7 @@ class PhotoController extends BaseController {
 		if (!file_exists($filePath)) {
 			return $this->container->get('liip_imagine.controller')->filterAction($request, $photo->getFilename(), $filter);
 		}
-		return new BinaryFileResponse($filePath);
+		return $this->createImageResponse($request, $filePath, $photo);
 	}
 
 	/**
@@ -45,4 +42,27 @@ class PhotoController extends BaseController {
 		return $this->viewParameters;
 	}
 
+	protected function createImageResponse(Request $request, $filePath, Photo $photo = null, $contentDisposition = 'inline') {
+		$response = new BinaryFileResponse($filePath, 200, [], true, $contentDisposition, true, true);
+		$date = new \DateTime();
+		$date->add(new \DateInterval('P1Y'));
+		$date->setTime(0, 0, 0);
+		$response->setExpires($date);
+		
+		foreach ($request->getETags() as $etag) {
+			if ($response->getEtag() === $etag) {
+				$response = new Response(null, Response::HTTP_NOT_MODIFIED);
+				$response->setPublic();
+				$response->setExpires($date);
+				return $response;
+			}
+		}
+		
+		if ($photo) {
+			$filename = $photo->getTitle() ? Utils::slugify($photo->getTitle()).'.'.$photo->getFileType() : $photo->getFilename();
+			$response->setContentDisposition($this->getRequest()->get('download') ? 'attachment' : 'inline', $filename);
+		}
+		
+		return $response;
+	}
 }

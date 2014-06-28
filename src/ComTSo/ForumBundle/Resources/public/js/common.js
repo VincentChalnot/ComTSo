@@ -3,12 +3,10 @@ $(document).ready(function(){
 	$('#chat-toggle').click(function(e){
 		e.preventDefault();
 		if ($(this).parent().hasClass('active')) {
-			$('#chat-panel').hide();
-			$('#main-content').show();
+			$('#chat-panel').slideUp();
 			$(this).parent().removeClass('active');
 		} else {
-			$('#chat-panel').show();
-			$('#main-content').hide();
+			$('#chat-panel').slideDown();
 			$(this).parent().addClass('active');
 		}
 	});
@@ -43,8 +41,10 @@ $(document).ready(function(){
 //	window.setInterval(function(){
 //		$.ajax(chat_url, {success: parseChatMessages});
 //	}, 10000);
-	$.ajax(chat_url, {success: parseChatMessages});
-
+	if ($('#chat-panel form').length) {
+		$.ajax(chat_url, {success: parseChatMessages});
+	}
+	
 	$('#chat-panel form').submit(function(e){
 		e.preventDefault();
 		var data = $(this).serialize();

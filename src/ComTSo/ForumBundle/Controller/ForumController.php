@@ -15,7 +15,7 @@ class ForumController extends BaseController {
 		$this->viewParameters['forum'] = $forum;
 		$this->viewParameters['title'] = (string) $forum;
 		$this->viewParameters['forums'] = $this->getRepository('Forum')->findAll();
-		$this->viewParameters['topics'] = $this->getRepository('Topic')->findByForum($forum, ['updatedAt' => 'DESC']);
+		$this->viewParameters['topics'] = $this->getRepository('Topic')->findForForumList($forum);
 		return $this->viewParameters;
 	}
 

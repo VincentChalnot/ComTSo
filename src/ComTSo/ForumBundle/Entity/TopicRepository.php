@@ -10,4 +10,14 @@ namespace ComTSo\ForumBundle\Entity;
  */
 class TopicRepository extends BaseRepository {
 	
+	public function findForForumList(Forum $forum) {
+		$qb = $this->createQueryBuilder('e')
+				->join('e.photos', 'p')
+				->addSelect('p')
+				->where('e.forum = :forum')
+				->andWhere('p.order < 4')
+				->addOrderBy('e.updatedAt')
+				->setParameter('forum', $forum);
+		return $qb->getQuery()->getResult();
+	}
 }
