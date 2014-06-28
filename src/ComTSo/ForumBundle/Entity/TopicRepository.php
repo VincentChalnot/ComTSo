@@ -12,10 +12,10 @@ class TopicRepository extends BaseRepository {
 	
 	public function findForForumList(Forum $forum) {
 		$qb = $this->createQueryBuilder('e')
-				->join('e.photos', 'p')
+				->leftJoin('e.photos', 'p')
 				->addSelect('p')
 				->where('e.forum = :forum')
-				->andWhere('p.order < 4')
+				->andWhere('p.order < 4 OR p.order IS NULL')
 				->addOrderBy('e.updatedAt')
 				->setParameter('forum', $forum);
 		return $qb->getQuery()->getResult();
