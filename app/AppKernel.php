@@ -25,6 +25,7 @@ class AppKernel extends Kernel
 			new Nc\Bundle\ElephantIOBundle\NcElephantIOBundle(),
 			new Liip\ImagineBundle\LiipImagineBundle(),
 			new FOS\JsRoutingBundle\FOSJsRoutingBundle(),
+			new Oneup\UploaderBundle\OneupUploaderBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

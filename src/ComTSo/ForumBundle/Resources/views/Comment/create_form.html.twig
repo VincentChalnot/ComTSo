@@ -4,11 +4,11 @@
             {% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': app.user} %}
         </div>
         <div class="col-sm-10 col-xs-9">
-            <form action="" method="post">
+            {{ form_start(form) }}
                 {{ form_row(form.content) }}
                 {{ form_rest(form) }}
                 <p class="text-right"><button type="submit" class="btn btn-primary">Envoyer</button></p>
-            </form>
+            {{ form_end(form) }}
         </div>
     </div>
 {% endif %}

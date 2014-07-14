@@ -1,0 +1,24 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+	{{ form_start(form) }}
+		{{ form_widget(form) }}
+		<p class="text-right">
+			<a href="{{ user|path }}" class="btn btn-default">Retour</a>
+			<button type="submit" class="btn btn-primary">Envoyer</button>
+		</p>
+	{{ form_end(form) }}
+{% endblock %}
+		
+{% block aside %}
+	
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+        $(document).ready(function(){
+            $('#{{ form.signature.vars.id }}').click(function(e){$(this).ckeditor();});
+        });
+	</script>
+{% endblock %}

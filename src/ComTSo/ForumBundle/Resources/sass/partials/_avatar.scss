@@ -15,32 +15,24 @@
 		width: 100%;
 		top: 43%;
 		font-size: 1.3em;
-	}
-
-	&.avatar-sm {
-		.username{
-			top: 15%;
-			font-size: 1em;
-		}
-		img {
-			width: 32px;
-			height: 32px;
+		text-shadow: 0 0 4px #fff;
+		&.username-force-display {
+			display: block;
 		}
 	}
 	
-	&.avatar-md .username{
-		top: 35%;
-		font-size: 1.1em;
-	}
-
-	&.avatar-lg {
-		.username{
-			top: 38%;
-			font-size: 1.5em;
-		}
-		img {
-			width: 128px;
-			height: 128px;
+	.avatar-default {
+		font-size: 64px;
+		display: inline-block;
+		background: white;
+		color: lightgray;
+		width: 64px;
+		height: 64px;
+		overflow: hidden;
+		i.icon-user {
+			position: relative;
+			display: block;
+			top: 5px;
 		}
 	}
 
@@ -53,12 +45,60 @@
 			width: auto;
 			font-size: 1em;
 		}
-		img {
+		&:hover {
+			.username {
+				display: inline;
+			}
+		}
+		img, .avatar-default {
 			width: 16px;
 			height: 16px;
+			font-size: 16px;
 			float: right;
 			margin-left: 5px;
 			margin-top: 2px;
+			i.icon-user {
+				left: -2px;
+				top: 2px;
+			}
+		}
+	}
+	
+	&.avatar-sm {
+		.username{
+			top: 15%;
+			font-size: 1em;
+		}
+		img, .avatar-default  {
+			width: 32px;
+			height: 32px;
+			font-size: 32px;
+		}
+	}
+	
+	&.avatar-md {
+		.username{
+			top: 35%;
+			font-size: 1.1em;
+		}
+		img {
+			width: 64px;
+			height: 64px;
+		}
+	}
+
+	&.avatar-lg {
+		.username{
+			top: 38%;
+			font-size: 1.5em;
+		}
+		img, .avatar-default {
+			width: 128px;
+			height: 128px;
+			font-size: 128px;
+			i.icon-user {
+				top: 10px;
+			}
 		}
 	}
 
@@ -66,7 +106,7 @@
 		.username{
 			display: block;
 		}
-		img{
+		img, .avatar-default{
 			opacity: 0.3;
 		}
 	}

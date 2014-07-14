@@ -1,0 +1,4 @@
+{% block simple_select_widget %}
+    {{ block('choice_widget_collapsed') }}
+    <input type="hidden" id="{{ id }}_original" value="{{ value }}" />
+{% endblock %}

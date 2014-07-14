@@ -2,11 +2,14 @@
 
 namespace ComTSo\ForumBundle\Controller;
 
+use ComTSo\ForumBundle\Lib\Pager;
 use ComTSo\ForumBundle\Lib\Utils;
 use ComTSo\UserBundle\Entity\User;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class BaseController extends Controller {
@@ -57,7 +60,7 @@ class BaseController extends Controller {
 		if (count($infos) == 1) {
 			$persistentObjectName = "{$this->getBundleName()}:{$persistentObjectName}";
 		}
-		return $this->getDoctrine()->getManager()->getRepository($persistentObjectName, $persistentManagerName);
+		return $this->getManager()->getRepository($persistentObjectName, $persistentManagerName);
 	}
 
 	/**
@@ -124,6 +127,37 @@ class BaseController extends Controller {
 			return $this->container->getParameter($name);
 		}
 		return $default;
+	}
+	
+	/**
+	 * @param QueryBuilder $qb
+	 * @return Pager
+	 */
+	public function createPager(QueryBuilder $qb, Request $request, $defaultSort = null, $defaultDirection = 'a', $defaultLimit = 10, $defaultPage = 1) {
+		$pager = $this->get('comtso.pager')
+				->setQueryBuilder($qb);
+		
+		if ($request->query->has($pager->getPageQuery())) {
+			$pager->setPage($request->query->get($pager->getPageQuery()));
+		} else {
+			$pager->setPage($defaultPage);
+		}
+		if ($request->query->has($pager->getLimitQuery())) {
+			$pager->setLimit($request->query->get($pager->getLimitQuery()));
+		} else {
+			$pager->setLimit($defaultLimit);
+		}
+		if ($request->query->has($pager->getDirectionQuery())) {
+			$pager->setDirection($request->query->get($pager->getDirectionQuery()));
+		} else {
+			$pager->setDirection($defaultDirection);
+		}
+		if ($request->query->has($pager->getSortQuery())) {
+			$pager->setSort($request->query->get($pager->getSortQuery()));
+		} else {
+			$pager->setSort($defaultSort);
+		}
+		return $pager;
 	}
 
 }

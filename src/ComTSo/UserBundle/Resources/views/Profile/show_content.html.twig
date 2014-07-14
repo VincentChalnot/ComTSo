@@ -9,7 +9,7 @@
 	</center>
 	<hr>
 	{% if app.user and app.user.id == user.id %}
-		<a href="#" class="btn btn-primary pull-right"><span class="glyphicon glyphicon-pencil"></span> Modifier</a>
+		<a href="{{ user|path('edit') }}" class="btn btn-primary pull-right"><span class="icon-edit"></span> Modifier</a>
 	{% endif %}
 	<dl class="dl-horizontal">
 		{% if user.email %}

@@ -10,7 +10,7 @@ trait Titleable {
 	 * @var string
 	 * @Doctrine\ORM\Mapping\Column(type="string", length=128)
 	 */
-	protected $title;
+	protected $title = '';
 
 	public function setTitle($text) {
 		$this->title = $text;

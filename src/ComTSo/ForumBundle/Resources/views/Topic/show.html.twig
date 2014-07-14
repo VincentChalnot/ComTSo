@@ -19,9 +19,7 @@
 					{% for photoTopic in topic.photos %}
 						{% set photo = photoTopic.photo %}
 						{% if photo %}
-							<a href="{{ photo|path }}" class="img-thumbnail" title="{{ photo.title }}" data-gallery data-url="{{ photo.filename | imagine_filter('large') }}">
-								{% include 'ComTSoForumBundle:Photo:image.html.twig' with {'filter': 'thumbnail'} %}
-							</a>
+							{% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
 						{% endif %}
 					{% endfor %}
 				</div>
@@ -43,10 +41,6 @@
 			<li{{ t.id == topic.id ? ' class="active"' }}><a href="{{ t|path }}">{{ t }}</a></li>
 		{% endfor %}
 	</ul>
-{% endblock %}
-
-{% block end_body %}
-	{% include 'ComTSoForumBundle:Photo:gallery.html.twig' %}
 {% endblock %}
 
 {% block javascripts %}

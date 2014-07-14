@@ -38,7 +38,7 @@ class TopicController extends BaseController {
 			if ($form->isValid()) {
 				$topic->setUpdatedAt(new \DateTime());
 				// Saving object
-				$em = $this->getDoctrine()->getManager();
+				$em = $this->getManager();
 				$em->persist($comment, $topic);
 				$em->flush();
 

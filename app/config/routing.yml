@@ -26,3 +26,7 @@ comtso_forum:
 
 fos_js_routing:
     resource: "@FOSJsRoutingBundle/Resources/config/routing/routing.xml"
+
+oneup_uploader:
+    resource: .
+    type: uploader

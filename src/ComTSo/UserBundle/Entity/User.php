@@ -5,6 +5,7 @@ namespace ComTSo\UserBundle\Entity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
+use ComTSo\ForumBundle\Entity\Photo;
 
 /**
  * Object
@@ -79,6 +80,12 @@ class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\En
 	 * @ORM\Column(name="last_activity", type="datetime", nullable=true)
 	 */
 	protected $lastActivity;
+	
+	/**
+	 * @var Photo
+	 * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Photo", fetch="EAGER")
+	 */
+	protected $avatar;
 
 	/**
 	 * Get id
@@ -297,8 +304,20 @@ class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\En
 		return $this;
 	}
 
+	/**
+	 * 
+	 * @return Photo
+	 */
 	public function getAvatar() {
-		return "/images/avatars/{$this->getUsernameCanonical()}.jpg";
+		return $this->avatar;
+	}
+
+	/**
+	 * 
+	 * @return Photo
+	 */
+	public function setAvatar(Photo $photo = null) {
+		return $this->avatar = $photo;
 	}
 	
 	public function jsonSerialize() {

@@ -4,6 +4,7 @@ namespace ComTSo\ForumBundle\Controller;
 
 use ComTSo\ForumBundle\Entity\Message;
 use ComTSo\UserBundle\Entity\User;
+use ComTSo\UserBundle\Form\Type\UserType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 class UserController extends BaseController {
@@ -30,8 +31,37 @@ class UserController extends BaseController {
 			$form->handleRequest($this->getRequest());
 			if ($form->isValid()) {
 				// Saving object
-				$em = $this->getDoctrine()->getManager();
+				$em = $this->getManager();
 				$em->persist($message);
+				$em->flush();
+
+				$this->addFlashMsg('success', 'Message envoyé');
+				return $this->redirect($this->generateUrl('comtso_user_show', [
+					'usernameCanonical' => $user->getUsernameCanonical(),
+				]));
+			}
+		}
+
+		$this->viewParameters['form'] = $form->createView();
+		return $this->viewParameters;
+	}
+	
+	/**
+	 * @Template()
+	 */
+	public function editAction(User $user) {
+		$this->setActiveMenu('people');
+		$this->viewParameters['user'] = $user;
+		$this->viewParameters['title'] = (string) $user;
+		
+		$form = $this->createForm(new UserType(), $user);
+		
+		if ($this->getRequest()->isMethod('POST')) {
+			$form->handleRequest($this->getRequest());
+			if ($form->isValid()) {
+				// Saving object
+				$em = $this->getManager();
+				$em->persist($user);
 				$em->flush();
 
 				$this->addFlashMsg('success', 'Message envoyé');

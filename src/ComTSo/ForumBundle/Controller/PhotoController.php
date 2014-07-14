@@ -42,26 +42,37 @@ class PhotoController extends BaseController {
 		return $this->viewParameters;
 	}
 
+	/**
+	 * @Template()
+	 */
+	public function browserAction(Request $request) {
+		$qb = $this->getRepository('Photo')->createQueryBuilder('e');
+		$photos = $this->createPager($qb, $request, 'createdAt', 'd')->initialize();
+		$this->viewParameters['photos'] = $photos;
+		$this->viewParameters['title'] = 'Photo Browser';
+		return $this->viewParameters;
+	}
+
 	protected function createImageResponse(Request $request, $filePath, Photo $photo = null, $contentDisposition = 'inline') {
 		$response = new BinaryFileResponse($filePath, 200, [], true, $contentDisposition, false, true);
 		$date = new \DateTime();
 		$date->add(new \DateInterval('P1Y'));
 		$date->setTime(0, 0, 0);
-		
+
 		if ($response->isNotModified($request)) {
 			$response = new Response(null, Response::HTTP_NOT_MODIFIED);
 			$response->setPublic();
 			$response->setExpires($date);
 			return $response;
 		}
-		
+
 		$response->setExpires($date);
-		
+
 		if ($photo) {
 			$filename = $photo->getTitle() ? Utils::slugify($photo->getTitle()).'.'.$photo->getFileType() : $photo->getFilename();
 			$response->setContentDisposition($this->getRequest()->get('download') ? 'attachment' : 'inline', $filename);
 		}
-		
+
 		return $response;
 	}
 }

@@ -29,6 +29,9 @@ framework:
 twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
+    form:
+        resources:
+            - 'ComTSoForumBundle:Form:fields.html.twig'
 
 # Assetic Configuration
 assetic:
@@ -77,3 +80,14 @@ fos_user:
 
 mopa_bootstrap:
     form: ~
+
+oneup_uploader:
+    mappings:
+        photos:
+            frontend: blueimp
+            enable_progress: true
+            enable_cancelation: true
+            storage:
+                type: filesystem
+                directory: %kernel.data_dir%/uploads
+                
