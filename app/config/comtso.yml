@@ -53,6 +53,10 @@ liip_imagine:
             filesystem:
                 data_root: %comtso.photo_dir%/originals
     filter_sets:
+        tiny:
+            quality: 70
+            filters:
+                thumbnail: { size: [64, 64], mode: outbound }
         thumbnail:
             quality: 70
             filters:

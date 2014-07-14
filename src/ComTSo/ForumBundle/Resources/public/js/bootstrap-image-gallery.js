@@ -66,7 +66,7 @@
             modal.find('.modal-body').append(element);
 			
 			var autoresize = function() {
-				$('.modal-body').css('paddingBottom', $(window).innerHeight() - 200 + 'px');
+				$('.modal-body').css('paddingBottom', $(window).innerHeight() - 60 + 'px');
 			};
 			autoresize();
 			if (!window.hasAutoresize) {

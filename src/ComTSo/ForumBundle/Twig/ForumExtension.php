@@ -32,6 +32,7 @@ class ForumExtension extends Twig_Extension {
 			'highlight' => new \Twig_Filter_Method($this, 'getHighlightedText', ['is_safe' => ['html']]),
 			'path' => new \Twig_Filter_Method($this, 'getObjectPath', ['is_safe' => ['html']]),
 			'shorten' => new \Twig_Filter_Method($this, 'shorten'),
+			'htmlDate' => new \Twig_Filter_Method($this, 'getHtmlDate', ['is_safe' => ['html']]),
 		];
 	}
 
@@ -132,16 +133,23 @@ class ForumExtension extends Twig_Extension {
 		return $result;
 	}
 	
-	public function getObjectPath(Routable $entity, $parameters = [], $absolute = false) {
+	public function getObjectPath(Routable $entity, $action = 'show', $parameters = [], $absolute = false) {
 		$class = ClassUtils::getRealClass(get_class($entity));
 		$namespace = explode('\\', $class);
 		$shortName = strtolower(array_pop($namespace));
-		$route = "comtso_{$shortName}_show";
+		$route = "comtso_{$shortName}_{$action}";
 		$parameters = array_merge($entity->getRoutingParameters(), $parameters);
 		return $this->container->get('router')->generate($route, $parameters, $absolute);
 	}
 	
 	public function shorten($string, $len = 40) {
 		return Utils::shorten($string, $len);
+	}
+	
+	public function getHtmlDate(\DateTime $date, $format = 'd/m/Y') {
+		$html = "<time datetime=\"{$date->format(\DateTime::W3C)}\" title=\"Le {$date->format('d/m/Y à H:i:s')}\">";
+		$html .= $date->format($format);
+		$html .= "</time>";
+		return $html;
 	}
 }

@@ -1,0 +1,7 @@
+<tr id="photo-selector-{{ photo.id }}">
+	<td>{% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' with {'filter': 'tiny'} %}</td>
+	<td><a href="{{ photo|path }}">{% if query is defined %}{{ photo.title|highlight(query, true) }}{% else %}{{ photo.title }}{% endif %}</a></td>
+	<td>{% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': photo.author, size: 'sm'} %}</td>
+	<td>{{ photo.takenAt|htmlDate }}</td>
+	<td>{{ photo.createdAt|htmlDate }}</td>
+</tr>

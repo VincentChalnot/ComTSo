@@ -21,4 +21,26 @@
 	.modal-dialog {
 		max-width: none !important;
 	}
+	.modal-content > button.prev {
+		position: absolute;
+		z-index: 10;
+		bottom: 10px;
+		left: 10px;
+	}
+	.modal-content > button.next {
+		position: absolute;
+		z-index: 10;
+		bottom: 10px;
+		right: 10px;
+	}
+	.modal-content > button.close {
+		position: absolute;
+		z-index: 10;
+		top: 5px;
+		right: 10px;
+	}
+}
+
+table.photo-selector {
+	
 }

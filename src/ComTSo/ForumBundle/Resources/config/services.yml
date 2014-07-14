@@ -1,5 +1,6 @@
 parameters:
     phpexiftool.reader.class: PHPExiftool\Reader
+    comtso.pager.class: ComTSo\ForumBundle\Lib\Pager
 
 services:
     twig.extension.comtso_forum:
@@ -25,6 +26,8 @@ services:
     comtso.image.uploader:
         class: ComTSo\ForumBundle\Service\ImageUploader
         arguments: [ "@service_container" ]
+        tags:
+            - { name: kernel.event_listener, event: oneup_uploader.post_persist, method: onUpload }
         
     phpexiftool.reader:
         scope: prototype
@@ -33,3 +36,7 @@ services:
         factory_method: create
         arguments:
             - "@logger"
+            
+    comtso.pager:
+        scope: prototype
+        class: "%comtso.pager.class%"

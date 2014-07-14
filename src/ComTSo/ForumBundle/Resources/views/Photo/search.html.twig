@@ -1,11 +1,12 @@
-{% set photo = entity %}
+{% set photo = photo is defined ? photo : entity %}
 <div class="photo" id="photo-{{ photo.id }}">
 	<div class="col-sm-3">
-		<a href="{{ photo|path }}">{% include 'ComTSoForumBundle:Photo:image.html.twig' with {filter: 'thumbnail'} %}</a>
+		{% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
 	</div>
 	<div class="col-sm-9">
 		{% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': photo.author, size: 'sm'} %}
-		<a href="{{ photo|path }}"><h4>{{ photo.title|highlight(query, true) }}</h4></a>
+		<a href="{{ photo|path }}"><h4>{% if query is defined %}{{ photo.title|highlight(query, true) }}{% else %}{{ photo.title }}{% endif %}</h4></a>
+		<div class="clear"></div>
 		<dl class="dl-horizontal">
 			<dt>Date de prise :</dt><dd>{{ photo.takenAt|date() }}</dd>
 			<dt>Taille :</dt><dd>{{ photo.fileSize|file_size }}</dd>

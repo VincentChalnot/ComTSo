@@ -17,6 +17,8 @@
 		{% stylesheets	'bundles/comtsoforum/css/comtso.css'
 						'bundles/comtsoforum/css/blueimp-gallery.min.css'
 						'bundles/comtsoforum/css/bootstrap-image-gallery.min.css'
+						'bundles/comtsoforum/css/jquery.fileupload.css'
+						'bundles/comtsoforum/css/bootstrap-datetimepicker.min.css'
 						'bundles/comtsoforum/css/bootstrap-lumen.min.css'
 			filter='cssrewrite' %}
 			<link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
@@ -88,23 +90,37 @@
 			</div>
 		{% endblock %}
     </div>
-	{% block end_body %}{% endblock %}
+	{% block end_body %}
+		{% include 'ComTSoForumBundle:Photo:gallery.html.twig' %}
+	{% endblock %}
 	{% block javascripts %}
 		<script>
 			var CKEDITOR_BASEPATH = '/bundles/comtsoforum/js/ckeditor/';
 		</script>
 		{% javascripts
 			'assets/jquery/jquery.min.js'
+			'assets/jquery-ui/ui/minified/jquery.ui.core.min.js'
+			'assets/jquery-ui/ui/minified/jquery.ui.widget.min.js'
 			'bundles/fosjsrouting/js/router.js'
-			'@MopaBootstrapBundle/Resources/public/bootstrap-sass/vendor/assets/javascripts/bootstrap/tooltip.js'
-			'@MopaBootstrapBundle/Resources/public/bootstrap-sass/vendor/assets/javascripts/bootstrap/*.js'
+			'@MopaBootstrapBundle/Resources/public/bootstrap-sass/assets/javascripts/bootstrap.js'
 			'@MopaBootstrapBundle/Resources/public/js/mopabootstrap-collection.js'
 			'@MopaBootstrapBundle/Resources/public/js/mopabootstrap-subnav.js'
+			'@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/js/bootstrap-datetimepicker.js'
+			'@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.fr.js'
 			'bundles/comtsoforum/js/ckeditor/ckeditor.js'
 			'bundles/comtsoforum/js/ckeditor/adapters/jquery.js'
 			'bundles/comtsoforum/js/jquery.blueimp-gallery.min.js'
 			'bundles/comtsoforum/js/bootstrap-image-gallery.js'
 			'bundles/comtsoforum/js/jquery.lazyload.min.js'
+			'bundles/comtsoforum/js/load-image.min.js'
+			'bundles/comtsoforum/js/jquery.iframe-transport.js'
+			'bundles/comtsoforum/js/jquery.fileupload.js'
+			'bundles/comtsoforum/js/jquery.fileupload-process.js'
+			'bundles/comtsoforum/js/jquery.fileupload-image.js'
+			'bundles/comtsoforum/js/jquery.fileupload-audio.js'
+			'bundles/comtsoforum/js/jquery.fileupload-video.js'
+			'bundles/comtsoforum/js/jquery.fileupload-validate.js'
+			'bundles/comtsoforum/js/jquery.fileupload-ui.js'
 			'bundles/comtsoforum/js/moment.min.js'
 			'bundles/comtsoforum/js/common.js'
 			%}
@@ -115,7 +131,7 @@
 			var chat_url = '{{ path('comtso_chat') }}';
 			var user_url = '{{ path('comtso_user_show', {usernameCanonical: '-place-holder-'}) }}';
 			$(document).ready(function(){
-				moment.lang('fr');
+				
 			});
 		</script>
     {% endblock %}

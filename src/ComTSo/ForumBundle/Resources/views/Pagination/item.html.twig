@@ -1,0 +1,7 @@
+<li class="{{ page == results.page ? 'active' : '' }}{{ clickable is defined and not clickable ? ' disabled' : '' }}{{ name is defined ? ' ' ~ name : '' }}">
+    {% if page != results.page and (clickable is not defined or clickable) %}
+        <a href="{{ path(app.request.get('_route'), app.request.query.all | merge({(results.pageQuery): page})) }}">{{ text is defined ? text : page }}</a>
+    {% else %}
+        <span>{{ text is defined ? text : page }}</span>
+    {% endif %}
+</li>

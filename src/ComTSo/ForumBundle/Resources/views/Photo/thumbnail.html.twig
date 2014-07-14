@@ -1,0 +1,4 @@
+{% set filter = filter is defined ? filter : 'thumbnail' %}
+<a href="{{ photo|path }}" class="img-thumbnail" title="{{ photo.title }}" data-gallery data-url="{{ photo.filename | imagine_filter('large') }}">
+	{% include 'ComTSoForumBundle:Photo:image.html.twig' with {filter: filter} %}
+</a>

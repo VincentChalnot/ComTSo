@@ -20,9 +20,7 @@
 						{% for photoTopic in topic.photos %}
 							{% set photo = photoTopic.photo %}
 							{% if photo %}
-								<a href="{{ photo|path }}" class="img-thumbnail" title="{{ photo.title }}" data-gallery data-url="{{ photo.filename | imagine_filter('large') }}">
-									<img class="lazy" data-original="{{ photo.filename | imagine_filter('thumbnail') }}" alt="{{ photo.filename }}" title="{{ photo.title }}" {{ image_size_attrs(photo, 'thumbnail') }} />
-								</a>
+								{% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
 							{% endif %}
 						{% endfor %}
 					</div>
@@ -40,16 +38,5 @@
 			<li><a href="{{ topic|path }}">{{ topic }}</a></li>
 		{% endfor %}
 	</ul>
-{% endblock %}
-
-{% block end_body %}
-	{% include 'ComTSoForumBundle:Photo:gallery.html.twig' %}
-{% endblock %}
-
-{% block javascripts %}
-	{{ parent() }}
-	<script>
-        $(document).ready(function(){$("img.lazy").lazyload();});
-	</script>
 {% endblock %}
 

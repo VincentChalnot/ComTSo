@@ -29,6 +29,12 @@ comtso_user_show:
     defaults: { _controller: ComTSoForumBundle:User:show }
     requirements:
         usernameCanonical: "[\w- ]+"
+        
+comtso_user_edit:
+    pattern:  /gens/{usernameCanonical}/edit
+    defaults: { _controller: ComTSoForumBundle:User:edit }
+    requirements:
+        usernameCanonical: "[\w- ]+"
 
 comtso_chat:
     pattern:  /chat
@@ -45,14 +51,14 @@ comtso_photo_backcompat:
     defaults: { _controller: ComTSoForumBundle:Photo:sourceCache }
     requirements:
         originalFilename: "[a-z\d.]+"
-        filter: "thumbnail|preview|large"
+        filter: "tiny|thumbnail|preview|large"
         
 comtso_photo_source_cache:
     pattern:  /cache/{filter}/{filename}
     defaults: { _controller: ComTSoForumBundle:Photo:sourceCache }
     requirements:
         filename: "[a-z\d.]+"
-        filter: "thumbnail|preview|large"
+        filter: "tiny|thumbnail|preview|large"
         
 comtso_photo_show:
     pattern:  /photos/{id}
@@ -73,3 +79,7 @@ comtso_album_show:
 comtso_album_list:
     pattern:  /albums
     defaults: { _controller: ComTSoForumBundle:Photo:list }
+    
+comtso_photo_browser:
+    pattern: /photos/browser
+    defaults: { _controller: ComTSoForumBundle:Photo:browser }
