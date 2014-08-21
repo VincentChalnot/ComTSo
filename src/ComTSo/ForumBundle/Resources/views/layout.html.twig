@@ -35,9 +35,9 @@
 						<div class="navbar-header">
 							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 								<span class="sr-only">Toggle navigation</span>
-								<span class="icon-bar"></span>
-								<span class="icon-bar"></span>
-								<span class="icon-bar"></span>
+								<span class="fa fa-bar"></span>
+								<span class="fa fa-bar"></span>
+								<span class="fa fa-bar"></span>
 							</button>
 							<a class="navbar-brand" href="{{ path('comtso_homepage') }}">ComTSo</a>
 						</div>
@@ -55,11 +55,11 @@
 									<input type="text" name="q" class="form-control" placeholder="Recherche" value="{% block search_value %}{% endblock %}">
 									<span class="input-group-btn"></span>
 								</div>
-								<button type="submit" class="btn btn-default"><i class="icon-search"></i></button>
+								<button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
 							</form>
 							<ul class="nav navbar-nav navbar-right">
-								<li><a href="{{ app.user|path }}"><i class="icon-user"></i> {{ app.user }}</a></li>
-								<li><a href="{{ path('fos_user_security_logout') }}"><i class="icon-signout"></i></a></li>
+								<li><a href="{{ app.user|path }}"><i class="fa fa-user"></i> {{ app.user }}</a></li>
+								<li><a href="{{ path('fos_user_security_logout') }}"><i class="fa fa-sign-out"></i></a></li>
 							</ul>
 						</div>
 					</div>
@@ -92,6 +92,7 @@
     </div>
 	{% block end_body %}
 		{% include 'ComTSoForumBundle:Photo:gallery.html.twig' %}
+		{% include 'ComTSoForumBundle:Photo:jquery-templates.html.php' %}
 	{% endblock %}
 	{% block javascripts %}
 		<script>
@@ -113,6 +114,7 @@
 			'bundles/comtsoforum/js/bootstrap-image-gallery.js'
 			'bundles/comtsoforum/js/jquery.lazyload.min.js'
 			'bundles/comtsoforum/js/load-image.min.js'
+			'bundles/comtsoforum/js/jquery.tmpl.min.js'
 			'bundles/comtsoforum/js/jquery.iframe-transport.js'
 			'bundles/comtsoforum/js/jquery.fileupload.js'
 			'bundles/comtsoforum/js/jquery.fileupload-process.js'
@@ -130,9 +132,6 @@
 		<script>
 			var chat_url = '{{ path('comtso_chat') }}';
 			var user_url = '{{ path('comtso_user_show', {usernameCanonical: '-place-holder-'}) }}';
-			$(document).ready(function(){
-				
-			});
 		</script>
     {% endblock %}
 </body>

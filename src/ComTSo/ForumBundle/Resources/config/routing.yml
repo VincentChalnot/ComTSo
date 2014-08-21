@@ -11,8 +11,13 @@ comtso_forum_show:
     defaults: { _controller: ComTSoForumBundle:Forum:show }
     requirements:
         id: "[\w-]+"
-      
-      
+
+comtso_forum_edit:
+    pattern:  /forum/{id}/edit
+    defaults: { _controller: ComTSoForumBundle:Forum:edit }
+    requirements:
+        id: "[\w-]+"
+
 comtso_topic_show:
     pattern:  /forum/{forumId}/{id}
     defaults: { _controller: ComTSoForumBundle:Topic:show }
