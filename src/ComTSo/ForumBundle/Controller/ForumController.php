@@ -18,5 +18,17 @@ class ForumController extends BaseController {
 		$this->viewParameters['topics'] = $this->getRepository('Topic')->findForForumList($forum);
 		return $this->viewParameters;
 	}
+    
+    /**
+	 * @Template()
+	 */
+	public function editAction(Forum $forum) {
+		$this->setActiveMenu('forums');
+		$this->viewParameters['forum'] = $forum;
+		$this->viewParameters['title'] = (string) $forum;
+		$this->viewParameters['forums'] = $this->getRepository('Forum')->findAll();
+		$this->viewParameters['topics'] = $this->getRepository('Topic')->findForForumList($forum);
+		return $this->viewParameters;
+	}
 
 }

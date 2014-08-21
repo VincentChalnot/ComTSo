@@ -22,9 +22,10 @@ use Exception;
 use HTMLPurifier;
 use JoliTypo\Fixer;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class ImportDatabaseCommand extends ContainerAwareCommand {
 
@@ -48,6 +49,12 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 	 * @var string
 	 */
 	protected $photoDir;
+
+	/**
+	 * Path of the chat log
+	 * @var string
+	 */
+	protected $chatLog;
 	
 	/**
 	 * @var HTMLPurifier
@@ -69,7 +76,8 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 
 	protected function configure() {
 		$this->setName('comtso:import')
-				->addArgument('photo-dir', InputArgument::REQUIRED, "The directory from which to import photos")
+				->addOption('photo-dir', 'p', InputOption::VALUE_REQUIRED, "The directory from which to import photos")
+				->addOption('chat-log', 'c', InputOption::VALUE_REQUIRED, "The path of the chat log file")
 				->setDescription('Import data from the old model');
 	}
 
@@ -78,11 +86,16 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 		$this->input = $input;
 		$this->output = $output;
 		$this->em = $this->getDoctrine()->getManager();
-		$photoDir = $this->input->getArgument('photo-dir');
+		$photoDir = $this->input->getOption('photo-dir');
 		if (!file_exists($photoDir)) {
-			throw new \Symfony\Component\Filesystem\Exception\FileNotFoundException("File not found: {$photoDir}");
+			throw new FileNotFoundException("File not found: {$photoDir}");
 		}
 		$this->photoDir = rtrim(realpath($photoDir), '/');
+		$chatLog = $this->input->getOption('chat-log');
+		if (!file_exists($chatLog)) {
+			throw new FileNotFoundException("File not found: {$chatLog}");
+		}
+		$this->chatLog = realpath($chatLog);
 		$this->htmlPurifier = $this->getContainer()->get('exercise_html_purifier.default');
 		$this->typoFixer = $this->getContainer()->get('joli_typo.fixer.fr');
 		$this->decoda = new Decoda('', array(
@@ -338,9 +351,8 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 	
 	protected function importChatMessages() {
 		$this->truncateTable(get_class(new ChatMessage));
-		$filePath = "{$this->getContainer()->get('kernel')->getRootDir()}/data/chat.html";
 		$linecount = 0;
-		$handle = fopen($filePath, "r");
+		$handle = fopen($this->chatLog, "r");
 		while (!feof($handle)) {
 			fgets($handle);
 			$linecount++;

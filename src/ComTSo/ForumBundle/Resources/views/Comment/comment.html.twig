@@ -7,8 +7,8 @@
 		<p class="post-infos text-muted">
 			Posté le {{ comment.createdAt|date('d/m/Y à H:i') }}
 			{#% if app.user.id == comment.author.id or 'ROLE_ADMIN' in app.user.roles %}
-			– <a class="btn btn-xs" href="#"><i class="icon-pencil"></i> modifier</a> | 
-			<a class="btn btn-xs text-warning" href="#"><i class="icon-remove"></i> supprimer</a>
+			– <a class="btn btn-xs" href="#"><i class="fa fa-pencil"></i> modifier</a> | 
+			<a class="btn btn-xs text-warning" href="#"><i class="fa fa-remove"></i> supprimer</a>
 			{% endif %#}
 		</p>
 	</div>
