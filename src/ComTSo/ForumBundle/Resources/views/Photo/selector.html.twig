@@ -1,7 +1,20 @@
-<tr id="photo-selector-{{ photo.id }}">
-	<td>{% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' with {'filter': 'tiny'} %}</td>
-	<td><a href="{{ photo|path }}">{% if query is defined %}{{ photo.title|highlight(query, true) }}{% else %}{{ photo.title }}{% endif %}</a></td>
-	<td>{% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': photo.author, size: 'sm'} %}</td>
-	<td>{{ photo.takenAt|htmlDate }}</td>
-	<td>{{ photo.createdAt|htmlDate }}</td>
-</tr>
+{% include 'ComTSoForumBundle:Pagination:pager.html.twig' with {'results': photos} %}
+<h3>Photos existantes</h3>
+<div class="clear"></div>
+<table class="table photo-selector">
+	<thead>
+		<tr>
+			<th>Miniature</th>
+			<th>Titre</th>
+			<th>Auteur</th>
+			<th class="minimize">Dates</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for photo in photos %}
+			{% include 'ComTSoForumBundle:Photo:selector-line.html.twig' %}
+		{% endfor %}
+	</tbody>
+</table>
+{% include 'ComTSoForumBundle:Pagination:pager.html.twig' with {'results': photos} %}

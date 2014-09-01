@@ -50,6 +50,9 @@ class PhotoController extends BaseController {
 		$photos = $this->createPager($qb, $request, 'createdAt', 'd')->initialize();
 		$this->viewParameters['photos'] = $photos;
 		$this->viewParameters['title'] = 'Photo Browser';
+		if ($request->isXmlHttpRequest()) {
+			return $this->render('ComTSoForumBundle:Photo:selector.html.twig', $this->viewParameters);
+		}
 		return $this->viewParameters;
 	}
 

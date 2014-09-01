@@ -165,7 +165,7 @@ class ImageUploader {
 	protected function getPhotoUrl(Photo $photo, $filter = 'preview') {
 		$router = $this->container->get('router');
 		if (in_array($filter, ['show', 'edit', 'delete', 'source_original'])) {
-			$router->generate("comtso_photo_{$filter}", ['id' => $photo->getId()]);
+			return $router->generate("comtso_photo_{$filter}", ['id' => $photo->getId()]);
 		}
 		return $router->generate('comtso_photo_source_cache', ['filter' => $filter, 'filename' => $photo->getFilename()]);
 	}

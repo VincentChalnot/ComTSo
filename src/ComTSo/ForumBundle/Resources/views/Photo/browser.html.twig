@@ -21,11 +21,11 @@
 									<input type="file" name="files[]" multiple>
 								</span>
 								<button type="reset" class="btn btn-warning cancel" title="Annuler tout">
-									<i class="fa fa-ban-circle"></i>
+									<i class="fa fa-ban"></i>
 									<span>Annuler</span>
 								</button>
 								<button type="button" class="btn btn-danger delete" title="Supprimer les uploads">
-									<i class="fa fa-trash"></i>
+									<i class="fa fa-trash-o"></i>
 									<span>Supprimer</span>
 								</button>
 								<button type="submit" class="btn btn-primary start" title="Commencer à envoyer les fichiers">
@@ -47,26 +47,9 @@
 						<!-- The table listing the files available for upload/download -->
 						<table role="presentation" class="table table-striped"><tbody class="files"></tbody></table>
 					</form>
-					{% include 'ComTSoForumBundle:Pagination:pager.html.twig' with {'results': photos} %}
-					<h3>Photos existantes</h3>
-					<div class="clear"></div>
-					<table class="table photo-selector">
-						<thead>
-							<tr>
-								<th>Miniature</th>
-								<th>Titre</th>
-								<th>Auteur</th>
-								<th>Date de prise</th>
-								<th>Date d'upload</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for photo in photos %}
-								{% include 'ComTSoForumBundle:Photo:selector.html.twig' %}
-							{% endfor %}
-						</tbody>
-					</table>
-					{% include 'ComTSoForumBundle:Pagination:pager.html.twig' with {'results': photos} %}
+					<div id="photo-selector">
+						{% include 'ComTSoForumBundle:Photo:selector.html.twig' %}
+					</div>
 					<div class="clear"></div>
 				</div>
 				<div class="modal-footer">
@@ -97,7 +80,13 @@
 				acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
 				done: function(e) {
 					console.log(e);
+					$('#photo-selector').load('{{ path('comtso_photo_browser') }}');
 				}
+			});
+			
+			$(document).on('click', '#photo-browser ul.pagination li a', function(e){
+				$('#photo-selector').load($(this).attr('href'));
+				e.preventDefault();
 			});
 		});
 	</script>
