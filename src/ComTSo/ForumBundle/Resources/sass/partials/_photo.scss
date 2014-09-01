@@ -42,5 +42,9 @@
 }
 
 table.photo-selector {
-	
+	tbody {
+		tr td {
+			vertical-align: middle;
+		}
+	}
 }

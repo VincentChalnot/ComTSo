@@ -24,6 +24,20 @@ h1 {
 	background: #adf0fe;
 }
 
+dl.dl-small {
+	margin-bottom: 0;
+	dd {
+		margin-left: 70px;
+	}
+	dt{
+		width: 65px;
+	}
+}
+
+table td.minimize, table th.minimize {
+	width: 1px;
+}
+
 @media (max-width: 768px) {
 	h1 {
 		font-size: 5em;
