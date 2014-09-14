@@ -43,8 +43,11 @@
 
 table.photo-selector {
 	tbody {
-		tr td {
-			vertical-align: middle;
+		tr {
+			border-bottom: 2px solid #eee;
+			td {
+				vertical-align: middle;
+			}
 		}
 	}
 }

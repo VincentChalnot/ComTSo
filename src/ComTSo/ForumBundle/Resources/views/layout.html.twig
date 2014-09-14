@@ -92,6 +92,7 @@
     </div>
 	{% block end_body %}
 		{% include 'ComTSoForumBundle:Photo:gallery.html.twig' %}
+		{% include 'ComTSoForumBundle:Photo:uploader_skeleton.html.twig' %}
 		{% include 'ComTSoForumBundle:Photo:jquery-templates.html.php' %}
 	{% endblock %}
 	{% block javascripts %}
@@ -129,10 +130,6 @@
 			<script type="text/javascript" src="{{ asset_url }}"></script>
 		{% endjavascripts %}
 		<script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
-		<script>
-			var chat_url = '{{ path('comtso_chat') }}';
-			var user_url = '{{ path('comtso_user_show', {usernameCanonical: '-place-holder-'}) }}';
-		</script>
     {% endblock %}
 </body>
 </html>

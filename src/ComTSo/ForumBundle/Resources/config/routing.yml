@@ -34,6 +34,8 @@ comtso_user_show:
     defaults: { _controller: ComTSoForumBundle:User:show }
     requirements:
         usernameCanonical: "[\w- ]+"
+    options:
+        expose: true
         
 comtso_user_edit:
     pattern:  /gens/{usernameCanonical}/edit
@@ -44,6 +46,8 @@ comtso_user_edit:
 comtso_chat:
     pattern:  /chat
     defaults: { _controller: ComTSoForumBundle:Chat:show }
+    options:
+        expose: true
     
 comtso_photo_source_original:
     pattern:  /photos/source/{id}
@@ -74,6 +78,12 @@ comtso_photo_show:
 comtso_photo_list:
     pattern:  /photos
     defaults: { _controller: ComTSoForumBundle:Photo:list }
+    
+comtso_photo_update:
+    pattern:  /api/photos/{id}
+    defaults: { _controller: ComTSoForumBundle:Photo:update }
+    options:
+        expose: true
         
 comtso_album_show:
     pattern:  /albums/{id}
@@ -88,3 +98,17 @@ comtso_album_list:
 comtso_photo_browser:
     pattern: /photos/browser
     defaults: { _controller: ComTSoForumBundle:Photo:browser }
+    options:
+        expose: true
+        
+comtso_photo_uploader:
+    pattern: /photos/uploader
+    defaults: { _controller: ComTSoForumBundle:Photo:uploader }
+    options:
+        expose: true
+
+comtso_photo_widget:
+    pattern: /photos/{id}/widget
+    defaults: { _controller: ComTSoForumBundle:Photo:widget }
+    options:
+        expose: true

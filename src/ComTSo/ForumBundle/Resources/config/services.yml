@@ -40,3 +40,8 @@ services:
     comtso.pager:
         scope: prototype
         class: "%comtso.pager.class%"
+
+    comtso.form.type.photo_selector:
+        class: ComTSo\ForumBundle\Form\Type\PhotoSelectorType
+        tags:
+            - { name: form.type, alias: photo }

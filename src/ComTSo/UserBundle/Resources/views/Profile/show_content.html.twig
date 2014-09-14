@@ -4,7 +4,7 @@
 	
 	<center>
 		<h3 class="media-heading">{{ user.name }} {{ user.surname }} <small>({{ user.username }})</small></h3>
-		<img src="/images/avatars/{{ user.usernameCanonical }}.jpg" alt="" width="140" height="140" border="0" class="img-circle"></a>
+		{% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': user, size: 'lg'} %}
 		<p class="lead">{{ user.signature|raw }}</p>
 	</center>
 	<hr>

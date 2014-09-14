@@ -1,4 +1,5 @@
 $(document).ready(function(){
+	
 	$('#chat-toggle').parent().show();
 	$('#chat-toggle').click(function(e){
 		e.preventDefault();
@@ -16,8 +17,7 @@ $(document).ready(function(){
 		var t = $('#chat-message-template');
 		$.each(data.messages, function(){
 			var user = data.users[this.author_id];
-			var link = new String(user_url);
-			t.find('.avatar').attr('href', link.replace('-place-holder-', user.usernameCanonical));
+			t.find('.avatar').attr('href', Routing.generate('comtso_user_show', {usernameCanonical: user.usernameCanonical}));
 			t.find('.avatar .username').html(user.username);
 			t.find('.avatar img').attr('src', user.avatar).attr('title', user.username);
 			t.find('p').html(this.content);
@@ -29,8 +29,7 @@ $(document).ready(function(){
 		t = $('#chat-connected-user-template');
 		$.each(data.connected_users_id, function(){
 			user = data.users[this];
-			var link = new String(user_url);
-			t.find('a').attr('href', link.replace('-place-holder-', user.usernameCanonical));
+			t.find('a').attr('href', Routing.generate('comtso_user_show', {usernameCanonical: user.usernameCanonical}));
 			t.find('img').attr('src', user.avatar).attr('title', user.username).attr('alt', user.username);
 			$('#chat-connected-users').append(t.html());
 		});
@@ -42,14 +41,14 @@ $(document).ready(function(){
 //		$.ajax(chat_url, {success: parseChatMessages});
 //	}, 10000);
 	if ($('#chat-panel form').length) {
-		$.ajax(chat_url, {success: parseChatMessages});
+		$.ajax(Routing.generate('comtso_chat'), {success: parseChatMessages});
 	}
 	
-	$('#chat-panel form').submit(function(e){
+	$(document).on('submit', '#chat-panel form', function(e){
 		e.preventDefault();
 		var data = $(this).serialize();
 		$("#chat-message-new").prop('disabled', true);
-		$.ajax(chat_url,{
+		$.ajax(Routing.generate('comtso_chat'),{
 			type: 'POST',
 			data: data,
 			success: parseChatMessages
@@ -89,9 +88,71 @@ $(document).ready(function(){
 	});
 
 	// Restore value from hidden input
-	$('input[type=hidden]', '.date').each(function(){
+	$('.date input[type=hidden]').each(function(){
 		if($(this).val()) {
 			$(this).parent().datetimepicker('setValue');
 		}
+	});
+		
+	$(document).on('click', '.photo-widget-browse', function(e){
+		var widgetId = $(this).parents('.photo-selector-widget').attr('id');
+		$('#photo-browser').modal({
+			remote: Routing.generate('comtso_photo_uploader', {widget: widgetId})
+		});
+	});
+	
+	$(document).on('loaded.bs.modal', '#photo-browser', function(e) {
+		$('#photo-upload').fileupload({
+			// Uncomment the following to send cross-domain cookies:
+			//xhrFields: {withCredentials: true},
+			url: Routing.generate('_uploader_upload_photos'),
+			// Enable image resizing, except for Android and Opera,
+			// which actually support image resizing, but fail to
+			// send Blob objects via XHR requests:
+			disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator.userAgent),
+			maxFileSize: 5000000,
+			acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+			done: function(e) {
+				$('#photo-selector').load(Routing.generate('comtso_photo_browser'));
+			}
+		});
+		$('#photo-upload [data-toggle="tooltip"]').tooltip();
+	});
+	
+	$(document).on('click', '#photo-browser ul.pagination li a', function(e){
+		$('#photo-selector').load($(this).attr('href'));
+		e.preventDefault();
+	});
+
+	var titleUpdateTimeOut = null;
+	$(document).on('change keyup', '#photo-browser .photo-selector-line input.photo-title', function(e){
+		var t = $(this);
+		var title = $(this).val();
+		var id = t.parents('.photo-selector-line').data('photo-id');
+		if (t.siblings('.old-title').val() === title) {
+			return;
+		}
+		window.clearTimeout(titleUpdateTimeOut);
+		titleUpdateTimeOut = window.setTimeout(function(e){
+			$.ajax(Routing.generate('comtso_photo_update', {id: id}), {
+				type: 'POST',
+				data: {
+					title: title
+				}
+			}).done(function(){
+				t.siblings('.old-title').val(title);
+				t.siblings('.input-append-icon').show().fadeOut(1500);
+			});
+		}, 800);
+	});
+	
+	$(document).on('click', '#photo-selector .photo-selector-line button.select', function(){
+		var t = $(this);
+		var widgetId = t.parents('#photo-selector').data('target-widget');
+		var photoId = t.parents('.photo-selector-line').data('photo-id');
+		var widget = $('#' + widgetId);
+		$('input[type="hidden"]', widget).val(photoId);
+		$('.widget-container', widget).load(Routing.generate('comtso_photo_widget', {id: photoId}));
+		$('#photo-browser').modal('hide');
 	});
 });

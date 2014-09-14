@@ -87,8 +87,19 @@ class BaseController extends Controller {
 		$this->viewParameters['activeMenu'] = $menuId;
 	}
 
+	/**
+	 * Returns current bundle name for controller
+	 * @return string
+	 */
 	protected function getBundleName() {
-		return $this->getRequest()->attributes->get('_template')->get('bundle');
+		$controller = $this->getRequest()->attributes->get('_controller');
+		$className = explode('::', $controller)[0];
+		foreach ($this->get('kernel')->getBundles() as $bundle) {
+			if (0 === strpos($className, $bundle->getNamespace())) {
+				return $bundle->getName();
+			}
+		}
+		throw new \Exception("Unknown Bundle for controller: {$className}");
 	}
 
 	protected function cleanHtml($html) {
@@ -128,7 +139,7 @@ class BaseController extends Controller {
 		}
 		return $default;
 	}
-	
+
 	/**
 	 * @param QueryBuilder $qb
 	 * @return Pager
@@ -136,7 +147,7 @@ class BaseController extends Controller {
 	public function createPager(QueryBuilder $qb, Request $request, $defaultSort = null, $defaultDirection = 'a', $defaultLimit = 10, $defaultPage = 1) {
 		$pager = $this->get('comtso.pager')
 				->setQueryBuilder($qb);
-		
+
 		if ($request->query->has($pager->getPageQuery())) {
 			$pager->setPage($request->query->get($pager->getPageQuery()));
 		} else {
