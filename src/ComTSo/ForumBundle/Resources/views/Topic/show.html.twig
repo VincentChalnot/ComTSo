@@ -7,6 +7,9 @@
 		{% endfor %}
 	</ul>
 	<div class="topic">
+		<div class="btn-group pull-right">
+			<a href="{{ topic|path('edit') }}" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
+		</div>
 		<h3>{{ topic }}</h3>
 		<div>{{ topic.content|raw }}</div>
 		<p class="text-muted">
@@ -22,6 +25,9 @@
 							{% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
 						{% endif %}
 					{% endfor %}
+					<a href="{{ topic|path('add_photos') }}" class="img-thumbnail img-new" title="Ajouter des photos">
+						<i class="fa fa-plus"></i>
+					</a>
 				</div>
 			{% endif %}
 		{% endspaceless %}

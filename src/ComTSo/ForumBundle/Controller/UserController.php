@@ -64,7 +64,7 @@ class UserController extends BaseController {
 				$em->persist($user);
 				$em->flush();
 
-				$this->addFlashMsg('success', 'Message envoyé');
+				$this->addFlashMsg('success', 'Profil sauvegardé');
 				return $this->redirect($this->generateUrl('comtso_user_show', [
 					'usernameCanonical' => $user->getUsernameCanonical(),
 				]));

@@ -3,10 +3,10 @@
 {% block content %}
 	{{ form_start(form) }}
 		{{ form_widget(form) }}
-		<p class="text-right">
+		<div class="btn-group pull-right">
 			<a href="{{ user|path }}" class="btn btn-default">Retour</a>
 			<button type="submit" class="btn btn-primary">Envoyer</button>
-		</p>
+		</div>
 	{{ form_end(form) }}
 {% endblock %}
 		
@@ -18,7 +18,7 @@
 	{{ parent() }}
 	<script>
         $(document).ready(function(){
-            $('#{{ form.signature.vars.id }}').click(function(e){$(this).ckeditor();});
+            $('#{{ form.signature.vars.id }}').ckeditor();
         });
 	</script>
 {% endblock %}

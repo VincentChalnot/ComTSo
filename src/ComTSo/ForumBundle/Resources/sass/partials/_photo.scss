@@ -41,7 +41,7 @@
 	}
 }
 
-table.photo-selector {
+table.photo-selector-table {
 	tbody {
 		tr {
 			border-bottom: 2px solid #eee;
@@ -49,5 +49,23 @@ table.photo-selector {
 				vertical-align: middle;
 			}
 		}
+	}
+}
+
+.photo-selector-widget {
+	p.empty {
+		padding-top: 7px;
+	}
+}
+
+.img-thumbnail.img-new {
+	width: 165px;
+	height: 165px;
+	vertical-align: middle;
+	text-align: center;
+	i.fa {
+		margin-top: 55px;
+		font-size: 3em;
+		opacity: 0.5;
 	}
 }

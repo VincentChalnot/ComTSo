@@ -41,7 +41,7 @@ class Topic implements Routable {
 	/**
 	 * Comments associated to this topic
 	 * @var PhotoTopic[]
-	 * @ORM\OneToMany(targetEntity="ComTSo\ForumBundle\Entity\PhotoTopic", mappedBy="topic")
+	 * @ORM\OneToMany(targetEntity="ComTSo\ForumBundle\Entity\PhotoTopic", mappedBy="topic", cascade={"persist"})
 	 * @ORM\OrderBy({"order" = "ASC"})
 	 */
 	protected $photos;

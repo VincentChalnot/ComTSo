@@ -2,7 +2,11 @@
 
 {% block content %}
 	{% include 'ComTSoUserBundle:Profile:show_content.html.twig' %}
-    <h2>Messages privés</h2>
+	{% if user == app.user %}
+		<h2>Mes mémos</h2>
+	{% else %}
+		<h2>Messages privés</h2>
+	{% endif %}
     {% include 'ComTSoForumBundle:Comment:create_form.html.twig' %}
     {% for comment in messages %}
         <hr class="clear">
