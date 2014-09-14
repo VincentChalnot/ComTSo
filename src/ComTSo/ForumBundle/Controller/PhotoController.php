@@ -6,6 +6,7 @@ use ComTSo\ForumBundle\Entity\Photo;
 use ComTSo\ForumBundle\Lib\Utils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -41,6 +42,17 @@ class PhotoController extends BaseController {
 		$this->viewParameters['title'] = 'Photos';
 		return $this->viewParameters;
 	}
+	
+	/**
+	 * @param Request $request
+	 * @return JsonResponse
+	 */
+	public function updateAction(Request $request, Photo $photo) {
+		$photo->setTitle($request->request->get('title'));
+		$this->getManager()->persist($photo);
+		$this->getManager()->flush();
+		return new JsonResponse(['status' => 'ok']);
+	}
 
 	/**
 	 * @Template()
@@ -53,6 +65,26 @@ class PhotoController extends BaseController {
 		if ($request->isXmlHttpRequest()) {
 			return $this->render('ComTSoForumBundle:Photo:selector.html.twig', $this->viewParameters);
 		}
+		return $this->viewParameters;
+	}
+
+	/**
+	 * @Template()
+	 */
+	public function uploaderAction(Request $request) {
+		$this->viewParameters['title'] = 'Photo Uploader';
+		$this->viewParameters['targetWidget'] = $request->get('widget');
+		if ($request->isXmlHttpRequest()) {
+			return $this->render('ComTSoForumBundle:Photo:uploader.html.twig', $this->viewParameters);
+		}
+		return $this->viewParameters;
+	}
+
+	/**
+	 * @Template()
+	 */
+	public function widgetAction(Request $request, Photo $photo) {
+		$this->viewParameters['photo'] = $photo;
 		return $this->viewParameters;
 	}
 

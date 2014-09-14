@@ -69,3 +69,6 @@ liip_imagine:
             quality: 90
             filters:
                 thumbnail: { size: [1900, 1000], mode: inset }
+                
+fos_js_routing:
+    routes_to_expose: [ _uploader_upload_photos ]

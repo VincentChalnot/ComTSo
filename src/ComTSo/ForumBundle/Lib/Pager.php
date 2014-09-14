@@ -17,6 +17,7 @@ class Pager extends \ArrayObject {
 	protected $directionQuery = 'direction';
 	protected $limitQuery = 'limit';
 	protected $pageRange = 5;
+	protected $route;
 
 	/**
 	 * @var QueryBuilder
@@ -163,23 +164,32 @@ class Pager extends \ArrayObject {
 		return $this;
 	}
 
+	public function getRoute() {
+		return $this->route;
+	}
+
+	public function setRoute($route) {
+		$this->route = $route;
+		return $this;
+	}
+
 	public function initialize() {
 		if ($this->isInitialized) {
 			return $this;
 		}
 		$this->initializeCount();
-		
+
 		$this->queryBuilder
 				->setMaxResults($this->getLimit())
 				->setFirstResult(($this->getPage() - 1) * $this->getLimit());
-		
+
 		$this->initializeSort();
-		
+
 		$this->exchangeArray($this->queryBuilder->getQuery()->getResult());
 		$this->isInitialized = true;
 		return $this;
 	}
-	
+
 	protected function initializeCount() {
 		$countQb = clone $this->queryBuilder;
 		$alias = $this->queryBuilder->getRootAliases()[0];
@@ -187,7 +197,7 @@ class Pager extends \ArrayObject {
 		$this->totalCount = (int) $countQb->getQuery()
 						->getOneOrNullResult(\Doctrine\ORM\Query::HYDRATE_SINGLE_SCALAR);
 	}
-	
+
 	protected function initializeSort() {
 		if (!$this->getSort()) {
 			return;
@@ -211,4 +221,5 @@ class Pager extends \ArrayObject {
 			$this->queryBuilder->addOrderBy("{$alias}.{$field}", $this->getDirection());
 		}
 	}
+
 }

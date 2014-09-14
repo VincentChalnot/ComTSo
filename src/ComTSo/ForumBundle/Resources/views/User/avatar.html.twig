@@ -2,7 +2,7 @@
 {% spaceless %}
 <a class="avatar avatar-{{ size }}" href="{{ author|path }}">
 	{% if author.avatar %}
-		<img src="{{ author.avatar.filename | imagine_filter('thumbnail') }}" alt="Avatar" title="{{ author }}" {{ image_size_attrs(photo, 'thumbnail') }} />
+		<img src="{{ author.avatar.filename | imagine_filter('thumbnail') }}" alt="Avatar" title="{{ author }}" {{ image_size_attrs(author.avatar, 'thumbnail') }} class="img-circle"/>
 		<span class="username">{{ author }}</span>
 	{% else %}
 		<div class="avatar-default img-circle">

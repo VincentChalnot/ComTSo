@@ -2,3 +2,14 @@
     {{ block('choice_widget_collapsed') }}
     <input type="hidden" id="{{ id }}_original" value="{{ value }}" />
 {% endblock %}
+
+{% block photo_widget %}
+	{% set photo = form.vars.data %}
+	<div class="photo-selector-widget" data-photo-id="{{ photo is not empty ? photo.id }}" id="photo-widget-{{ id }}">
+		<div class="widget-container">
+			{% include 'ComTSoForumBundle:Photo:widget.html.twig' %}
+		</div>
+		<input type="hidden" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+	</div>
+{% endblock %}
+

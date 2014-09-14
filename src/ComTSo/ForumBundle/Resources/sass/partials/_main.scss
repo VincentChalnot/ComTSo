@@ -38,6 +38,22 @@ table td.minimize, table th.minimize {
 	width: 1px;
 }
 
+.input-append-icon {
+	position: relative;
+	width: 0;
+	float: right;
+	i.fa {
+		position: absolute;
+		top: 8px;
+		left: -25px;
+		font-size: 1.5em;
+	}
+}
+
+textarea {
+	resize: vertical;
+}
+
 @media (max-width: 768px) {
 	h1 {
 		font-size: 5em;

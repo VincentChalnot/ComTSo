@@ -5,7 +5,6 @@ namespace ComTSo\UserBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 
 class UserType extends AbstractType {
 
@@ -17,7 +16,7 @@ class UserType extends AbstractType {
 		$builder
 				->add('username')
 				->add('email')
-				->add('avatar')
+				->add('avatar', 'photo')
 				->add('name')
 				->add('surname')
 				->add('birthday', 'date', [
