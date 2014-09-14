@@ -19,7 +19,7 @@ $(document).ready(function(){
 			var user = data.users[this.author_id];
 			t.find('.avatar').attr('href', Routing.generate('comtso_user_show', {usernameCanonical: user.usernameCanonical}));
 			t.find('.avatar .username').html(user.username);
-			t.find('.avatar img').attr('src', user.avatar).attr('title', user.username);
+			//t.find('.avatar img').attr('src', Routing.generate()).attr('title', user.username);
 			t.find('p').html(this.content);
 			var date = moment(this.created_at);
 			t.find('time').html(date.fromNow() + ', ' + date.format('dddd D MMMM YYYY [à] H:mm'));
@@ -30,7 +30,7 @@ $(document).ready(function(){
 		$.each(data.connected_users_id, function(){
 			user = data.users[this];
 			t.find('a').attr('href', Routing.generate('comtso_user_show', {usernameCanonical: user.usernameCanonical}));
-			t.find('img').attr('src', user.avatar).attr('title', user.username).attr('alt', user.username);
+			//t.find('img').attr('src', user.avatar).attr('title', user.username).attr('alt', user.username);
 			$('#chat-connected-users').append(t.html());
 		});
 		$('#chat-message-new').val('');
@@ -101,8 +101,8 @@ $(document).ready(function(){
 		});
 	});
 	
-	$(document).on('loaded.bs.modal', '#photo-browser', function(e) {
-		$('#photo-upload').fileupload({
+	oneUploadFormInit = function(el) {
+		el.fileupload({
 			// Uncomment the following to send cross-domain cookies:
 			//xhrFields: {withCredentials: true},
 			url: Routing.generate('_uploader_upload_photos'),
@@ -113,14 +113,18 @@ $(document).ready(function(){
 			maxFileSize: 5000000,
 			acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
 			done: function(e) {
-				$('#photo-selector').load(Routing.generate('comtso_photo_browser'));
+				$('.photo-selector', el).load(Routing.generate('comtso_photo_browser'));
 			}
 		});
+	};
+	
+	$(document).on('loaded.bs.modal', '#photo-browser', function(e) {
+		oneUploadFormInit($('#photo-upload'));
 		$('#photo-upload [data-toggle="tooltip"]').tooltip();
 	});
 	
-	$(document).on('click', '#photo-browser ul.pagination li a', function(e){
-		$('#photo-selector').load($(this).attr('href'));
+	$(document).on('click', '.photo-selector ul.pagination li a', function(e){
+		$(this).parents('.photo-selector').load($(this).attr('href'));
 		e.preventDefault();
 	});
 
@@ -146,9 +150,9 @@ $(document).ready(function(){
 		}, 800);
 	});
 	
-	$(document).on('click', '#photo-selector .photo-selector-line button.select', function(){
+	$(document).on('click', '#photo-browser .photo-selector .photo-selector-line button.select', function(){
 		var t = $(this);
-		var widgetId = t.parents('#photo-selector').data('target-widget');
+		var widgetId = t.parents('.photo-selector').data('target-widget');
 		var photoId = t.parents('.photo-selector-line').data('photo-id');
 		var widget = $('#' + widgetId);
 		$('input[type="hidden"]', widget).val(photoId);

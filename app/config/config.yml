@@ -79,7 +79,8 @@ fos_user:
     user_class: ComTSo\UserBundle\Entity\User
 
 mopa_bootstrap:
-    form: ~
+    form:
+        render_optional_text: false
 
 oneup_uploader:
     mappings:

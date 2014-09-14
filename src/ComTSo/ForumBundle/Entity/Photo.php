@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table(name="ctso_photo")
  * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\PhotoRepository")
  */
-class Photo implements Routable {
+class Photo implements \JsonSerializable, Routable {
 
 	use Behavior\Authorable,
 	 Behavior\Timestampable,
@@ -86,7 +86,7 @@ class Photo implements Routable {
 	/**
 	 * Topics associated to this photo
 	 * @var PhotoTopic[]
-	 * @ORM\OneToMany(targetEntity="ComTSo\ForumBundle\Entity\PhotoTopic", mappedBy="photo")
+	 * @ORM\OneToMany(targetEntity="ComTSo\ForumBundle\Entity\PhotoTopic", mappedBy="photo", cascade={"persist"})
 	 * @ORM\OrderBy({"createdAt" = "DESC"})
 	 */
 	protected $topics;
@@ -228,6 +228,23 @@ class Photo implements Routable {
 
 	public function getRoutingParameters() {
 		return ['id' => $this->getId()];
+	}
+
+	public function jsonSerialize() {
+		return [
+			'id' => $this->getId(),
+			'authorId' => $this->getAuthor()->getId(),
+			'filename' => $this->getFilename(),
+			'originalFilename' => $this->getOriginalFilename(),
+			'fileSize' => $this->getFileSize(),
+			'fileType' => $this->getFileType(),
+			'fileModifiedAt' => $this->getFileModifiedAt(),
+			'takenAt' => $this->getTakenAt(),
+			'width' => $this->getWidth(),
+			'height' => $this->getHeight(),
+			'title' => $this->getTitle(),
+			'content' => $this->getContent(),
+		];
 	}
 
 }

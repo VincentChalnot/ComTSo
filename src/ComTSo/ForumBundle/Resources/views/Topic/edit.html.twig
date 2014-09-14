@@ -1,0 +1,36 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+	<ul class="nav nav-tabs">
+		{% for f in forums %}
+			<li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
+		{% endfor %}
+	</ul>
+	<div class="topic">
+		{{ form_start(form) }}
+			{{ form_widget(form) }}
+			<div class="btn-group pull-right">
+				<a href="{{ topic|path }}" class="btn btn-default">Retour</a>
+				<button type="submit" class="btn btn-primary">Envoyer</button>
+			</div>
+		{{ form_end(form) }}
+	</div>
+{% endblock %}
+		
+{% block aside %}
+	<h4>Accès rapide</h4>
+	<ul class="nav nav-compact">
+		{% for t in topics %}
+			<li{{ t.id == topic.id ? ' class="active"' }}><a href="{{ t|path }}">{{ t }}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+        $(document).ready(function(){
+            $('#{{ form.content.vars.id }}').ckeditor();
+        });
+	</script>
+{% endblock %}

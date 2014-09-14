@@ -318,12 +318,12 @@ class ImportDatabaseCommand extends ContainerAwareCommand {
 	
 	protected function importMessages($users) {
 		$this->truncateTable(get_class(new Message));
-		$stmt = $this->em->getConnection()->executeQuery('SELECT COUNT(*) FROM messages');
+		$stmt = $this->em->getConnection()->executeQuery('SELECT COUNT(*) FROM messages WHERE state != 5');
 		$messageCount = $stmt->fetch(Query::HYDRATE_SINGLE_SCALAR)[0];
 		$progress = $this->getHelperSet()->get('progress');
 		$progress->start($this->output, $messageCount);
 
-		$stmt = $this->em->getConnection()->executeQuery('SELECT * FROM messages');
+		$stmt = $this->em->getConnection()->executeQuery('SELECT * FROM messages WHERE state != 5');
 		$this->output->writeln("<info>Importing Messages</info>");
 		while ($rs = $stmt->fetch(Query::HYDRATE_ARRAY)) {
 			$message = new Message;

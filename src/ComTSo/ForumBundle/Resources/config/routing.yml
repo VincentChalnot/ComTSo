@@ -24,6 +24,20 @@ comtso_topic_show:
     requirements:
         forumId: "[\w-]+"
         id: "\d+"
+
+comtso_topic_edit:
+    pattern:  /forum/{forumId}/{id}/edit
+    defaults: { _controller: ComTSoForumBundle:Topic:edit }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+
+comtso_topic_add_photos:
+    pattern:  /forum/{forumId}/{id}/add_photos
+    defaults: { _controller: ComTSoForumBundle:Topic:addPhotos }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
        
 comtso_user_list:
     pattern:  /gens

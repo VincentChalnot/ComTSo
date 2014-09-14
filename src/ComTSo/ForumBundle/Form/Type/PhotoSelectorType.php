@@ -13,8 +13,12 @@ class PhotoSelectorType extends AbstractType {
 	public function setDefaultOptions(OptionsResolverInterface $resolver) {
 		$resolver->setDefaults([
 			'class' => 'ComTSo\ForumBundle\Entity\Photo',
-			//'data_class' => 'ComTSo\ForumBundle\Entity\Photo',
+			'browsable' => true,
 		]);
+	}
+	
+	public function buildView(\Symfony\Component\Form\FormView $view, \Symfony\Component\Form\FormInterface $form, array $options) {
+		$view->vars['browsable'] = $options['browsable'];
 	}
 	
 	public function getParent() {
