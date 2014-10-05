@@ -6,10 +6,12 @@ use ComTSo\ForumBundle\Controller\BaseController;
 use ComTSo\ForumBundle\Entity\Comment;
 use ComTSo\ForumBundle\Entity\Topic;
 use ComTSo\ForumBundle\Form\Type\TopicType;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TopicController extends BaseController {
 
@@ -47,7 +49,7 @@ class TopicController extends BaseController {
 		if ($this->getRequest()->isMethod('POST')) {
 			$form->handleRequest($this->getRequest());
 			if ($form->isValid()) {
-				$topic->setUpdatedAt(new \DateTime());
+				$topic->setUpdatedAt(new DateTime());
 				// Saving object
 				$em = $this->getManager();
 				$em->persist($comment, $topic);
@@ -83,7 +85,7 @@ class TopicController extends BaseController {
 			if ($form->isValid()) {
 				$em = $this->getManager();
 				
-				$topic->setUpdatedAt(new \DateTime());
+				$topic->setUpdatedAt(new DateTime());
 				
 				foreach ($originalPhotos as $photo) {
 					if (false === $topic->getPhotos()->contains($photo)) {
@@ -142,5 +144,84 @@ class TopicController extends BaseController {
 			return $this->render('ComTSoForumBundle:Photo:selector.html.twig', $this->viewParameters);
 		}
 		return $this->viewParameters;
+	}
+	
+	/**
+	 * @Template()
+	 */
+	public function addPhotoAction(Request $request, Topic $topic, $forumId) {
+		$response = $this->initTopic($topic, $forumId);
+		if ($response instanceof Response) {
+			return $response;
+		}
+		
+		if (!$request->query->has('add')) {
+			throw new NotFoundHttpException("Missing 'add' parameter");
+		}
+		$photo = $this->getRepository('Photo')->find($request->query->get('add'));
+		if (!$photo) {
+			throw new NotFoundHttpException("Photo not found : {$request->query->get('add')}");
+		}
+
+		$lastPhoto = $this->getRepository('PhotoTopic')->findLast($topic);
+
+		$em = $this->getManager();
+		$photoTopic = new \ComTSo\ForumBundle\Entity\PhotoTopic;
+		$photoTopic->setPhoto($photo)
+				->setTopic($topic)
+				->setOrder($lastPhoto->getOrder() + 1)
+				->setAuthor($this->getUser());
+		$em->persist($photoTopic);
+		$em->flush();
+		$this->viewParameters['photoTopic'] = $photoTopic;
+		return $this->render('ComTSoForumBundle:Topic:add_confirmed.html.twig', $this->viewParameters);
+	}
+	
+	/**
+	 * @Template()
+	 */
+	public function removePhotoAction(Request $request, Topic $topic, $forumId) {
+		$response = $this->initTopic($topic, $forumId);
+		if ($response instanceof Response) {
+			return $response;
+		}
+		
+		if (!$request->query->has('remove')) {
+			throw new NotFoundHttpException("Missing 'remove' parameter");
+		}
+		$photoTopic = $this->getRepository('PhotoTopic')->find($request->query->get('remove'));
+		if (!$photoTopic) {
+			throw new NotFoundHttpException("PhotoTopic not found : {$request->query->get('remove')}");
+		}
+
+		$em = $this->getManager();
+		$em->remove($photoTopic);
+		$em->flush();
+		return new Response;
+	}
+	
+	/**
+	 * @Template()
+	 */
+	public function orderPhotosAction(Request $request, Topic $topic, $forumId) {
+		$response = $this->initTopic($topic, $forumId);
+		if ($response instanceof Response) {
+			return $response;
+		}
+		
+		if (!$request->request->has('order')) {
+			throw new NotFoundHttpException("Missing 'order' in request body");
+		}
+		$order = $request->request->get('order');
+		$em = $this->getManager();
+		foreach ($topic->getPhotos() as $photoTopic) {
+			if (!isset($order[$photoTopic->getPhoto()->getId()])) {
+				continue; // Throw error ?
+			}
+			$photoTopic->setOrder($order[$photoTopic->getPhoto()->getId()]);
+			$em->persist($photoTopic);
+		}
+		$em->flush();
+		return $this->render('ComTSoForumBundle:Topic:order_confirmed.html.twig', $this->viewParameters);
 	}
 }

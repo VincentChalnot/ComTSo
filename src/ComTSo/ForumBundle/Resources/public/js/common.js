@@ -1,4 +1,38 @@
+
+var timeout = null;
+var updatePhotoOrder = function (t) {
+	var list = {};
+	var i = 0;
+	t.children().each(function(){
+		var id = $(this).data('id');
+		if (id) {
+			list[id] = i++;
+		}
+	});
+	var topicId = t.parents('.topic').data('topic-id');
+	var forumId = t.parents('.topic').data('forum-id');
+	var url = Routing.generate('comtso_topic_order_photos', {id: topicId, forumId: forumId});
+	$.ajax(url, {
+		type: 'POST',
+		data: {
+			order: list
+		},
+		complete: function(data) {
+			$(document).trigger('comtso.notification', {
+				object: t,
+				message: 'Modifications enregistrées'
+			});
+		}
+	});
+};
+
 $(document).ready(function(){
+	
+	$(document).on('mouseover', '[data-toggle="tooltip"]', function(){
+		$(this).tooltip({
+			container: 'body'
+		}).tooltip('show');
+	});
 	
 	$('#chat-toggle').parent().show();
 	$('#chat-toggle').click(function(e){
@@ -120,7 +154,6 @@ $(document).ready(function(){
 	
 	$(document).on('loaded.bs.modal', '#photo-browser', function(e) {
 		oneUploadFormInit($('#photo-upload'));
-		$('#photo-upload [data-toggle="tooltip"]').tooltip();
 	});
 	
 	$(document).on('click', '.photo-selector ul.pagination li a', function(e){
@@ -158,5 +191,34 @@ $(document).ready(function(){
 		$('input[type="hidden"]', widget).val(photoId);
 		$('.widget-container', widget).load(Routing.generate('comtso_photo_widget', {id: photoId}));
 		$('#photo-browser').modal('hide');
+	});
+	
+	$(document).on('click', '.topic .photo-selector .photo-selector-line button.select', function(){
+		var t = $(this);
+		var line = t.parents('.photo-selector-line');
+		var photoId = line.data('photo-id');
+		var topicId = t.parents('.topic').data('topic-id');
+		var forumId = t.parents('.topic').data('forum-id');
+		var url = Routing.generate('comtso_topic_add_photo', {id: topicId, forumId: forumId, add: photoId});
+		t.parents('tr').find('td').first().prepend($('<div>').addClass('cache loader'));
+		$.ajax(url, {
+			complete: function(data) {
+				t.parents('tr')
+						.find('.cache')
+						.removeClass('loader')
+						.html(data.responseText)
+						.find('a[data-action="cancel"]')
+						.on('click', function(e) {
+							e.preventDefault();
+							$.ajax($(this).attr('href'), {
+								success: function() {
+									t.parents('tr').find('.cache').remove();
+								}
+							});
+						});
+				
+			}
+		});
+		console.log(t);
 	});
 });

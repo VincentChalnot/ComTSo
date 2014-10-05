@@ -2,7 +2,7 @@
 body {
 	padding-top: 20px;
 	padding-bottom: 20px;
-	overflow-y: scroll;
+	//overflow-y: scroll; // Caued a bug in jQueryUI Sortable
 	font-size: 14px;
 }
 
@@ -52,6 +52,19 @@ table td.minimize, table th.minimize {
 
 textarea {
 	resize: vertical;
+}
+
+.loader {
+	background-image: image-url('ajax-loader.gif');
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+.ui-sortable-placeholder, .ui-sortable-helper {
+	transition: none !important;
+	-webkit-transition: none !important;
+	-moz-transition: none !important;
+	-o-transition: none !important;
 }
 
 @media (max-width: 768px) {

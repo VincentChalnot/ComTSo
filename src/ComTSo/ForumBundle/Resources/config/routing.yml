@@ -38,6 +38,35 @@ comtso_topic_add_photos:
     requirements:
         forumId: "[\w-]+"
         id: "\d+"
+    options:
+        expose: true
+
+comtso_topic_add_photo:
+    pattern:  /forum/{forumId}/{id}/add_photo
+    defaults: { _controller: ComTSoForumBundle:Topic:addPhoto }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+    options:
+        expose: true
+
+comtso_topic_remove_photo:
+    pattern:  /forum/{forumId}/{id}/remove_photo
+    defaults: { _controller: ComTSoForumBundle:Topic:removePhoto }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+    options:
+        expose: true
+
+comtso_topic_order_photos:
+    pattern:  /forum/{forumId}/{id}/order_photos
+    defaults: { _controller: ComTSoForumBundle:Topic:orderPhotos }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+    options:
+        expose: true
        
 comtso_user_list:
     pattern:  /gens

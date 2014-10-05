@@ -10,4 +10,13 @@ namespace ComTSo\ForumBundle\Entity;
  */
 class PhotoTopicRepository extends BaseRepository {
 	
+	public function findLast(Topic $topic) {
+		$qb = $this->createQueryBuilder('e')
+				->innerJoin('e.topic', 't')
+				->where('t = :topic')
+				->addOrderBy('e.order', 'DESC')
+				->setMaxResults(1)
+				->setParameter('topic', $topic);
+		return $qb->getQuery()->getOneOrNullResult();
+	}
 }

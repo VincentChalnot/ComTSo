@@ -10,4 +10,12 @@
 	.modal-header {
 		display: none;
 	}
+	.topic-photos {
+		position: relative;
+		.img-thumbnail {
+			float: left;
+			display: block;
+			vertical-align: middle;
+		}
+	}
 }

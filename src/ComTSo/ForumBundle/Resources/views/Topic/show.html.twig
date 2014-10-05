@@ -6,9 +6,10 @@
 			<li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
 		{% endfor %}
 	</ul>
-	<div class="topic">
+	<div class="topic" data-topic-id="{{ topic.id }}" data-forum-id="{{ topic.forum.id }}">
 		<div class="btn-group pull-right">
-			<a href="{{ topic|path('edit') }}" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
+			<a href="{{ topic|path('edit') }}" class="btn btn-primary" title="Modifier"><i class="fa fa-pencil"></i></a>
+			<a href="{{ topic|path('add_photos') }}" class="btn btn-info" title="Ajouter des photos"><i class="fa fa-camera-retro"></i></a>
 		</div>
 		<h3>{{ topic }}</h3>
 		<div>{{ topic.content|raw }}</div>
@@ -18,16 +19,13 @@
 		</p>
 		{% spaceless %}
 			{% if topic.photos %}
-				<div class="topic-photos">
+				<div class="topic-photos" id="sortable-photos">
 					{% for photoTopic in topic.photos %}
 						{% set photo = photoTopic.photo %}
 						{% if photo %}
 							{% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
 						{% endif %}
 					{% endfor %}
-					<a href="{{ topic|path('add_photos') }}" class="img-thumbnail img-new" title="Ajouter des photos">
-						<i class="fa fa-plus"></i>
-					</a>
 				</div>
 			{% endif %}
 		{% endspaceless %}
@@ -54,6 +52,26 @@
 	<script>
         $(document).ready(function(){
             $('#{{ form.content.vars.id }}').click(function(e){$(this).ckeditor();});
+			
+			
+			var timeout = null;
+			$('#sortable-photos').sortable({
+				scroll: true,
+				update: function(e, ui) {
+					var t = $(e.target);
+					if (timeout) {
+						window.clearTimeout(timeout);
+					}
+					timeout = window.setTimeout(function() {
+						updatePhotoOrder(t);
+					}, 1000);
+				},
+				start: function(e, ui) {
+					if (timeout) {
+						window.clearTimeout(timeout);
+					}
+				}
+			});
         });
 	</script>
 {% endblock %}
