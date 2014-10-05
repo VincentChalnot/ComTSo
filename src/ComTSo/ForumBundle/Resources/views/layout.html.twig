@@ -14,11 +14,12 @@
 				<script type="text/javascript" src="{{ asset_url }}"></script>
 			{% endjavascripts %}
 		<![endif]-->
-		{% stylesheets	'bundles/comtsoforum/css/comtso.css'
-						'bundles/comtsoforum/css/blueimp-gallery.min.css'
+		{% stylesheets	'bundles/comtsoforum/css/blueimp-gallery.min.css'
 						'bundles/comtsoforum/css/bootstrap-image-gallery.min.css'
 						'bundles/comtsoforum/css/jquery.fileupload.css'
 						'bundles/comtsoforum/css/bootstrap-datetimepicker.min.css'
+						'assets/jquery-ui/themes/base/minified/jquery-ui.min.css'
+						'bundles/comtsoforum/css/comtso.css'
 						'bundles/comtsoforum/css/bootstrap-lumen.min.css'
 			filter='cssrewrite' %}
 			<link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
@@ -103,6 +104,8 @@
 			'assets/jquery/jquery.min.js'
 			'assets/jquery-ui/ui/minified/jquery.ui.core.min.js'
 			'assets/jquery-ui/ui/minified/jquery.ui.widget.min.js'
+			'assets/jquery-ui/ui/minified/jquery.ui.mouse.min.js'
+			'assets/jquery-ui/ui/minified/jquery.ui.sortable.min.js'
 			'bundles/fosjsrouting/js/router.js'
 			'@MopaBootstrapBundle/Resources/public/bootstrap-sass/assets/javascripts/bootstrap.js'
 			'@MopaBootstrapBundle/Resources/public/js/mopabootstrap-collection.js'

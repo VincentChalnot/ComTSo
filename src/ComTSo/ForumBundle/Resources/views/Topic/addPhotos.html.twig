@@ -6,7 +6,8 @@
 			<li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
 		{% endfor %}
 	</ul>
-	<div class="topic">
+	<div class="topic" data-topic-id="{{ topic.id }}" data-forum-id="{{ topic.forum.id }}">
+		<a href="{{ topic|path }}" class="btn btn-default pull-right"><i class="fa fa-arrow-left"></i> Retour</a>
 		<h3>{{ topic }}</h3>
 		<p class="text-muted">
 			Créé par <a href="{{ topic.author|path }}">{{ topic.author }}</a>

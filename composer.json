@@ -21,7 +21,7 @@
         "sensio/generator-bundle": "~2.3",
         "incenteev/composer-parameter-handler": "~2.0",
 		"friendsofsymfony/user-bundle": "~2.0@dev",
-        "friendsofsymfony/jsrouting-bundle": "1.5.*",
+        "friendsofsymfony/jsrouting-bundle": "dev-master",
 		"mopa/bootstrap-bundle": "3.*@dev",
         "twbs/bootstrap-sass": "3.*@dev",
         "components/jquery": "1.11.*",

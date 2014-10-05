@@ -47,6 +47,13 @@ table.photo-selector-table {
 			border-bottom: 2px solid #eee;
 			td {
 				vertical-align: middle;
+				.cache {
+					position: absolute;
+					width: 100%;
+					background-color: rgba(255,255,255,0.8);
+					z-index: 10;
+					height: 80px;
+				}
 			}
 		}
 	}
