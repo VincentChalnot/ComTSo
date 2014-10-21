@@ -8,47 +8,54 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="ctso_quote")
  * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\QuoteRepository")
  */
-class Quote implements Routable {
+class Quote implements Routable
+{
+    use Behavior\Authorable,
+     Behavior\Timestampable,
+     Behavior\ContentEditable;
 
-	use Behavior\Authorable,
-	 Behavior\Timestampable,
-	 Behavior\ContentEditable;
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
 
-	/**
-	 * @ORM\Id
-	 * @ORM\Column(type="integer")
-	 * @ORM\GeneratedValue(strategy="AUTO")
-	 */
-	protected $id;
+    /**
+     * Original author of the quote (author is the user who posted it)
+     *
+     * @var string
+     * @ORM\Column(name="original_author", type="string", length=128)
+     */
+    protected $originalAuthor;
 
-	/**
-	 * Original author of the quote (author is the user who posted it)
-	 *
-	 * @var string
-	 * @ORM\Column(name="original_author", type="string", length=128)
-	 */
-	protected $originalAuthor;
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	public function getId() {
-		return $this->id;
-	}
+    public function setId($id)
+    {
+        $this->id = $id;
 
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+        return $this;
+    }
 
-	public function setOriginalAuthor($text = null) {
-		$this->originalAuthor = $text;
-		return $this;
-	}
+    public function setOriginalAuthor($text = null)
+    {
+        $this->originalAuthor = $text;
 
-	public function getOriginalAuthor() {
-		return $this->originalAuthor;
-	}
+        return $this;
+    }
 
-	public function getRoutingParameters() {
-		return ['id' => $this->getId()];
-	}
+    public function getOriginalAuthor()
+    {
+        return $this->originalAuthor;
+    }
+
+    public function getRoutingParameters()
+    {
+        return ['id' => $this->getId()];
+    }
 
 }

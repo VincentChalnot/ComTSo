@@ -1,22 +1,22 @@
 
 .post {
-	clear: both;
-	font-size: 1.1em;
-	textarea {
-		resize: vertical;
-	}
-	.post-infos {
-		visibility: hidden;
-		margin-bottom: 0;
-		clear: both;
-	}
-	.post-side {
-		padding-bottom: 1.4em;
-		a.btn {
-			margin-top: 1em;
-		}
-	}
-	&:hover .post-infos {
-		visibility: visible;
-	}
+    clear: both;
+    font-size: 1.1em;
+    textarea {
+        resize: vertical;
+    }
+    .post-infos {
+        visibility: hidden;
+        margin-bottom: 0;
+        clear: both;
+    }
+    .post-side {
+        padding-bottom: 1.4em;
+        a.btn {
+            margin-top: 1em;
+        }
+    }
+    &:hover .post-infos {
+        visibility: visible;
+    }
 }

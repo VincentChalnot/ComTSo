@@ -1,74 +1,74 @@
 
 body {
-	padding-top: 20px;
-	padding-bottom: 20px;
-	//overflow-y: scroll; // Caued a bug in jQueryUI Sortable
-	font-size: 14px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    //overflow-y: scroll; // Caued a bug in jQueryUI Sortable
+    font-size: 14px;
 }
 
 h1 {
-	font-family: 'Port Lligat Slab', serif;
-	font-size: 10em;
-	text-shadow: 2px 2px 2px #000;
+    font-family: 'Port Lligat Slab', serif;
+    font-size: 10em;
+    text-shadow: 2px 2px 2px #000;
 }
 
 .navbar {
-	margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .nav.nav-compact > li > a {
-	padding: 2px 5px;
+    padding: 2px 5px;
 }
 
 .highlight {
-	background: #adf0fe;
+    background: #adf0fe;
 }
 
 dl.dl-small {
-	margin-bottom: 0;
-	dd {
-		margin-left: 70px;
-	}
-	dt{
-		width: 65px;
-	}
+    margin-bottom: 0;
+    dd {
+        margin-left: 70px;
+    }
+    dt{
+        width: 65px;
+    }
 }
 
 table td.minimize, table th.minimize {
-	width: 1px;
+    width: 1px;
 }
 
 .input-append-icon {
-	position: relative;
-	width: 0;
-	float: right;
-	i.fa {
-		position: absolute;
-		top: 8px;
-		left: -25px;
-		font-size: 1.5em;
-	}
+    position: relative;
+    width: 0;
+    float: right;
+    i.fa {
+        position: absolute;
+        top: 8px;
+        left: -25px;
+        font-size: 1.5em;
+    }
 }
 
 textarea {
-	resize: vertical;
+    resize: vertical;
 }
 
 .loader {
-	background-image: image-url('ajax-loader.gif');
-	background-repeat: no-repeat;
-	background-position: center center;
+    background-image: image-url('ajax-loader.gif');
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
 .ui-sortable-placeholder, .ui-sortable-helper {
-	transition: none !important;
-	-webkit-transition: none !important;
-	-moz-transition: none !important;
-	-o-transition: none !important;
+    transition: none !important;
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
 }
 
 @media (max-width: 768px) {
-	h1 {
-		font-size: 5em;
-	}
+    h1 {
+        font-size: 5em;
+    }
 }

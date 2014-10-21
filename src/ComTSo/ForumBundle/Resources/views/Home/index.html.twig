@@ -1,35 +1,35 @@
 {% extends 'ComTSoForumBundle::layout.html.twig' %}
 
 {% block content %}
-	<h2>Activités récentes</h2>
-	{% for topic in topics %}
-		<div class="topic panel panel-default">
-			<div class="panel-heading">
-				<h3><a href="{{ topic|path }}" name="topic-{{ topic.id }}">{{ topic }}</a></h3>
-				<div>{{ topic.content|raw }}</div>
-			</div>
-			<div class="panel-body">
-				{% for comment in topic.lastComments %}
-					{% if loop.index != 1 %}<hr class="clear">{% endif %}
-					{% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
-				{% endfor %}
-			</div>
-			<div class="panel-footer text-center"><a class="btn btn-info" href="{{ topic|path }}">Voir le topic</a></div>
-		</div>
-	{% endfor %}
+    <h2>Activités récentes</h2>
+    {% for topic in topics %}
+        <div class="topic panel panel-default">
+            <div class="panel-heading">
+                <h3><a href="{{ topic|path }}" name="topic-{{ topic.id }}">{{ topic }}</a></h3>
+                <div>{{ topic.content|raw }}</div>
+            </div>
+            <div class="panel-body">
+                {% for comment in topic.lastComments %}
+                    {% if loop.index != 1 %}<hr class="clear">{% endif %}
+                    {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+                {% endfor %}
+            </div>
+            <div class="panel-footer text-center"><a class="btn btn-info" href="{{ topic|path }}">Voir le topic</a></div>
+        </div>
+    {% endfor %}
 {% endblock %}
-		
+
 {% block aside %}
-	<h4>Accès rapide</h4>
-	<ul class="nav nav-compact">
-		{% for t in topics %}
-			<li><a href="{{ t|path }}">{{ t }}</a></li>
-		{% endfor %}
-	</ul>
-	<h4>Forums</h4>
-	<ul class="nav nav-compact">
-		{% for f in forums %}
-			<li><a href="{{ f|path }}">{{ f }}</a></li>
-		{% endfor %}
-	</ul>
+    <h4>Accès rapide</h4>
+    <ul class="nav nav-compact">
+        {% for t in topics %}
+            <li><a href="{{ t|path }}">{{ t }}</a></li>
+        {% endfor %}
+    </ul>
+    <h4>Forums</h4>
+    <ul class="nav nav-compact">
+        {% for f in forums %}
+            <li><a href="{{ f|path }}">{{ f }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}

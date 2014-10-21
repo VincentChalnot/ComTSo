@@ -2,17 +2,17 @@
 <h3>Photos existantes</h3>
 <div class="clear"></div>
 <table class="table photo-selector-table">
-	<thead>
-		<tr>
-			<th>Miniature</th>
-			<th>Titre</th>
-			<th>Action</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for photo in photos %}
-			{% include 'ComTSoForumBundle:Photo:selector-line.html.twig' %}
-		{% endfor %}
-	</tbody>
+    <thead>
+        <tr>
+            <th>Miniature</th>
+            <th>Titre</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for photo in photos %}
+            {% include 'ComTSoForumBundle:Photo:selector-line.html.twig' %}
+        {% endfor %}
+    </tbody>
 </table>
 {% include 'ComTSoForumBundle:Pagination:pager.html.twig' with {'results': photos} %}

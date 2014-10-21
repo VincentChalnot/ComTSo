@@ -1,7 +1,7 @@
 {% set quote = entity %}
 <blockquote>
-	<p>{{ quote.content|highlight(query) }}</p>
-	{% if quote.originalAuthor %}
-		<footer>{{ quote.originalAuthor|highlight(query) }}</footer>
-	{% endif %}
+    <p>{{ quote.content|highlight(query) }}</p>
+    {% if quote.originalAuthor %}
+        <footer>{{ quote.originalAuthor|highlight(query) }}</footer>
+    {% endif %}
 </blockquote>

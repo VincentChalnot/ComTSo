@@ -1,36 +1,36 @@
 {% extends 'ComTSoForumBundle::layout.html.twig' %}
 
 {% block content %}
-	<ul class="nav nav-tabs">
-		{% for f in forums %}
-			<li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
-		{% endfor %}
-	</ul>
-	<div class="topic" data-topic-id="{{ topic.id }}" data-forum-id="{{ topic.forum.id }}">
-		<a href="{{ topic|path }}" class="btn btn-default pull-right"><i class="fa fa-arrow-left"></i> Retour</a>
-		<h3>{{ topic }}</h3>
-		<p class="text-muted">
-			Créé par <a href="{{ topic.author|path }}">{{ topic.author }}</a>
-			le {{ topic.createdAt|date('d/m/Y à H:i') }} – {{ topic.views }} vues – {{ topic.commentCount }} posts
-		</p>
-		{% include 'ComTSoForumBundle:Photo:uploader.html.twig' %}
-	</div>
+    <ul class="nav nav-tabs">
+        {% for f in forums %}
+            <li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
+        {% endfor %}
+    </ul>
+    <div class="topic" data-topic-id="{{ topic.id }}" data-forum-id="{{ topic.forum.id }}">
+        <a href="{{ topic|path }}" class="btn btn-default pull-right"><i class="fa fa-arrow-left"></i> Retour</a>
+        <h3>{{ topic }}</h3>
+        <p class="text-muted">
+            Créé par <a href="{{ topic.author|path }}">{{ topic.author }}</a>
+            le {{ topic.createdAt|date('d/m/Y à H:i') }} – {{ topic.views }} vues – {{ topic.commentCount }} posts
+        </p>
+        {% include 'ComTSoForumBundle:Photo:uploader.html.twig' %}
+    </div>
 {% endblock %}
-		
+
 {% block aside %}
-	<h4>Accès rapide</h4>
-	<ul class="nav nav-compact">
-		{% for t in topics %}
-			<li{{ t.id == topic.id ? ' class="active"' }}><a href="{{ t|path }}">{{ t }}</a></li>
-		{% endfor %}
-	</ul>
+    <h4>Accès rapide</h4>
+    <ul class="nav nav-compact">
+        {% for t in topics %}
+            <li{{ t.id == topic.id ? ' class="active"' }}><a href="{{ t|path }}">{{ t }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 
 {% block javascripts %}
-	{{ parent() }}
-	<script>
+    {{ parent() }}
+    <script>
         $(document).ready(function(){
             oneUploadFormInit($('#photo-upload'));
         });
-	</script>
+    </script>
 {% endblock %}

@@ -1,37 +1,37 @@
 <tr id="photo-selector-{{ photo.id }}" class="photo-selector-line" data-photo-id="{{ photo.id }}">
-	<td>{% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' with {'filter': 'tiny'} %}</td>
-	<td>
-		<div class="row">
-			<div class="col-sm-3">
-				{% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': photo.author, size: 'sm'} %}
-			</div>
-			<div class="col-sm-9 form-group">
-				<span class="input-append-icon" style="display:none;"><i class="fa fa-check-circle text-success"></i></span>
-				<input type="text" class="form-control photo-title" placeholder="Titre de la photo" value="{{ photo.title }}">
-				<input type="hidden" class="old-title" value="{{ photo.title }}">
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-6">
-				<dl class="dl-horizontal dl-small">
-					<dt>Prise :</dt><dd>{{ photo.takenAt|htmlDate }}</dd>
-				</dl>
-			</div>
-			<div class="col-sm-6">
-				<dl class="dl-horizontal dl-small">
-					<dt>Upload :</dt><dd>{{ photo.createdAt|htmlDate }}</dd>
-				</dl>
-			</div>
-		</div>
-	</td>
-	<td>
-		<div class="btn-group">
-			<button type="submit" class="btn btn-primary select" title="Sélectionner la photo" data-toggle="tooltip">
-				<i class="fa fa-check"></i>
-			</button>
-			<button type="button" class="btn btn-danger delete" title="Supprimer la photo" data-toggle="tooltip">
-				<i class="fa fa-trash-o"></i>
-			</button>
-		</div>
-	</td>
+    <td>{% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' with {'filter': 'tiny'} %}</td>
+    <td>
+        <div class="row">
+            <div class="col-sm-3">
+                {% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': photo.author, size: 'sm'} %}
+            </div>
+            <div class="col-sm-9 form-group">
+                <span class="input-append-icon" style="display:none;"><i class="fa fa-check-circle text-success"></i></span>
+                <input type="text" class="form-control photo-title" placeholder="Titre de la photo" value="{{ photo.title }}">
+                <input type="hidden" class="old-title" value="{{ photo.title }}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <dl class="dl-horizontal dl-small">
+                    <dt>Prise :</dt><dd>{{ photo.takenAt|htmlDate }}</dd>
+                </dl>
+            </div>
+            <div class="col-sm-6">
+                <dl class="dl-horizontal dl-small">
+                    <dt>Upload :</dt><dd>{{ photo.createdAt|htmlDate }}</dd>
+                </dl>
+            </div>
+        </div>
+    </td>
+    <td>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primary select" title="Sélectionner la photo" data-toggle="tooltip">
+                <i class="fa fa-check"></i>
+            </button>
+            <button type="button" class="btn btn-danger delete" title="Supprimer la photo" data-toggle="tooltip">
+                <i class="fa fa-trash-o"></i>
+            </button>
+        </div>
+    </td>
 </tr>

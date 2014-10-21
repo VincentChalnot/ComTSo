@@ -1,78 +1,78 @@
 
 .photo {
-	.avatar {
-		float: left;
-		margin-right: 10px;
-		margin-top: 5px;
-	}
+    .avatar {
+        float: left;
+        margin-right: 10px;
+        margin-top: 5px;
+    }
 }
 
 .topic-photos {
-	a {
-		display: inline-block;
-		margin: 3px;
-	}
+    a {
+        display: inline-block;
+        margin: 3px;
+    }
 }
 
 .blueimp-gallery {
-	.slides>.slide>.slide-content.modal {
-		overflow-y: auto;
-	}
-	.modal-dialog {
-		max-width: none !important;
-	}
-	.modal-content > button.prev {
-		position: absolute;
-		z-index: 10;
-		bottom: 10px;
-		left: 10px;
-	}
-	.modal-content > button.next {
-		position: absolute;
-		z-index: 10;
-		bottom: 10px;
-		right: 10px;
-	}
-	.modal-content > button.close {
-		position: absolute;
-		z-index: 10;
-		top: 5px;
-		right: 10px;
-	}
+    .slides>.slide>.slide-content.modal {
+        overflow-y: auto;
+    }
+    .modal-dialog {
+        max-width: none !important;
+    }
+    .modal-content > button.prev {
+        position: absolute;
+        z-index: 10;
+        bottom: 10px;
+        left: 10px;
+    }
+    .modal-content > button.next {
+        position: absolute;
+        z-index: 10;
+        bottom: 10px;
+        right: 10px;
+    }
+    .modal-content > button.close {
+        position: absolute;
+        z-index: 10;
+        top: 5px;
+        right: 10px;
+    }
 }
 
 table.photo-selector-table {
-	tbody {
-		tr {
-			border-bottom: 2px solid #eee;
-			td {
-				vertical-align: middle;
-				.cache {
-					position: absolute;
-					width: 100%;
-					background-color: rgba(255,255,255,0.8);
-					z-index: 10;
-					height: 80px;
-				}
-			}
-		}
-	}
+    tbody {
+        tr {
+            border-bottom: 2px solid #eee;
+            td {
+                vertical-align: middle;
+                .cache {
+                    position: absolute;
+                    width: 100%;
+                    background-color: rgba(255,255,255,0.8);
+                    z-index: 10;
+                    height: 80px;
+                }
+            }
+        }
+    }
 }
 
 .photo-selector-widget {
-	p.empty {
-		padding-top: 7px;
-	}
+    p.empty {
+        padding-top: 7px;
+    }
 }
 
 .img-thumbnail.img-new {
-	width: 165px;
-	height: 165px;
-	vertical-align: middle;
-	text-align: center;
-	i.fa {
-		margin-top: 55px;
-		font-size: 3em;
-		opacity: 0.5;
-	}
+    width: 165px;
+    height: 165px;
+    vertical-align: middle;
+    text-align: center;
+    i.fa {
+        margin-top: 55px;
+        font-size: 3em;
+        opacity: 0.5;
+    }
 }

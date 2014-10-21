@@ -1,138 +1,138 @@
 <!DOCTYPE html>
 <html lang="{{ app.request.locale }}">
 <head>
-	<meta charset="{{ _charset }}">
-	<title>{% block title %}ComTSo{{ title is defined ? ' - ' ~ title }}{% endblock %}</title>
-	{% block metas %}
+    <meta charset="{{ _charset }}">
+    <title>{% block title %}ComTSo{{ title is defined ? ' - ' ~ title }}{% endblock %}</title>
+    {% block metas %}
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="ComTSo">
         <meta name="author" content="">
     {% endblock %}
-	{% block stylesheets %}
-		<!--[if lt IE 10]>
-			{% javascripts 'bundles/comtsoforum/js/modernizr.custom.min.js' %}
-				<script type="text/javascript" src="{{ asset_url }}"></script>
-			{% endjavascripts %}
-		<![endif]-->
-		{% stylesheets	'bundles/comtsoforum/css/blueimp-gallery.min.css'
-						'bundles/comtsoforum/css/bootstrap-image-gallery.min.css'
-						'bundles/comtsoforum/css/jquery.fileupload.css'
-						'bundles/comtsoforum/css/bootstrap-datetimepicker.min.css'
-						'assets/jquery-ui/themes/base/minified/jquery-ui.min.css'
-						'bundles/comtsoforum/css/comtso.css'
-						'bundles/comtsoforum/css/bootstrap-lumen.min.css'
-			filter='cssrewrite' %}
-			<link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
-		{% endstylesheets %}
-		<link href="//fonts.googleapis.com/css?family=Port+Lligat+Slab" type="text/css" rel="stylesheet">
+    {% block stylesheets %}
+        <!--[if lt IE 10]>
+            {% javascripts 'bundles/comtsoforum/js/modernizr.custom.min.js' %}
+                <script type="text/javascript" src="{{ asset_url }}"></script>
+            {% endjavascripts %}
+        <![endif]-->
+        {% stylesheets    'bundles/comtsoforum/css/blueimp-gallery.min.css'
+                        'bundles/comtsoforum/css/bootstrap-image-gallery.min.css'
+                        'bundles/comtsoforum/css/jquery.fileupload.css'
+                        'bundles/comtsoforum/css/bootstrap-datetimepicker.min.css'
+                        'assets/jquery-ui/themes/base/minified/jquery-ui.min.css'
+                        'bundles/comtsoforum/css/comtso.css'
+                        'bundles/comtsoforum/css/bootstrap-lumen.min.css'
+            filter='cssrewrite' %}
+            <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
+        {% endstylesheets %}
+        <link href="//fonts.googleapis.com/css?family=Port+Lligat+Slab" type="text/css" rel="stylesheet">
     {% endblock %}
 </head>
 <body>
     <div class="container">
-		{% block main_content %}
-			{% block main_menu %}
-				<div class="navbar navbar-default hidden-print" role="navigation">
-					<div class="container-fluid">
-						<div class="navbar-header">
-							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-								<span class="sr-only">Toggle navigation</span>
-								<span class="fa fa-bar"></span>
-								<span class="fa fa-bar"></span>
-								<span class="fa fa-bar"></span>
-							</button>
-							<a class="navbar-brand" href="{{ path('comtso_homepage') }}">ComTSo</a>
-						</div>
-						<div class="navbar-collapse collapse">
-							<ul class="nav navbar-nav">
-								{% set activeMenu = activeMenu is defined ? activeMenu : 'home' %}
-								<li{{ activeMenu == 'home' ? ' class="active"' }}><a href="{{ path('comtso_homepage') }}">Home</a></li>
-								<li{{ activeMenu == 'forums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'le-bac-a-sable'}) }}">Le forum</a></li>
-								<li{{ activeMenu == 'albums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'albums'}) }}">Les albums</a></li>
-								<li{{ activeMenu == 'people' ? ' class="active"' }}><a href="{{ path('comtso_user_list') }}">Les gens</a></li>
-								<li style="display:none;"><a href="#chat" id="chat-toggle">Chat</a></li>
-							</ul>
-							<form action="{{ path('comtso_search') }}" method="get" class="navbar-form navbar-left" role="search">
-								<div class="form-group">
-									<input type="text" name="q" class="form-control" placeholder="Recherche" value="{% block search_value %}{% endblock %}">
-									<span class="input-group-btn"></span>
-								</div>
-								<button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-							</form>
-							<ul class="nav navbar-nav navbar-right">
-								<li><a href="{{ app.user|path }}"><i class="fa fa-user"></i> {{ app.user }}</a></li>
-								<li><a href="{{ path('fos_user_security_logout') }}"><i class="fa fa-sign-out"></i></a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			{% endblock %}
-			<div class="container-fluid">
-				{% block messages %}
-					{% for name in ['error', 'warning', 'success', 'info'] %}
-						{% for message in app.session.flashBag.get(name) %}
-							<div class="alert alert-{{ name }}">
-							  <button type="button" class="close" data-dismiss="alert">&times;</button>
-							  {{ message|raw }}
-							</div>
-						{% endfor %}
-					{% endfor %}
-				{% endblock %}
-				<div class="row" id="main-content">
-					{% include 'ComTSoForumBundle:ChatMessage:chat_panel.html.twig' %}
-					<div class="col-md-8" role="main">
-						{% block content %}{% endblock %}
-					</div>
-					<div class="col-md-4" class="hidden-print affix" role="complementary">
-						{% block aside %}{% endblock %}
-						<hr>
-						{% include 'ComTSoForumBundle:Quote:random.html.twig' %}
-					</div>
-				</div>
-			</div>
-		{% endblock %}
+        {% block main_content %}
+            {% block main_menu %}
+                <div class="navbar navbar-default hidden-print" role="navigation">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="fa fa-bar"></span>
+                                <span class="fa fa-bar"></span>
+                                <span class="fa fa-bar"></span>
+                            </button>
+                            <a class="navbar-brand" href="{{ path('comtso_homepage') }}">ComTSo</a>
+                        </div>
+                        <div class="navbar-collapse collapse">
+                            <ul class="nav navbar-nav">
+                                {% set activeMenu = activeMenu is defined ? activeMenu : 'home' %}
+                                <li{{ activeMenu == 'home' ? ' class="active"' }}><a href="{{ path('comtso_homepage') }}">Home</a></li>
+                                <li{{ activeMenu == 'forums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'le-bac-a-sable'}) }}">Le forum</a></li>
+                                <li{{ activeMenu == 'albums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'albums'}) }}">Les albums</a></li>
+                                <li{{ activeMenu == 'people' ? ' class="active"' }}><a href="{{ path('comtso_user_list') }}">Les gens</a></li>
+                                <li style="display:none;"><a href="#chat" id="chat-toggle">Chat</a></li>
+                            </ul>
+                            <form action="{{ path('comtso_search') }}" method="get" class="navbar-form navbar-left" role="search">
+                                <div class="form-group">
+                                    <input type="text" name="q" class="form-control" placeholder="Recherche" value="{% block search_value %}{% endblock %}">
+                                    <span class="input-group-btn"></span>
+                                </div>
+                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                            </form>
+                            <ul class="nav navbar-nav navbar-right">
+                                <li><a href="{{ app.user|path }}"><i class="fa fa-user"></i> {{ app.user }}</a></li>
+                                <li><a href="{{ path('fos_user_security_logout') }}"><i class="fa fa-sign-out"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endblock %}
+            <div class="container-fluid">
+                {% block messages %}
+                    {% for name in ['error', 'warning', 'success', 'info'] %}
+                        {% for message in app.session.flashBag.get(name) %}
+                            <div class="alert alert-{{ name }}">
+                              <button type="button" class="close" data-dismiss="alert">&times;</button>
+                              {{ message|raw }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endblock %}
+                <div class="row" id="main-content">
+                    {% include 'ComTSoForumBundle:ChatMessage:chat_panel.html.twig' %}
+                    <div class="col-md-8" role="main">
+                        {% block content %}{% endblock %}
+                    </div>
+                    <div class="col-md-4" class="hidden-print affix" role="complementary">
+                        {% block aside %}{% endblock %}
+                        <hr>
+                        {% include 'ComTSoForumBundle:Quote:random.html.twig' %}
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
     </div>
-	{% block end_body %}
-		{% include 'ComTSoForumBundle:Photo:gallery.html.twig' %}
-		{% include 'ComTSoForumBundle:Photo:uploader_skeleton.html.twig' %}
-		{% include 'ComTSoForumBundle:Photo:jquery-templates.html.php' %}
-	{% endblock %}
-	{% block javascripts %}
-		<script>
-			var CKEDITOR_BASEPATH = '/bundles/comtsoforum/js/ckeditor/';
-		</script>
-		{% javascripts
-			'assets/jquery/jquery.min.js'
-			'assets/jquery-ui/ui/minified/jquery.ui.core.min.js'
-			'assets/jquery-ui/ui/minified/jquery.ui.widget.min.js'
-			'assets/jquery-ui/ui/minified/jquery.ui.mouse.min.js'
-			'assets/jquery-ui/ui/minified/jquery.ui.sortable.min.js'
-			'bundles/fosjsrouting/js/router.js'
-			'@MopaBootstrapBundle/Resources/public/bootstrap-sass/assets/javascripts/bootstrap.js'
-			'@MopaBootstrapBundle/Resources/public/js/mopabootstrap-collection.js'
-			'@MopaBootstrapBundle/Resources/public/js/mopabootstrap-subnav.js'
-			'@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/js/bootstrap-datetimepicker.js'
-			'@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.fr.js'
-			'bundles/comtsoforum/js/ckeditor/ckeditor.js'
-			'bundles/comtsoforum/js/ckeditor/adapters/jquery.js'
-			'bundles/comtsoforum/js/jquery.blueimp-gallery.min.js'
-			'bundles/comtsoforum/js/bootstrap-image-gallery.js'
-			'bundles/comtsoforum/js/jquery.lazyload.min.js'
-			'bundles/comtsoforum/js/load-image.min.js'
-			'bundles/comtsoforum/js/jquery.tmpl.min.js'
-			'bundles/comtsoforum/js/jquery.iframe-transport.js'
-			'bundles/comtsoforum/js/jquery.fileupload.js'
-			'bundles/comtsoforum/js/jquery.fileupload-process.js'
-			'bundles/comtsoforum/js/jquery.fileupload-image.js'
-			'bundles/comtsoforum/js/jquery.fileupload-audio.js'
-			'bundles/comtsoforum/js/jquery.fileupload-video.js'
-			'bundles/comtsoforum/js/jquery.fileupload-validate.js'
-			'bundles/comtsoforum/js/jquery.fileupload-ui.js'
-			'bundles/comtsoforum/js/moment.min.js'
-			'bundles/comtsoforum/js/common.js'
-			%}
-			<script type="text/javascript" src="{{ asset_url }}"></script>
-		{% endjavascripts %}
-		<script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
+    {% block end_body %}
+        {% include 'ComTSoForumBundle:Photo:gallery.html.twig' %}
+        {% include 'ComTSoForumBundle:Photo:uploader_skeleton.html.twig' %}
+        {% include 'ComTSoForumBundle:Photo:jquery-templates.html.php' %}
+    {% endblock %}
+    {% block javascripts %}
+        <script>
+            var CKEDITOR_BASEPATH = '/bundles/comtsoforum/js/ckeditor/';
+        </script>
+        {% javascripts
+            'assets/jquery/jquery.min.js'
+            'assets/jquery-ui/ui/minified/jquery.ui.core.min.js'
+            'assets/jquery-ui/ui/minified/jquery.ui.widget.min.js'
+            'assets/jquery-ui/ui/minified/jquery.ui.mouse.min.js'
+            'assets/jquery-ui/ui/minified/jquery.ui.sortable.min.js'
+            'bundles/fosjsrouting/js/router.js'
+            '@MopaBootstrapBundle/Resources/public/bootstrap-sass/assets/javascripts/bootstrap.js'
+            '@MopaBootstrapBundle/Resources/public/js/mopabootstrap-collection.js'
+            '@MopaBootstrapBundle/Resources/public/js/mopabootstrap-subnav.js'
+            '@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/js/bootstrap-datetimepicker.js'
+            '@MopaBootstrapBundle/Resources/public/components/smalot-bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.fr.js'
+            'bundles/comtsoforum/js/ckeditor/ckeditor.js'
+            'bundles/comtsoforum/js/ckeditor/adapters/jquery.js'
+            'bundles/comtsoforum/js/jquery.blueimp-gallery.min.js'
+            'bundles/comtsoforum/js/bootstrap-image-gallery.js'
+            'bundles/comtsoforum/js/jquery.lazyload.min.js'
+            'bundles/comtsoforum/js/load-image.min.js'
+            'bundles/comtsoforum/js/jquery.tmpl.min.js'
+            'bundles/comtsoforum/js/jquery.iframe-transport.js'
+            'bundles/comtsoforum/js/jquery.fileupload.js'
+            'bundles/comtsoforum/js/jquery.fileupload-process.js'
+            'bundles/comtsoforum/js/jquery.fileupload-image.js'
+            'bundles/comtsoforum/js/jquery.fileupload-audio.js'
+            'bundles/comtsoforum/js/jquery.fileupload-video.js'
+            'bundles/comtsoforum/js/jquery.fileupload-validate.js'
+            'bundles/comtsoforum/js/jquery.fileupload-ui.js'
+            'bundles/comtsoforum/js/moment.min.js'
+            'bundles/comtsoforum/js/common.js'
+            %}
+            <script type="text/javascript" src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+        <script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
     {% endblock %}
 </body>
 </html>

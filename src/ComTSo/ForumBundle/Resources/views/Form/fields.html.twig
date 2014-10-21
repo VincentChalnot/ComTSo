@@ -4,29 +4,29 @@
 {% endblock %}
 
 {% block photo_widget %}
-	{% set photo = form.vars.data %}
-	<div class="photo-selector-widget" data-photo-id="{{ photo is not empty ? photo.id }}" id="photo-widget-{{ id }}">
-		{% if browsable or photo is empty %}
-			<div class="btn-group pull-right">
-				<button type="button" class="btn btn-primary btn-sm photo-widget-browse" title="Sélectionner une photo" data-toggle="tooltip">
-					<i class="fa fa-search"></i> Browse
-				</button>
-				{% if photo %}
-					<button type="button" class="btn btn-warning btn-sm photo-widget-detach" title="Détacher la photo" data-toggle="tooltip">
-						<i class="fa fa-times"></i>
-					</button>
-				{% endif %}
-			</div>
-		{% endif %}
-		<div class="widget-container">
-			{% include 'ComTSoForumBundle:Photo:widget.html.twig' %}
-		</div>
-		<input type="hidden" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
-	</div>
+    {% set photo = form.vars.data %}
+    <div class="photo-selector-widget" data-photo-id="{{ photo is not empty ? photo.id }}" id="photo-widget-{{ id }}">
+        {% if browsable or photo is empty %}
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-primary btn-sm photo-widget-browse" title="Sélectionner une photo" data-toggle="tooltip">
+                    <i class="fa fa-search"></i> Browse
+                </button>
+                {% if photo %}
+                    <button type="button" class="btn btn-warning btn-sm photo-widget-detach" title="Détacher la photo" data-toggle="tooltip">
+                        <i class="fa fa-times"></i>
+                    </button>
+                {% endif %}
+            </div>
+        {% endif %}
+        <div class="widget-container">
+            {% include 'ComTSoForumBundle:Photo:widget.html.twig' %}
+        </div>
+        <input type="hidden" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    </div>
 {% endblock %}
 
 {% block comtso_photo_topic_widget %}
     <a class="btn btn-warning pull-right" data-collection-remove-btn=".comtso_topic_photos_0_form_group"><i class="fa fa-times"></i></a>
-	{{ block('form_row') }}
-	<hr>
+    {{ block('form_row') }}
+    <hr>
 {% endblock %}

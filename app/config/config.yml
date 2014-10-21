@@ -91,4 +91,3 @@ oneup_uploader:
             storage:
                 type: filesystem
                 directory: %kernel.data_dir%/uploads
-                
