@@ -1,0 +1,16 @@
+<h3>{{ entity }}</h3>
+{% if entity.content is defined and entity.content %}
+    <div>{{ entity.content|raw }}</div>
+{% endif %}
+<p class="text-muted">
+    Créé
+    {% if entity.author is defined and entity.author %}
+        par <a href="{{ entity.author|path }}">{{ entity.author }}</a>
+    {% endif %}
+    {% if entity.createdAt is defined and entity.createdAt %}
+        le {{ entity.createdAt|date('d/m/Y à H:i') }}
+    {% endif %}
+    {% if entity.updatedAt is defined and entity.updatedAt %}
+        - Dernière modification le {{ entity.updatedAt|date('d/m/Y à H:i') }}
+    {% endif %}
+</p>

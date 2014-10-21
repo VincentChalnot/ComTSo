@@ -58,7 +58,7 @@ class TopicController extends BaseController
 
                 $this->addFlashMsg('success', 'Commentaire enregistré');
 
-                return $this->redirect($this->generateUrl('comtso_topic_show', ['id' => $topic->getId(), 'forumId' => $forum->getId()]));
+                return $this->redirect($this->generateUrl('comtso_topic_show', ['id' => $topic->getId(), 'forumId' => $topic->getForum()->getId()]));
             }
         }
 
@@ -138,11 +138,10 @@ class TopicController extends BaseController
             $ids[] = $photo->getPhoto()->getId();
         }
         $qb = $this->getRepository('Photo')->createQueryBuilder('e');
-        $qb->where('e.id NOT IN (:ids)')
-                ->setParameter('ids', $ids);
-
-        $request->query->set('forumId', $forumId);
-        $request->query->set('id', $topic->getId());
+        if ($ids) {
+            $qb->where('e.id NOT IN (:ids)')
+                    ->setParameter('ids', $ids);
+        }
 
         $photos = $this->createPager($qb, $request, 'createdAt', 'd')->initialize();
         $this->viewParameters['photos'] = $photos;
@@ -173,12 +172,13 @@ class TopicController extends BaseController
         }
 
         $lastPhoto = $this->getRepository('PhotoTopic')->findLast($topic);
+        $order = $lastPhoto ? $lastPhoto->getOrder() + 1 : 0;
 
         $em = $this->getManager();
         $photoTopic = new \ComTSo\ForumBundle\Entity\PhotoTopic();
         $photoTopic->setPhoto($photo)
                 ->setTopic($topic)
-                ->setOrder($lastPhoto->getOrder() + 1)
+                ->setOrder($order)
                 ->setAuthor($this->getUser());
         $em->persist($photoTopic);
         $em->flush();

@@ -18,6 +18,12 @@ comtso_forum_edit:
     requirements:
         id: "[\w-]+"
 
+comtso_forum_add_topic:
+    pattern:  /forum/{id}/add_topic
+    defaults: { _controller: ComTSoForumBundle:Forum:addTopic }
+    requirements:
+        id: "[\w-]+"
+
 comtso_topic_show:
     pattern:  /forum/{forumId}/{id}
     defaults: { _controller: ComTSoForumBundle:Topic:show }

@@ -49,12 +49,12 @@ class Topic implements Routable
     /**
      * @ORM\Column(type="integer")
      */
-    protected $views;
+    protected $views = 0;
 
     /**
      * @ORM\Column(name="comment_count", type="integer")
      */
-    protected $commentCount;
+    protected $commentCount = 0;
 
     /**
      * @param  int   $id

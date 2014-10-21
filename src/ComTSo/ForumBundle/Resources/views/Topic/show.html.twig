@@ -11,12 +11,7 @@
             <a href="{{ topic|path('edit') }}" class="btn btn-primary" title="Modifier"><i class="fa fa-pencil"></i></a>
             <a href="{{ topic|path('add_photos') }}" class="btn btn-info" title="Ajouter des photos"><i class="fa fa-camera-retro"></i></a>
         </div>
-        <h3>{{ topic }}</h3>
-        <div>{{ topic.content|raw }}</div>
-        <p class="text-muted">
-            Créé par <a href="{{ topic.author|path }}">{{ topic.author }}</a>
-            le {{ topic.createdAt|date('d/m/Y à H:i') }} – {{ topic.views }} vues – {{ topic.commentCount }} posts
-        </p>
+        {% include 'ComTSoForumBundle:Common:entity_header.html.twig' with {entity: topic} %}
         {% spaceless %}
             {% if topic.photos %}
                 <div class="topic-photos" id="sortable-photos">
