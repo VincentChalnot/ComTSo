@@ -1,0 +1,20 @@
+{% extends 'ComTSoForumBundle:Forum:show.html.twig' %}
+
+{% block inner_content %}
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <div class="btn-group pull-right">
+            <a href="{{ forum|path }}" class="btn btn-default">Retour</a>
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function(){
+            $('#{{ form.content.vars.id }}').ckeditor();
+        });
+    </script>
+{% endblock %}

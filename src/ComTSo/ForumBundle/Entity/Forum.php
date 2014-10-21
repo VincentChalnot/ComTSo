@@ -10,8 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Forum implements Routable
 {
-    use Behavior\Titleable,
-     Behavior\Timestampable;
+    use Behavior\Authorable,
+     Behavior\Timestampable,
+     Behavior\Titleable,
+     Behavior\ContentEditable;
 
     /**
      * @ORM\Id

@@ -6,29 +6,22 @@
             <li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
         {% endfor %}
     </ul>
-    {% for topic in topics %}
-        <div class="topic" id="topic-{{ topic.id }}">
-            <h3><a href="{{ topic|path }}">{{ topic }}</a></h3>
-            <div>{{ topic.content|raw }}</div>
-            {% for comment in [] %}
-                <hr class="clear">
-                {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
-            {% endfor %}
-            {% spaceless %}
-                {% if topic.photos %}
-                    <div class="topic-photos">
-                        {% for photoTopic in topic.photos %}
-                            {% set photo = photoTopic.photo %}
-                            {% if photo %}
-                                {% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            {% endspaceless %}
+    <div class="forum" data-forum-id="{{ forum.id }}">
+        <div class="btn-group pull-right">
+            <a href="{{ forum|path('edit') }}" class="btn btn-primary" title="Modifier"><i class="fa fa-pencil"></i></a>
+            <a href="{{ forum|path('add_topic') }}" class="btn btn-info" title="Ajouter un topic"><i class="fa fa-plus"></i></a>
         </div>
-        <hr>
-    {% endfor %}
+        {% include 'ComTSoForumBundle:Common:entity_header.html.twig' with {entity: forum} %}
+        <hr class="clear">
+        {% block inner_content %}
+            {% include 'ComTSoForumBundle:Pagination:pager.html.twig' with {'results': topics} %}
+            {% for topic in topics %}
+                {% include 'ComTSoForumBundle:Topic:preview.html.twig' %}
+            {% endfor %}
+            <div class="clear"></div>
+            {% include 'ComTSoForumBundle:Pagination:pager.html.twig' with {'results': topics} %}
+        {% endblock %}
+    </div>
 {% endblock %}
 
 {% block aside %}

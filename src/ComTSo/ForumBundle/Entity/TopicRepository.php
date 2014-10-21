@@ -10,7 +10,7 @@ namespace ComTSo\ForumBundle\Entity;
  */
 class TopicRepository extends BaseRepository
 {
-    public function findForForumList(Forum $forum)
+    public function getQBForForumList(Forum $forum)
     {
         $qb = $this->createQueryBuilder('e')
                 ->leftJoin('e.photos', 'p')
@@ -20,6 +20,6 @@ class TopicRepository extends BaseRepository
                 ->addOrderBy('e.updatedAt', 'DESC')
                 ->setParameter('forum', $forum);
 
-        return $qb->getQuery()->getResult();
+        return $qb;
     }
 }
