@@ -2,4 +2,3 @@ parameters:
     security.authentication.provider.dao.class: ComTSo\UserBundle\Authentication\ComTSoAuthenticationProvider
 
 services:
-

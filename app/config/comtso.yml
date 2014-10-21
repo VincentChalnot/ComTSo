@@ -25,7 +25,7 @@ joli_typo:
         fr:
             fixers: [ Ellipsis, Dimension, Dash, FrenchQuotes, FrenchNoBreakSpace, CurlyQuote, Trademark ]
             locale: fr_FR
-            
+
 exercise_html_purifier:
     default:
       HTML.TargetBlank: true
@@ -40,7 +40,7 @@ exercise_html_purifier:
       HTML.Trusted: true
       HTML.SafeIframe: true
       URI.SafeIframeRegexp: "\\^http://(www.youtube.com/embed/|player.vimeo.com/video/)\\"
-      
+
 liip_imagine:
     driver: %imagine_driver%
     resolvers:
@@ -69,6 +69,6 @@ liip_imagine:
             quality: 90
             filters:
                 thumbnail: { size: [1900, 1000], mode: inset }
-                
+
 fos_js_routing:
     routes_to_expose: [ _uploader_upload_photos ]

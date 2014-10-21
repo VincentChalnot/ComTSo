@@ -8,17 +8,18 @@ use Decoda\Exception\IoException;
 /**
  * Renders tags by using PHP as template engine.
  */
-class PhpEngine extends AbstractEngine {
-
+class PhpEngine extends AbstractEngine
+{
     /**
      * Renders the tag by using PHP templates.
      *
-     * @param array $tag
-     * @param string $content
+     * @param  array       $tag
+     * @param  string      $content
      * @return string
      * @throws IoException
      */
-    public function render(array $tag, $content) {
+    public function render(array $tag, $content)
+    {
         $setup = $this->getFilter()->getTag($tag['tag']);
 
         foreach ($this->getPaths() as $path) {

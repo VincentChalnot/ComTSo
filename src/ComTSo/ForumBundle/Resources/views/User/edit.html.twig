@@ -1,24 +1,24 @@
 {% extends 'ComTSoForumBundle::layout.html.twig' %}
 
 {% block content %}
-	{{ form_start(form) }}
-		{{ form_widget(form) }}
-		<div class="btn-group pull-right">
-			<a href="{{ user|path }}" class="btn btn-default">Retour</a>
-			<button type="submit" class="btn btn-primary">Envoyer</button>
-		</div>
-	{{ form_end(form) }}
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <div class="btn-group pull-right">
+            <a href="{{ user|path }}" class="btn btn-default">Retour</a>
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+        </div>
+    {{ form_end(form) }}
 {% endblock %}
-		
+
 {% block aside %}
-	
+
 {% endblock %}
 
 {% block javascripts %}
-	{{ parent() }}
-	<script>
+    {{ parent() }}
+    <script>
         $(document).ready(function(){
             $('#{{ form.signature.vars.id }}').ckeditor();
         });
-	</script>
+    </script>
 {% endblock %}

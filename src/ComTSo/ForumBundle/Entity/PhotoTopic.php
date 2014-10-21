@@ -2,91 +2,102 @@
 
 namespace ComTSo\ForumBundle\Entity;
 
-use ComTSo\ForumBundle\Entity\Topic;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="ctso_photo_topic")
  * @ORM\Entity(repositoryClass="ComTSo\ForumBundle\Entity\PhotoTopicRepository")
  */
-class PhotoTopic {
+class PhotoTopic
+{
+    use Behavior\Authorable,
+     Behavior\Timestampable;
 
-	use Behavior\Authorable,
-	 Behavior\Timestampable;
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
 
-	/**
-	 * @ORM\Id
-	 * @ORM\Column(type="integer")
-	 * @ORM\GeneratedValue(strategy="AUTO")
-	 */
-	protected $id;
-	
-	/**
-	 * @ORM\Column(name="ord", type="integer", nullable=true)
-	 */
-	protected $order;
-	
-	/**
-	 * @var Topic
-	 * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Topic", inversedBy="photos", fetch="EAGER")
-	 */
-	protected $topic;
+    /**
+     * @ORM\Column(name="ord", type="integer", nullable=true)
+     */
+    protected $order;
 
-	/**
-	 * @var Photo
-	 * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Photo", inversedBy="topics", fetch="EAGER")
-	 */
-	protected $photo;
+    /**
+     * @var Topic
+     * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Topic", inversedBy="photos", fetch="EAGER")
+     */
+    protected $topic;
 
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @var Photo
+     * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Photo", inversedBy="topics", fetch="EAGER")
+     */
+    protected $photo;
 
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @return Topic 
-	 */
-	public function getTopic() {
-		return $this->topic;
-	}
+    public function setId($id)
+    {
+        $this->id = $id;
 
-	/**
-	 * @param Topic $topic
-	 * @return Comment
-	 */
-	public function setTopic(Topic $topic) {
-		$this->topic = $topic;
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * @return Photo
-	 */
-	public function getPhoto() {
-		return $this->photo;
-	}
+    /**
+     * @return Topic
+     */
+    public function getTopic()
+    {
+        return $this->topic;
+    }
 
-	/**
-	 * 
-	 * @param Photo $photo
-	 * @return PhotoTopic
-	 */
-	public function setPhoto(Photo $photo) {
-		$this->photo = $photo;
-		return $this;
-	}
+    /**
+     * @param  Topic   $topic
+     * @return Comment
+     */
+    public function setTopic(Topic $topic)
+    {
+        $this->topic = $topic;
 
-	public function getOrder() {
-		return $this->order;
-	}
+        return $this;
+    }
 
-	public function setOrder($order) {
-		$this->order = $order;
-		return $this;
-	}
-	
+    /**
+     * @return Photo
+     */
+    public function getPhoto()
+    {
+        return $this->photo;
+    }
+
+    /**
+     *
+     * @param  Photo      $photo
+     * @return PhotoTopic
+     */
+    public function setPhoto(Photo $photo)
+    {
+        $this->photo = $photo;
+
+        return $this;
+    }
+
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    public function setOrder($order)
+    {
+        $this->order = $order;
+
+        return $this;
+    }
+
 }

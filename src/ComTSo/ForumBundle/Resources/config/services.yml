@@ -22,13 +22,13 @@ services:
             - { name: doctrine.event_subscriber, connection: default }
         calls:
             - [ setAnnotationReader, [ "@annotation_reader" ] ]
-            
+
     comtso.image.uploader:
         class: ComTSo\ForumBundle\Service\ImageUploader
         arguments: [ "@service_container" ]
         tags:
             - { name: kernel.event_listener, event: oneup_uploader.post_persist, method: onUpload }
-        
+
     phpexiftool.reader:
         scope: prototype
         class: "%phpexiftool.reader.class%"
@@ -36,7 +36,7 @@ services:
         factory_method: create
         arguments:
             - "@logger"
-            
+
     comtso.pager:
         scope: prototype
         class: "%comtso.pager.class%"

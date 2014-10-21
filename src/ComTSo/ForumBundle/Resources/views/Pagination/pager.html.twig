@@ -1,23 +1,23 @@
 {% set pagerClass = pagerClass is defined ? pagerClass : 'pagination-small pull-right' %}
 {% if results.pageCount > 1 %}
-	{% set item = 'ComTSoForumBundle:Pagination:item.html.twig' %}
-	<ul class="pagination {{ pagerClass }}">
-		{% include item with { page: 1 } %}
-		
-		{% if results.pagesInRange|first > 2 %}
-			<li class="disabled"><span>…</span></li>
-		{% endif %}
+    {% set item = 'ComTSoForumBundle:Pagination:item.html.twig' %}
+    <ul class="pagination {{ pagerClass }}">
+        {% include item with { page: 1 } %}
 
-		{% for page in results.pagesInRange %}
-			{% if page not in [ 1, results.pageCount ] %}
-			   {% include item %}
-			{% endif %}
-		{% endfor %}
-		
-		{% if results.pagesInRange|last < results.pageCount - 1 %}
-			<li class="disabled"><span>…</span></li>
-		{% endif %}
+        {% if results.pagesInRange|first > 2 %}
+            <li class="disabled"><span>…</span></li>
+        {% endif %}
 
-		{% include item with { page: results.pageCount } %}
-	</ul>
+        {% for page in results.pagesInRange %}
+            {% if page not in [ 1, results.pageCount ] %}
+               {% include item %}
+            {% endif %}
+        {% endfor %}
+
+        {% if results.pagesInRange|last < results.pageCount - 1 %}
+            <li class="disabled"><span>…</span></li>
+        {% endif %}
+
+        {% include item with { page: results.pageCount } %}
+    </ul>
 {% endif %}

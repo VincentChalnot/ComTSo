@@ -1,21 +1,21 @@
 {% if photo %}
-	<div class="pull-left">
-		{% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' with {'filter': 'tiny'} %}
-	</div>
-	<dl class="col-lg-7 dl-horizontal dl-small">
-		<dt>Titre :</dt><dd>
-			<a href="{{ photo|path }}" target="_blank">
-				{% if photo.title %}
-					{{ photo.title }}
-				{% else %}
-					<span class="text-muted">Photo sans titre</span>
-				{% endif %}
-			</a>
-		</dd>
-		<dt>Taille :</dt><dd>{{ photo.fileSize|file_size }}</dd>
-		<dt>Prise :</dt><dd>{{ photo.takenAt|htmlDate }}</dd>
-		<dt>Upload :</dt><dd>{{ photo.createdAt|htmlDate }}</dd>
-	</dl>
+    <div class="pull-left">
+        {% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' with {'filter': 'tiny'} %}
+    </div>
+    <dl class="col-lg-7 dl-horizontal dl-small">
+        <dt>Titre :</dt><dd>
+            <a href="{{ photo|path }}" target="_blank">
+                {% if photo.title %}
+                    {{ photo.title }}
+                {% else %}
+                    <span class="text-muted">Photo sans titre</span>
+                {% endif %}
+            </a>
+        </dd>
+        <dt>Taille :</dt><dd>{{ photo.fileSize|file_size }}</dd>
+        <dt>Prise :</dt><dd>{{ photo.takenAt|htmlDate }}</dd>
+        <dt>Upload :</dt><dd>{{ photo.createdAt|htmlDate }}</dd>
+    </dl>
 {% else %}
-	<p class="text-muted empty">Aucune photo sélectionné</p>
+    <p class="text-muted empty">Aucune photo sélectionné</p>
 {% endif %}

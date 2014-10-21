@@ -2,23 +2,26 @@
 
 namespace ComTSo\ForumBundle\Entity\Behavior;
 
-trait ContentEditable {
+trait ContentEditable
+{
+    /**
+     * Body of the content
+     *
+     * @var string
+     * @Doctrine\ORM\Mapping\Column(type="text", nullable=true)
+     */
+    protected $content;
 
-	/**
-	 * Body of the content
-	 *
-	 * @var string
-	 * @Doctrine\ORM\Mapping\Column(type="text", nullable=true)
-	 */
-	protected $content;
+    public function setContent($text = null)
+    {
+        $this->content = $text;
 
-	public function setContent($text = null) {
-		$this->content = $text;
-		return $this;
-	}
+        return $this;
+    }
 
-	public function getContent() {
-		return $this->content;
-	}
+    public function getContent()
+    {
+        return $this->content;
+    }
 
 }

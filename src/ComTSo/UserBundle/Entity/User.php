@@ -13,328 +13,368 @@ use ComTSo\ForumBundle\Entity\Photo;
  * @ORM\Table(name="fos_user")
  * @ORM\Entity(repositoryClass="ComTSo\UserBundle\Entity\UserRepository")
  */
-class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\Entity\Routable {
+class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\Entity\Routable
+{
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    protected $id;
 
-	/**
-	 * @ORM\Id
-	 * @ORM\Column(type="integer")
-	 * @ORM\GeneratedValue(strategy="AUTO")
-	 */
-	protected $id;
+    /**
+     * @ORM\Column(type="string", length=32)
+     */
+    protected $name;
 
-	/**
-	 * @ORM\Column(type="string", length=32)
-	 */
-	protected $name;
+    /**
+     * @ORM\Column(type="string", length=32)
+     */
+    protected $surname;
 
-	/**
-	 * @ORM\Column(type="string", length=32)
-	 */
-	protected $surname;
+    /**
+     * @var \DateTime
+     * @ORM\Column(type="date")
+     */
+    protected $birthday;
 
-	/**
-	 * @var \DateTime
-	 * @ORM\Column(type="date")
-	 */
-	protected $birthday;
+    /**
+     * @ORM\Column(type="text")
+     */
+    protected $address;
 
-	/**
-	 * @ORM\Column(type="text")
-	 */
-	protected $address;
+    /**
+     * @ORM\Column(type="string", length=20)
+     */
+    protected $phone;
 
-	/**
-	 * @ORM\Column(type="string", length=20)
-	 */
-	protected $phone;
+    /**
+     * @ORM\Column(type="text")
+     */
+    protected $activities;
 
-	/**
-	 * @ORM\Column(type="text")
-	 */
-	protected $activities;
+    /**
+     * @ORM\Column(type="text")
+     */
+    protected $signature;
 
-	/**
-	 * @ORM\Column(type="text")
-	 */
-	protected $signature;
+    /**
+     * @ORM\Column(type="string", length=128)
+     */
+    protected $website;
 
-	/**
-	 * @ORM\Column(type="string", length=128)
-	 */
-	protected $website;
+    /**
+     * @var \DateTime
+     * @ORM\Column(name="registered_at", type="datetime")
+     */
+    protected $registeredAt;
 
-	/**
-	 * @var \DateTime
-	 * @ORM\Column(name="registered_at", type="datetime")
-	 */
-	protected $registeredAt;
-	
-	/**
-	 * @var \DateTime
-	 * @ORM\Column(name="previous_login", type="datetime", nullable=true)
-	 */
-	protected $previousLogin;
-	
-	/**
-	 * @var \DateTime
-	 * @ORM\Column(name="last_activity", type="datetime", nullable=true)
-	 */
-	protected $lastActivity;
-	
-	/**
-	 * @var Photo
-	 * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Photo", fetch="EAGER")
-	 */
-	protected $avatar;
+    /**
+     * @var \DateTime
+     * @ORM\Column(name="previous_login", type="datetime", nullable=true)
+     */
+    protected $previousLogin;
 
-	/**
-	 * Get id
-	 *
-	 * @return integer 
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @var \DateTime
+     * @ORM\Column(name="last_activity", type="datetime", nullable=true)
+     */
+    protected $lastActivity;
 
-	/**
-	 * Set name
-	 *
-	 * @param string $name
-	 * @return User
-	 */
-	public function setName($name) {
-		$this->name = $name;
-		return $this;
-	}
+    /**
+     * @var Photo
+     * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Photo", fetch="EAGER")
+     */
+    protected $avatar;
 
-	/**
-	 * Get name
-	 *
-	 * @return string 
-	 */
-	public function getName() {
-		return $this->name;
-	}
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * Set surname
-	 *
-	 * @param string $surname
-	 * @return User
-	 */
-	public function setSurname($surname) {
-		$this->surname = $surname;
-		return $this;
-	}
+    /**
+     * Set name
+     *
+     * @param  string $name
+     * @return User
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
 
-	/**
-	 * Get surname
-	 *
-	 * @return string 
-	 */
-	public function getSurname() {
-		return $this->surname;
-	}
+        return $this;
+    }
 
-	/**
-	 * Set birthday
-	 *
-	 * @param DateTime $birthday
-	 * @return User
-	 */
-	public function setBirthday(DateTime $birthday) {
-		$this->birthday = $birthday;
-		return $this;
-	}
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * Get birthday
-	 *
-	 * @return DateTime
-	 */
-	public function getBirthday() {
-		return $this->birthday;
-	}
-	
-	/**
-	 * Get age
-	 *
-	 * @return DateTime
-	 */
-	public function getAge() {
-		$diff = $this->birthday->diff(new DateTime);
-		return $diff->y;
-	}
+    /**
+     * Set surname
+     *
+     * @param  string $surname
+     * @return User
+     */
+    public function setSurname($surname)
+    {
+        $this->surname = $surname;
 
-	/**
-	 * Set address
-	 *
-	 * @param string $address
-	 * @return User
-	 */
-	public function setAddress($address) {
-		$this->address = $address;
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get address
-	 *
-	 * @return string 
-	 */
-	public function getAddress() {
-		return $this->address;
-	}
+    /**
+     * Get surname
+     *
+     * @return string
+     */
+    public function getSurname()
+    {
+        return $this->surname;
+    }
 
-	/**
-	 * Set phone
-	 *
-	 * @param string $phone
-	 * @return User
-	 */
-	public function setPhone($phone) {
-		$this->phone = $phone;
-		return $this;
-	}
+    /**
+     * Set birthday
+     *
+     * @param  DateTime $birthday
+     * @return User
+     */
+    public function setBirthday(DateTime $birthday)
+    {
+        $this->birthday = $birthday;
 
-	/**
-	 * Get phone
-	 *
-	 * @return string 
-	 */
-	public function getPhone() {
-		return $this->phone;
-	}
+        return $this;
+    }
 
-	/**
-	 * Set activities
-	 *
-	 * @param string $activities
-	 * @return User
-	 */
-	public function setActivities($activities) {
-		$this->activities = $activities;
-		return $this;
-	}
+    /**
+     * Get birthday
+     *
+     * @return DateTime
+     */
+    public function getBirthday()
+    {
+        return $this->birthday;
+    }
 
-	/**
-	 * Get activities
-	 *
-	 * @return string 
-	 */
-	public function getActivities() {
-		return $this->activities;
-	}
+    /**
+     * Get age
+     *
+     * @return DateTime
+     */
+    public function getAge()
+    {
+        $diff = $this->birthday->diff(new DateTime());
 
-	/**
-	 * Set signature
-	 *
-	 * @param string $signature
-	 * @return User
-	 */
-	public function setSignature($signature) {
-		$this->signature = $signature;
-		return $this;
-	}
+        return $diff->y;
+    }
 
-	/**
-	 * Get signature
-	 *
-	 * @return string 
-	 */
-	public function getSignature() {
-		return $this->signature;
-	}
+    /**
+     * Set address
+     *
+     * @param  string $address
+     * @return User
+     */
+    public function setAddress($address)
+    {
+        $this->address = $address;
 
-	/**
-	 * Set website
-	 *
-	 * @param string $website
-	 * @return User
-	 */
-	public function setWebsite($website) {
-		$this->website = $website;
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get website
-	 *
-	 * @return string 
-	 */
-	public function getWebsite() {
-		return $this->website;
-	}
+    /**
+     * Get address
+     *
+     * @return string
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
 
-	/**
-	 * Set registered
-	 *
-	 * @param DateTime $registered
-	 * @return User
-	 */
-	public function setRegisteredAt(DateTime $registeredAt) {
-		$this->registeredAt = $registeredAt;
-		return $this;
-	}
+    /**
+     * Set phone
+     *
+     * @param  string $phone
+     * @return User
+     */
+    public function setPhone($phone)
+    {
+        $this->phone = $phone;
 
-	/**
-	 * Get registered
-	 *
-	 * @return DateTime
-	 */
-	public function getRegisteredAt() {
-		return $this->registeredAt;
-	}
-	
-	public function setLastLogin(DateTime $time = null) {
-		$this->previousLogin = $this->lastLogin;
-		return parent::setLastLogin($time);
-	}
-	
-	public function getPreviousLogin() {
-		return $this->previousLogin;
-	}
+        return $this;
+    }
 
-	public function getLastActivity() {
-		return $this->lastActivity;
-	}
+    /**
+     * Get phone
+     *
+     * @return string
+     */
+    public function getPhone()
+    {
+        return $this->phone;
+    }
 
-	public function setLastActivity(\DateTime $lastActivity) {
-		$this->lastActivity = $lastActivity;
-		return $this;
-	}
+    /**
+     * Set activities
+     *
+     * @param  string $activities
+     * @return User
+     */
+    public function setActivities($activities)
+    {
+        $this->activities = $activities;
 
-	/**
-	 * 
-	 * @return Photo
-	 */
-	public function getAvatar() {
-		return $this->avatar;
-	}
+        return $this;
+    }
 
-	/**
-	 * 
-	 * @return Photo
-	 */
-	public function setAvatar(Photo $photo = null) {
-		return $this->avatar = $photo;
-	}
-	
-	public function jsonSerialize() {
-		return [
-			'id' => $this->getId(),
-			'username' => $this->getUsername(),
-			'usernameCanonical' => $this->getUsernameCanonical(),
-			'email' => $this->getEmail(),
-			'name' => $this->getName(),
-			'surname' => $this->getSurname(),
-			'signature' => $this->getSignature(),
-			'avatar' => $this->getAvatar(),
-		];
-	}
+    /**
+     * Get activities
+     *
+     * @return string
+     */
+    public function getActivities()
+    {
+        return $this->activities;
+    }
 
-	public function getRoutingParameters() {
-		return ['usernameCanonical' => $this->getUsernameCanonical()];
-	}
+    /**
+     * Set signature
+     *
+     * @param  string $signature
+     * @return User
+     */
+    public function setSignature($signature)
+    {
+        $this->signature = $signature;
+
+        return $this;
+    }
+
+    /**
+     * Get signature
+     *
+     * @return string
+     */
+    public function getSignature()
+    {
+        return $this->signature;
+    }
+
+    /**
+     * Set website
+     *
+     * @param  string $website
+     * @return User
+     */
+    public function setWebsite($website)
+    {
+        $this->website = $website;
+
+        return $this;
+    }
+
+    /**
+     * Get website
+     *
+     * @return string
+     */
+    public function getWebsite()
+    {
+        return $this->website;
+    }
+
+    /**
+     * Set registered
+     *
+     * @param  DateTime $registered
+     * @return User
+     */
+    public function setRegisteredAt(DateTime $registeredAt)
+    {
+        $this->registeredAt = $registeredAt;
+
+        return $this;
+    }
+
+    /**
+     * Get registered
+     *
+     * @return DateTime
+     */
+    public function getRegisteredAt()
+    {
+        return $this->registeredAt;
+    }
+
+    public function setLastLogin(DateTime $time = null)
+    {
+        $this->previousLogin = $this->lastLogin;
+
+        return parent::setLastLogin($time);
+    }
+
+    public function getPreviousLogin()
+    {
+        return $this->previousLogin;
+    }
+
+    public function getLastActivity()
+    {
+        return $this->lastActivity;
+    }
+
+    public function setLastActivity(\DateTime $lastActivity)
+    {
+        $this->lastActivity = $lastActivity;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @return Photo
+     */
+    public function getAvatar()
+    {
+        return $this->avatar;
+    }
+
+    /**
+     *
+     * @return Photo
+     */
+    public function setAvatar(Photo $photo = null)
+    {
+        return $this->avatar = $photo;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->getId(),
+            'username' => $this->getUsername(),
+            'usernameCanonical' => $this->getUsernameCanonical(),
+            'email' => $this->getEmail(),
+            'name' => $this->getName(),
+            'surname' => $this->getSurname(),
+            'signature' => $this->getSignature(),
+            'avatar' => $this->getAvatar(),
+        ];
+    }
+
+    public function getRoutingParameters()
+    {
+        return ['usernameCanonical' => $this->getUsernameCanonical()];
+    }
 
 }

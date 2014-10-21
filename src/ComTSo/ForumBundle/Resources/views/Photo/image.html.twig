@@ -1,4 +1,2 @@
 {% set filter = filter is defined and filter ? filter : 'preview' %}
 <img src="{{ photo.filename | imagine_filter(filter) }}" alt="{{ photo.filename }}" title="{{ photo.title }}" {{ image_size_attrs(photo, filter) }} />
-
-

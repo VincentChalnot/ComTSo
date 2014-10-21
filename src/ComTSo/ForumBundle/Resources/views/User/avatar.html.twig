@@ -1,14 +1,14 @@
 {% set size = size is defined ? size : 'md' %}
 {% spaceless %}
 <a class="avatar avatar-{{ size }}" href="{{ author|path }}">
-	{% if author.avatar %}
-		<img src="{{ author.avatar.filename | imagine_filter('thumbnail') }}" alt="Avatar" title="{{ author }}" {{ image_size_attrs(author.avatar, 'thumbnail') }} class="img-circle"/>
-		<span class="username">{{ author }}</span>
-	{% else %}
-		<div class="avatar-default img-circle">
-			<i class="fa fa-user" title="{{ author }}"></i>
-		</div>
-		<span class="username username-force-display">{{ author }}</span>
-	{% endif %}
+    {% if author.avatar %}
+        <img src="{{ author.avatar.filename | imagine_filter('thumbnail') }}" alt="Avatar" title="{{ author }}" {{ image_size_attrs(author.avatar, 'thumbnail') }} class="img-circle"/>
+        <span class="username">{{ author }}</span>
+    {% else %}
+        <div class="avatar-default img-circle">
+            <i class="fa fa-user" title="{{ author }}"></i>
+        </div>
+        <span class="username username-force-display">{{ author }}</span>
+    {% endif %}
 </a>
 {% endspaceless %}

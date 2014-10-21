@@ -1,33 +1,33 @@
 {% extends 'ComTSoForumBundle::layout.html.twig' %}
 
 {% block content %}
-	{% include 'ComTSoUserBundle:Profile:show_content.html.twig' %}
-	{% if user == app.user %}
-		<h2>Mes mémos</h2>
-	{% else %}
-		<h2>Messages privés</h2>
-	{% endif %}
+    {% include 'ComTSoUserBundle:Profile:show_content.html.twig' %}
+    {% if user == app.user %}
+        <h2>Mes mémos</h2>
+    {% else %}
+        <h2>Messages privés</h2>
+    {% endif %}
     {% include 'ComTSoForumBundle:Comment:create_form.html.twig' %}
     {% for comment in messages %}
         <hr class="clear">
         {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
     {% endfor %}
 {% endblock %}
-		
+
 {% block aside %}
-	<h4>Accès rapide</h4>
-	<ul class="nav nav-compact">
-		{% for u in users %}
-			<li{{ u.id == user.id ? ' class="active"' }}><a href="{{ u|path }}">{{ u }}</a></li>
-		{% endfor %}
-	</ul>
+    <h4>Accès rapide</h4>
+    <ul class="nav nav-compact">
+        {% for u in users %}
+            <li{{ u.id == user.id ? ' class="active"' }}><a href="{{ u|path }}">{{ u }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 
 {% block javascripts %}
-	{{ parent() }}
-	<script>
+    {{ parent() }}
+    <script>
         $(document).ready(function(){
             $('#{{ form.content.vars.id }}').click(function(e){$(this).ckeditor();});
         });
-	</script>
+    </script>
 {% endblock %}

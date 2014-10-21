@@ -1,14 +1,14 @@
 {% set topic = entity %}
 <div class="topic" id="topic-{{ topic.id }}">
-	<div class="col-sm-2 col-xs-3 post-side">
-		{% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': topic.author} %}
-	</div>
-	<div class="col-sm-10 col-xs-9">
-		<a href="{{ topic|path }}"><h4>{{ topic|highlight(query) }}</h4></a>
-		<div>{{ topic.content|highlight(query) }}</div>
-		<p class="text-muted">
-			Créé par <a href="{{ topic.author|path }}">{{ topic.author }}</a>
-			le {{ topic.createdAt|date('d/m/Y à H:i') }} – {{ topic.views }} vues – {{ topic.commentCount }} posts
-		</p>
-	</div>
+    <div class="col-sm-2 col-xs-3 post-side">
+        {% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': topic.author} %}
+    </div>
+    <div class="col-sm-10 col-xs-9">
+        <a href="{{ topic|path }}"><h4>{{ topic|highlight(query) }}</h4></a>
+        <div>{{ topic.content|highlight(query) }}</div>
+        <p class="text-muted">
+            Créé par <a href="{{ topic.author|path }}">{{ topic.author }}</a>
+            le {{ topic.createdAt|date('d/m/Y à H:i') }} – {{ topic.views }} vues – {{ topic.commentCount }} posts
+        </p>
+    </div>
 </div>

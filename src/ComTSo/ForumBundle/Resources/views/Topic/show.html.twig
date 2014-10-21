@@ -1,77 +1,77 @@
 {% extends 'ComTSoForumBundle::layout.html.twig' %}
 
 {% block content %}
-	<ul class="nav nav-tabs">
-		{% for f in forums %}
-			<li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
-		{% endfor %}
-	</ul>
-	<div class="topic" data-topic-id="{{ topic.id }}" data-forum-id="{{ topic.forum.id }}">
-		<div class="btn-group pull-right">
-			<a href="{{ topic|path('edit') }}" class="btn btn-primary" title="Modifier"><i class="fa fa-pencil"></i></a>
-			<a href="{{ topic|path('add_photos') }}" class="btn btn-info" title="Ajouter des photos"><i class="fa fa-camera-retro"></i></a>
-		</div>
-		<h3>{{ topic }}</h3>
-		<div>{{ topic.content|raw }}</div>
-		<p class="text-muted">
-			Créé par <a href="{{ topic.author|path }}">{{ topic.author }}</a>
-			le {{ topic.createdAt|date('d/m/Y à H:i') }} – {{ topic.views }} vues – {{ topic.commentCount }} posts
-		</p>
-		{% spaceless %}
-			{% if topic.photos %}
-				<div class="topic-photos" id="sortable-photos">
-					{% for photoTopic in topic.photos %}
-						{% set photo = photoTopic.photo %}
-						{% if photo %}
-							{% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
-						{% endif %}
-					{% endfor %}
-				</div>
-			{% endif %}
-		{% endspaceless %}
-		<hr class="clear">
-		{% include 'ComTSoForumBundle:Comment:create_form.html.twig' %}
-		{% for comment in topic.comments %}
-			<hr class="clear">
-			{% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
-		{% endfor %}
-	</div>
+    <ul class="nav nav-tabs">
+        {% for f in forums %}
+            <li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
+        {% endfor %}
+    </ul>
+    <div class="topic" data-topic-id="{{ topic.id }}" data-forum-id="{{ topic.forum.id }}">
+        <div class="btn-group pull-right">
+            <a href="{{ topic|path('edit') }}" class="btn btn-primary" title="Modifier"><i class="fa fa-pencil"></i></a>
+            <a href="{{ topic|path('add_photos') }}" class="btn btn-info" title="Ajouter des photos"><i class="fa fa-camera-retro"></i></a>
+        </div>
+        <h3>{{ topic }}</h3>
+        <div>{{ topic.content|raw }}</div>
+        <p class="text-muted">
+            Créé par <a href="{{ topic.author|path }}">{{ topic.author }}</a>
+            le {{ topic.createdAt|date('d/m/Y à H:i') }} – {{ topic.views }} vues – {{ topic.commentCount }} posts
+        </p>
+        {% spaceless %}
+            {% if topic.photos %}
+                <div class="topic-photos" id="sortable-photos">
+                    {% for photoTopic in topic.photos %}
+                        {% set photo = photoTopic.photo %}
+                        {% if photo %}
+                            {% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endspaceless %}
+        <hr class="clear">
+        {% include 'ComTSoForumBundle:Comment:create_form.html.twig' %}
+        {% for comment in topic.comments %}
+            <hr class="clear">
+            {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+        {% endfor %}
+    </div>
 {% endblock %}
-		
+
 {% block aside %}
-	<h4>Accès rapide</h4>
-	<ul class="nav nav-compact">
-		{% for t in topics %}
-			<li{{ t.id == topic.id ? ' class="active"' }}><a href="{{ t|path }}">{{ t }}</a></li>
-		{% endfor %}
-	</ul>
+    <h4>Accès rapide</h4>
+    <ul class="nav nav-compact">
+        {% for t in topics %}
+            <li{{ t.id == topic.id ? ' class="active"' }}><a href="{{ t|path }}">{{ t }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}
 
 {% block javascripts %}
-	{{ parent() }}
-	<script>
+    {{ parent() }}
+    <script>
         $(document).ready(function(){
             $('#{{ form.content.vars.id }}').click(function(e){$(this).ckeditor();});
-			
-			
-			var timeout = null;
-			$('#sortable-photos').sortable({
-				scroll: true,
-				update: function(e, ui) {
-					var t = $(e.target);
-					if (timeout) {
-						window.clearTimeout(timeout);
-					}
-					timeout = window.setTimeout(function() {
-						updatePhotoOrder(t);
-					}, 1000);
-				},
-				start: function(e, ui) {
-					if (timeout) {
-						window.clearTimeout(timeout);
-					}
-				}
-			});
+
+
+            var timeout = null;
+            $('#sortable-photos').sortable({
+                scroll: true,
+                update: function(e, ui) {
+                    var t = $(e.target);
+                    if (timeout) {
+                        window.clearTimeout(timeout);
+                    }
+                    timeout = window.setTimeout(function() {
+                        updatePhotoOrder(t);
+                    }, 1000);
+                },
+                start: function(e, ui) {
+                    if (timeout) {
+                        window.clearTimeout(timeout);
+                    }
+                }
+            });
         });
-	</script>
+    </script>
 {% endblock %}

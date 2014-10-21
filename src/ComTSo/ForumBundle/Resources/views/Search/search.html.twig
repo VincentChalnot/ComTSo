@@ -3,33 +3,33 @@
 {% block search_value %}{{ original }}{% endblock %}
 
 {% block content %}
-	<h2>Résultats pour "{{ original }}"</h2>
-	{% for key, result in results %}
-		<div class="topic panel panel-default" id="result-{{ key }}">
-			<div class="panel-heading">
-				<h3>{{ result.label }}</h3>
-			</div>
-			<div class="panel-body search-results">
-				{% if result.entities is defined %}
-					{% for entity in result.entities %}
-						{% if loop.index != 1 %}<hr class="clear">{% endif %}
-						{% include result.template %}
-					{% else %}
-						<p class="text-center text-muted">Aucun résultat</p>
-					{% endfor %}
-				{% else %}
-					<div class="alert alert-warning">Missing handler for {{ result.name }}</div>
-				{% endif %}
-			</div>
-		</div>
-	{% endfor %}
+    <h2>Résultats pour "{{ original }}"</h2>
+    {% for key, result in results %}
+        <div class="topic panel panel-default" id="result-{{ key }}">
+            <div class="panel-heading">
+                <h3>{{ result.label }}</h3>
+            </div>
+            <div class="panel-body search-results">
+                {% if result.entities is defined %}
+                    {% for entity in result.entities %}
+                        {% if loop.index != 1 %}<hr class="clear">{% endif %}
+                        {% include result.template %}
+                    {% else %}
+                        <p class="text-center text-muted">Aucun résultat</p>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-warning">Missing handler for {{ result.name }}</div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}
 
 {% block aside %}
-	<h4>Accès rapide aux résultats</h4>
-	<ul class="nav nav-compact">
-		{% for key, result in results %}
-			<li><a href="#result-{{ key }}">{{ result.label }}</a></li>
-		{% endfor %}
-	</ul>
+    <h4>Accès rapide aux résultats</h4>
+    <ul class="nav nav-compact">
+        {% for key, result in results %}
+            <li><a href="#result-{{ key }}">{{ result.label }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}

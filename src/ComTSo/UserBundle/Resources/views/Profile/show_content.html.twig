@@ -1,38 +1,37 @@
 {% trans_default_domain 'FOSUserBundle' %}
 
 <div class="well">
-	
-	<center>
-		<h3 class="media-heading">{{ user.name }} {{ user.surname }} <small>({{ user.username }})</small></h3>
-		{% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': user, size: 'lg'} %}
-		<p class="lead">{{ user.signature|raw }}</p>
-	</center>
-	<hr>
-	{% if app.user and app.user.id == user.id %}
-		<a href="{{ user|path('edit') }}" class="btn btn-primary pull-right"><span class="icon-edit"></span> Modifier</a>
-	{% endif %}
-	<dl class="dl-horizontal">
-		{% if user.email %}
-			<dt>Email :</dt><dd><a href="mailto:{{ user.email }}">{{ user.email }}</a></dd>
-		{% endif %}
-		{% if user.website %}
-			<dt>Site web :</dt><dd><a href="{{ user.website }}" target="_blank">{{ user.website }}</a></dd>
-		{% endif %}
-		{% if user.activities %}
-			<dt>Activites :</dt><dd>{{ user.activities }}</dd>
-		{% endif %}
-		{% if user.birthday %}
-			<dt>Date de naissance :</dt><dd>{{ user.birthday|date('d/m/Y') }} ({{ user.age }} ans)</dd>
-		{% endif %}
-		{% if user.registeredAt %}
-			<dt>Inscrit le :</dt><dd>{{ user.registeredAt|date('d/m/Y') }}</dd>
-		{% endif %}
-		{% if user.phone %}
-			<dt>Téléphone :</dt><dd><a href="tel:{{ user.phone }}">{{ user.phone }}</a></dd>
-		{% endif %}
-		{% if user.address %}
-			<dt>Adresse :</dt><dd><address>{{ user.address|raw }}</address></dd>
-		{% endif %}
-	</dl>
-</div>
 
+    <center>
+        <h3 class="media-heading">{{ user.name }} {{ user.surname }} <small>({{ user.username }})</small></h3>
+        {% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': user, size: 'lg'} %}
+        <p class="lead">{{ user.signature|raw }}</p>
+    </center>
+    <hr>
+    {% if app.user and app.user.id == user.id %}
+        <a href="{{ user|path('edit') }}" class="btn btn-primary pull-right"><span class="icon-edit"></span> Modifier</a>
+    {% endif %}
+    <dl class="dl-horizontal">
+        {% if user.email %}
+            <dt>Email :</dt><dd><a href="mailto:{{ user.email }}">{{ user.email }}</a></dd>
+        {% endif %}
+        {% if user.website %}
+            <dt>Site web :</dt><dd><a href="{{ user.website }}" target="_blank">{{ user.website }}</a></dd>
+        {% endif %}
+        {% if user.activities %}
+            <dt>Activites :</dt><dd>{{ user.activities }}</dd>
+        {% endif %}
+        {% if user.birthday %}
+            <dt>Date de naissance :</dt><dd>{{ user.birthday|date('d/m/Y') }} ({{ user.age }} ans)</dd>
+        {% endif %}
+        {% if user.registeredAt %}
+            <dt>Inscrit le :</dt><dd>{{ user.registeredAt|date('d/m/Y') }}</dd>
+        {% endif %}
+        {% if user.phone %}
+            <dt>Téléphone :</dt><dd><a href="tel:{{ user.phone }}">{{ user.phone }}</a></dd>
+        {% endif %}
+        {% if user.address %}
+            <dt>Adresse :</dt><dd><address>{{ user.address|raw }}</address></dd>
+        {% endif %}
+    </dl>
+</div>

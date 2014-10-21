@@ -29,7 +29,7 @@
 
     $.extend(Gallery.prototype.options, {
         useBootstrapModal: true,
-		urlProperty: 'data-url'
+        urlProperty: 'data-url'
     });
 
     var close = Gallery.prototype.close,
@@ -64,16 +64,16 @@
                 }, factoryInterface);
             modal.find('.modal-title').text(element.title || String.fromCharCode(160));
             modal.find('.modal-body').append(element);
-			
-			var autoresize = function() {
-				$('.modal-body').css('paddingBottom', $(window).innerHeight() - 60 + 'px');
-			};
-			autoresize();
-			if (!window.hasAutoresize) {
-				$(window).resize(autoresize);
-				window.hasAutoresize = true;
-			}
-			
+            
+            var autoresize = function() {
+                $('.modal-body').css('paddingBottom', $(window).innerHeight() - 60 + 'px');
+            };
+            autoresize();
+            if (!window.hasAutoresize) {
+                $(window).resize(autoresize);
+                window.hasAutoresize = true;
+            }
+            
             return modal[0];
         },
 
@@ -93,18 +93,18 @@
             this.container.find('.modal').removeClass('in');
             close.call(this);
         },
-		
-		getItemProperty: function (obj, property) {
+        
+        getItemProperty: function (obj, property) {
             var prop = obj[property];
             if (prop === undefined) {
                 prop = this.getDataProperty(obj, property);
             }
-			if (prop === undefined) {
-				prop = this.getNestedProperty(obj, property);
-			}
-			if (prop === undefined) {
-				prop = $(obj).attr(property);
-			}
+            if (prop === undefined) {
+                prop = this.getNestedProperty(obj, property);
+            }
+            if (prop === undefined) {
+                prop = $(obj).attr(property);
+            }
             return prop;
         }
 

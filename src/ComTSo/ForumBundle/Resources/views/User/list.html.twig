@@ -1,18 +1,18 @@
 {% extends 'ComTSoForumBundle::layout.html.twig' %}
 
 {% block content %}
-	<div class="people">
-		{% for user in users %}
-			{% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': user, size: 'lg'} %}
-		{% endfor %}
-	</div>
+    <div class="people">
+        {% for user in users %}
+            {% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': user, size: 'lg'} %}
+        {% endfor %}
+    </div>
 {% endblock %}
-		
+
 {% block aside %}
-	<h4>Accès rapide</h4>
-	<ul class="nav nav-compact">
-		{% for u in users %}
-			<li><a href="{{ u|path }}">{{ u }}</a></li>
-		{% endfor %}
-	</ul>
+    <h4>Accès rapide</h4>
+    <ul class="nav nav-compact">
+        {% for u in users %}
+            <li><a href="{{ u|path }}">{{ u }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}
