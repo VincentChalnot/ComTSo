@@ -1,5 +1,9 @@
-<div class="topic panel panel-default" id="topic-{{ topic.id }}">
+<div class="topic panel panel-default{{ app.user.isStarred(topic) ? ' is-starred' }}" id="topic-{{ topic.id }}">
     <div class="panel-heading">
+        <div class="btn-group pull-right">
+            <a class="btn topic-starred" href="{{ topic|path('unstar') }}" title="Retirer des favoris"><i class="fa fa-star"></i></a>
+            <a class="btn topic-unstarred" href="{{ topic|path('star') }}" title="Ajouter aux favoris"><i class="fa fa-star-o"></i></a>
+        </div>
         <h3><a href="{{ topic|path }}">{{ topic }}</a></h3>
         <div>{{ topic.content|raw }}</div>
     </div>

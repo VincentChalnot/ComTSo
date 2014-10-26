@@ -70,11 +70,8 @@ class ForumController extends BaseController
         $topic->setAuthor($this->getUser());
         $topic->setForum($forum);
 
-        $builder = $this->createFormBuilder($topic, ['label' => 'Nouveau topic']);
-        $builder->add('title', 'text', ['horizontal' => false, 'label_render' => false, 'attr' => ['placeholder' => 'Titre']]);
-        $builder->add('content', 'textarea', ['horizontal' => false, 'label_render' => false]);
+        $form = $this->createForm(new \ComTSo\ForumBundle\Form\Type\TopicType(), $topic, ['label' => 'Nouveau topic']);
 
-        $form = $builder->getForm();
         if ($this->getRequest()->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isValid()) {

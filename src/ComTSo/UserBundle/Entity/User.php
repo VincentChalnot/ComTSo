@@ -6,6 +6,8 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 use ComTSo\ForumBundle\Entity\Photo;
+use ComTSo\ForumBundle\Entity\Topic;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Object
@@ -86,7 +88,21 @@ class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\En
      * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Photo", fetch="EAGER")
      */
     protected $avatar;
+    
+    /**
+     *
+     * @var Topic[]
+     * @ORM\ManyToMany(targetEntity="ComTSo\ForumBundle\Entity\Topic")
+     * @ORM\JoinTable(name="ctso_starred_topic")
+     */
+    protected $starredTopics;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->starredTopics = new ArrayCollection;
+    }
+    
     /**
      * Get id
      *
@@ -357,7 +373,52 @@ class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\En
     {
         return $this->avatar = $photo;
     }
+    
+    /**
+     * Add StarredTopic
+     *
+     * @param  Topic $topic
+     * @return User
+     */
+    public function addStarredTopic(Topic $topic)
+    {
+        $this->starredTopics[] = $topic;
+        return $this;
+    }
 
+    /**
+     * Remove Starredtopic
+     *
+     * @param Topic $topic
+     * @return User
+     */
+    public function removeStarredTopic(Topic $topic)
+    {
+        $this->starredTopics->removeElement($topic);
+        return $this;
+    }
+
+    /**
+     * Get topics
+     *
+     * @return ArrayCollection
+     */
+    public function getStarredTopics()
+    {
+        return $this->starredTopics;
+    }
+    
+    /**
+     * 
+     * @param Topic $topic
+     * @return bool
+     */
+    public function isStarred(Topic $topic)
+    {
+        return $this->starredTopics->contains($topic);
+    }
+
+    
     public function jsonSerialize()
     {
         return [

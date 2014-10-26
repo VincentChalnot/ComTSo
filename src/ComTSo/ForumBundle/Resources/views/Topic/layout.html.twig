@@ -1,0 +1,30 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+    <ul class="nav nav-tabs">
+        {% for f in forums %}
+            <li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
+        {% endfor %}
+    </ul>
+    <div class="topic" data-topic-id="{{ topic.id }}" data-forum-id="{{ topic.forum.id }}">
+        {% block topic_actions %}
+            <div class="btn-group pull-right">
+                <a href="{{ topic|path('edit') }}" class="btn btn-primary" title="Modifier"><i class="fa fa-pencil"></i></a>
+                <a href="{{ topic|path('manage_photos') }}" class="btn btn-info" title="Gérer les photos"><i class="fa fa-camera-retro"></i></a>
+            </div>
+        {% endblock %}
+        {% include 'ComTSoForumBundle:Common:entity_header.html.twig' with {entity: topic} %}
+        {% block inner_content %}{% endblock %}
+    </div>
+{% endblock %}
+
+{% block aside %}
+    <h4>Accès rapide</h4>
+    <ul class="nav nav-compact">
+        {% for t in topics %}
+            {% if t.id != topic.id %}
+                <li><a href="{{ t|path }}">{{ t }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endblock %}

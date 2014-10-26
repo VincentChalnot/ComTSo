@@ -1,0 +1,18 @@
+
+comtso_comment_show:
+    pattern:  /comment/{id}
+    defaults: { _controller: ComTSoForumBundle:Comment:show }
+    requirements:
+        id: "\d+"
+        
+comtso_comment_edit:
+    pattern:  /comment/{id}/edit
+    defaults: { _controller: ComTSoForumBundle:Comment:edit }
+    requirements:
+        id: "\d+"
+        
+comtso_comment_delete:
+    pattern:  /comment/{id}/delete
+    defaults: { _controller: ComTSoForumBundle:Comment:delete }
+    requirements:
+        id: "\d+"

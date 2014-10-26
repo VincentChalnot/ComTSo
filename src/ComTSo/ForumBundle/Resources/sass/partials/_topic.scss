@@ -26,4 +26,15 @@
             vertical-align: middle;
         }
     }
+    .btn.topic-starred {
+        display: none;
+    }
+    &.is-starred {
+        .btn.topic-starred {
+            display: initial;
+        }
+        .btn.topic-unstarred {
+            display: none;
+        }
+    }
 }

@@ -1,0 +1,68 @@
+
+comtso_topic_show:
+    pattern:  /forum/{forumId}/{id}
+    defaults: { _controller: ComTSoForumBundle:Topic:show }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+
+comtso_topic_edit:
+    pattern:  /forum/{forumId}/{id}/edit
+    defaults: { _controller: ComTSoForumBundle:Topic:edit }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+        
+comtso_topic_star:
+    pattern:  /forum/{forumId}/{id}/star
+    defaults: { _controller: ComTSoForumBundle:Topic:star }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+    options:
+        expose: true
+        
+comtso_topic_unstar:
+    pattern:  /forum/{forumId}/{id}/unstar
+    defaults: { _controller: ComTSoForumBundle:Topic:star, star: false }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+    options:
+        expose: true
+
+comtso_topic_manage_photos:
+    pattern:  /forum/{forumId}/{id}/manage_photos
+    defaults: { _controller: ComTSoForumBundle:Topic:managePhotos }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+    options:
+        expose: true
+
+comtso_topic_add_photo:
+    pattern:  /forum/{forumId}/{id}/add_photo
+    defaults: { _controller: ComTSoForumBundle:Topic:addPhoto }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+    options:
+        expose: true
+
+comtso_topic_remove_photo:
+    pattern:  /forum/{forumId}/{id}/remove_photo
+    defaults: { _controller: ComTSoForumBundle:Topic:removePhoto }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+    options:
+        expose: true
+
+comtso_topic_order_photos:
+    pattern:  /forum/{forumId}/{id}/order_photos
+    defaults: { _controller: ComTSoForumBundle:Topic:orderPhotos }
+    requirements:
+        forumId: "[\w-]+"
+        id: "\d+"
+    options:
+        expose: true

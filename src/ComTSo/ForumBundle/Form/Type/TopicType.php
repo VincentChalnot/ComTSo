@@ -18,18 +18,7 @@ class TopicType extends AbstractType
                 ->add('title')
                 ->add('forum')
                 ->add('author')
-                ->add('content')
-                ->add('photos', 'collection', [
-                    'type' => new PhotoTopicType(),
-                    //'allow_add' => true,
-                    'allow_delete' => true,
-                    //'widget_add_btn' => false,
-                    'options' => [
-                        'horizontal_input_wrapper_class' => 'col-lg-10',
-                        'label_render' => false,
-                        'widget_remove_btn' => false,
-                    ],
-                ]);
+                ->add('content');
     }
 
     /**
