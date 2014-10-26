@@ -135,6 +135,13 @@ $(document).ready(function(){
         });
     });
     
+    $(document).on('click', '.photo-widget-detach', function(e){
+        var widget = $(this).parents('.photo-selector-widget').first();
+        widget.find('.widget-container').html('<p class="text-muted empty">Aucune photo sélectionné</p>');
+        widget.find('input[type="hidden"]').val('');
+        $(this).remove();
+    });
+    
     oneUploadFormInit = function(el) {
         el.fileupload({
             // Uncomment the following to send cross-domain cookies:
