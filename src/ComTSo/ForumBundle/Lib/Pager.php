@@ -87,7 +87,7 @@ class Pager extends \ArrayObject
     {
         $this->initialize();
         $delta = floor($this->getPageRange() / 2);
-        $current = min(max($this->getPage() - $delta, 1), $this->getPageCount() - $this->getPageRange());
+        $current = min(max($this->getPage() - $delta, 1), max($this->getPageCount() - $this->getPageRange(), 1));
         $count = 0;
         $pages = [];
         while ($count < $this->getPageRange()) {
