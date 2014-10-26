@@ -6,176 +6,23 @@ comtso_search:
     pattern:  /recherche
     defaults: { _controller: ComTSoForumBundle:Search:search }
 
-comtso_forum_show:
-    pattern:  /forum/{id}
-    defaults: { _controller: ComTSoForumBundle:Forum:show }
-    requirements:
-        id: "[\w-]+"
-
-comtso_forum_edit:
-    pattern:  /forum/{id}/edit
-    defaults: { _controller: ComTSoForumBundle:Forum:edit }
-    requirements:
-        id: "[\w-]+"
-
-comtso_forum_add_topic:
-    pattern:  /forum/{id}/add_topic
-    defaults: { _controller: ComTSoForumBundle:Forum:addTopic }
-    requirements:
-        id: "[\w-]+"
-
-comtso_topic_show:
-    pattern:  /forum/{forumId}/{id}
-    defaults: { _controller: ComTSoForumBundle:Topic:show }
-    requirements:
-        forumId: "[\w-]+"
-        id: "\d+"
-
-comtso_topic_edit:
-    pattern:  /forum/{forumId}/{id}/edit
-    defaults: { _controller: ComTSoForumBundle:Topic:edit }
-    requirements:
-        forumId: "[\w-]+"
-        id: "\d+"
-
-comtso_topic_add_photos:
-    pattern:  /forum/{forumId}/{id}/add_photos
-    defaults: { _controller: ComTSoForumBundle:Topic:addPhotos }
-    requirements:
-        forumId: "[\w-]+"
-        id: "\d+"
-    options:
-        expose: true
-
-comtso_topic_add_photo:
-    pattern:  /forum/{forumId}/{id}/add_photo
-    defaults: { _controller: ComTSoForumBundle:Topic:addPhoto }
-    requirements:
-        forumId: "[\w-]+"
-        id: "\d+"
-    options:
-        expose: true
-
-comtso_topic_remove_photo:
-    pattern:  /forum/{forumId}/{id}/remove_photo
-    defaults: { _controller: ComTSoForumBundle:Topic:removePhoto }
-    requirements:
-        forumId: "[\w-]+"
-        id: "\d+"
-    options:
-        expose: true
-
-comtso_topic_order_photos:
-    pattern:  /forum/{forumId}/{id}/order_photos
-    defaults: { _controller: ComTSoForumBundle:Topic:orderPhotos }
-    requirements:
-        forumId: "[\w-]+"
-        id: "\d+"
-    options:
-        expose: true
-
-comtso_user_list:
-    pattern:  /gens
-    defaults: { _controller: ComTSoForumBundle:User:list }
-
-comtso_user_show:
-    pattern:  /gens/{usernameCanonical}
-    defaults: { _controller: ComTSoForumBundle:User:show }
-    requirements:
-        usernameCanonical: "[\w- ]+"
-    options:
-        expose: true
-
-comtso_user_edit:
-    pattern:  /gens/{usernameCanonical}/edit
-    defaults: { _controller: ComTSoForumBundle:User:edit }
-    requirements:
-        usernameCanonical: "[\w- ]+"
-
 comtso_chat:
     pattern:  /chat
     defaults: { _controller: ComTSoForumBundle:Chat:show }
     options:
         expose: true
 
-comtso_photo_source_original:
-    pattern:  /photos/source/{id}
-    defaults: { _controller: ComTSoForumBundle:Photo:source }
-    requirements:
-        id: "\d+"
+comtso_forum:
+    resource: "@ComTSoForumBundle/Resources/config/routing.forum.yml"
 
-comtso_photo_backcompat:
-    pattern:  /photos/{filter}/{originalFilename}
-    defaults: { _controller: ComTSoForumBundle:Photo:sourceCache }
-    requirements:
-        originalFilename: "[a-z\d.]+"
-        filter: "tiny|thumbnail|preview|large"
-
-comtso_photo_source_cache:
-    pattern:  /cache/{filter}/{filename}
-    defaults: { _controller: ComTSoForumBundle:Photo:sourceCache }
-    requirements:
-        filename: "[a-z\d.]+"
-        filter: "tiny|thumbnail|preview|large"
-
-comtso_photo_show:
-    pattern:  /photos/{id}
-    defaults: { _controller: ComTSoForumBundle:Photo:show }
-    requirements:
-        id: "\d+"
-
-comtso_photo_list:
-    pattern:  /photos
-    defaults: { _controller: ComTSoForumBundle:Photo:list }
-
-comtso_photo_update:
-    pattern:  /api/photos/{id}
-    defaults: { _controller: ComTSoForumBundle:Photo:update }
-    options:
-        expose: true
-
-comtso_album_show:
-    pattern:  /albums/{id}
-    defaults: { _controller: ComTSoForumBundle:Photo:show }
-    requirements:
-        id: "\d+"
-
-comtso_album_list:
-    pattern:  /albums
-    defaults: { _controller: ComTSoForumBundle:Photo:list }
-
-comtso_photo_browser:
-    pattern: /photos/browser
-    defaults: { _controller: ComTSoForumBundle:Photo:browser }
-    options:
-        expose: true
-
-comtso_photo_uploader:
-    pattern: /photos/uploader
-    defaults: { _controller: ComTSoForumBundle:Photo:uploader }
-    options:
-        expose: true
-
-comtso_photo_widget:
-    pattern: /photos/{id}/widget
-    defaults: { _controller: ComTSoForumBundle:Photo:widget }
-    options:
-        expose: true
-
-comtso_comment_show:
-    pattern:  /comment/{id}
-    defaults: { _controller: ComTSoForumBundle:Comment:show }
-    requirements:
-        id: "\d+"
-        
-comtso_comment_edit:
-    pattern:  /comment/{id}/edit
-    defaults: { _controller: ComTSoForumBundle:Comment:edit }
-    requirements:
-        id: "\d+"
-        
-comtso_comment_delete:
-    pattern:  /comment/{id}/delete
-    defaults: { _controller: ComTSoForumBundle:Comment:delete }
-    requirements:
-        id: "\d+"
+comtso_topic:
+    resource: "@ComTSoForumBundle/Resources/config/routing.topic.yml"
+    
+comtso_comment:
+    resource: "@ComTSoForumBundle/Resources/config/routing.comment.yml"
+    
+comtso_user:
+    resource: "@ComTSoForumBundle/Resources/config/routing.user.yml"
+    
+comtso_photo:
+    resource: "@ComTSoForumBundle/Resources/config/routing.photo.yml"

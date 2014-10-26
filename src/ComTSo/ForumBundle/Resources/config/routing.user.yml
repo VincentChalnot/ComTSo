@@ -1,0 +1,18 @@
+
+comtso_user_list:
+    pattern:  /gens
+    defaults: { _controller: ComTSoForumBundle:User:list }
+
+comtso_user_show:
+    pattern:  /gens/{usernameCanonical}
+    defaults: { _controller: ComTSoForumBundle:User:show }
+    requirements:
+        usernameCanonical: "[\w- ]+"
+    options:
+        expose: true
+
+comtso_user_edit:
+    pattern:  /gens/{usernameCanonical}/edit
+    defaults: { _controller: ComTSoForumBundle:User:edit }
+    requirements:
+        usernameCanonical: "[\w- ]+"

@@ -46,7 +46,6 @@
                                 {% set activeMenu = activeMenu is defined ? activeMenu : 'home' %}
                                 <li{{ activeMenu == 'home' ? ' class="active"' }}><a href="{{ path('comtso_homepage') }}">Home</a></li>
                                 <li{{ activeMenu == 'forums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'le-bac-a-sable'}) }}">Le forum</a></li>
-                                <li{{ activeMenu == 'albums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'albums'}) }}">Les albums</a></li>
                                 <li{{ activeMenu == 'people' ? ' class="active"' }}><a href="{{ path('comtso_user_list') }}">Les gens</a></li>
                                 <li><a href="#chat" id="chat-toggle">Chat</a></li>
                             </ul>

@@ -1,0 +1,18 @@
+
+comtso_forum_show:
+    pattern:  /forum/{id}
+    defaults: { _controller: ComTSoForumBundle:Forum:show }
+    requirements:
+        id: "[\w-]+"
+
+comtso_forum_edit:
+    pattern:  /forum/{id}/edit
+    defaults: { _controller: ComTSoForumBundle:Forum:edit }
+    requirements:
+        id: "[\w-]+"
+
+comtso_forum_add_topic:
+    pattern:  /forum/{id}/add_topic
+    defaults: { _controller: ComTSoForumBundle:Forum:addTopic }
+    requirements:
+        id: "[\w-]+"

@@ -1,5 +1,11 @@
 {% extends 'ComTSoForumBundle:Forum:show.html.twig' %}
 
+{% block forum_actions %}
+    <div class="btn-group pull-right">
+        <a href="{{ forum|path }}" class="btn btn-default"><i class="fa fa-arrow-left"></i> Retour</a>
+    </div>
+{% endblock %}
+
 {% block inner_content %}
     {{ form_start(form) }}
         {{ form_widget(form) }}

@@ -18,7 +18,7 @@ class TopicController extends BaseController
     {
         $forum = $topic->getForum();
         if ($forum->getId() != $forumId) {
-            return $this->redirect($this->generateUrl('comtso_topic_show', ['id' => $topic->getId(), 'forumId' => $forum->getId()]), 304);
+            return $this->redirectToTopic($topic, 304);
         }
         $topic->getPhotos()->initialize();
         $this->setActiveMenu('forums');
@@ -32,7 +32,7 @@ class TopicController extends BaseController
     /**
      * @Template()
      */
-    public function showAction(Topic $topic, $forumId)
+    public function showAction(Request $request, Topic $topic, $forumId)
     {
         $response = $this->initTopic($topic, $forumId);
         if ($response instanceof Response) {
@@ -44,7 +44,7 @@ class TopicController extends BaseController
         $comment->setTopic($topic);
 
         $builder = $this->createFormBuilder($comment);
-        $builder->add('content', 'textarea', ['horizontal' => false, 'label_render' => false]);
+        $builder->add('content', 'textarea', ['horizontal' => false, 'label_render' => false, 'attr' => ['placeholder' => 'Nouveau commentaire…']]);
 
         $form = $builder->getForm();
         if ($this->getRequest()->isMethod('POST')) {
@@ -57,12 +57,15 @@ class TopicController extends BaseController
                 $em->flush();
 
                 $this->addFlashMsg('success', 'Commentaire enregistré');
-
-                return $this->redirect($this->generateUrl('comtso_topic_show', ['id' => $topic->getId(), 'forumId' => $topic->getForum()->getId()]));
+                return $this->redirectToTopic($topic);
             }
         }
 
         $this->viewParameters['form'] = $form->createView();
+        
+        $qb = $this->getRepository('Comment')->getQBForTopic($topic);
+        $comments = $this->createPager($qb, $request, 'updatedAt', 'd', 20)->initialize();
+        $this->viewParameters['comments'] = $comments;
 
         return $this->viewParameters;
     }
@@ -77,7 +80,7 @@ class TopicController extends BaseController
             return $response;
         }
 
-        $form = $this->createForm(new TopicType(), $topic);
+        $form = $this->createForm(new TopicType(), $topic, ['label' => 'Édition du topic']);
 
         $originalPhotos = new ArrayCollection();
         foreach ($topic->getPhotos() as $photo) {
@@ -87,34 +90,14 @@ class TopicController extends BaseController
         if ($this->getRequest()->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $em = $this->getManager();
-
                 $topic->setUpdatedAt(new DateTime());
-
-                foreach ($originalPhotos as $photo) {
-                    if (false === $topic->getPhotos()->contains($photo)) {
-                        $topic->getPhotos()->removeElement($photo);
-                        $em->remove($photo);
-                    }
-                }
-
-                foreach ($topic->getPhotos() as $photo) {
-                    if ($photo->getPhoto()) {
-                        $photo->setAuthor($this->getUser());
-                        $photo->setTopic($topic);
-                        $em->persist($photo);
-                    } else {
-                        $topic->getPhotos()->removeElement($photo);
-                        $em->remove($photo);
-                    }
-                }
-
+                
+                $em = $this->getManager();
                 $em->persist($topic);
                 $em->flush();
 
                 $this->addFlashMsg('success', 'Topic mis à jour');
-
-                return $this->redirect($this->generateUrl('comtso_topic_show', ['id' => $topic->getId(), 'forumId' => $forum->getId()]));
+                return $this->redirectToTopic($topic);
             }
         }
 
@@ -122,6 +105,20 @@ class TopicController extends BaseController
 
         return $this->viewParameters;
     }
+    
+    /**
+     * @Template()
+     */
+    public function managePhotosAction(Topic $topic, $forumId)
+    {
+        $response = $this->initTopic($topic, $forumId);
+        if ($response instanceof Response) {
+            return $response;
+        }
+
+        return $this->viewParameters;
+    }
+
 
     /**
      * @Template()
@@ -237,5 +234,38 @@ class TopicController extends BaseController
         $em->flush();
 
         return $this->render('ComTSoForumBundle:Topic:order_confirmed.html.twig', $this->viewParameters);
+    }
+    
+    /**
+     * @Template()
+     */
+    public function starAction(Request $request, Topic $topic, $forumId, $star = true)
+    {
+        $response = $this->initTopic($topic, $forumId);
+        if ($response instanceof Response) {
+            return $response;
+        }
+
+        $user = $this->getUser();
+        if ($star) {
+            $user->addStarredTopic($topic);
+        } else {
+            $user->removeStarredTopic($topic);
+        }
+        $em = $this->getManager();
+        $em->persist($user);
+        $em->flush();
+        
+        if ($request->isXmlHttpRequest()) {
+            return new \Symfony\Component\HttpFoundation\JsonResponse(true);
+        }
+
+        $this->addFlashMsg('success', 'Topic ajouté aux favoris');
+        return $this->redirectToTopic($topic);
+    }
+    
+    protected function redirectToTopic($topic, $code = 302)
+    {
+        return $this->redirect($this->generateUrl('comtso_topic_show', ['id' => $topic->getId(), 'forumId' => $topic->getForum()->getId()]), $code);
     }
 }
