@@ -32,7 +32,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// Let's have it basic on dialogs as well.
 	config.removeDialogTabs = 'link:advanced';
 	
-	config.youtube_width = '575';
+	config.youtube_width = '518';
 	config.youtube_height = '300';
 	config.youtube_related = false;
 	
