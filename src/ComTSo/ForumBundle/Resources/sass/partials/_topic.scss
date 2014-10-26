@@ -24,6 +24,9 @@
             float: left;
             display: block;
             vertical-align: middle;
+            &.selected {
+                border-color: $brand-primary;
+            }
         }
     }
     .btn.topic-starred {
@@ -35,6 +38,25 @@
         }
         .btn.topic-unstarred {
             display: none;
+        }
+    }
+}
+
+#sortable-photos {
+    .img-thumbnail {
+        position: relative;
+        margin: 3px;
+        .btn-group {
+            position: absolute;
+            z-index: 100;
+            bottom: 0;
+            left: 3px;
+            display: none;
+        }
+        &.selected {
+            .btn-group {
+                display: block;
+            }
         }
     }
 }

@@ -1,0 +1,17 @@
+{% extends 'ComTSoForumBundle:Photo:show.html.twig' %}
+
+{% block photo_actions %}
+    <div class="btn-group pull-right">
+        <a href="{{ photo|path }}" class="btn btn-default"><i class="fa fa-arrow-left"></i> Retour</a>
+    </div>
+{% endblock %}
+
+{% block inner_content %}
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <div class="btn-group pull-right">
+            <a href="{{ photo|path }}" class="btn btn-default">Retour</a>
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

@@ -3,7 +3,10 @@
 namespace ComTSo\ForumBundle\Controller;
 
 use ComTSo\ForumBundle\Entity\Photo;
+use ComTSo\ForumBundle\Form\Type\PhotoType;
 use ComTSo\ForumBundle\Lib\Utils;
+use DateInterval;
+use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,6 +22,33 @@ class PhotoController extends BaseController
     {
         $this->viewParameters['photo'] = $photo;
         $this->viewParameters['title'] = (string) $photo;
+
+        return $this->viewParameters;
+    }
+    
+    /**
+     * @Template()
+     */
+    public function editAction(Request $request, Photo $photo)
+    {
+        $this->viewParameters['photo'] = $photo;
+        $this->viewParameters['title'] = (string) $photo;
+        
+        $form = $this->createForm(new PhotoType, $photo, ['label' => 'Édition de la photo']);
+
+        if ($this->getRequest()->isMethod('POST')) {
+            $form->handleRequest($request);
+            if ($form->isValid()) {
+                $em = $this->getManager();
+                $em->persist($photo);
+                $em->flush();
+
+                $this->addFlashMsg('success', 'Topic mis à jour');
+                return $this->redirect($this->generateUrl('comtso_photo_show', $photo->getRoutingParameters()));
+            }
+        }
+
+        $this->viewParameters['form'] = $form->createView();
 
         return $this->viewParameters;
     }
@@ -104,8 +134,8 @@ class PhotoController extends BaseController
     protected function createImageResponse(Request $request, $filePath, Photo $photo = null, $contentDisposition = 'inline')
     {
         $response = new BinaryFileResponse($filePath, 200, [], true, $contentDisposition, false, true);
-        $date = new \DateTime();
-        $date->add(new \DateInterval('P1Y'));
+        $date = new DateTime();
+        $date->add(new DateInterval('P1Y'));
         $date->setTime(0, 0, 0);
 
         if ($response->isNotModified($request)) {
@@ -119,8 +149,8 @@ class PhotoController extends BaseController
         $response->setExpires($date);
 
         if ($photo) {
-            $filename = $photo->getTitle() ? Utils::slugify($photo->getTitle()).'.'.$photo->getFileType() : $photo->getFilename();
-            $response->setContentDisposition($this->getRequest()->get('download') ? 'attachment' : 'inline', $filename);
+            $filename = $photo->getTitle() ? $photo->getTitle().'.'.$photo->getFileType() : $photo->getOriginalFilename();
+            $response->setContentDisposition($this->getRequest()->get('download') ? 'attachment' : 'inline', Utils::slugify($filename));
         }
 
         return $response;
