@@ -9,6 +9,7 @@
         visibility: hidden;
         margin-bottom: 0;
         clear: both;
+        font-size: 0.8em;
     }
     .post-side {
         padding-bottom: 1.4em;
@@ -16,7 +17,17 @@
             margin-top: 1em;
         }
     }
-    &:hover .post-infos {
-        visibility: visible;
+    .post-actions {
+        visibility: hidden;
+        margin-top: -0.2em;
+        font-size: 1.2em;
+        .btn {
+            padding: 0.2em 0.5em;
+        }
+    }
+    &:hover {
+        .post-infos, .post-actions {
+            visibility: visible;
+        }
     }
 }

@@ -9,15 +9,21 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 class UserController extends BaseController
 {
+    
+    protected function preExecute()
+    {
+        $this->setActiveMenu('people');
+        $this->viewParameters['users'] = $this->getRepository('ComTSoUserBundle:User')->findByEnabled(true);
+    }
+    
     /**
      * @Template()
      */
     public function showAction(User $user)
     {
-        $this->setActiveMenu('people');
+        $this->preExecute();
         $this->viewParameters['user'] = $user;
         $this->viewParameters['title'] = (string) $user;
-        $this->viewParameters['users'] = $this->getRepository('ComTSoUserBundle:User')->findAll();
         $this->viewParameters['messages'] = $this->getRepository('Message')->findConversation($this->getUser(), $user);
 
         $message = new Message();
@@ -54,7 +60,7 @@ class UserController extends BaseController
      */
     public function editAction(User $user)
     {
-        $this->setActiveMenu('people');
+        $this->preExecute();
         $this->viewParameters['user'] = $user;
         $this->viewParameters['title'] = (string) $user;
 
@@ -86,8 +92,7 @@ class UserController extends BaseController
      */
     public function listAction()
     {
-        $this->setActiveMenu('people');
-        $this->viewParameters['users'] = $this->getRepository('ComTSoUserBundle:User')->findAll();
+        $this->preExecute();
         $this->viewParameters['title'] = 'Membres';
 
         return $this->viewParameters;

@@ -26,7 +26,7 @@ class TopicController extends BaseController
         $this->viewParameters['title'] = (string) $topic;
         $this->viewParameters['forum'] = $forum;
         $this->viewParameters['forums'] = $this->getRepository('Forum')->findAll();
-        $this->viewParameters['topics'] = $this->getRepository('Topic')->findByForum($forum, ['updatedAt' => 'DESC']);
+        $this->viewParameters['topics'] = $this->getRepository('Topic')->findByForum($forum, ['updatedAt' => 'DESC'], 10);
     }
 
     /**

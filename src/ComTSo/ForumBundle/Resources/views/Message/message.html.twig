@@ -1,0 +1,9 @@
+{% extends 'ComTSoForumBundle:Comment:comment.html.twig' %}
+
+{% set comment = message %}
+
+{% block post_actions %}
+    {#<div class="btn-group btn-group-vertical">
+        <a href="{{ comment|path('delete') }}" class="btn text-danger"><i class="fa fa-trash-o"></i></a>
+    </div>#}
+{% endblock %}
