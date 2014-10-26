@@ -5,7 +5,7 @@
     </div>
     <div class="panel-body">
         {% spaceless %}
-            {% if topic.photos %}
+            {% if topic.photos | length %}
                 <div class="topic-photos">
                     {% for photoTopic in topic.photos %}
                         {% set photo = photoTopic.photo %}
@@ -13,12 +13,16 @@
                             {% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
                         {% endif %}
                     {% endfor %}
+                    <hr class="clear">
                 </div>
-                <hr class="clear">
             {% endif %}
-            {% for comment in topic.comments.slice(0, 3) %}
+            {% for comment in topic.comments.slice(0, 4) %}
                 {% if loop.index != 1 %}<hr class="clear">{% endif %}
-                {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+                {% if loop.index < 4 %}
+                    {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+                {% else %}
+                    <p class="text-center text-muted lead">…</p>
+                {% endif %}
             {% endfor %}
         {% endspaceless %}
     </div>

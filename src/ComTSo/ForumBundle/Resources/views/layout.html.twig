@@ -20,7 +20,6 @@
                         'bundles/comtsoforum/css/bootstrap-datetimepicker.min.css'
                         'assets/jquery-ui/themes/base/minified/jquery-ui.min.css'
                         'bundles/comtsoforum/css/comtso.css'
-                        'bundles/comtsoforum/css/bootstrap-lumen.min.css'
             filter='cssrewrite' %}
             <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
         {% endstylesheets %}
@@ -49,7 +48,7 @@
                                 <li{{ activeMenu == 'forums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'le-bac-a-sable'}) }}">Le forum</a></li>
                                 <li{{ activeMenu == 'albums' ? ' class="active"' }}><a href="{{ path('comtso_forum_show', {id: 'albums'}) }}">Les albums</a></li>
                                 <li{{ activeMenu == 'people' ? ' class="active"' }}><a href="{{ path('comtso_user_list') }}">Les gens</a></li>
-                                <li style="display:none;"><a href="#chat" id="chat-toggle">Chat</a></li>
+                                <li><a href="#chat" id="chat-toggle">Chat</a></li>
                             </ul>
                             <form action="{{ path('comtso_search') }}" method="get" class="navbar-form navbar-left" role="search">
                                 <div class="form-group">

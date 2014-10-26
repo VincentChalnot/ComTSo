@@ -8,9 +8,9 @@
         <h2>Messages privés</h2>
     {% endif %}
     {% include 'ComTSoForumBundle:Comment:create_form.html.twig' %}
-    {% for comment in messages %}
+    {% for message in messages %}
         <hr class="clear">
-        {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+        {% include 'ComTSoForumBundle:Message:message.html.twig' %}
     {% endfor %}
 {% endblock %}
 
