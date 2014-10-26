@@ -3,7 +3,7 @@
 {% block inner_content %}
     {% spaceless %}
         {% if topic.photos %}
-            <div class="topic-photos" id="sortable-photos">
+            <div class="topic-photos">
                 {% for photoTopic in topic.photos %}
                     {% set photo = photoTopic.photo %}
                     {% if photo %}

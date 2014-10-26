@@ -146,8 +146,9 @@ $(document).ready(function(){
             disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator.userAgent),
             maxFileSize: 5000000,
             acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-            done: function(e) {
-                $('.photo-selector', el).load(Routing.generate('comtso_photo_browser'));
+            done: function(e, o) {
+                $('.photo-selector').load(Routing.generate('comtso_photo_browser'));
+                o.context.remove();
             }
         });
     };
@@ -162,7 +163,7 @@ $(document).ready(function(){
     });
 
     var titleUpdateTimeOut = null;
-    $(document).on('change keyup', '#photo-browser .photo-selector-line input.photo-title', function(e){
+    $(document).on('change keyup', '.photo-selector-line input.photo-title', function(e){
         var t = $(this);
         var title = $(this).val();
         var id = t.parents('.photo-selector-line').data('photo-id');

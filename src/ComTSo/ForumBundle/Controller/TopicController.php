@@ -82,11 +82,6 @@ class TopicController extends BaseController
 
         $form = $this->createForm(new TopicType(), $topic, ['label' => 'Édition du topic']);
 
-        $originalPhotos = new ArrayCollection();
-        foreach ($topic->getPhotos() as $photo) {
-            $originalPhotos->add($photo);
-        }
-
         if ($this->getRequest()->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isValid()) {
@@ -264,8 +259,8 @@ class TopicController extends BaseController
         return $this->redirectToTopic($topic);
     }
     
-    protected function redirectToTopic($topic, $code = 302)
+    protected function redirectToTopic(Topic $topic, $code = 302)
     {
-        return $this->redirect($this->generateUrl('comtso_topic_show', ['id' => $topic->getId(), 'forumId' => $topic->getForum()->getId()]), $code);
+        return $this->redirect($this->generateUrl('comtso_topic_show', $topic->getRoutingParameters()), $code);
     }
 }

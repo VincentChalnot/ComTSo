@@ -1,4 +1,16 @@
 
+comtso_photo_show:
+    pattern:  /photos/{id}
+    defaults: { _controller: ComTSoForumBundle:Photo:show }
+    requirements:
+        id: "\d+"
+
+comtso_photo_edit:
+    pattern:  /photos/{id}/edit
+    defaults: { _controller: ComTSoForumBundle:Photo:edit }
+    requirements:
+        id: "\d+"
+
 comtso_photo_source_original:
     pattern:  /photos/source/{id}
     defaults: { _controller: ComTSoForumBundle:Photo:source }
@@ -18,21 +30,6 @@ comtso_photo_source_cache:
     requirements:
         filename: "[a-z\d.]+"
         filter: "tiny|thumbnail|preview|large"
-
-comtso_photo_show:
-    pattern:  /photos/{id}
-    defaults: { _controller: ComTSoForumBundle:Photo:show }
-    requirements:
-        id: "\d+"
-
-comtso_photo_list:
-    pattern:  /photos
-    defaults: { _controller: ComTSoForumBundle:Photo:list }
-comtso_photo_show:
-    pattern:  /photos/{id}
-    defaults: { _controller: ComTSoForumBundle:Photo:show }
-    requirements:
-        id: "\d+"
 
 comtso_photo_update:
     pattern:  /api/photos/{id}

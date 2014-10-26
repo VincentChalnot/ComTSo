@@ -1,5 +1,6 @@
+{% set skip_content = skip_content is defined ? skip_content : false %}
 <h3>{{ entity }}</h3>
-{% if entity.content is defined and entity.content %}
+{% if entity.content is defined and entity.content and not skip_content %}
     <div>{{ entity.content|raw }}</div>
 {% endif %}
 <p class="text-muted">

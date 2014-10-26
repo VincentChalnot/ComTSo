@@ -1,5 +1,7 @@
 {% extends 'ComTSoForumBundle:Forum:show.html.twig' %}
 
+{% set skip_content = true %}
+
 {% block forum_actions %}
     <div class="btn-group pull-right">
         <a href="{{ forum|path }}" class="btn btn-default"><i class="fa fa-arrow-left"></i> Retour</a>
