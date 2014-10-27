@@ -100,6 +100,8 @@ class PhotoController extends BaseController
     public function browserAction(Request $request)
     {
         $qb = $this->getRepository('Photo')->createQueryBuilder('e');
+        $qb->andWhere('e.author = :user')
+                ->setParameter('user', $this->getUser());
         $photos = $this->createPager($qb, $request, 'createdAt', 'd')->initialize();
         $this->viewParameters['photos'] = $photos;
         $this->viewParameters['title'] = 'Photo Browser';
