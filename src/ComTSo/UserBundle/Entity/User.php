@@ -25,43 +25,43 @@ class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\En
     protected $id;
 
     /**
-     * @ORM\Column(type="string", length=32)
+     * @ORM\Column(type="string", length=32, nullable=true)
      */
     protected $name;
 
     /**
-     * @ORM\Column(type="string", length=32)
+     * @ORM\Column(type="string", length=32, nullable=true)
      */
     protected $surname;
 
     /**
      * @var \DateTime
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", nullable=true)
      */
     protected $birthday;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     protected $address;
 
     /**
-     * @ORM\Column(type="string", length=20)
+     * @ORM\Column(type="string", length=20, nullable=true)
      */
     protected $phone;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     protected $activities;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     protected $signature;
 
     /**
-     * @ORM\Column(type="string", length=128)
+     * @ORM\Column(type="string", length=128, nullable=true)
      */
     protected $website;
 
@@ -100,6 +100,8 @@ class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\En
     public function __construct()
     {
         parent::__construct();
+        $this->registeredAt = new DateTime;
+        $this->enabled = false;
         $this->starredTopics = new ArrayCollection;
     }
     

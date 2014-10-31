@@ -17,3 +17,5 @@ parameters:
     imagine_driver: gd
 
     kernel.data_dir: %kernel.root_dir%/data
+
+    brand.name: ComTSo
