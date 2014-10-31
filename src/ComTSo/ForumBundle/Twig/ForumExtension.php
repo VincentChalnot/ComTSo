@@ -44,6 +44,7 @@ class ForumExtension extends Twig_Extension
         return [
             'random_quote' => new Twig_Function_Method($this, 'getRandomQuote'),
             'image_size_attrs' => new Twig_Function_Method($this, 'getImageSizeAttrs', ['is_safe' => ['html']]),
+            'get_brand_name' => new \Twig_SimpleFunction('get_brand_name', [$this, 'getBrandName'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -99,6 +100,11 @@ class ForumExtension extends Twig_Extension
         }
 
         return $result;
+    }
+
+    public function getBrandName()
+    {
+        return $this->container->getParameter('brand.name');
     }
 
     protected function skipNonMatching($text, $terms)
