@@ -1,5 +1,5 @@
 #!/bin/sh
-php composer.phar install --optimize-autoloader;
+composer install --optimize-autoloader;
 php app/console cache:clear --env=prod --no-debug;
 php app/console assets:install web --symlink;
 php app/console assetic:dump;

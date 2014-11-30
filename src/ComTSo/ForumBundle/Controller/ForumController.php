@@ -21,7 +21,7 @@ class ForumController extends BaseController
         $this->viewParameters['forums'] = $this->getRepository('Forum')->findAll();
 
         $qb = $this->getRepository('Topic')->getQBForForumList($forum);
-        $topics = $this->createPager($qb, $request, 'updatedAt', 'd')->initialize();
+        $topics = $this->createPager($qb, $request);
         $this->viewParameters['topics'] = $topics;
 
         return $this->viewParameters;

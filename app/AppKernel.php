@@ -16,9 +16,7 @@ class AppKernel extends Kernel
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
-            new ComTSo\ForumBundle\ComTSoForumBundle(),
             new FOS\UserBundle\FOSUserBundle(),
-            new ComTSo\UserBundle\ComTSoUserBundle(),
             new Mopa\Bundle\BootstrapBundle\MopaBootstrapBundle(),
             new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
             new Joli\TypoBundle\JoliTypoBundle(),
@@ -26,6 +24,10 @@ class AppKernel extends Kernel
             new Liip\ImagineBundle\LiipImagineBundle(),
             new FOS\JsRoutingBundle\FOSJsRoutingBundle(),
             new Oneup\UploaderBundle\OneupUploaderBundle(),
+            new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
+            
+            new ComTSo\ForumBundle\ComTSoForumBundle(),
+            new ComTSo\UserBundle\ComTSoUserBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

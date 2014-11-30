@@ -8,6 +8,8 @@ use ComTSo\UserBundle\Entity\User;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Pagerfanta\Adapter\DoctrineORMAdapter;
+use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -162,31 +164,17 @@ class BaseController extends Controller
      * @param  QueryBuilder $qb
      * @return Pager
      */
-    public function createPager(QueryBuilder $qb, Request $request, $defaultSort = null, $defaultDirection = 'a', $defaultLimit = 10, $defaultPage = 1)
+    public function createPager(QueryBuilder $qb, Request $request, $defaultLimit = 10, $defaultPage = 1)
     {
-        $pager = $this->get('comtso.pager')
-                ->setQueryBuilder($qb);
+        $adapter = new DoctrineORMAdapter($qb);
+        $pager = new Pagerfanta($adapter);
 
-        if ($request->query->has($pager->getPageQuery())) {
-            $pager->setPage($request->query->get($pager->getPageQuery()));
+        if ($request->query->has('page')) {
+            $pager->setCurrentPage($request->query->get('page'));
         } else {
-            $pager->setPage($defaultPage);
+            $pager->setCurrentPage($defaultPage);
         }
-        if ($request->query->has($pager->getLimitQuery())) {
-            $pager->setLimit($request->query->get($pager->getLimitQuery()));
-        } else {
-            $pager->setLimit($defaultLimit);
-        }
-        if ($request->query->has($pager->getDirectionQuery())) {
-            $pager->setDirection($request->query->get($pager->getDirectionQuery()));
-        } else {
-            $pager->setDirection($defaultDirection);
-        }
-        if ($request->query->has($pager->getSortQuery())) {
-            $pager->setSort($request->query->get($pager->getSortQuery()));
-        } else {
-            $pager->setSort($defaultSort);
-        }
+        $pager->setMaxPerPage($defaultLimit);
 
         return $pager;
     }
