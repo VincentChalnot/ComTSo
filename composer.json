@@ -32,7 +32,8 @@
 		"phpexiftool/phpexiftool": "0.3.*@dev",
 		"jolicode/jolitypo-bundle": "dev-master",
 		"mjohnson/decoda": "dev-master",
-		"exercise/htmlpurifier-bundle": "dev-master"
+		"exercise/htmlpurifier-bundle": "dev-master",
+        "white-october/pagerfanta-bundle": "~1.0"
     },
     "scripts": {
         "post-install-cmd": [
