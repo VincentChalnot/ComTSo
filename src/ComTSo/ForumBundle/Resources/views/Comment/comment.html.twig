@@ -14,13 +14,11 @@
     </div>
     <div class="col-sm-1 post-actions">
         {% block post_actions %}
-            {# @TODO
             <div class="btn-group btn-group-vertical">
                 <a href="{{ comment|path('show') }}" class="btn"><i class="fa fa-eye"></i></a>
                 <a href="{{ comment|path('edit') }}" class="btn"><i class="fa fa-pencil"></i></a>
                 <a href="{{ comment|path('delete') }}" class="btn text-danger"><i class="fa fa-trash-o"></i></a>
             </div>
-            #}
         {% endblock %}
     </div>
 </div>
