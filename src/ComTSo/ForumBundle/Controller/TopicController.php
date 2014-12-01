@@ -82,7 +82,7 @@ class TopicController extends BaseController
 
         $form = $this->createForm(new TopicType(), $topic, ['label' => 'Édition du topic']);
 
-        if ($this->getRequest()->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $topic->setUpdatedAt(new DateTime());

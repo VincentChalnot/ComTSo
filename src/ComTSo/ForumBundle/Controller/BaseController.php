@@ -100,18 +100,22 @@ class BaseController extends Controller
 
     /**
      * Returns current bundle name for controller
+     * @throws Exception
      * @return string
      */
     protected function getBundleName()
     {
         $controller = $this->getRequest()->attributes->get('_controller');
         $className = explode('::', $controller)[0];
+        if (false !== strpos($className, ':')) {
+            return explode(':', $controller)[0];
+        }
         foreach ($this->get('kernel')->getBundles() as $bundle) {
             if (0 === strpos($className, $bundle->getNamespace())) {
                 return $bundle->getName();
             }
         }
-        throw new \Exception("Unknown Bundle for controller: {$className}");
+        throw new Exception("Unknown Bundle for controller: {$controller}");
     }
 
     protected function cleanHtml($html)
