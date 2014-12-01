@@ -228,4 +228,13 @@ $(document).ready(function(){
             }
         });
     });
+
+    $(document).on('click', '.preview .preview-toggle', function(e) {
+        var t = $(this);
+        if (t.hasClass('preview-show')) {
+            t.parent().addClass('active');
+        } else {
+            t.parent().removeClass('active');
+        }
+    });
 });

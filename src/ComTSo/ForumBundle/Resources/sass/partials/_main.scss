@@ -69,6 +69,29 @@ textarea {
     -o-transition: none !important;
 }
 
+.preview {
+    height: 30px;
+    overflow-y: hidden;
+    .preview-toggle {
+        text-align: center;
+        height: 30px;
+        display: block;
+        padding: 5px;
+        color: $text-muted;
+        &:hover {
+            text-decoration: none;
+            color: $text-color;
+        }
+    }
+    &.active {
+        height: auto;
+        .preview-show {
+            display: none;
+        }
+    }
+}
+
+
 @media (max-width: 768px) {
     h1 {
         font-size: 5em;

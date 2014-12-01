@@ -5,7 +5,13 @@
             <a class="btn topic-unstarred" href="{{ topic|path('star') }}" title="Ajouter aux favoris"><i class="fa fa-star-o"></i></a>
         </div>
         <h3><a href="{{ topic|path }}">{{ topic }}</a></h3>
-        <div>{{ topic.content|raw }}</div>
+        {% if topic.content %}
+            <div class="preview">
+                <a href="#topic-{{ topic.id }}" class="preview-toggle preview-show"><i class="fa fa-toggle-down"></i> Afficher la description</a>
+                {{ topic.content|raw }}
+                <a href="#topic-{{ topic.id }}" class="preview-toggle preview-hide"><i class="fa fa-toggle-up"></i> Masquer la description</a>
+            </div>
+        {% endif %}
     </div>
     <div class="panel-body">
         {% spaceless %}
