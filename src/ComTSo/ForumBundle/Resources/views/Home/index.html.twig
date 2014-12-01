@@ -2,6 +2,7 @@
 
 {% block content %}
     <h2>Activités récentes</h2>
+    <p class="text-muted">Affichage des derniers messages depuis le {{ since|date('d/m/Y') }}</p>
     {% for topic in topics %}
         <div class="topic panel panel-default">
             <div class="panel-heading">
@@ -15,6 +16,10 @@
                 {% endfor %}
             </div>
             <div class="panel-footer text-center"><a class="btn btn-info" href="{{ topic|path }}">Voir le topic</a></div>
+        </div>
+    {% else %}
+        <div class="well text-center">
+            <p class="text-muted"><small>Aucun message à afficher</small></p>
         </div>
     {% endfor %}
 {% endblock %}
