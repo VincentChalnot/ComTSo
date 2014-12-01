@@ -8,6 +8,7 @@ use FOS\UserBundle\Model\User as BaseUser;
 use ComTSo\ForumBundle\Entity\Photo;
 use ComTSo\ForumBundle\Entity\Topic;
 use Doctrine\Common\Collections\ArrayCollection;
+use ComTSo\ForumBundle\Entity\Routable;
 
 /**
  * Object
@@ -15,7 +16,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Table(name="fos_user")
  * @ORM\Entity(repositoryClass="ComTSo\UserBundle\Entity\UserRepository")
  */
-class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\Entity\Routable
+class User extends BaseUser implements \JsonSerializable, Routable
 {
     /**
      * @ORM\Id
@@ -411,7 +412,7 @@ class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\En
     }
     
     /**
-     * 
+     *
      * @param Topic $topic
      * @return bool
      */
@@ -420,7 +421,7 @@ class User extends BaseUser implements \JsonSerializable, \ComTSo\ForumBundle\En
         return $this->starredTopics->contains($topic);
     }
 
-    
+
     public function jsonSerialize()
     {
         return [

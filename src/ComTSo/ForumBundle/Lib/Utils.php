@@ -260,7 +260,7 @@ class Utils
     public static function filesizeFormat($size, $decimals = 1)
     {
         $size = self::numberParse($size);
-        $units = array('octets', 'Ko', 'Mo', 'Go', 'To', 'Po');
+        $units = ['octets', 'Ko', 'Mo', 'Go', 'To', 'Po'];
         $i = 0;
         while ($size > 1024) {
             $size = $size / 1024;
