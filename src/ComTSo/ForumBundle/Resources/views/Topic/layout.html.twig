@@ -1,6 +1,7 @@
 {% extends 'ComTSoForumBundle::layout.html.twig' %}
 
 {% block content %}
+    {% set skip_content = skip_content is defined ? skip_content : false %}
     <ul class="nav nav-tabs">
         {% for f in forums %}
             <li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
@@ -14,7 +15,7 @@
             </div>
         {% endblock %}
         {% include 'ComTSoForumBundle:Common:entity_header.html.twig' with {entity: topic, skip_content: true} %}
-        {% if topic.content %}
+        {% if topic.content and not skip_content %}
             <div class="preview">
                 <a href="#topic-{{ topic.id }}" class="preview-toggle preview-show"><i class="fa fa-toggle-down"></i> Afficher la description</a>
                 {{ topic.content|raw }}
