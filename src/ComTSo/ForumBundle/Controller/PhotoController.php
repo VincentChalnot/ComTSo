@@ -102,7 +102,7 @@ class PhotoController extends BaseController
         $qb = $this->getRepository('Photo')->createQueryBuilder('e');
         $qb->andWhere('e.author = :user')
                 ->setParameter('user', $this->getUser())
-                ->addOrderBy('e.createdAt', 'ASC');
+                ->addOrderBy('e.createdAt', 'DESC');
         $photos = $this->createPager($qb, $request);
         $this->viewParameters['photos'] = $photos;
         $this->viewParameters['title'] = 'Photo Browser';

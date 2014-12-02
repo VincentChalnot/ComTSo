@@ -10,6 +10,9 @@
 
 {% block inner_content %}
     {% include 'ComTSoForumBundle:Photo:uploader.html.twig' %}
+    <div class="btn-group pull-right">
+        <a href="{{ topic|path('manage_photos') }}" class="btn btn-default"><i class="fa fa-arrow-left"></i> Retour</a>
+    </div>
 {% endblock %}
 
 {% block javascripts %}

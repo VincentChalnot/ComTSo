@@ -71,9 +71,9 @@ $(document).ready(function(){
         $("#chat-message-new").prop('disabled', false);
     };
 
-//    window.setInterval(function(){
-//        $.ajax(chat_url, {success: parseChatMessages});
-//    }, 10000);
+    window.setInterval(function(){
+        $.ajax(Routing.generate('comtso_chat'), {success: parseChatMessages});
+    }, 10000);
     if ($('#chat-panel form').length) {
         $.ajax(Routing.generate('comtso_chat'), {success: parseChatMessages});
     }
