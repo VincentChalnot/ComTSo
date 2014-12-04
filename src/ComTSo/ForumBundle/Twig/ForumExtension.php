@@ -45,6 +45,8 @@ class ForumExtension extends Twig_Extension
             'random_quote' => new Twig_Function_Method($this, 'getRandomQuote'),
             'image_size_attrs' => new Twig_Function_Method($this, 'getImageSizeAttrs', ['is_safe' => ['html']]),
             'get_brand_name' => new \Twig_SimpleFunction('get_brand_name', [$this, 'getBrandName'], ['is_safe' => ['html']]),
+            'get_owa_base_url' => new \Twig_SimpleFunction('get_owa_base_url', [$this, 'getOwaBaseUrl'], ['is_safe' => ['html']]),
+            'get_owa_site_id' => new \Twig_SimpleFunction('get_owa_site_id', [$this, 'getOwaSiteId'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -105,6 +107,16 @@ class ForumExtension extends Twig_Extension
     public function getBrandName()
     {
         return $this->container->getParameter('brand.name');
+    }
+
+    public function getOwaBaseUrl()
+    {
+        return $this->container->getParameter('owa.baseUrl');
+    }
+
+    public function getOwaSiteId()
+    {
+        return $this->container->getParameter('owa.siteId');
     }
 
     protected function skipNonMatching($text, $terms)
