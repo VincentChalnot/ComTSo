@@ -14,7 +14,7 @@ class CommentRepository extends BaseRepository
     {
         $qb = $this->createQueryBuilder('e')
                 ->where('e.topic = :topic')
-                ->addOrderBy('e.updatedAt', 'DESC')
+                ->addOrderBy('e.createdAt', 'DESC')
                 ->setParameter('topic', $topic);
 
         return $qb;
