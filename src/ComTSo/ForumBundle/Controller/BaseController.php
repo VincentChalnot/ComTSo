@@ -118,25 +118,6 @@ class BaseController extends Controller
         throw new Exception("Unknown Bundle for controller: {$controller}");
     }
 
-    protected function cleanHtml($html)
-    {
-        $html = $this->get('joli_typo.fixer.fr')->fix($html);
-        $html = $this->get('exercise_html_purifier.default')->purify($html);
-
-        return $html;
-    }
-
-    protected function cleanText($html, $cut = null)
-    {
-        $html = $this->cleanHtml($html);
-        $txt = Utils::convertToText($html);
-        if ($cut) {
-            $txt = Utils::shorten($txt, $cut);
-        }
-
-        return str_replace("\n", ' ', $txt);
-    }
-
     /**
      *
      * @return User
@@ -183,4 +164,21 @@ class BaseController extends Controller
         return $pager;
     }
 
+    protected function cleanHtml($html)
+    {
+        $html = $this->get('joli_typo.fixer.fr')->fix($html);
+        $html = $this->get('exercise_html_purifier.default')->purify($html);
+        return $html;
+    }
+
+    protected function cleanText($html, $cut = null)
+    {
+        $html = $this->cleanHtml($html);
+        $txt = Utils::convertToText($html);
+        if ($cut) {
+            $txt = Utils::shorten($txt, $cut);
+        }
+
+        return str_replace("\n", ' ', $txt);
+    }
 }
