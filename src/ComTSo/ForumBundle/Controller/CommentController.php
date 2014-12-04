@@ -45,6 +45,7 @@ class CommentController extends BaseController
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $comment->setUpdatedAt(new DateTime());
+                $comment->setContent($this->cleanHtml($comment->getContent()));
 
                 $em = $this->getManager();
                 $em->persist($comment);

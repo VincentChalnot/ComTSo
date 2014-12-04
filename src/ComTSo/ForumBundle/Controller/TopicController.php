@@ -6,7 +6,6 @@ use ComTSo\ForumBundle\Entity\Comment;
 use ComTSo\ForumBundle\Entity\Topic;
 use ComTSo\ForumBundle\Form\Type\TopicType;
 use DateTime;
-use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,6 +50,8 @@ class TopicController extends BaseController
             $form->handleRequest($this->getRequest());
             if ($form->isValid()) {
                 $topic->setUpdatedAt(new DateTime());
+                $comment->setContent($this->cleanHtml($comment->getContent()));
+                
                 // Saving object
                 $em = $this->getManager();
                 $em->persist($comment, $topic);
@@ -86,6 +87,7 @@ class TopicController extends BaseController
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $topic->setUpdatedAt(new DateTime());
+                $topic->setContent($this->cleanHtml($topic->getContent()));
                 
                 $em = $this->getManager();
                 $em->persist($topic);
