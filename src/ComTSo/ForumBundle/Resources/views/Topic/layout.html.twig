@@ -1,6 +1,7 @@
 {% extends 'ComTSoForumBundle::layout.html.twig' %}
 
 {% block content %}
+    {% set skip_content = skip_content is defined ? skip_content : false %}
     <ul class="nav nav-tabs">
         {% for f in forums %}
             <li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
@@ -13,7 +14,14 @@
                 <a href="{{ topic|path('manage_photos') }}" class="btn btn-info" title="Gérer les photos"><i class="fa fa-camera-retro"></i></a>
             </div>
         {% endblock %}
-        {% include 'ComTSoForumBundle:Common:entity_header.html.twig' with {entity: topic} %}
+        {% include 'ComTSoForumBundle:Common:entity_header.html.twig' with {entity: topic, skip_content: true} %}
+        {% if topic.content and not skip_content %}
+            <div class="preview">
+                <a href="#topic-{{ topic.id }}" class="preview-toggle preview-show"><i class="fa fa-toggle-down"></i> Afficher la description</a>
+                {{ topic.content|raw }}
+                <a href="#topic-{{ topic.id }}" class="preview-toggle preview-hide"><i class="fa fa-toggle-up"></i> Masquer la description</a>
+            </div>
+        {% endif %}
         {% block inner_content %}{% endblock %}
     </div>
 {% endblock %}

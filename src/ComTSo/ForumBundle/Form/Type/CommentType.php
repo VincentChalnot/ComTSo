@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class TopicType extends AbstractType
+class CommentType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -14,8 +14,7 @@ class TopicType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('title')
-                ->add('forum')
+        $builder->add('topic')
                 ->add('author')
                 ->add('content');
     }
@@ -26,7 +25,7 @@ class TopicType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'ComTSo\ForumBundle\Entity\Topic'
+            'data_class' => 'ComTSo\ForumBundle\Entity\Comment'
         ]);
     }
 
@@ -35,7 +34,7 @@ class TopicType extends AbstractType
      */
     public function getName()
     {
-        return 'comtso_topic';
+        return 'comtso_comment';
     }
 
 }

@@ -1,0 +1,28 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+    <ul class="nav nav-tabs">
+        {% for f in forums %}
+            <li{{ f.id == forum.id ? ' class="active"' }}><a href="{{ f|path }}">{{ f }}</a></li>
+        {% endfor %}
+    </ul>
+    <div class="comment">
+        <div class="btn-group pull-right">
+            <a href="{{ topic|path }}" class="btn btn-default"><i class="fa fa-arrow-left"></i> Retour</a>
+        </div>
+        {% include 'ComTSoForumBundle:Common:entity_header.html.twig' with {entity: comment, skip_content: true} %}
+        <hr class="clear">
+        {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+    </div>
+{% endblock %}
+
+{% block aside %}
+    <h4>Accès rapide</h4>
+    <ul class="nav nav-compact">
+        {% for t in topics %}
+            {% if t.id != topic.id %}
+                <li><a href="{{ t|path }}">{{ t }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endblock %}

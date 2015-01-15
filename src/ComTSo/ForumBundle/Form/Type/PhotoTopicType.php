@@ -28,9 +28,9 @@ class PhotoTopicType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'data_class' => 'ComTSo\ForumBundle\Entity\PhotoTopic',
-        ));
+        ]);
     }
 
     /**

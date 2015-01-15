@@ -2,19 +2,12 @@
 
 {% block content %}
     <h2>Activités récentes</h2>
+    <p class="text-muted">Affichage des derniers messages depuis le {{ since|date('d/m/Y') }}</p>
     {% for topic in topics %}
-        <div class="topic panel panel-default">
-            <div class="panel-heading">
-                <h3><a href="{{ topic|path }}" name="topic-{{ topic.id }}">{{ topic }}</a></h3>
-                <div>{{ topic.content|raw }}</div>
-            </div>
-            <div class="panel-body">
-                {% for comment in topic.lastComments %}
-                    {% if loop.index != 1 %}<hr class="clear">{% endif %}
-                    {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
-                {% endfor %}
-            </div>
-            <div class="panel-footer text-center"><a class="btn btn-info" href="{{ topic|path }}">Voir le topic</a></div>
+        {% include 'ComTSoForumBundle:Home:topic_preview.html.twig' %}
+    {% else %}
+        <div class="well text-center">
+            <p class="text-muted"><small>Aucun message à afficher</small></p>
         </div>
     {% endfor %}
 {% endblock %}

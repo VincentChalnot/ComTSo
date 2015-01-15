@@ -4,6 +4,10 @@ namespace ComTSo\ForumBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+/**
+ * Class HomeController
+ * @package ComTSo\ForumBundle\Controller
+ */
 class HomeController extends BaseController
 {
 
@@ -12,8 +16,13 @@ class HomeController extends BaseController
      */
     public function indexAction()
     {
-        $since = new \DateTime();
-        $since->sub(new \DateInterval('P6D'));
+        $yesterday = new \DateTime('yesterday');
+        $yesterday->setTime(0, 0);
+        $since = $this->getUser()->getPreviousLogin();
+        if ($since > $yesterday) {
+            $since = $yesterday;
+        }
+        $this->viewParameters['since'] = $since;
         $comments = $this->getRepository('Comment')->findLastsCreated(100, $since);
         $topics = [];
         foreach ($comments as $comment) {

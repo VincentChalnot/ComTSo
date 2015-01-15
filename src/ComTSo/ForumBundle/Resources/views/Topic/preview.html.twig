@@ -1,34 +1,44 @@
 <div class="topic panel panel-default{{ app.user.isStarred(topic) ? ' is-starred' }}" id="topic-{{ topic.id }}">
-    <div class="panel-heading">
-        <div class="btn-group pull-right">
-            <a class="btn topic-starred" href="{{ topic|path('unstar') }}" title="Retirer des favoris"><i class="fa fa-star"></i></a>
-            <a class="btn topic-unstarred" href="{{ topic|path('star') }}" title="Ajouter aux favoris"><i class="fa fa-star-o"></i></a>
-        </div>
-        <h3><a href="{{ topic|path }}">{{ topic }}</a></h3>
-        <div>{{ topic.content|raw }}</div>
-    </div>
-    <div class="panel-body">
-        {% spaceless %}
-            {% if topic.photos | length %}
-                <div class="topic-photos">
-                    {% for photoTopic in topic.photos %}
-                        {% set photo = photoTopic.photo %}
-                        {% if photo %}
-                            {% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
-                        {% endif %}
-                    {% endfor %}
-                    <hr class="clear">
+    {% block topic_panel_heading %}
+        <div class="panel-heading">
+            <div class="btn-group pull-right">
+                <a class="btn topic-starred" href="{{ topic|path('unstar') }}" title="Retirer des favoris"><i class="fa fa-star"></i></a>
+                <a class="btn topic-unstarred" href="{{ topic|path('star') }}" title="Ajouter aux favoris"><i class="fa fa-star-o"></i></a>
+            </div>
+            <h3><a href="{{ topic|path }}">{{ topic }}</a></h3>
+            {% if topic.content %}
+                <div class="preview">
+                    <a href="#topic-{{ topic.id }}" class="preview-toggle preview-show"><i class="fa fa-toggle-down"></i> Afficher la description</a>
+                    {{ topic.content|raw }}
+                    <a href="#topic-{{ topic.id }}" class="preview-toggle preview-hide"><i class="fa fa-toggle-up"></i> Masquer la description</a>
                 </div>
             {% endif %}
-            {% for comment in topic.comments.slice(0, 4) %}
-                {% if loop.index != 1 %}<hr class="clear">{% endif %}
-                {% if loop.index < 4 %}
-                    {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
-                {% else %}
-                    <p class="text-center text-muted lead">…</p>
+        </div>
+    {% endblock %}
+    {% block topic_panel_body %}
+        <div class="panel-body">
+            {% spaceless %}
+                {% if topic.photos | length %}
+                    <div class="topic-photos">
+                        {% for photoTopic in topic.photos.slice(0, 4) %}
+                            {% set photo = photoTopic.photo %}
+                            {% if photo %}
+                                {% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
+                            {% endif %}
+                        {% endfor %}
+                        <hr class="clear">
+                    </div>
                 {% endif %}
-            {% endfor %}
-        {% endspaceless %}
-    </div>
+                {% for comment in topic.comments.slice(0, 4) %}
+                    {% if loop.index != 1 %}<hr class="clear">{% endif %}
+                    {% if loop.index < 4 %}
+                        {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+                    {% else %}
+                        <p class="text-center text-muted lead">…</p>
+                    {% endif %}
+                {% endfor %}
+            {% endspaceless %}
+        </div>
+    {% endblock %}
     <div class="panel-footer text-center"><a class="btn btn-info" href="{{ topic|path }}">Voir le topic</a></div>
 </div>

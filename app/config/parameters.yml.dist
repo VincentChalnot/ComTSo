@@ -19,3 +19,5 @@ parameters:
     kernel.data_dir: %kernel.root_dir%/data
 
     brand.name: ComTSo
+    owa.baseUrl: https://chalnot.fr/owa/
+    owa.siteId: e38e9ef679ef74e681ac18c06c543138

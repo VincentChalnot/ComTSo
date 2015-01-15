@@ -100,12 +100,12 @@ class ImportDatabaseCommand extends ContainerAwareCommand
         $this->chatLog = realpath($chatLog);
         $this->htmlPurifier = $this->getContainer()->get('exercise_html_purifier.default');
         $this->typoFixer = $this->getContainer()->get('joli_typo.fixer.fr');
-        $this->decoda = new Decoda('', array(
+        $this->decoda = new Decoda('', [
             'strictMode' => false,
             'escapeHtml' => false,
             'locale' => 'fr-fr',
             'removeEmpty' => true,
-        ));
+        ]);
         $this->decoda->addFilter(new \Decoda\Filter\DefaultFilter());
         $this->decoda->addFilter(new \Decoda\Filter\UrlFilter());
         $this->decoda->addFilter(new \Decoda\Filter\EmailFilter());
@@ -686,9 +686,9 @@ class ImportDatabaseCommand extends ContainerAwareCommand
 
     protected function parseDecodaErrors()
     {
-        $nesting = array();
-        $closing = array();
-        $scope = array();
+        $nesting = [];
+        $closing = [];
+        $scope = [];
 
         foreach ($this->decoda->getErrors() as $error) {
             switch ($error['type']) {

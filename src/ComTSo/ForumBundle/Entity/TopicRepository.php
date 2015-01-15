@@ -15,8 +15,7 @@ class TopicRepository extends BaseRepository
         $qb = $this->createQueryBuilder('e')
                 ->leftJoin('e.photos', 'p')
                 ->addSelect('p')
-                ->where('e.forum = :forum')
-                ->andWhere('p.order < 4 OR p.order IS NULL')
+                ->andWhere('e.forum = :forum')
                 ->addOrderBy('e.updatedAt', 'DESC')
                 ->setParameter('forum', $forum);
 

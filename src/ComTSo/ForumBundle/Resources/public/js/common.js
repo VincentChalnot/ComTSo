@@ -71,9 +71,9 @@ $(document).ready(function(){
         $("#chat-message-new").prop('disabled', false);
     };
 
-//    window.setInterval(function(){
-//        $.ajax(chat_url, {success: parseChatMessages});
-//    }, 10000);
+    window.setInterval(function(){
+        $.ajax(Routing.generate('comtso_chat'), {success: parseChatMessages});
+    }, 10000);
     if ($('#chat-panel form').length) {
         $.ajax(Routing.generate('comtso_chat'), {success: parseChatMessages});
     }
@@ -152,7 +152,7 @@ $(document).ready(function(){
             // send Blob objects via XHR requests:
             disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator.userAgent),
             maxFileSize: 5000000,
-            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+            acceptFileTypes: /(\.|\/)(gif|jpe?g|png|bmp)$/i,
             done: function(e, o) {
                 $('.photo-selector').load(Routing.generate('comtso_photo_browser'));
                 o.context.remove();
@@ -227,5 +227,14 @@ $(document).ready(function(){
                 
             }
         });
+    });
+
+    $(document).on('click', '.preview .preview-toggle', function(e) {
+        var t = $(this);
+        if (t.hasClass('preview-show')) {
+            t.parent().addClass('active');
+        } else {
+            t.parent().removeClass('active');
+        }
     });
 });

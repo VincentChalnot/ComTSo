@@ -6,7 +6,6 @@ use ComTSo\ForumBundle\Entity\Comment;
 use ComTSo\ForumBundle\Entity\Topic;
 use ComTSo\ForumBundle\Form\Type\TopicType;
 use DateTime;
-use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,10 +46,12 @@ class TopicController extends BaseController
         $builder->add('content', 'textarea', ['horizontal' => false, 'label_render' => false, 'attr' => ['placeholder' => 'Nouveau commentaire…']]);
 
         $form = $builder->getForm();
-        if ($this->getRequest()->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             $form->handleRequest($this->getRequest());
             if ($form->isValid()) {
                 $topic->setUpdatedAt(new DateTime());
+                $comment->setContent($this->cleanHtml($comment->getContent()));
+                
                 // Saving object
                 $em = $this->getManager();
                 $em->persist($comment, $topic);
@@ -64,7 +65,7 @@ class TopicController extends BaseController
         $this->viewParameters['form'] = $form->createView();
         
         $qb = $this->getRepository('Comment')->getQBForTopic($topic);
-        $comments = $this->createPager($qb, $request, 'updatedAt', 'd', 20)->initialize();
+        $comments = $this->createPager($qb, $request, 20);
         $this->viewParameters['comments'] = $comments;
 
         return $this->viewParameters;
@@ -82,10 +83,11 @@ class TopicController extends BaseController
 
         $form = $this->createForm(new TopicType(), $topic, ['label' => 'Édition du topic']);
 
-        if ($this->getRequest()->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $topic->setUpdatedAt(new DateTime());
+                $topic->setContent($this->cleanHtml($topic->getContent()));
                 
                 $em = $this->getManager();
                 $em->persist($topic);
@@ -131,11 +133,14 @@ class TopicController extends BaseController
         }
         $qb = $this->getRepository('Photo')->createQueryBuilder('e');
         if ($ids) {
-            $qb->where('e.id NOT IN (:ids)')
+            $qb->andWhere('e.id NOT IN (:ids)')
                     ->setParameter('ids', $ids);
         }
+        $qb->andWhere('e.author = :user')
+            ->setParameter('user', $this->getUser())
+            ->addOrderBy('e.createdAt', 'DESC');
 
-        $photos = $this->createPager($qb, $request, 'createdAt', 'd')->initialize();
+        $photos = $this->createPager($qb, $request);
         $this->viewParameters['photos'] = $photos;
 
         if ($request->isXmlHttpRequest()) {

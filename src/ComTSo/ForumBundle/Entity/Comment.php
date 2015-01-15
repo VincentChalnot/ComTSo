@@ -64,4 +64,8 @@ class Comment implements Routable
         return ['id' => $this->getId()];
     }
 
+    public function __toString()
+    {
+        return 'Commentaire #'.$this->getId();
+    }
 }

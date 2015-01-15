@@ -36,7 +36,7 @@ class PhotoController extends BaseController
         
         $form = $this->createForm(new PhotoType, $photo, ['label' => 'Édition de la photo']);
 
-        if ($this->getRequest()->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $em = $this->getManager();
@@ -101,8 +101,9 @@ class PhotoController extends BaseController
     {
         $qb = $this->getRepository('Photo')->createQueryBuilder('e');
         $qb->andWhere('e.author = :user')
-                ->setParameter('user', $this->getUser());
-        $photos = $this->createPager($qb, $request, 'createdAt', 'd')->initialize();
+                ->setParameter('user', $this->getUser())
+                ->addOrderBy('e.createdAt', 'DESC');
+        $photos = $this->createPager($qb, $request);
         $this->viewParameters['photos'] = $photos;
         $this->viewParameters['title'] = 'Photo Browser';
 
