@@ -5,11 +5,11 @@ namespace ComTSo\ForumBundle\Twig;
 use ComTSo\ForumBundle\Entity\Photo;
 use ComTSo\ForumBundle\Entity\Routable;
 use ComTSo\ForumBundle\Lib\Utils;
+use ComTSo\UserBundle\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twig_Extension;
-use Twig_Function_Method;
 
 class ForumExtension extends Twig_Extension
 {
@@ -31,22 +31,23 @@ class ForumExtension extends Twig_Extension
     public function getFilters()
     {
         return [
-            'file_size' => new \Twig_Filter_Method($this, 'fileSizeFormat'),
-            'highlight' => new \Twig_Filter_Method($this, 'getHighlightedText', ['is_safe' => ['html']]),
-            'path' => new \Twig_Filter_Method($this, 'getObjectPath', ['is_safe' => ['html']]),
-            'shorten' => new \Twig_Filter_Method($this, 'shorten'),
-            'htmlDate' => new \Twig_Filter_Method($this, 'getHtmlDate', ['is_safe' => ['html']]),
+            new \Twig_SimpleFilter('file_size', [$this, 'fileSizeFormat']),
+            new \Twig_SimpleFilter('highlight', [$this, 'getHighlightedText'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFilter('path', [$this, 'getObjectPath'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFilter('shorten', [$this, 'shorten']),
+            new \Twig_SimpleFilter('htmlDate', [$this, 'getHtmlDate'], ['is_safe' => ['html']] ),
         ];
     }
 
     public function getFunctions()
     {
         return [
-            'random_quote' => new Twig_Function_Method($this, 'getRandomQuote'),
-            'image_size_attrs' => new Twig_Function_Method($this, 'getImageSizeAttrs', ['is_safe' => ['html']]),
-            'get_brand_name' => new \Twig_SimpleFunction('get_brand_name', [$this, 'getBrandName'], ['is_safe' => ['html']]),
-            'get_owa_base_url' => new \Twig_SimpleFunction('get_owa_base_url', [$this, 'getOwaBaseUrl'], ['is_safe' => ['html']]),
-            'get_owa_site_id' => new \Twig_SimpleFunction('get_owa_site_id', [$this, 'getOwaSiteId'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('random_quote', [$this, 'getRandomQuote']),
+            new \Twig_SimpleFunction('image_size_attrs', [$this, 'getImageSizeAttrs'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('get_brand_name', [$this, 'getBrandName'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('get_owa_base_url', [$this, 'getOwaBaseUrl'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('get_owa_site_id', [$this, 'getOwaSiteId'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('user_theme', [$this, 'getUserTheme']),
         ];
     }
 
@@ -189,5 +190,31 @@ class ForumExtension extends Twig_Extension
         $html .= "</time>";
 
         return $html;
+    }
+
+    public function getUserTheme()
+    {
+        $user = $this->getUser();
+        if ($user instanceof User && $theme = $user->getConfigValue('bootstrap_theme')) {
+            return $theme;
+        }
+        return $this->container->getParameter('default_bootstrap_theme');
+    }
+
+    /**
+     * @return null|User
+     * @see TokenInterface::getUser()
+     */
+    public function getUser()
+    {
+        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
+            return;
+        }
+
+        if (!is_object($user = $token->getUser())) {
+            return;
+        }
+
+        return $user;
     }
 }

@@ -3,27 +3,32 @@
 namespace ComTSo\ForumBundle\Controller;
 
 use ComTSo\ForumBundle\Entity\Message;
+use ComTSo\ForumBundle\Form\Type\ConfigType;
 use ComTSo\UserBundle\Entity\User;
 use ComTSo\UserBundle\Form\Type\UserType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Request;
 
 class UserController extends BaseController
 {
     
-    protected function preExecute()
+    protected function preExecute($title = null)
     {
         $this->setActiveMenu('people');
         $this->viewParameters['users'] = $this->getRepository('ComTSoUserBundle:User')->findByEnabled(true);
+        $this->viewParameters['title'] = (string) $title;
     }
-    
+
     /**
      * @Template()
+     * @param Request $request
+     * @param User $user
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function showAction(User $user)
+    public function showAction(Request $request, User $user)
     {
-        $this->preExecute();
+        $this->preExecute($user);
         $this->viewParameters['user'] = $user;
-        $this->viewParameters['title'] = (string) $user;
         $this->viewParameters['messages'] = $this->getRepository('Message')->findConversation($this->getUser(), $user);
 
         $message = new Message();
@@ -34,8 +39,8 @@ class UserController extends BaseController
         $builder->add('content', 'textarea', ['horizontal' => false, 'label_render' => false]);
 
         $form = $builder->getForm();
-        if ($this->getRequest()->isMethod('POST')) {
-            $form->handleRequest($this->getRequest());
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
             if ($form->isValid()) {
                 // Saving object
                 $em = $this->getManager();
@@ -57,17 +62,19 @@ class UserController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @param User $user
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function editAction(User $user)
+    public function editAction(Request $request, User $user)
     {
-        $this->preExecute();
+        $this->preExecute($user);
         $this->viewParameters['user'] = $user;
-        $this->viewParameters['title'] = (string) $user;
 
         $form = $this->createForm(new UserType(), $user);
 
-        if ($this->getRequest()->isMethod('POST')) {
-            $form->handleRequest($this->getRequest());
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
             if ($form->isValid()) {
                 // Saving object
                 $em = $this->getManager();
@@ -92,8 +99,39 @@ class UserController extends BaseController
      */
     public function listAction()
     {
-        $this->preExecute();
-        $this->viewParameters['title'] = 'Membres';
+        $this->preExecute('Membres');
+
+        return $this->viewParameters;
+    }
+
+    /**
+     * @Template()
+     * @param Request $request
+     * @param User $user
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function configAction(Request $request, User $user)
+    {
+        $this->preExecute('Configuration');
+
+        $form = $this->createForm(new ConfigType(), $user->getConfig());
+
+        if ($request->isMethod('POST')) {
+            $form->handleRequest($request);
+            if ($form->isValid()) {
+                $user->setConfig($form->getData());
+                // Saving object
+                $em = $this->getManager();
+                $em->persist($user);
+                $em->flush();
+
+                $this->addFlashMsg('success', 'Configuration sauvegardé');
+
+                return $this->redirect($this->generateUrl('comtso_user_config', $user->getRoutingParameters()));
+            }
+        }
+
+        $this->viewParameters['form'] = $form->createView();
 
         return $this->viewParameters;
     }
