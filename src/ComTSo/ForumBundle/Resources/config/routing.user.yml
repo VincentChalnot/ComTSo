@@ -16,3 +16,9 @@ comtso_user_edit:
     defaults: { _controller: ComTSoForumBundle:User:edit }
     requirements:
         usernameCanonical: "[\w- ]+"
+
+comtso_user_config:
+    pattern:  /gens/{usernameCanonical}/config
+    defaults: { _controller: ComTSoForumBundle:User:config }
+    requirements:
+        usernameCanonical: "[\w- ]+"

@@ -10,6 +10,7 @@
         <div class="btn-group pull-right">
             <a href="{{ topic|path }}" class="btn btn-default"><i class="fa fa-arrow-left"></i> Retour</a>
         </div>
+        <div class="clear"></div>
         {% include 'ComTSoForumBundle:Common:entity_header.html.twig' with {entity: comment, skip_content: true} %}
         <hr class="clear">
         {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}

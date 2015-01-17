@@ -1,0 +1,15 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <div class="btn-group pull-right">
+            <button type="submit" class="btn btn-primary">Sauvegarder</button>
+        </div>
+        <div class="clear"></div>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block aside %}
+
+{% endblock %}

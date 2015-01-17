@@ -3,6 +3,10 @@
     <input type="hidden" id="{{ id }}_original" value="{{ value }}" />
 {% endblock %}
 
+{% block help_label %}
+    <span class="help-block">{{ help_label|trans({}, translation_domain)|raw }}</span>
+{% endblock help_label %}
+
 {% block photo_widget %}
     {% set photo = form.vars.data %}
     <div class="photo-selector-widget" data-photo-id="{{ photo is not empty ? photo.id }}" id="photo-widget-{{ id }}">

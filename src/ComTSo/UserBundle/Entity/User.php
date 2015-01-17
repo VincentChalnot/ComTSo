@@ -98,6 +98,12 @@ class User extends BaseUser implements \JsonSerializable, Routable
      */
     protected $starredTopics;
 
+    /**
+     * @var array
+     * @ORM\Column(type="json_array", nullable=true)
+     */
+    protected $config = [];
+
     public function __construct()
     {
         parent::__construct();
@@ -441,4 +447,42 @@ class User extends BaseUser implements \JsonSerializable, Routable
         return ['usernameCanonical' => $this->getUsernameCanonical()];
     }
 
+    /**
+     * Returns the value from a configuration key
+     * @param $key
+     * @return mixed
+     */
+    public function getConfigValue($key = null) {
+        if (isset($this->config[$key])) {
+            return $this->config[$key];
+        }
+        return null;
+    }
+
+    /**
+     * Set a config key
+     * @param $key
+     * @param $value
+     * @return mixed
+     */
+    public function setConfigValue($key, $value = null) {
+        $this->config[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfig() {
+        return $this->config;
+    }
+
+    /**
+     * @param array $config
+     * @return $this
+     */
+    public function setConfig(array $config = null) {
+        $this->config = $config;
+        return $this;
+    }
 }
