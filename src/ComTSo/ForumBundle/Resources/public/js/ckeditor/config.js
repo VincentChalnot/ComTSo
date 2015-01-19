@@ -40,4 +40,6 @@ CKEDITOR.editorConfig = function( config ) {
 	
 	config.extraPlugins = 'autosave';
 	config.autosave_delay = 10;
+	
+	config.disableNativeSpellChecker = false;
 };
