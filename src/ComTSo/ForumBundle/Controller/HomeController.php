@@ -16,7 +16,7 @@ class HomeController extends BaseController
      */
     public function indexAction()
     {
-        $yesterday = new \DateTime('yesterday');
+        $yesterday = new \DateTime();
         $yesterday->setTime(0, 0);
         $since = $this->getUser()->getPreviousLogin();
         if ($since > $yesterday) {

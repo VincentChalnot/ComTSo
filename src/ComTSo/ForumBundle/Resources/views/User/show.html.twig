@@ -28,6 +28,20 @@
     <script>
         $(document).ready(function(){
             $('#{{ form.content.vars.id }}').click(function(e){$(this).ckeditor();});
+            $('.well a.avatar.avatar-lg').click(function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                {% if user.avatar %}
+                    var gallery = blueimp.Gallery([
+                        {
+                            "title": '{{ user }}',
+                            "data-url": '{{ user.avatar.filename | imagine_filter('large') }}',
+                            "type": 'image/jpeg',
+                        }
+
+                    ]);
+                {% endif %}
+            });
         });
     </script>
 {% endblock %}

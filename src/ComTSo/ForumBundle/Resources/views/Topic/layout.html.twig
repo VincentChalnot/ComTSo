@@ -17,7 +17,7 @@
         {% include 'ComTSoForumBundle:Common:entity_header.html.twig' with {entity: topic, skip_content: true} %}
         {% if topic.content and not skip_content %}
             <div class="preview">
-                <a href="#topic-{{ topic.id }}" class="preview-toggle preview-show"><i class="fa fa-toggle-down"></i> Afficher la description</a>
+                <a href="#topic-{{ topic.id }}" class="preview-toggle preview-show"><i class="fa fa-toggle-down"></i> Afficher toute la description</a>
                 {{ topic.content|raw }}
                 <a href="#topic-{{ topic.id }}" class="preview-toggle preview-hide"><i class="fa fa-toggle-up"></i> Masquer la description</a>
             </div>

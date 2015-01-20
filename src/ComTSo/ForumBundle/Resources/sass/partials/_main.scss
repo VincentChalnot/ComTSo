@@ -52,6 +52,10 @@ table td.minimize, table th.minimize {
     }
 }
 
+blockquote {
+    font-size: 1em;
+}
+
 textarea {
     resize: vertical;
 }
@@ -70,25 +74,42 @@ textarea {
 }
 
 .preview {
-    height: 30px;
+    max-height: 200px;
     overflow-y: hidden;
+    position: relative;
+    padding-bottom: 30px;
+    @include transition(max-height 0.8s);
     .preview-toggle {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
         text-align: center;
         height: 30px;
         display: block;
         padding: 5px;
-        color: $text-muted;
+        background: $body-bg;
         &:hover {
             text-decoration: none;
             color: $text-color;
         }
-    }
-    &.active {
-        height: auto;
-        .preview-show {
+        &.preview-hide {
             display: none;
         }
     }
+    &.active {
+        max-height: 10000px;
+        .preview-show {
+            display: none;
+        }
+        .preview-hide {
+            display: block;
+        }
+    }
+}
+
+.panel.panel-default .panel-heading .preview-toggle {
+    background: $panel-default-heading-bg;
 }
 
 
