@@ -8,7 +8,7 @@
             <h3><a href="{{ topic|path }}">{{ topic }}</a></h3>
             {% if topic.content %}
                 <div class="preview">
-                    <a href="#topic-{{ topic.id }}" class="preview-toggle preview-show"><i class="fa fa-toggle-down"></i> Afficher la description</a>
+                    <a href="#topic-{{ topic.id }}" class="preview-toggle preview-show"><i class="fa fa-toggle-down"></i> Afficher toute la description</a>
                     {{ topic.content|raw }}
                     <a href="#topic-{{ topic.id }}" class="preview-toggle preview-hide"><i class="fa fa-toggle-up"></i> Masquer la description</a>
                 </div>

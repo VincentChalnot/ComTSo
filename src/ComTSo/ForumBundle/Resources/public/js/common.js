@@ -67,8 +67,6 @@ $(document).ready(function(){
             //t.find('img').attr('src', user.avatar).attr('title', user.username).attr('alt', user.username);
             $('#chat-connected-users').append(t.html());
         });
-        $('#chat-message-new').val('');
-        $("#chat-message-new").prop('disabled', false);
     };
 
     window.setInterval(function(){
@@ -85,7 +83,11 @@ $(document).ready(function(){
         $.ajax(Routing.generate('comtso_chat'),{
             type: 'POST',
             data: data,
-            success: parseChatMessages
+            success: function(response) {
+                parseChatMessages(response);
+                $('#chat-message-new').val('');
+                $("#chat-message-new").prop('disabled', false);
+            }
         });
     });
     
@@ -230,11 +232,19 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.preview .preview-toggle', function(e) {
+        e.preventDefault();
         var t = $(this);
         if (t.hasClass('preview-show')) {
             t.parent().addClass('active');
         } else {
             t.parent().removeClass('active');
+        }
+    });
+
+    $('.preview').each(function() {
+        var t = $(this);
+        if (t.innerHeight() < 200) {
+            t.find('.preview-show').hide();
         }
     });
 });
