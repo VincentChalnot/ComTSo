@@ -34,3 +34,25 @@
     {{ block('form_row') }}
     <hr>
 {% endblock %}
+
+{% block date_widget %}
+    {% spaceless %}
+        {% if widget == 'single_text' %}
+            {% set widget_addon_icon = widget_addon_append.icon is defined ? widget_addon_append.icon : 'calendar'  %}
+            <div data-provider="datepicker" class="input-group date" data-date="{{ value }}" data-link-field="{{ id }}" data-link-format="yyyy-mm-dd">
+                <input {% if widget_form_control_class is not sameas(false) %}class="{{ widget_form_control_class }}" {% endif %}type="text" {% if read_only %} readonly="readonly"{% endif %}{% if disabled %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if 'placeholder' in attr|keys %} placeholder="{{ attr['placeholder'] }}"{% endif %}>
+                <input type="hidden" value="{{ value }}" {{ block('widget_attributes') }}>
+                <span class="input-group-addon"><span class="glyphicon-calendar fa fa-{{ widget_addon_icon }}"></span></span>
+            </div>
+        {% else %}
+            {% set attr = attr|merge({'class': attr.class|default('inline')}) %}
+            <div class="row">
+                {{ date_pattern|replace({
+                    '{{ year }}':  form_widget(form.year, {'attr': {'class': attr.widget_class|default('') ~ ''}, 'horizontal_input_wrapper_class': horizontal_input_wrapper_class|default('col-sm-3')}),
+                    '{{ month }}': form_widget(form.month, {'attr': {'class': attr.widget_class|default('') ~ ''}, 'horizontal_input_wrapper_class': horizontal_input_wrapper_class|default('col-sm-3')}),
+                    '{{ day }}':   form_widget(form.day, {'attr': {'class': attr.widget_class|default('') ~ ''}, 'horizontal_input_wrapper_class': horizontal_input_wrapper_class|default('col-sm-3')}),
+                })|raw }}
+            </div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock date_widget %}

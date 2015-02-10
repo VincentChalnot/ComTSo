@@ -10,11 +10,11 @@ namespace ComTSo\ForumBundle\Entity;
  */
 class CommentRepository extends BaseRepository
 {
-    public function getQBForTopic(Topic $topic)
+    public function getQBForTopic(Topic $topic, $order = 'DESC')
     {
         $qb = $this->createQueryBuilder('e')
                 ->where('e.topic = :topic')
-                ->addOrderBy('e.createdAt', 'DESC')
+                ->addOrderBy('e.createdAt', $order)
                 ->setParameter('topic', $topic);
 
         return $qb;

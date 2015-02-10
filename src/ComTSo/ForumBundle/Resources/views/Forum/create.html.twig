@@ -1,0 +1,19 @@
+{% extends 'ComTSoForumBundle:Forum:edit.html.twig' %}
+
+{% block content %}
+    <div class="forum" data-forum-id="{{ forum.id }}">
+        <h3>Nouveau forum</h3>
+        <hr class="clear">
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="btn-group pull-right">
+                <a href="{{ path('comtso_forum_list') }}" class="btn btn-default">Retour</a>
+                <button type="submit" class="btn btn-primary">Envoyer</button>
+            </div>
+        {{ form_end(form) }}
+        <div class="clear"></div>
+    </div>
+{% endblock %}
+
+{% block aside %}
+{% endblock %}

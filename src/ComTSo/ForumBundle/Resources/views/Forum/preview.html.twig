@@ -1,0 +1,37 @@
+<div class="forum panel panel-primary" id="forum-{{ forum.id }}">
+    {% set previewTopics = forum.topics.slice(0, 4) %}
+    <div class="panel-body">
+        <a href="{{ forum|path }}">
+            <h3>{{ forum }}</h3>
+        </a>
+        {% include '@ComTSoForum/Common/entity_info.html.twig' with {'entity': forum} %}
+        {% if forum.content %}
+            <div class="preview">
+                <a href="#forum-{{ forum.id }}" class="preview-toggle preview-show"><i class="fa fa-toggle-down"></i> Afficher toute la description</a>
+                {{ forum.content|raw }}
+                <a href="#forum-{{ forum.id }}" class="preview-toggle preview-hide"><i class="fa fa-toggle-up"></i> Masquer la description</a>
+            </div>
+        {% endif %}
+        {% spaceless %}
+            {% if previewTopics | length %}
+                {% for topic in previewTopics %}
+                    {% if loop.index != 1 %}<hr class="clear">{% endif %}
+                    <div class="media">
+                        <div class="media-left">
+                            <a href="{{ topic|path }}">
+                                {% include 'ComTSoForumBundle:Topic:icon.html.twig' %}
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <a href="{{ topic|path }}"><h4 class="media-heading">{{ topic }}</h4></a>
+                            {{ topic.content|shorten(200) }}
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="text-center"><a class="btn btn-info" href="{{ forum|path }}">Voir tous les topics</a></div>
+            {% else %}
+                <p class="text-center text-muted">Aucun topic</p>
+            {% endif %}
+        {% endspaceless %}
+    </div>
+</div>

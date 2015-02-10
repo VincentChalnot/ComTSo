@@ -1,4 +1,12 @@
-{% extends 'ComTSoForumBundle::layout.html.twig' %}
+{% extends 'ComTSoForumBundle:Topic:layout.html.twig' %}
+
+{% set skip_content = true %}
+
+{% block topic_actions %}
+    <div class="btn-group-vertical col-sm-10 entity-actions">
+        <a href="{{ topic|path }}" class="btn btn-default"><i class="fa fa-arrow-left"></i> Retour au topic</a>
+    </div>
+{% endblock %}
 
 {% block content %}
     <ul class="nav nav-tabs">
@@ -7,9 +15,6 @@
         {% endfor %}
     </ul>
     <div class="comment">
-        <div class="btn-group pull-right">
-            <a href="{{ topic|path }}" class="btn btn-default"><i class="fa fa-arrow-left"></i> Retour</a>
-        </div>
         <div class="clear"></div>
         {% include 'ComTSoForumBundle:Common:entity_header.html.twig' with {entity: comment, skip_content: true} %}
         <hr class="clear">
@@ -17,13 +22,3 @@
     </div>
 {% endblock %}
 
-{% block aside %}
-    <h4>Accès rapide</h4>
-    <ul class="nav nav-compact">
-        {% for t in topics %}
-            {% if t.id != topic.id %}
-                <li><a href="{{ t|path }}">{{ t }}</a></li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-{% endblock %}

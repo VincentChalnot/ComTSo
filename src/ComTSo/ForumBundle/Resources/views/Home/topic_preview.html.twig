@@ -1,10 +1,6 @@
 {% extends 'ComTSoForumBundle:Topic:preview.html.twig' %}
 
 {% block topic_panel_body %}
-    <div class="panel-body">
-        {% for comment in topic.lastComments %}
-            {% if loop.index != 1 %}<hr class="clear">{% endif %}
-            {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
-        {% endfor %}
-    </div>
+    {% set previewComments = topic.lastComments %}
+    {{ parent() }}
 {% endblock %}

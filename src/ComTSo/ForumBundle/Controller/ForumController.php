@@ -13,6 +13,18 @@ class ForumController extends BaseController
     /**
      * @Template()
      */
+    public function listAction(Request $request)
+    {
+        $this->setActiveMenu('forums');
+        $this->viewParameters['title'] = 'Les Forums';
+        $this->viewParameters['forums'] = $this->getRepository('Forum')->findAll();
+
+        return $this->viewParameters;
+    }
+
+    /**
+     * @Template()
+     */
     public function showAction(Request $request, Forum $forum)
     {
         $this->setActiveMenu('forums');
@@ -30,12 +42,21 @@ class ForumController extends BaseController
     /**
      * @Template()
      */
+    public function createAction(Request $request)
+    {
+        return $this->editAction($request, new Forum);
+    }
+
+    /**
+     * @Template()
+     */
     public function editAction(Request $request, Forum $forum)
     {
         $this->showAction($request, $forum);
 
         $builder = $this->createFormBuilder($forum, ['show_legend' => false]);
         $builder->add('title', 'text', ['horizontal' => false, 'label_render' => false, 'attr' => ['placeholder' => 'Titre']]);
+        $builder->add('order', 'number', ['horizontal' => false, 'label_render' => false, 'attr' => ['placeholder' => "Numéro d'ordre pour l'affichage"]]);
         $builder->add('content', 'textarea', ['horizontal' => false, 'label_render' => false]);
 
         $form = $builder->getForm();

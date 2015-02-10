@@ -12,13 +12,13 @@ use Doctrine\ORM\EntityRepository;
  */
 class BaseRepository extends EntityRepository
 {
-    public function findLastsCreated($limit = 20, \DateTime $since = null)
+    public function findLastsCreated($limit = 20, \DateTime $since = null, $order = 'DESC')
     {
         if (!$this->getClassMetadata()->hasField('createdAt')) {
             throw new \Exception('Cannot call this method on a Entity that has no createdAt field');
         }
         $qb = $this->createQueryBuilder('e')
-                ->addOrderBy('e.createdAt', 'DESC')
+                ->addOrderBy('e.createdAt', $order)
                 ->setMaxResults($limit);
         if ($since) {
             $qb->where('e.createdAt > :since')
@@ -29,13 +29,13 @@ class BaseRepository extends EntityRepository
                         ->getResult();
     }
 
-    public function findLastsModified($limit = 20, \DateTime $since = null)
+    public function findLastsModified($limit = 20, \DateTime $since = null, $order = 'DESC')
     {
         if (!$this->getClassMetadata()->hasField('updatedAt')) {
             throw new \Exception('Cannot call this method on a Entity that has no createdAt field');
         }
         $qb = $this->createQueryBuilder('e')
-                ->addOrderBy('e.updatedAt', 'DESC')
+                ->addOrderBy('e.updatedAt', $order)
                 ->setMaxResults($limit);
         if ($since) {
             $qb->where('e.createdAt > :since')

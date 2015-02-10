@@ -15,12 +15,18 @@
         {% endif %}
     {% endspaceless %}
     {% include 'ComTSoForumBundle:Pagination:pager.html.twig' with {'results': comments} %}
-    <hr class="clear">
-    {% include 'ComTSoForumBundle:Comment:create_form.html.twig' %}
+    {% if user_message_order() == 'DESC' and not comments.hasPreviousPage %}
+        <hr class="clear">
+        {% include 'ComTSoForumBundle:Comment:create_form.html.twig' %}
+    {% endif %}
     {% for comment in comments %}
         <hr class="clear">
         {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
     {% endfor %}
+    {% if user_message_order() == 'ASC' and not comments.hasNextPage %}
+        <hr class="clear">
+        {% include 'ComTSoForumBundle:Comment:create_form.html.twig' %}
+    {% endif %}
     <hr class="clear">
     {% include 'ComTSoForumBundle:Pagination:pager.html.twig' with {'results': comments} %}
 {% endblock %}

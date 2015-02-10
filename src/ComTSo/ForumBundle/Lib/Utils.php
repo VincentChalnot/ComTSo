@@ -87,6 +87,7 @@ class Utils
      */
     public static function shorten($string, $len = 40)
     {
+        $string = strip_tags($string);
         $tmp = explode(',', (string) $string);
         $string = trim($tmp[0]);
         if (strlen($string) > $len) {

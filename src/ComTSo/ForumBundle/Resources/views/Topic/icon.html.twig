@@ -1,0 +1,5 @@
+{% if topic.photos | length and topic.photos.first.photo %}
+    {% include 'ComTSoForumBundle:Photo:image.html.twig' with {'photo': topic.photos.first.photo, 'filter': 'tiny' } %}
+{% else %}
+    <span class="forum-preview"><i class="fa fa-comments-o"></i></span>
+{% endif %}

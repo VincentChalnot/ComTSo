@@ -22,7 +22,6 @@ class UserType extends AbstractType
                 ->add('surname')
                 ->add('birthday', 'date', [
                     'widget' => 'single_text',
-                    'datepicker' => true,
                 ])
                 ->add('address')
                 ->add('phone')

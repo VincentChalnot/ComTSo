@@ -1,18 +1,25 @@
+comtso_forum_list:
+    pattern:  /forums/
+    defaults: { _controller: ComTSoForumBundle:Forum:list }
+
+comtso_forum_create:
+    pattern:  /forums/create
+    defaults: { _controller: ComTSoForumBundle:Forum:create }
 
 comtso_forum_show:
-    pattern:  /forum/{id}
+    pattern:  /forums/{id}
     defaults: { _controller: ComTSoForumBundle:Forum:show }
     requirements:
         id: "[\w-]+"
 
 comtso_forum_edit:
-    pattern:  /forum/{id}/edit
+    pattern:  /forums/{id}/edit
     defaults: { _controller: ComTSoForumBundle:Forum:edit }
     requirements:
         id: "[\w-]+"
 
 comtso_forum_add_topic:
-    pattern:  /forum/{id}/add_topic
+    pattern:  /forums/{id}/add_topic
     defaults: { _controller: ComTSoForumBundle:Forum:addTopic }
     requirements:
         id: "[\w-]+"

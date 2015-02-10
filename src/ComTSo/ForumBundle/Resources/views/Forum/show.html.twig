@@ -7,12 +7,6 @@
         {% endfor %}
     </ul>
     <div class="forum" data-forum-id="{{ forum.id }}">
-        {% block forum_actions %}
-            <div class="btn-group pull-right">
-                <a href="{{ forum|path('edit') }}" class="btn btn-primary" title="Modifier"><i class="fa fa-pencil"></i></a>
-                <a href="{{ forum|path('add_topic') }}" class="btn btn-info" title="Ajouter un topic"><i class="fa fa-plus"></i></a>
-            </div>
-        {% endblock %}
         {% include 'ComTSoForumBundle:Common:entity_header.html.twig' with {entity: forum} %}
         <hr class="clear">
         {% block inner_content %}
@@ -28,6 +22,12 @@
 {% endblock %}
 
 {% block aside %}
+    {% block forum_actions %}
+        <div class="btn-group-vertical col-sm-10 entity-actions">
+            <a href="{{ forum|path('edit') }}" class="btn btn-primary" title="Modifier"><i class="fa fa-pencil"></i> Modifier le forum</a>
+            <a href="{{ forum|path('add_topic') }}" class="btn btn-info" title="Ajouter un topic"><i class="fa fa-plus"></i> Ajouter un topic</a>
+        </div>
+    {% endblock %}
     <h4>Accès rapide</h4>
     <ul class="nav nav-compact">
         {% for topic in topics %}
