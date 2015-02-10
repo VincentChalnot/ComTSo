@@ -1,0 +1,19 @@
+.forum {
+    clear: both;
+    &.panel{
+        h3{
+            margin-top: 4px;
+        }
+        margin-bottom: 2em;
+    }
+    .forum-preview {
+        display: inline-block;
+        width: 64px;
+        height: 64px;
+        font-size: 50px;
+        text-align: center;
+        .fa {
+            vertical-align: top;
+        }
+    }
+}

@@ -147,19 +147,23 @@ class BaseController extends Controller
 
     /**
      * @param  QueryBuilder $qb
-     * @return Pager
+     * @return Pagerfanta
      */
     public function createPager(QueryBuilder $qb, Request $request, $defaultLimit = 10, $defaultPage = 1)
     {
         $adapter = new DoctrineORMAdapter($qb);
         $pager = new Pagerfanta($adapter);
 
+        $pager->setMaxPerPage($defaultLimit);
+
+        if ($defaultPage < 0) {
+            $defaultPage = $pager->getNbPages() + $defaultPage + 1;
+        }
         if ($request->query->has('page')) {
             $pager->setCurrentPage($request->query->get('page'));
         } else {
             $pager->setCurrentPage($defaultPage);
         }
-        $pager->setMaxPerPage($defaultLimit);
 
         return $pager;
     }
@@ -180,5 +184,10 @@ class BaseController extends Controller
         }
 
         return str_replace("\n", ' ', $txt);
+    }
+
+    public function getUserMessageOrder()
+    {
+        return $this->get('comtso.config.handler')->getUserMessageOrder();
     }
 }

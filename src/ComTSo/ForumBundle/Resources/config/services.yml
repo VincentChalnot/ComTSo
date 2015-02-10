@@ -45,3 +45,8 @@ services:
         class: ComTSo\ForumBundle\Form\Type\PhotoSelectorType
         tags:
             - { name: form.type, alias: photo }
+
+    comtso.config.handler:
+        class: ComTSo\ForumBundle\Service\ConfigHandler
+        calls:
+            - [ setContainer, [ "@service_container" ] ]

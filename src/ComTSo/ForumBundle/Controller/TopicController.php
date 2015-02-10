@@ -64,8 +64,8 @@ class TopicController extends BaseController
 
         $this->viewParameters['form'] = $form->createView();
         
-        $qb = $this->getRepository('Comment')->getQBForTopic($topic);
-        $comments = $this->createPager($qb, $request, 20);
+        $qb = $this->getRepository('Comment')->getQBForTopic($topic, $this->getUserMessageOrder());
+        $comments = $this->createPager($qb, $request, 20, $this->getUserMessageOrder() === 'DESC' ? 1 : -1);
         $this->viewParameters['comments'] = $comments;
 
         return $this->viewParameters;

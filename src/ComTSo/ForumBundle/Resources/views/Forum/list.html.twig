@@ -1,0 +1,16 @@
+{% extends 'ComTSoForumBundle::layout.html.twig' %}
+
+{% block content %}
+    <h2>Les forums</h2>
+    {% for f in forums %}
+        {% include 'ComTSoForumBundle:Forum:preview.html.twig' with { 'forum': f } %}
+    {% endfor %}
+{% endblock %}
+
+{% block aside %}
+    {% block forum_actions %}
+        <div class="btn-group-vertical col-sm-10 entity-actions">
+            <a href="{{ path('comtso_forum_create') }}" class="btn btn-primary"><i class="fa fa-plus"></i> Ajouter un forum</a>
+        </div>
+    {% endblock %}
+{% endblock %}

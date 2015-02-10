@@ -112,6 +112,16 @@ textarea {
     background: $panel-default-heading-bg;
 }
 
+.entity-actions {
+    &.btn-group-vertical {
+        clear: both;
+        float: none;
+        text-align: left;
+        .btn {
+            text-align: left;
+        }
+    }
+}
 
 @media (max-width: 768px) {
     h1 {

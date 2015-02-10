@@ -34,7 +34,8 @@ class ForumExtension extends Twig_Extension
             new \Twig_SimpleFilter('file_size', [$this, 'fileSizeFormat']),
             new \Twig_SimpleFilter('highlight', [$this, 'getHighlightedText'], ['is_safe' => ['html']]),
             new \Twig_SimpleFilter('path', [$this, 'getObjectPath'], ['is_safe' => ['html']]),
-            new \Twig_SimpleFilter('shorten', [$this, 'shorten']),
+            new \Twig_SimpleFilter('shorten', [$this, 'shorten'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFilter('summarize', [$this, 'summarize'], ['is_safe' => ['html']]),
             new \Twig_SimpleFilter('htmlDate', [$this, 'getHtmlDate'], ['is_safe' => ['html']] ),
         ];
     }
@@ -48,6 +49,7 @@ class ForumExtension extends Twig_Extension
             new \Twig_SimpleFunction('get_owa_base_url', [$this, 'getOwaBaseUrl'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('get_owa_site_id', [$this, 'getOwaSiteId'], ['is_safe' => ['html']]),
             new \Twig_SimpleFunction('user_theme', [$this, 'getUserTheme']),
+            new \Twig_SimpleFunction('user_message_order', [$this, 'getUserMessageOrder']),
         ];
     }
 
@@ -183,6 +185,11 @@ class ForumExtension extends Twig_Extension
         return Utils::shorten($string, $len);
     }
 
+    public function summarize($string, $len = 300)
+    {
+        return Utils::summarize($string, $len);
+    }
+
     public function getHtmlDate(\DateTime $date, $format = 'd/m/Y')
     {
         $html = "<time datetime=\"{$date->format(\DateTime::W3C)}\" title=\"Le {$date->format('d/m/Y à H:i:s')}\">";
@@ -194,27 +201,11 @@ class ForumExtension extends Twig_Extension
 
     public function getUserTheme()
     {
-        $user = $this->getUser();
-        if ($user instanceof User && $theme = $user->getConfigValue('bootstrap_theme')) {
-            return $theme;
-        }
-        return $this->container->getParameter('default_bootstrap_theme');
+        return $this->container->get('comtso.config.handler')->getUserTheme();
     }
 
-    /**
-     * @return null|User
-     * @see TokenInterface::getUser()
-     */
-    public function getUser()
+    public function getUserMessageOrder()
     {
-        if (null === $token = $this->container->get('security.token_storage')->getToken()) {
-            return;
-        }
-
-        if (!is_object($user = $token->getUser())) {
-            return;
-        }
-
-        return $user;
+        return $this->container->get('comtso.config.handler')->getUserMessageOrder();
     }
 }

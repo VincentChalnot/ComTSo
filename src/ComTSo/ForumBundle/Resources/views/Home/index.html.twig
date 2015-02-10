@@ -2,13 +2,18 @@
 
 {% block content %}
     <h2>Activités récentes</h2>
-    <p class="text-muted">Affichage des derniers messages depuis le {{ since|date('d/m/Y') }}</p>
+    {{ form(form) }}
     {% for topic in topics %}
         {% include 'ComTSoForumBundle:Home:topic_preview.html.twig' %}
     {% else %}
         <div class="well text-center">
             <p class="text-muted"><small>Aucun message à afficher</small></p>
         </div>
+    {% endfor %}
+    <hr style="margin:5em;">
+    <h2>Les forums</h2>
+    {% for f in forums %}
+        {% include 'ComTSoForumBundle:Forum:preview.html.twig' with { 'forum': f } %}
     {% endfor %}
 {% endblock %}
 
@@ -25,4 +30,15 @@
             <li><a href="{{ f|path }}">{{ f }}</a></li>
         {% endfor %}
     </ul>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function(){
+            $('#{{ form.since.vars.id }}').on('change', function(e){
+                $(this.form).submit();
+            });
+        });
+    </script>
 {% endblock %}

@@ -34,6 +34,10 @@ class ConfigType extends AbstractType
                 'yeti' => 'Yeti',
             ],
             'help_label' => '<a href="http://bootswatch.com">bootswatch.com</a>',
+        ])
+        ->add('message_order', 'choice', [
+            'label' => 'Ordre des messages',
+            'choices' => ['ASC' => 'Plus récent en dernier', 'DESC' => 'Plus récent en premier']
         ]);
     }
 

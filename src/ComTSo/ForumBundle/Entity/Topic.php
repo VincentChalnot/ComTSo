@@ -26,7 +26,7 @@ class Topic implements Routable
     /**
      * Forum of this topic
      * @var Forum
-     * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Forum")
+     * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Forum", inversedBy="topics")
      */
     protected $forum;
 

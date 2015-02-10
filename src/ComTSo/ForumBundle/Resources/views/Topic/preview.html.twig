@@ -15,6 +15,7 @@
             {% endif %}
         </div>
     {% endblock %}
+    {% set previewComments = topic.comments.slice(0, 4) %}
     {% block topic_panel_body %}
         <div class="panel-body">
             {% spaceless %}
@@ -29,13 +30,11 @@
                         <hr class="clear">
                     </div>
                 {% endif %}
-                {% for comment in topic.comments.slice(0, 4) %}
+                {% for comment in previewComments %}
                     {% if loop.index != 1 %}<hr class="clear">{% endif %}
-                    {% if loop.index < 4 %}
-                        {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
-                    {% else %}
-                        <p class="text-center text-muted lead">…</p>
-                    {% endif %}
+                    {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+                {% else %}
+                    <p class="text-center text-muted">Aucun commentaire</p>
                 {% endfor %}
             {% endspaceless %}
         </div>
