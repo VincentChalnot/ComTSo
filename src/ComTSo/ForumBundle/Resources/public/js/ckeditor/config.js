@@ -35,7 +35,8 @@ CKEDITOR.editorConfig = function( config ) {
 	config.youtube_width = '518';
 	config.youtube_height = '300';
 	config.youtube_related = false;
-	
+    config.extraAllowedContent = 'iframe[*]';
+
 	config.startupFocus = true;
 	
 	config.extraPlugins = 'autosave';
