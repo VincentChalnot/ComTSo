@@ -5,7 +5,7 @@ set :domain,               "sidus.fr"
 set :deploy_to,            "/home/www/forum.gamayati"
 set :app_path,             "app"
 set :user,                 "vincent"
-set :branch,               "gamayati"
+set :branch,               "master"
 #ssh_options[:port] =       "22"
 
 role :web,                 domain
