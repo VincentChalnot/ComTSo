@@ -39,7 +39,7 @@ exercise_html_purifier:
 #      HTML.AllowedAttributes:
       HTML.Trusted: true
       HTML.SafeIframe: true
-      URI.SafeIframeRegexp: "\\^http://(www.youtube.com/embed/|player.vimeo.com/video/)\\"
+      URI.SafeIframeRegexp: "~^(https?:)?//(www\.youtube(?:-nocookie)?\.com/embed/|player\.vimeo\.com/video/)~"
 
 liip_imagine:
     driver: %imagine_driver%
