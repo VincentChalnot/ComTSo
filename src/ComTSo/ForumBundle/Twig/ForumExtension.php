@@ -156,6 +156,7 @@ class ForumExtension extends Twig_Extension
 
     protected function highlightText($text, $term)
     {
+        mb_internal_encoding('UTF-8');
         $result = '';
         $l = mb_strlen($term);
         $parsed = Utils::asciiFormat(str_replace(['…', '«', '»'], ['.', '"', '"'], $text));
