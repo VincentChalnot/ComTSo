@@ -21,7 +21,7 @@
             {% spaceless %}
                 {% if topic.photos | length %}
                     <div class="topic-photos">
-                        {% for photoTopic in topic.photos.slice(0, 4) %}
+                        {% for photoTopic in topic.photos.slice(-4, 4) %}
                             {% set photo = photoTopic.photo %}
                             {% if photo %}
                                 {% include 'ComTSoForumBundle:Photo:thumbnail.html.twig' %}
