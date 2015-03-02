@@ -32,6 +32,7 @@ class ConfigType extends AbstractType
                 'superhero' => 'Superhero',
                 'united' => 'United',
                 'yeti' => 'Yeti',
+                'geobootstrap' => 'GeoBootstrap',
             ],
             'help_label' => '<a href="http://bootswatch.com">bootswatch.com</a>',
         ])
