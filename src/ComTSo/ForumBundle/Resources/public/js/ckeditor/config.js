@@ -29,6 +29,9 @@ CKEDITOR.editorConfig = function( config ) {
 	// we don't want too have in a basic editor. We remove them here.
 	config.removeButtons = 'Cut,Copy,Paste,Undo,Redo,Anchor,NumberedList,Maximize,Format,HorizontalRule,SpecialChar';
 
+    // Remove unwanted plugins
+    config.removePlugins='liststyle,scayt,contextmenu';
+
 	// Let's have it basic on dialogs as well.
 	config.removeDialogTabs = 'link:advanced';
 	

@@ -19,7 +19,7 @@
                         'bundles/comtsoforum/css/jquery.fileupload.css'
                         'bundles/comtsoforum/css/bootstrap-datetimepicker.min.css'
                         'assets/jquery-ui/themes/flick/jquery-ui.min.css'
-                filter='cssrewrite' %}
+                filter='?uglifycss' filter='cssrewrite' %}
             <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
         {% endstylesheets %}
         <link href="{{ asset('bundles/comtsoforum/css/comtso-' ~ user_theme() ~ '.css') }}" type="text/css" rel="stylesheet" media="screen" />
@@ -128,7 +128,8 @@
             'bundles/comtsoforum/js/jquery.fileupload-ui.js'
             'bundles/comtsoforum/js/moment.min.js'
             'bundles/comtsoforum/js/common.js'
-            %}
+            filter='?uglifyjs2'
+        %}
             <script type="text/javascript" src="{{ asset_url }}"></script>
         {% endjavascripts %}
         <script src="{{ path('fos_js_routing_js', {"callback": "fos.Router.setData"}) }}"></script>
