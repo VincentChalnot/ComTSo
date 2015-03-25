@@ -71,7 +71,7 @@ class Utils
      */
     public static function convertToText($html, $len = null)
     {
-        if ($len == null) {
+        if ($len === null) {
             return html_entity_decode(strip_tags((string) $html));
         }
 
@@ -154,7 +154,7 @@ class Utils
     {
         try {
             $value = (string) $value;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return $value;
         }
         $date_regexp = '([0-3]?[0-9])[\/\-]([0-1][0-9])[\/\-]([1-2][0-9])?(\d\d)'; // Date
@@ -204,9 +204,9 @@ class Utils
      * @param  double $price
      * @return string
      */
-    public static function moneyFormat($price)
+    public static function moneyFormat($price, $currency = '€')
     {
-        return str_replace(' ', utf8_encode(chr(160)), number_format(self::numberParse($price), 2, ',', ' ').' '.sfConfig::get('app_surface_money_unit', '€'));
+        return str_replace(' ', utf8_encode(chr(160)), number_format(self::numberParse($price), 2, ',', ' ') . $currency);
     }
 
     /**

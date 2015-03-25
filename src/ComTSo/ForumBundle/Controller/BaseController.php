@@ -2,12 +2,14 @@
 
 namespace ComTSo\ForumBundle\Controller;
 
-use ComTSo\ForumBundle\Lib\Pager;
 use ComTSo\ForumBundle\Lib\Utils;
 use ComTSo\UserBundle\Entity\User;
+use DateInterval;
+use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Exception;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -22,7 +24,7 @@ class BaseController extends Controller
      * Get the current session or create a new one
      * @return Session $session
      */
-    public function getSession()
+    protected function getSession()
     {
         $session = $this->get('session');
         if (!$session) {
@@ -38,7 +40,7 @@ class BaseController extends Controller
      * @param string $name
      * @param mixed  $value
      */
-    public function addFlashMsg($name, $value)
+    protected function addFlashMsg($name, $value)
     {
         $this->getSession()->getFlashBag()->add($name, $value);
     }
@@ -50,7 +52,7 @@ class BaseController extends Controller
      * @param  bool   $deep
      * @return mixed
      */
-    public function getRequestParameter($path, $default = null, $deep = false)
+    protected function getRequestParameter($path, $default = null, $deep = false)
     {
         return $this->getRequest()->get($path, $default, $deep);
     }
@@ -61,7 +63,7 @@ class BaseController extends Controller
      * @param  string           $persistentManagerName
      * @return EntityRepository
      */
-    public function getRepository($persistentObjectName, $persistentManagerName = null)
+    protected function getRepository($persistentObjectName, $persistentManagerName = null)
     {
         $infos = explode(':', $persistentObjectName);
         if (count($infos) == 1) {
@@ -75,7 +77,7 @@ class BaseController extends Controller
      * Alias to return the entity manager
      * @return EntityManager
      */
-    public function getManager()
+    protected function getManager()
     {
         return $this->getDoctrine()->getManager();
     }
@@ -122,13 +124,13 @@ class BaseController extends Controller
      *
      * @return User
      */
-    public function getUser()
+    protected function getUser()
     {
         $user = parent::getUser();
-        $lastMinute = new \DateTime();
-        $lastMinute->sub(new \DateInterval('PT1M'));
+        $lastMinute = new DateTime();
+        $lastMinute->sub(new DateInterval('PT1M'));
         if ($user->getLastActivity() < $lastMinute) {
-            $user->setLastActivity(new \DateTime());
+            $user->setLastActivity(new DateTime());
             $this->getManager()->persist($user);
             $this->getManager()->flush();
         }
@@ -136,7 +138,7 @@ class BaseController extends Controller
         return $user;
     }
 
-    public function getConfigParameter($name, $default = null)
+    protected function getConfigParameter($name, $default = null)
     {
         if ($this->container->hasParameter($name)) {
             return $this->container->getParameter($name);
@@ -149,7 +151,7 @@ class BaseController extends Controller
      * @param  QueryBuilder $qb
      * @return Pagerfanta
      */
-    public function createPager(QueryBuilder $qb, Request $request, $defaultLimit = 10, $defaultPage = 1)
+    protected function createPager(QueryBuilder $qb, Request $request, $defaultLimit = 10, $defaultPage = 1)
     {
         $adapter = new DoctrineORMAdapter($qb);
         $pager = new Pagerfanta($adapter);
@@ -186,7 +188,7 @@ class BaseController extends Controller
         return str_replace("\n", ' ', $txt);
     }
 
-    public function getUserMessageOrder()
+    protected function getUserMessageOrder()
     {
         return $this->get('comtso.config.handler')->getUserMessageOrder();
     }
