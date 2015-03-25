@@ -2,7 +2,6 @@
 
 namespace ComTSo\ForumBundle\Entity\Behavior;
 
-use ComTSo\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 trait Authorable
@@ -10,7 +9,7 @@ trait Authorable
     /**
      * Author of the entity
      *
-     * @var User
+     * @var \ComTSo\UserBundle\Entity\User
      * @Doctrine\ORM\Mapping\ManyToOne(targetEntity="ComTSo\UserBundle\Entity\User")
      */
     protected $author;
