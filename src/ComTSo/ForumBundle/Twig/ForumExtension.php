@@ -5,7 +5,6 @@ namespace ComTSo\ForumBundle\Twig;
 use ComTSo\ForumBundle\Entity\Photo;
 use ComTSo\ForumBundle\Entity\Routable;
 use ComTSo\ForumBundle\Lib\Utils;
-use ComTSo\UserBundle\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
