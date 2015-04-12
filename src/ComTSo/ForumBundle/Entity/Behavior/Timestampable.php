@@ -24,6 +24,7 @@ trait Timestampable
 
     /**
      * @var \DateTime
+     * @return \DateTime|string
      */
     public function getCreatedAt($format = null)
     {
@@ -36,6 +37,7 @@ trait Timestampable
 
     /**
      * @var \DateTime
+     * @return \DateTime|string
      */
     public function getUpdatedAt($format = null)
     {
@@ -48,21 +50,21 @@ trait Timestampable
 
     /**
      * @var \DateTime
+     * @return $this
      */
     public function setCreatedAt(\DateTime $date)
     {
         $this->createdAt = $date;
-
         return $this;
     }
 
     /**
      * @var \DateTime
+     * @return $this
      */
     public function setUpdatedAt(\DateTime $date)
     {
         $this->updatedAt = $date;
-
         return $this;
     }
 

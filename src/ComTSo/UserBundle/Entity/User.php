@@ -2,13 +2,13 @@
 
 namespace ComTSo\UserBundle\Entity;
 
+use ComTSo\ForumBundle\Entity\Photo;
+use ComTSo\ForumBundle\Entity\Routable;
+use ComTSo\ForumBundle\Entity\Topic;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
-use ComTSo\ForumBundle\Entity\Photo;
-use ComTSo\ForumBundle\Entity\Topic;
-use Doctrine\Common\Collections\ArrayCollection;
-use ComTSo\ForumBundle\Entity\Routable;
 
 /**
  * Object
@@ -321,13 +321,12 @@ class User extends BaseUser implements \JsonSerializable, Routable
     /**
      * Set registered
      *
-     * @param  DateTime $registered
+     * @param DateTime $registeredAt
      * @return User
      */
     public function setRegisteredAt(DateTime $registeredAt)
     {
         $this->registeredAt = $registeredAt;
-
         return $this;
     }
 
@@ -376,6 +375,7 @@ class User extends BaseUser implements \JsonSerializable, Routable
 
     /**
      *
+     * @param Photo $photo
      * @return Photo
      */
     public function setAvatar(Photo $photo = null)

@@ -43,14 +43,14 @@
     {{ parent() }}
     <script>
         $(document).ready(function(){
-            
-            $('#sortable-photos .img-thumbnail').on('mousedown', function(e){
+            var sortablePhotos = $('#sortable-photos');
+            sortablePhotos.find('.img-thumbnail').on('mousedown', function (e) {
                 var t = $(this);
                 t.siblings().removeClass('selected');
                 t.addClass('selected');
             });
-            
-            $('#sortable-photos .img-thumbnail a[data-action="remove"]').click(function(e){
+
+            sortablePhotos.find('.img-thumbnail a[data-action="remove"]').click(function (e) {
                 var t = $(this);
                 $.ajax($(this).attr('href'), {
                     success: function() {
@@ -62,7 +62,7 @@
             });
             
             var timeout = null;
-            $('#sortable-photos').sortable({
+            sortablePhotos.sortable({
                 scroll: true,
                 update: function(e, ui) {
                     var t = $(e.target);

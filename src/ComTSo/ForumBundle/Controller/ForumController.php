@@ -4,6 +4,7 @@ namespace ComTSo\ForumBundle\Controller;
 
 use ComTSo\ForumBundle\Entity\Forum;
 use ComTSo\ForumBundle\Entity\Topic;
+use ComTSo\ForumBundle\Form\Type\TopicType;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,27 +13,31 @@ class ForumController extends BaseController
 {
     /**
      * @Template()
+     * @return array
      */
-    public function listAction(Request $request)
+    public function listAction()
     {
         $this->setActiveMenu('forums');
         $this->viewParameters['title'] = 'Les Forums';
-        $this->viewParameters['forums'] = $this->getRepository('Forum')->findAll();
+        $this->viewParameters['forums'] = $this->getRepository('ComTSoForumBundle:Forum')->findAll();
 
         return $this->viewParameters;
     }
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Forum $forum
+     * @return array
      */
     public function showAction(Request $request, Forum $forum)
     {
         $this->setActiveMenu('forums');
         $this->viewParameters['forum'] = $forum;
         $this->viewParameters['title'] = (string) $forum;
-        $this->viewParameters['forums'] = $this->getRepository('Forum')->findAll();
+        $this->viewParameters['forums'] = $this->getRepository('ComTSoForumBundle:Forum')->findAll();
 
-        $qb = $this->getRepository('Topic')->getQBForForumList($forum);
+        $qb = $this->getRepository('ComTSoForumBundle:Topic')->getQBForForumList($forum);
         $topics = $this->createPager($qb, $request);
         $this->viewParameters['topics'] = $topics;
 
@@ -41,6 +46,8 @@ class ForumController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function createAction(Request $request)
     {
@@ -49,6 +56,9 @@ class ForumController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Forum $forum
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function editAction(Request $request, Forum $forum)
     {
@@ -82,6 +92,9 @@ class ForumController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Forum $forum
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function addTopicAction(Request $request, Forum $forum)
     {
@@ -91,7 +104,7 @@ class ForumController extends BaseController
         $topic->setAuthor($this->getUser());
         $topic->setForum($forum);
 
-        $form = $this->createForm(new \ComTSo\ForumBundle\Form\Type\TopicType(), $topic, ['label' => 'Nouveau topic']);
+        $form = $this->createForm(new TopicType(), $topic, ['label' => 'Nouveau topic']);
 
         if ($this->getRequest()->isMethod('POST')) {
             $form->handleRequest($request);

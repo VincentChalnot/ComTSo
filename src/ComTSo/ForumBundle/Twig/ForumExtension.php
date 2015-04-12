@@ -5,21 +5,48 @@ namespace ComTSo\ForumBundle\Twig;
 use ComTSo\ForumBundle\Entity\Photo;
 use ComTSo\ForumBundle\Entity\Routable;
 use ComTSo\ForumBundle\Lib\Utils;
+use ComTSo\ForumBundle\Service\ConfigHandler;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
+use Symfony\Component\Routing\RouterInterface;
 use Twig_Extension;
 
 class ForumExtension extends Twig_Extension
 {
     /**
-     * @var ContainerInterface
+     * @var FilterConfiguration
      */
-    protected $container;
+    protected $liipFilterConfiguration;
 
-    public function __construct(ContainerInterface $container)
+    /**
+     * @var ConfigHandler
+     */
+    protected $configHandler;
+
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
+
+    /**
+     * @var Registry
+     */
+    protected $doctrine;
+
+    protected $brandName;
+    protected $owaBaseUrl;
+    protected $owaSiteId;
+
+    public function __construct(FilterConfiguration $liipFilterConfiguration, ConfigHandler $configHandler, RouterInterface $router, Registry $doctrine, $brandName, $owaBaseUrl, $owaSiteId)
     {
-        $this->container = $container;
+        $this->liipFilterConfiguration = $liipFilterConfiguration;
+        $this->configHandler = $configHandler;
+        $this->router = $router;
+        $this->doctrine = $doctrine;
+        $this->brandName = $brandName;
+        $this->owaBaseUrl = $owaBaseUrl;
+        $this->owaSiteId = $owaSiteId;
     }
 
     public function getName()
@@ -54,12 +81,12 @@ class ForumExtension extends Twig_Extension
 
     public function getRandomQuote()
     {
-        return $this->getDoctrine()->getRepository('ComTSoForumBundle:Quote')->findRandom();
+        return $this->doctrine->getRepository('ComTSoForumBundle:Quote')->findRandom();
     }
 
     public function getImageSizeAttrs(Photo $photo, $filter)
     {
-        $config = $this->container->get('liip_imagine.filter.configuration')->get($filter);
+        $config = $this->liipFilterConfiguration->get($filter);
         $width = $photo->getWidth();
         $height = $photo->getHeight();
         if (isset($config['filters']['thumbnail'])) {
@@ -76,15 +103,6 @@ class ForumExtension extends Twig_Extension
         }
 
         return "width=\"{$width}\" height=\"{$height}\"";
-    }
-
-    /**
-     *
-     * @return Registry
-     */
-    public function getDoctrine()
-    {
-        return $this->container->get('doctrine');
     }
 
     public function fileSizeFormat($size, $decimals = 1)
@@ -108,17 +126,17 @@ class ForumExtension extends Twig_Extension
 
     public function getBrandName()
     {
-        return $this->container->getParameter('brand.name');
+        return $this->brandName;
     }
 
     public function getOwaBaseUrl()
     {
-        return $this->container->getParameter('owa.baseUrl');
+        return $this->owaBaseUrl;
     }
 
     public function getOwaSiteId()
     {
-        return $this->container->getParameter('owa.siteId');
+        return $this->owaSiteId;
     }
 
     protected function skipNonMatching($text, $terms)
@@ -177,7 +195,7 @@ class ForumExtension extends Twig_Extension
         $route = "comtso_{$shortName}_{$action}";
         $parameters = array_merge($entity->getRoutingParameters(), $parameters);
 
-        return $this->container->get('router')->generate($route, $parameters, $absolute);
+        return $this->router->generate($route, $parameters, $absolute);
     }
 
     public function shorten($string, $len = 40)
@@ -201,11 +219,11 @@ class ForumExtension extends Twig_Extension
 
     public function getUserTheme()
     {
-        return $this->container->get('comtso.config.handler')->getUserTheme();
+        return $this->configHandler->getUserTheme();
     }
 
     public function getUserMessageOrder()
     {
-        return $this->container->get('comtso.config.handler')->getUserMessageOrder();
+        return $this->configHandler->getUserMessageOrder();
     }
 }

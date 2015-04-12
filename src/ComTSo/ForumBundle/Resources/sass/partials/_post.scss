@@ -6,6 +6,9 @@
     textarea {
         resize: vertical;
     }
+    &.post-small {
+        font-size: 0.8em;
+    }
     .post-infos {
         visibility: hidden;
         margin-bottom: 0;

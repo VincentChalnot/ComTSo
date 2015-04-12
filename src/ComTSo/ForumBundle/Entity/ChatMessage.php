@@ -21,18 +21,27 @@ class ChatMessage implements \JsonSerializable, Routable
      */
     protected $id;
 
+    /**
+     * @return int
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * @param int $id
+     * @return $this
+     */
     public function setId($id)
     {
         $this->id = $id;
-
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
     public function getAuthorId()
     {
         if ($this->getAuthor()) {
@@ -40,6 +49,9 @@ class ChatMessage implements \JsonSerializable, Routable
         }
     }
 
+    /**
+     * @return array
+     */
     public function jsonSerialize()
     {
         return [
@@ -51,6 +63,9 @@ class ChatMessage implements \JsonSerializable, Routable
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getRoutingParameters()
     {
         return ['id' => $this->getId()];

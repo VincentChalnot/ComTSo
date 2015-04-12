@@ -9,7 +9,6 @@ use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-use Exception;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -46,18 +45,6 @@ class BaseController extends Controller
     }
 
     /**
-     * Get current request parameter
-     * @param  string $path
-     * @param  mixed  $default
-     * @param  bool   $deep
-     * @return mixed
-     */
-    protected function getRequestParameter($path, $default = null, $deep = false)
-    {
-        return $this->getRequest()->get($path, $default, $deep);
-    }
-
-    /**
      * Alias to get a doctrine repository, automatically use the current bundle if not specified
      * @param  string           $persistentObjectName
      * @param  string           $persistentManagerName
@@ -65,11 +52,6 @@ class BaseController extends Controller
      */
     protected function getRepository($persistentObjectName, $persistentManagerName = null)
     {
-        $infos = explode(':', $persistentObjectName);
-        if (count($infos) == 1) {
-            $persistentObjectName = "{$this->getBundleName()}:{$persistentObjectName}";
-        }
-
         return $this->getManager()->getRepository($persistentObjectName, $persistentManagerName);
     }
 
@@ -101,30 +83,10 @@ class BaseController extends Controller
     }
 
     /**
-     * Returns current bundle name for controller
-     * @throws Exception
-     * @return string
-     */
-    protected function getBundleName()
-    {
-        $controller = $this->getRequest()->attributes->get('_controller');
-        $className = explode('::', $controller)[0];
-        if (false !== strpos($className, ':')) {
-            return explode(':', $controller)[0];
-        }
-        foreach ($this->get('kernel')->getBundles() as $bundle) {
-            if (0 === strpos($className, $bundle->getNamespace())) {
-                return $bundle->getName();
-            }
-        }
-        throw new Exception("Unknown Bundle for controller: {$controller}");
-    }
-
-    /**
      *
      * @return User
      */
-    protected function getUser()
+    public function getUser()
     {
         $user = parent::getUser();
         $lastMinute = new DateTime();
@@ -149,6 +111,9 @@ class BaseController extends Controller
 
     /**
      * @param  QueryBuilder $qb
+     * @param Request $request
+     * @param int $defaultLimit
+     * @param int $defaultPage
      * @return Pagerfanta
      */
     protected function createPager(QueryBuilder $qb, Request $request, $defaultLimit = 10, $defaultPage = 1)

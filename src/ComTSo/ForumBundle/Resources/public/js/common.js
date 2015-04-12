@@ -244,7 +244,7 @@ $(document).ready(function(){
     $('.preview').each(function() {
         var t = $(this);
         if (t.innerHeight() < 200) {
-            t.find('.preview-show').hide();
+            t.addClass('disabled');
         }
     });
 });

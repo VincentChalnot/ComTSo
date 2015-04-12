@@ -19,12 +19,14 @@ class CommentController extends BaseController
         $this->viewParameters['topic'] = $topic;
         $this->viewParameters['forum'] = $topic->getForum();
         $this->viewParameters['title'] = (string) $comment->getTopic();
-        $this->viewParameters['forums'] = $this->getRepository('Forum')->findAll();
-        $this->viewParameters['topics'] = $this->getRepository('Topic')->findByForum($topic->getForum(), ['updatedAt' => 'DESC'], 10);
+        $this->viewParameters['forums'] = $this->getRepository('ComTSoForumBundle:Forum')->findAll();
+        $this->viewParameters['topics'] = $this->getRepository('ComTSoForumBundle:Topic')->findByForum($topic->getForum(), ['updatedAt' => 'DESC'], 10);
     }
-    
+
     /**
      * @Template()
+     * @param Comment $comment
+     * @return array
      */
     public function showAction(Comment $comment)
     {
@@ -34,6 +36,9 @@ class CommentController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Comment $comment
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function editAction(Request $request, Comment $comment)
     {
@@ -63,6 +68,9 @@ class CommentController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Comment $comment
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction(Request $request, Comment $comment)
     {

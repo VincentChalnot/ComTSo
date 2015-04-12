@@ -12,7 +12,7 @@ class Utils
      * case the result. Try to replace all accuentuated chars to their ASCII
      * equivalent if Iconv exists and if the locale is set correctly
      * @param  string $string
-     * @param  char   $delimiter
+     * @param string $delimiter
      * @return string
      */
     public static function slugify($string, $delimiter = '-')
@@ -41,9 +41,9 @@ class Utils
 
     /**
      * Replace all control characters (meaning not letters neither numbers)
-     * @param  type $subject
-     * @param  type $replacement
-     * @return type
+     * @param  string $subject
+     * @param string $replacement
+     * @return string
      */
     public static function replaceControlChars($subject, $replacement = '')
     {
@@ -52,8 +52,8 @@ class Utils
 
     /**
      * Camelize a string
-     * @param  type $string
-     * @return type
+     * @param string $string
+     * @return string
      */
     public static function camelize($string)
     {
@@ -64,9 +64,9 @@ class Utils
     }
 
     /**
-     * Convert HTML to text, optionnaly summarize to specified lenght
+     * Convert HTML to text, optionally summarize to specified length
      * @param  string $html
-     * @param  int    $cut
+     * @param int|null $len
      * @return string
      */
     public static function convertToText($html, $len = null)
@@ -149,6 +149,7 @@ class Utils
      * Autoformat date and/or time inside string from international convention
      * dd/mm/YY(YY) of dd-mm-YY(YY) to ISO date(time)
      * @param string $value
+     * @return null|string
      */
     public static function dateTimeFormat($value)
     {
@@ -202,6 +203,7 @@ class Utils
      * insecable spaces.
      * You can change the unit in app.yml
      * @param  double $price
+     * @param string $currency
      * @return string
      */
     public static function moneyFormat($price, $currency = '€')
@@ -231,7 +233,11 @@ class Utils
     /**
      * Format a string to match a number form
      * Warning ! Maximum floating point precision is limited to 12
-     * @param  mixed  $value number
+     * @param  mixed $value number
+     * @param string|null $decimals
+     * @param string $point
+     * @param string $separator
+     * @param string|null $unit
      * @return string
      */
     public static function numberFormat($value, $decimals = null, $point = '.', $separator = '', $unit = null)
@@ -239,14 +245,14 @@ class Utils
         if ($value === null || $value === '') {
             return '';
         }
-        $nolimit = false;
+        $noLimit = false;
         if ($decimals === null) {
             //précision max fixée à 1E-16 dans PHP
             $decimals = 12;
-            $nolimit = true;
+            $noLimit = true;
         }
         $value = number_format(self::numberParse($value), $decimals, $point, $separator);
-        if ($nolimit) {
+        if ($noLimit) {
             $value = rtrim(rtrim($value, '0'), $point);
         }
 
@@ -255,7 +261,8 @@ class Utils
 
     /**
      * Use this function to display a filesize in a human readable form.
-     * @param  in     $size number of octets
+     * @param  int $size number of octets
+     * @param int $decimals
      * @return string
      */
     public static function filesizeFormat($size, $decimals = 1)

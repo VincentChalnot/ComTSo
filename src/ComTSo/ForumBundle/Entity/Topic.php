@@ -2,8 +2,8 @@
 
 namespace ComTSo\ForumBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="ctso_topic")
@@ -186,7 +186,7 @@ class Topic implements Routable
     /**
      * Get photos
      *
-     * @return ArrayCollection
+     * @return Photo[]|ArrayCollection
      */
     public function getPhotos()
     {
