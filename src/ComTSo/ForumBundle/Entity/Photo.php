@@ -2,8 +2,8 @@
 
 namespace ComTSo\ForumBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Table(name="ctso_photo")
@@ -127,6 +127,7 @@ class Photo implements \JsonSerializable, Routable
     }
 
     /**
+     * @param string|null $format
      * @return \DateTime
      */
     public function getFileModifiedAt($format = null)

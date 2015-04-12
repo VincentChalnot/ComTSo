@@ -10,7 +10,7 @@ h1 {
     text-transform: uppercase;
     font-family: 'Port Lligat Slab', serif;
     font-size: 6em;
-    text-shadow: 0px 2px 2px #555;
+    text-shadow: 0 2px 2px #555;
     color: #444;
 }
 
@@ -61,9 +61,7 @@ textarea {
 }
 
 .loader {
-    background-image: image-url('ajax-loader.gif');
-    background-repeat: no-repeat;
-    background-position: center center;
+    background: image-url('ajax-loader.gif') no-repeat center center;
 }
 
 .ui-sortable-placeholder, .ui-sortable-helper {
@@ -104,6 +102,15 @@ textarea {
         }
         .preview-hide {
             display: block;
+        }
+    }
+    &.disabled {
+        padding-bottom: 0;
+        .preview-show {
+            display: none;
+        }
+        .preview-hide {
+            display: none;
         }
     }
 }

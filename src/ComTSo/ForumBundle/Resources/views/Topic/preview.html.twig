@@ -15,7 +15,7 @@
             {% endif %}
         </div>
     {% endblock %}
-    {% set previewComments = topic.comments.slice(0, 4) %}
+    {% set previewComment = topic.comments.first %}
     {% block topic_panel_body %}
         <div class="panel-body">
             {% spaceless %}
@@ -30,12 +30,12 @@
                         <hr class="clear">
                     </div>
                 {% endif %}
-                {% for comment in previewComments %}
-                    {% if loop.index != 1 %}<hr class="clear">{% endif %}
-                    {% include 'ComTSoForumBundle:Comment:comment.html.twig' %}
+                {% if previewComment %}
+                    <p>Dernier message par <a href="{{ previewComment.author|path }}">{{ previewComment.author }}</a>
+                        le {{ previewComment.createdAt|date('d/m/Y à H:i') }}</p>
                 {% else %}
                     <p class="text-center text-muted">Aucun commentaire</p>
-                {% endfor %}
+                {% endif %}
             {% endspaceless %}
         </div>
     {% endblock %}

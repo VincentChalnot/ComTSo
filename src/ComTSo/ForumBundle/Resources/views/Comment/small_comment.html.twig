@@ -1,0 +1,10 @@
+{% set show_actions = show_actions is defined ? show_actions : true %}
+<div class="post post-small" id="post-{{ comment.id }}">
+    <div class="col-sm-3 col-xs-4 post-side">
+        {% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': comment.author, 'size': 'xs'} %}
+    </div>
+    <div class="col-sm-8 col-xs-7 text-justify">
+        {{ comment.content|raw }}
+    </div>
+    <div class="clear"></div>
+</div>

@@ -1,31 +1,29 @@
 parameters:
     phpexiftool.reader.class: PHPExiftool\Reader
-    comtso.pager.class: ComTSo\ForumBundle\Lib\Pager
 
 services:
     twig.extension.comtso_forum:
         class: ComTSo\ForumBundle\Twig\ForumExtension
-        arguments: [ "@service_container" ]
+        arguments:
+            - @liip_imagine.filter.configuration
+            - @comtso.config.handler
+            - @router
+            - @doctrine
+            - %brand.name%
+            - %owa.baseUrl%
+            - %owa.siteId%
         tags:
             - { name: 'twig.extension' }
 
-    gedmo.listener.timestampable:
-        class: Gedmo\Timestampable\TimestampableListener
-        tags:
-            - { name: doctrine.event_subscriber, connection: default }
-        calls:
-            - [ setAnnotationReader, [ "@annotation_reader" ] ]
-
-    gedmo.listener.sluggable:
-        class: Gedmo\Sluggable\SluggableListener
-        tags:
-            - { name: doctrine.event_subscriber, connection: default }
-        calls:
-            - [ setAnnotationReader, [ "@annotation_reader" ] ]
-
     comtso.image.uploader:
         class: ComTSo\ForumBundle\Service\ImageUploader
-        arguments: [ "@service_container" ]
+        arguments:
+            - %comtso.photo_dir%
+            - @doctrine
+            - @liip_imagine
+            - @phpexiftool.reader=
+            - @security.token_storage
+            - @router
         tags:
             - { name: kernel.event_listener, event: oneup_uploader.post_persist, method: onUpload }
 
@@ -36,10 +34,6 @@ services:
         factory_method: create
         arguments:
             - "@logger"
-
-    comtso.pager:
-        scope: prototype
-        class: "%comtso.pager.class%"
 
     comtso.form.type.photo_selector:
         class: ComTSo\ForumBundle\Form\Type\PhotoSelectorType

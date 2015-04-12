@@ -29,7 +29,7 @@ class UserController extends BaseController
     {
         $this->preExecute($user);
         $this->viewParameters['user'] = $user;
-        $this->viewParameters['messages'] = $this->getRepository('Message')->findConversation($this->getUser(), $user);
+        $this->viewParameters['messages'] = $this->getRepository('ComTSoForumBundle:Message')->findConversation($this->getUser(), $user);
 
         $message = new Message();
         $message->setAuthor($this->getUser());

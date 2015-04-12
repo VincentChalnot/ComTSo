@@ -15,6 +15,8 @@ class HomeController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @return array
      */
     public function indexAction(Request $request)
     {
@@ -34,7 +36,7 @@ class HomeController extends BaseController
         $this->viewParameters['form'] = $form->createView();
         $this->viewParameters['since'] = $since;
         $this->viewParameters['topics'] = $this->loadTopics($since);
-        $this->viewParameters['forums'] = $this->getRepository('Forum')->findAll();
+        $this->viewParameters['forums'] = $this->getRepository('ComTSoForumBundle:Forum')->findAll();
 
         return $this->viewParameters;
     }
@@ -42,12 +44,12 @@ class HomeController extends BaseController
     protected function loadTopics(DateTime $since)
     {
         $topics = [];
-        foreach ($this->getRepository('Topic')->findLastsModified(100, $since) as $topic) {
+        foreach ($this->getRepository('ComTSoForumBundle:Topic')->findLastsModified(100, $since) as $topic) {
             $topic->lastComments = [];
             $topics[$topic->getId()] = $topic;
         }
 
-        $comments = $this->getRepository('Comment')->findLastsCreated(100, $since, $this->getUserMessageOrder());
+        $comments = $this->getRepository('ComTSoForumBundle:Comment')->findLastsCreated(100, $since, $this->getUserMessageOrder());
         foreach ($comments as $comment) {
             $topic = $comment->getTopic();
             $topic->lastComments[] = $comment;

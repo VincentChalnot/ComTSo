@@ -4,15 +4,18 @@ namespace ComTSo\ForumBundle\Controller;
 
 use ComTSo\ForumBundle\Lib\Utils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Request;
 
 class SearchController extends BaseController
 {
     /**
      * @Template()
+     * @param Request $request
+     * @return array
      */
-    public function searchAction()
+    public function searchAction(Request $request)
     {
-        $original = $this->getRequestParameter('q');
+        $original = $request->get('q');
         $q = $this->parseQuery($original);
         $results = $this->getSearchRepositories();
         foreach ($results as &$repo) {

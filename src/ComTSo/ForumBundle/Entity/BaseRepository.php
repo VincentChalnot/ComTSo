@@ -12,6 +12,14 @@ use Doctrine\ORM\EntityRepository;
  */
 class BaseRepository extends EntityRepository
 {
+
+    /**
+     * @param int $limit
+     * @param \DateTime $since
+     * @param string $order
+     * @return array
+     * @throws \Exception
+     */
     public function findLastsCreated($limit = 20, \DateTime $since = null, $order = 'DESC')
     {
         if (!$this->getClassMetadata()->hasField('createdAt')) {
@@ -29,6 +37,13 @@ class BaseRepository extends EntityRepository
                         ->getResult();
     }
 
+    /**
+     * @param int $limit
+     * @param \DateTime $since
+     * @param string $order
+     * @return array
+     * @throws \Exception
+     */
     public function findLastsModified($limit = 20, \DateTime $since = null, $order = 'DESC')
     {
         if (!$this->getClassMetadata()->hasField('updatedAt')) {
@@ -46,6 +61,12 @@ class BaseRepository extends EntityRepository
                         ->getResult();
     }
 
+    /**
+     * @param $terms
+     * @param int $limit
+     * @return array
+     * @throws \Exception
+     */
     public function search($terms, $limit = 50)
     {
         if (!$this->getClassMetadata()->hasField('title') && !$this->getClassMetadata()->hasField('content')) {

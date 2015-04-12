@@ -3,10 +3,12 @@
 namespace ComTSo\ForumBundle\Controller;
 
 use ComTSo\ForumBundle\Entity\Comment;
+use ComTSo\ForumBundle\Entity\PhotoTopic;
 use ComTSo\ForumBundle\Entity\Topic;
 use ComTSo\ForumBundle\Form\Type\TopicType;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -24,12 +26,16 @@ class TopicController extends BaseController
         $this->viewParameters['topic'] = $topic;
         $this->viewParameters['title'] = (string) $topic;
         $this->viewParameters['forum'] = $forum;
-        $this->viewParameters['forums'] = $this->getRepository('Forum')->findAll();
-        $this->viewParameters['topics'] = $this->getRepository('Topic')->findByForum($forum, ['updatedAt' => 'DESC'], 10);
+        $this->viewParameters['forums'] = $this->getRepository('ComTSoForumBundle:Forum')->findAll();
+        $this->viewParameters['topics'] = $this->getRepository('ComTSoForumBundle:Topic')->findByForum($forum, ['updatedAt' => 'DESC'], 10);
     }
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Topic $topic
+     * @param $forumId
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function showAction(Request $request, Topic $topic, $forumId)
     {
@@ -63,8 +69,8 @@ class TopicController extends BaseController
         }
 
         $this->viewParameters['form'] = $form->createView();
-        
-        $qb = $this->getRepository('Comment')->getQBForTopic($topic, $this->getUserMessageOrder());
+
+        $qb = $this->getRepository('ComTSoForumBundle:Comment')->getQBForTopic($topic, $this->getUserMessageOrder());
         $comments = $this->createPager($qb, $request, 20, $this->getUserMessageOrder() === 'DESC' ? 1 : -1);
         $this->viewParameters['comments'] = $comments;
 
@@ -73,6 +79,10 @@ class TopicController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Topic $topic
+     * @param $forumId
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function editAction(Request $request, Topic $topic, $forumId)
     {
@@ -102,9 +112,12 @@ class TopicController extends BaseController
 
         return $this->viewParameters;
     }
-    
+
     /**
      * @Template()
+     * @param Topic $topic
+     * @param $forumId
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function managePhotosAction(Topic $topic, $forumId)
     {
@@ -119,6 +132,10 @@ class TopicController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Topic $topic
+     * @param $forumId
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function addPhotosAction(Request $request, Topic $topic, $forumId)
     {
@@ -131,7 +148,7 @@ class TopicController extends BaseController
         foreach ($topic->getPhotos() as $photo) {
             $ids[] = $photo->getPhoto()->getId();
         }
-        $qb = $this->getRepository('Photo')->createQueryBuilder('e');
+        $qb = $this->getRepository('ComTSoForumBundle:Photo')->createQueryBuilder('e');
         if ($ids) {
             $qb->andWhere('e.id NOT IN (:ids)')
                     ->setParameter('ids', $ids);
@@ -152,6 +169,10 @@ class TopicController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Topic $topic
+     * @param $forumId
+     * @return Response
      */
     public function addPhotoAction(Request $request, Topic $topic, $forumId)
     {
@@ -163,16 +184,16 @@ class TopicController extends BaseController
         if (!$request->query->has('add')) {
             throw new NotFoundHttpException("Missing 'add' parameter");
         }
-        $photo = $this->getRepository('Photo')->find($request->query->get('add'));
+        $photo = $this->getRepository('ComTSoForumBundle:Photo')->find($request->query->get('add'));
         if (!$photo) {
             throw new NotFoundHttpException("Photo not found : {$request->query->get('add')}");
         }
 
-        $lastPhoto = $this->getRepository('PhotoTopic')->findLast($topic);
+        $lastPhoto = $this->getRepository('ComTSoForumBundle:PhotoTopic')->findLast($topic);
         $order = $lastPhoto ? $lastPhoto->getOrder() + 1 : 0;
 
         $em = $this->getManager();
-        $photoTopic = new \ComTSo\ForumBundle\Entity\PhotoTopic();
+        $photoTopic = new PhotoTopic();
         $photoTopic->setPhoto($photo)
                 ->setTopic($topic)
                 ->setOrder($order)
@@ -186,6 +207,10 @@ class TopicController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Topic $topic
+     * @param $forumId
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function removePhotoAction(Request $request, Topic $topic, $forumId)
     {
@@ -197,7 +222,7 @@ class TopicController extends BaseController
         if (!$request->query->has('remove')) {
             throw new NotFoundHttpException("Missing 'remove' parameter");
         }
-        $photoTopic = $this->getRepository('PhotoTopic')->find($request->query->get('remove'));
+        $photoTopic = $this->getRepository('ComTSoForumBundle:PhotoTopic')->find($request->query->get('remove'));
         if (!$photoTopic) {
             throw new NotFoundHttpException("PhotoTopic not found : {$request->query->get('remove')}");
         }
@@ -211,6 +236,10 @@ class TopicController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Topic $topic
+     * @param $forumId
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function orderPhotosAction(Request $request, Topic $topic, $forumId)
     {
@@ -235,9 +264,14 @@ class TopicController extends BaseController
 
         return $this->render('ComTSoForumBundle:Topic:order_confirmed.html.twig', $this->viewParameters);
     }
-    
+
     /**
      * @Template()
+     * @param Request $request
+     * @param Topic $topic
+     * @param $forumId
+     * @param bool $star
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function starAction(Request $request, Topic $topic, $forumId, $star = true)
     {
@@ -257,7 +291,7 @@ class TopicController extends BaseController
         $em->flush();
         
         if ($request->isXmlHttpRequest()) {
-            return new \Symfony\Component\HttpFoundation\JsonResponse(true);
+            return new JsonResponse(true);
         }
 
         $this->addFlashMsg('success', 'Topic ajouté aux favoris');

@@ -17,6 +17,8 @@ class PhotoController extends BaseController
 {
     /**
      * @Template()
+     * @param Photo $photo
+     * @return array
      */
     public function showAction(Photo $photo)
     {
@@ -25,9 +27,12 @@ class PhotoController extends BaseController
 
         return $this->viewParameters;
     }
-    
+
     /**
      * @Template()
+     * @param Request $request
+     * @param Photo $photo
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function editAction(Request $request, Photo $photo)
     {
@@ -75,14 +80,15 @@ class PhotoController extends BaseController
      */
     public function listAction()
     {
-        $this->viewParameters['photos'] = $this->getRepository('Photo')->findAll();
+        $this->viewParameters['photos'] = $this->getRepository('ComTSoForumBundle:Photo')->findAll();
         $this->viewParameters['title'] = 'Photos';
 
         return $this->viewParameters;
     }
 
     /**
-     * @param  Request      $request
+     * @param  Request $request
+     * @param Photo $photo
      * @return JsonResponse
      */
     public function updateAction(Request $request, Photo $photo)
@@ -96,10 +102,12 @@ class PhotoController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @return Response
      */
     public function browserAction(Request $request)
     {
-        $qb = $this->getRepository('Photo')->createQueryBuilder('e');
+        $qb = $this->getRepository('ComTSoForumBundle:Photo')->createQueryBuilder('e');
         $qb->andWhere('e.author = :user')
                 ->setParameter('user', $this->getUser())
                 ->addOrderBy('e.createdAt', 'DESC');
@@ -112,6 +120,8 @@ class PhotoController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @return array|Response
      */
     public function uploaderAction(Request $request)
     {
@@ -126,6 +136,9 @@ class PhotoController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
+     * @param Photo $photo
+     * @return array
      */
     public function widgetAction(Request $request, Photo $photo)
     {

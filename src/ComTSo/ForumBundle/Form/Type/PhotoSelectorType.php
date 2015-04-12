@@ -3,6 +3,8 @@
 namespace ComTSo\ForumBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class PhotoSelectorType extends AbstractType
@@ -18,7 +20,7 @@ class PhotoSelectorType extends AbstractType
         ]);
     }
 
-    public function buildView(\Symfony\Component\Form\FormView $view, \Symfony\Component\Form\FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['browsable'] = $options['browsable'];
     }

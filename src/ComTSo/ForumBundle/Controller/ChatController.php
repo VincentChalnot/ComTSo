@@ -3,14 +3,14 @@
 namespace ComTSo\ForumBundle\Controller;
 
 use ComTSo\ForumBundle\Entity\ChatMessage;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class ChatController extends BaseController
 {
     /**
-     * @Template()
+     * @param Request $request
+     * @return JsonResponse
      */
     public function showAction(Request $request)
     {
@@ -30,7 +30,7 @@ class ChatController extends BaseController
         $users = [
             $user->getId() => $user,
         ];
-        foreach ($this->getRepository('ChatMessage')->findLastsCreated(20) as $message) {
+        foreach ($this->getRepository('ComTSoForumBundle:ChatMessage')->findLastsCreated(20) as $message) {
             $messages[] = $message;
             $users[$message->getAuthor()->getId()] = $message->getAuthor();
         }

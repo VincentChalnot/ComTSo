@@ -39,11 +39,11 @@ class ConfigHandler extends ContainerAware {
     protected function getUser()
     {
         if (null === $token = $this->container->get('security.token_storage')->getToken()) {
-            return;
+            return null;
         }
 
         if (!is_object($user = $token->getUser())) {
-            return;
+            return null;
         }
 
         return $user;
