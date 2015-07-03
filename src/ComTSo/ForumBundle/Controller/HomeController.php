@@ -46,6 +46,7 @@ class HomeController extends BaseController
         $topics = [];
         foreach ($this->getRepository('ComTSoForumBundle:Topic')->findLastsModified(100, $since) as $topic) {
             $topic->lastComments = [];
+            $topic->lastPhotos = [];
             $topics[$topic->getId()] = $topic;
         }
 
@@ -53,6 +54,12 @@ class HomeController extends BaseController
         foreach ($comments as $comment) {
             $topic = $comment->getTopic();
             $topic->lastComments[] = $comment;
+            $topics[$topic->getId()] = $topic;
+        }
+        $photos = $this->getRepository('ComTSoForumBundle:PhotoTopic')->findLastsCreated(100, $since, $this->getUserMessageOrder());
+        foreach ($photos as $photo) {
+            $topic = $photo->getTopic();
+            $topic->lastPhotos[] = $photo;
             $topics[$topic->getId()] = $topic;
         }
         return $topics;

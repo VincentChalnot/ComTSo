@@ -4,7 +4,11 @@
         {% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': comment.author} %}
     </div>
     <div class="col-sm-9 col-xs-8 text-justify">
-        {{ comment.content|raw }}
+        <div class="preview">
+            <a href="#post-{{ comment.id }}" class="preview-toggle preview-show"><i class="fa fa-toggle-down"></i> Afficher le post</a>
+            {{ comment.content|raw }}
+            <a href="#post-{{ comment.id }}" class="preview-toggle preview-hide"><i class="fa fa-toggle-up"></i> Masquer le post</a>
+        </div>
         <p class="post-infos text-muted">
             Posté le {{ comment.createdAt|date('d/m/Y à H:i') }}
         </p>
