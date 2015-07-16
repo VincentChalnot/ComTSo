@@ -56,18 +56,22 @@ liip_imagine:
         tiny:
             quality: 70
             filters:
+                auto_rotate: ~
                 thumbnail: { size: [64, 64], mode: outbound }
         thumbnail:
             quality: 70
             filters:
+                auto_rotate: ~
                 thumbnail: { size: [165, 165], mode: outbound }
         preview:
             quality: 80
             filters:
+                auto_rotate: ~
                 thumbnail: { size: [730, 730], mode: inset }
         large:
             quality: 90
             filters:
+                auto_rotate: ~
                 thumbnail: { size: [1900, 1000], mode: inset }
 
 fos_js_routing:
