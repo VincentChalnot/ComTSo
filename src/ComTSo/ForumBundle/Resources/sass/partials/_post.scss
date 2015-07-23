@@ -23,11 +23,15 @@
     }
     .post-actions {
         visibility: hidden;
-        margin-top: -0.2em;
-        font-size: 1.2em;
-        .btn {
-            padding: 0.2em 0.5em;
+        margin-top: 0.7em;
+        &.post-actions-vertical {
+            margin-top: -0.2em;
+            font-size: 1.2em;
+            .btn {
+                padding: 0.2em 0.5em;
+            }
         }
+
     }
     &:hover {
         .post-infos, .post-actions {
