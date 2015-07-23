@@ -3,7 +3,17 @@
     <div class="col-sm-2 col-xs-3 post-side">
         {% include 'ComTSoForumBundle:User:avatar.html.twig' with {'author': comment.author} %}
     </div>
-    <div class="col-sm-9 col-xs-8 text-justify">
+    {% if show_actions %}
+        <div class="col-xs-8 visible-xs post-actions text-right">
+            <div class="btn-group">
+                {% if app.user.id == comment.author.id or 'ROLE_ADMIN' in app.user.roles %}
+                    <a href="{{ comment|path('edit') }}" class="btn btn-default"><i class="fa fa-pencil"></i> Modifier</a>
+                    <a href="{{ comment|path('delete') }}" class="btn btn-danger"><i class="fa fa-trash-o"></i> Supprimer</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    <div class="col-sm-9 col-xs-12 text-justify">
         <div class="preview">
             <a href="#post-{{ comment.id }}" class="preview-toggle preview-show"><i class="fa fa-toggle-down"></i> Afficher le post</a>
             {{ comment.content|raw }}
@@ -14,7 +24,7 @@
         </p>
     </div>
     {% if show_actions %}
-        <div class="col-sm-1 post-actions">
+        <div class="col-md-1 hidden-xs post-actions post-actions-vertical">
             {% block post_actions %}
                 <div class="btn-group btn-group-vertical">
                     <a href="{{ comment|path('show') }}" class="btn"><i class="fa fa-eye"></i></a>
