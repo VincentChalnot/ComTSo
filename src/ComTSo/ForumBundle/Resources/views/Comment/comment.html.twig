@@ -5,12 +5,14 @@
     </div>
     {% if show_actions %}
         <div class="col-xs-8 visible-xs post-actions text-right">
-            <div class="btn-group">
-                {% if app.user.id == comment.author.id or 'ROLE_ADMIN' in app.user.roles %}
-                    <a href="{{ comment|path('edit') }}" class="btn btn-default"><i class="fa fa-pencil"></i> Modifier</a>
-                    <a href="{{ comment|path('delete') }}" class="btn btn-danger"><i class="fa fa-trash-o"></i> Supprimer</a>
-                {% endif %}
-            </div>
+            {% block post_mobile_actions %}
+                <div class="btn-group">
+                    {% if app.user.id == comment.author.id or 'ROLE_ADMIN' in app.user.roles %}
+                        <a href="{{ comment|path('edit') }}" class="btn btn-default"><i class="fa fa-pencil"></i> Modifier</a>
+                        <a href="{{ comment|path('delete') }}" class="btn btn-danger"><i class="fa fa-trash-o"></i> Supprimer</a>
+                    {% endif %}
+                </div>
+            {% endblock %}
         </div>
     {% endif %}
     <div class="col-sm-9 col-xs-12 text-justify">
