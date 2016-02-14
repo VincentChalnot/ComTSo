@@ -70,19 +70,17 @@ class ForumController extends BaseController
         $builder->add('content', 'textarea', ['horizontal' => false, 'label_render' => false]);
 
         $form = $builder->getForm();
-        if ($this->getRequest()->isMethod('POST')) {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                $forum->setUpdatedAt(new DateTime());
-                // Saving object
-                $em = $this->getManager();
-                $em->persist($forum);
-                $em->flush();
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $forum->setUpdatedAt(new DateTime());
+            // Saving object
+            $em = $this->getManager();
+            $em->persist($forum);
+            $em->flush();
 
-                $this->addFlashMsg('success', 'Modifications enregistrées');
+            $this->addFlashMsg('success', 'Modifications enregistrées');
 
-                return $this->redirect($this->generateUrl('comtso_forum_show', ['id' => $forum->getId()]));
-            }
+            return $this->redirect($this->generateUrl('comtso_forum_show', ['id' => $forum->getId()]));
         }
 
         $this->viewParameters['form'] = $form->createView();
@@ -106,19 +104,17 @@ class ForumController extends BaseController
 
         $form = $this->createForm(new TopicType(), $topic, ['label' => 'Nouveau topic']);
 
-        if ($this->getRequest()->isMethod('POST')) {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                $forum->setUpdatedAt(new DateTime());
-                // Saving object
-                $em = $this->getManager();
-                $em->persist($topic, $forum);
-                $em->flush();
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $forum->setUpdatedAt(new DateTime());
+            // Saving object
+            $em = $this->getManager();
+            $em->persist($topic);
+            $em->flush();
 
-                $this->addFlashMsg('success', 'Nouveau topic enregistré');
+            $this->addFlashMsg('success', 'Nouveau topic enregistré');
 
-                return $this->redirect($this->generateUrl('comtso_topic_show', ['id' => $topic->getId(), 'forumId' => $forum->getId()]));
-            }
+            return $this->redirect($this->generateUrl('comtso_topic_show', ['id' => $topic->getId(), 'forumId' => $forum->getId()]));
         }
 
         $this->viewParameters['form'] = $form->createView();

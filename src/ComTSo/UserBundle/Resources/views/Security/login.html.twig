@@ -21,7 +21,7 @@
                         <input class="form-control" placeholder="{{ 'security.login.password'|trans }}" name="_password" type="password" value="" required="required">
                     </div>
                     {% if error %}
-                        <div class="text-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                        <div class="text-danger">{{ error|trans({}, 'FOSUserBundle') }}</div>
                     {% endif %}
                     <div class="checkbox">
                         <label>

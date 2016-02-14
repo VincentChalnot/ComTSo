@@ -9,12 +9,18 @@ use ComTSo\ForumBundle\Form\Type\TopicType;
 use DateTime;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TopicController extends BaseController
 {
+    /**
+     * @param Topic $topic
+     * @param $forumId
+     * @return RedirectResponse|null
+     */
     protected function initTopic(Topic $topic, $forumId)
     {
         $forum = $topic->getForum();
@@ -35,7 +41,7 @@ class TopicController extends BaseController
      * @param Request $request
      * @param Topic $topic
      * @param $forumId
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|RedirectResponse
      */
     public function showAction(Request $request, Topic $topic, $forumId)
     {
@@ -53,14 +59,14 @@ class TopicController extends BaseController
 
         $form = $builder->getForm();
         if ($request->isMethod('POST')) {
-            $form->handleRequest($this->getRequest());
+            $form->handleRequest($request);
             if ($form->isValid()) {
                 $topic->setUpdatedAt(new DateTime());
                 $comment->setContent($this->cleanHtml($comment->getContent()));
                 
                 // Saving object
                 $em = $this->getManager();
-                $em->persist($comment, $topic);
+                $em->persist($comment);
                 $em->flush();
 
                 $this->addFlashMsg('success', 'Commentaire enregistré');
@@ -82,7 +88,7 @@ class TopicController extends BaseController
      * @param Request $request
      * @param Topic $topic
      * @param $forumId
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|RedirectResponse
      */
     public function editAction(Request $request, Topic $topic, $forumId)
     {
@@ -117,7 +123,7 @@ class TopicController extends BaseController
      * @Template()
      * @param Topic $topic
      * @param $forumId
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|RedirectResponse
      */
     public function managePhotosAction(Topic $topic, $forumId)
     {
@@ -135,7 +141,7 @@ class TopicController extends BaseController
      * @param Request $request
      * @param Topic $topic
      * @param $forumId
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|RedirectResponse|Response
      */
     public function addPhotosAction(Request $request, Topic $topic, $forumId)
     {
@@ -210,7 +216,7 @@ class TopicController extends BaseController
      * @param Request $request
      * @param Topic $topic
      * @param $forumId
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return RedirectResponse|Response
      */
     public function removePhotoAction(Request $request, Topic $topic, $forumId)
     {
@@ -239,7 +245,7 @@ class TopicController extends BaseController
      * @param Request $request
      * @param Topic $topic
      * @param $forumId
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return RedirectResponse|Response
      */
     public function orderPhotosAction(Request $request, Topic $topic, $forumId)
     {
@@ -271,7 +277,7 @@ class TopicController extends BaseController
      * @param Topic $topic
      * @param $forumId
      * @param bool $star
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function starAction(Request $request, Topic $topic, $forumId, $star = true)
     {

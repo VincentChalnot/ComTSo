@@ -41,16 +41,14 @@ class PhotoController extends BaseController
         
         $form = $this->createForm(new PhotoType, $photo, ['label' => 'Édition de la photo']);
 
-        if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                $em = $this->getManager();
-                $em->persist($photo);
-                $em->flush();
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $em = $this->getManager();
+            $em->persist($photo);
+            $em->flush();
 
-                $this->addFlashMsg('success', 'Topic mis à jour');
-                return $this->redirect($this->generateUrl('comtso_photo_show', $photo->getRoutingParameters()));
-            }
+            $this->addFlashMsg('success', 'Topic mis à jour');
+            return $this->redirect($this->generateUrl('comtso_photo_show', $photo->getRoutingParameters()));
         }
 
         $this->viewParameters['form'] = $form->createView();
@@ -62,7 +60,7 @@ class PhotoController extends BaseController
     {
         $filePath = "{$this->getConfigParameter('comtso.photo_dir')}/originals/{$photo->getFilename()}";
 
-        return $this->createImageResponse($request, $filePath, $photo, $this->getRequest()->get('download') ? 'attachment' : 'inline');
+        return $this->createImageResponse($request, $filePath, $photo, $request->get('download') ? 'attachment' : 'inline');
     }
 
     public function sourceCacheAction(Request $request, Photo $photo, $filter)
@@ -136,11 +134,10 @@ class PhotoController extends BaseController
 
     /**
      * @Template()
-     * @param Request $request
      * @param Photo $photo
      * @return array
      */
-    public function widgetAction(Request $request, Photo $photo)
+    public function widgetAction(Photo $photo)
     {
         $this->viewParameters['photo'] = $photo;
 
@@ -166,7 +163,7 @@ class PhotoController extends BaseController
 
         if ($photo) {
             $filename = $photo->getTitle() ? $photo->getTitle().'.'.$photo->getFileType() : $photo->getOriginalFilename();
-            $response->setContentDisposition($this->getRequest()->get('download') ? 'attachment' : 'inline', Utils::slugify($filename));
+            $response->setContentDisposition($request->get('download') ? 'attachment' : 'inline', Utils::slugify($filename));
         }
 
         return $response;

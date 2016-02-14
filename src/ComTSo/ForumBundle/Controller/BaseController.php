@@ -52,16 +52,17 @@ class BaseController extends Controller
      */
     protected function getRepository($persistentObjectName, $persistentManagerName = null)
     {
-        return $this->getManager()->getRepository($persistentObjectName, $persistentManagerName);
+        return $this->getManager($persistentManagerName)->getRepository($persistentObjectName);
     }
 
     /**
      * Alias to return the entity manager
+     * @param null $persistentManagerName
      * @return EntityManager
      */
-    protected function getManager()
+    protected function getManager($persistentManagerName = null)
     {
-        return $this->getDoctrine()->getManager();
+        return $this->getDoctrine()->getManager($persistentManagerName);
     }
 
     /**
