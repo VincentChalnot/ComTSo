@@ -39,15 +39,6 @@ comtso_topic_manage_photos:
         id: "\d+"
     options:
         expose: true
-        
-comtso_topic_add_photos:
-    pattern:  /forum/{forumId}/{id}/add_photos
-    defaults: { _controller: ComTSoForumBundle:Topic:addPhotos }
-    requirements:
-        forumId: "[\w-]+"
-        id: "\d+"
-    options:
-        expose: true
 
 comtso_topic_add_photo:
     pattern:  /forum/{forumId}/{id}/add_photo

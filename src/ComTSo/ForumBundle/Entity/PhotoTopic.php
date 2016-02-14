@@ -28,12 +28,14 @@ class PhotoTopic
     /**
      * @var Topic
      * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Topic", inversedBy="photos", fetch="EAGER")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $topic;
 
     /**
      * @var Photo
      * @ORM\ManyToOne(targetEntity="ComTSo\ForumBundle\Entity\Photo", inversedBy="topics", fetch="EAGER")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $photo;
 
@@ -59,7 +61,7 @@ class PhotoTopic
 
     /**
      * @param  Topic   $topic
-     * @return Comment
+     * @return PhotoTopic
      */
     public function setTopic(Topic $topic)
     {
@@ -78,7 +80,7 @@ class PhotoTopic
 
     /**
      *
-     * @param  Photo      $photo
+     * @param Photo $photo
      * @return PhotoTopic
      */
     public function setPhoto(Photo $photo)

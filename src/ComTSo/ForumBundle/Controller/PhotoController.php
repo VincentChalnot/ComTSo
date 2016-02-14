@@ -162,8 +162,9 @@ class PhotoController extends BaseController
         $response->setExpires($date);
 
         if ($photo) {
-            $filename = $photo->getTitle() ? $photo->getTitle().'.'.$photo->getFileType() : $photo->getOriginalFilename();
-            $response->setContentDisposition($request->get('download') ? 'attachment' : 'inline', Utils::slugify($filename));
+            $filename = $photo->getTitle() ? Utils::slugify($photo->getTitle()) . '.' . $photo->getFileType() : $photo->getOriginalFilename();
+
+            $response->setContentDisposition($request->get('download') ? 'attachment' : 'inline', $filename);
         }
 
         return $response;

@@ -28,18 +28,18 @@ joli_typo:
 
 exercise_html_purifier:
     default:
-      HTML.TargetBlank: true
-#      AutoFormat.AutoParagraph: true
-      AutoFormat.Linkify: true
-      AutoFormat.RemoveEmpty: true
-      AutoFormat.RemoveEmpty.RemoveNbsp: true
-      AutoFormat.RemoveSpansWithoutAttributes: true
-      Core.CollectErrors: false
-#      HTML.AllowedElements:
-#      HTML.AllowedAttributes:
-      HTML.Trusted: true
-      HTML.SafeIframe: true
-      URI.SafeIframeRegexp: "~^(https?:)?//(www\.youtube(?:-nocookie)?\.com/embed/|player\.vimeo\.com/video/)~"
+        HTML.TargetBlank: true
+#        AutoFormat.AutoParagraph: true
+        AutoFormat.Linkify: true
+        AutoFormat.RemoveEmpty: true
+        AutoFormat.RemoveEmpty.RemoveNbsp: true
+        AutoFormat.RemoveSpansWithoutAttributes: true
+        Core.CollectErrors: false
+#        HTML.AllowedElements:
+#        HTML.AllowedAttributes:
+        HTML.Trusted: true
+        HTML.SafeIframe: true
+        URI.SafeIframeRegexp: "~^(https?:)?//(www\.youtube(?:-nocookie)?\.com/embed/|player\.vimeo\.com/video/)~"
 
 liip_imagine:
     driver: %imagine_driver%

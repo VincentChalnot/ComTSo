@@ -4,39 +4,7 @@
 </div>
 <div class="modal-body">
     <h3>Ajout de photos</h3>
-    <form id="photo-upload" action="{{ oneup_uploader_endpoint('photos') }}" method="POST" enctype="multipart/form-data">
-        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-        <div class="fileupload-buttonbar">
-            <div class="btn-group">
-                <!-- The fileinput-button span is used to style the file input field as button -->
-                <span class="btn btn-success fileinput-button" title="Ajouter des photos">
-                    <i class="fa fa-plus"></i>
-                    <span>Ajouter</span>
-                    <input type="file" name="files[]" multiple>
-                </span>
-                <button type="reset" class="btn btn-warning cancel" title="Annuler tout">
-                    <i class="fa fa-ban"></i>
-                    <span>Annuler</span>
-                </button>
-                <button type="submit" class="btn btn-primary start" title="Commencer à envoyer les fichiers">
-                    <i class="fa fa-upload"></i>
-                    <span>Lancer l'upload</span>
-                </button>
-            </div>
-            <span class="fileupload-process"></span>
-            <!-- The global progress state -->
-            <div class="fileupload-progress fade">
-                <!-- The global progress bar -->
-                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar progress-bar-success" style="width:0;"></div>
-                </div>
-                <!-- The extended global progress state -->
-                <div class="progress-extended">&nbsp;</div>
-            </div>
-        </div>
-        <!-- The table listing the files available for upload/download -->
-        <table role="presentation" class="table table-striped"><tbody class="files"></tbody></table>
-    </form>
+    {% include "@ComTSoForum/Photo/uploader.form.html.twig" %}
     <div class="photo-selector" {% if targetWidget is defined %}data-target-widget="{{ targetWidget }}"{% endif %}>
         {% if photos is defined %}
             {% include 'ComTSoForumBundle:Photo:selector.html.twig' %}

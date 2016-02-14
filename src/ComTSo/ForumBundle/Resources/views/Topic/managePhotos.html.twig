@@ -5,7 +5,10 @@
 {% block topic_actions %}
     <div class="btn-group-vertical col-sm-10 entity-actions">
         <a href="{{ topic|path }}" class="btn btn-default"><i class="fa fa-arrow-left"></i> Retour</a>
-        <a href="{{ topic|path('add_photos') }}" class="btn btn-info"><i class="fa fa-camera-retro"></i> Ajouter des photos</a>
+        <a href="#topic_add_photos" class="btn btn-info" title="Ajouter des photos"><i class="fa fa-camera-retro"></i>
+            Ajouter des photos</a>
+        <a href="{{ topic|path('manage_photos', {orderByDate: 1}) }}" class="btn btn-default"
+           title="Trier les photos par date de prise de vue"><i class="fa fa-sort-numeric-asc"></i> Trier les photos</a>
     </div>
 {% endblock %}
 
@@ -14,71 +17,22 @@
     <p class="text-info"><small><i class="fa fa-question-circle"></i> Cliquez sur une photo pour faire apparaître les actions possibles, glissez-déposez les photos pour les réordonner.</small></p>
     {% spaceless %}
         {% if topic.photos %}
-            <div class="topic-photos" id="sortable-photos">
-                {% for photoTopic in topic.photos %}
-                    {% set photo = photoTopic.photo %}
-                    {% if photo %}
-                        <div class="img-thumbnail" title="{{ photo.title }}" data-id="{{ photo.id }}">
-                            {% include 'ComTSoForumBundle:Photo:image.html.twig' with {filter: 'thumbnail'} %}
-                            <div class="btn-group">
-                                <a href="{{ photo|path('edit')}}" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
-                                <a href="{{ topic|path('remove_photo', {'remove': photoTopic.id}) }}" class="btn btn-primary" data-action="remove"><i class="fa fa-times"></i></a>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-                <div class="clear"></div>
+            <div class="topic-photos" id="sortable-photos" data-id="{{ topic.id }}" data-forum-id="{{ forum.id }}">
+                {% include "@ComTSoForum/Topic/managePhotos.list.html.twig" %}
             </div>
         {% endif %}
     {% endspaceless %}
     <hr class="clear">
-    <div class="text-center">
-        <div class="btn-group">
-            <a href="{{ topic|path('add_photos') }}" class="btn btn-info" title="Ajouter des photos"><i class="fa fa-camera-retro"></i> Ajouter des photos</a>
-        </div>
-    </div>
+    <h4 id="topic_add_photos">Ajout de photos</h4>
+    {% include 'ComTSoForumBundle:Photo:uploader.form.html.twig' %}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script>
         $(document).ready(function(){
-            var sortablePhotos = $('#sortable-photos');
-            sortablePhotos.find('.img-thumbnail').on('mousedown', function (e) {
-                var t = $(this);
-                t.siblings().removeClass('selected');
-                t.addClass('selected');
-            });
-
-            sortablePhotos.find('.img-thumbnail a[data-action="remove"]').click(function (e) {
-                var t = $(this);
-                $.ajax($(this).attr('href'), {
-                    success: function() {
-                        t.parents('.img-thumbnail').first().remove();
-                    }
-                });
-                e.preventDefault();
-                return false;
-            });
-            
-            var timeout = null;
-            sortablePhotos.sortable({
-                scroll: true,
-                update: function(e, ui) {
-                    var t = $(e.target);
-                    if (timeout) {
-                        window.clearTimeout(timeout);
-                    }
-                    timeout = window.setTimeout(function() {
-                        updatePhotoOrder(t);
-                    }, 1000);
-                },
-                start: function(e, ui) {
-                    if (timeout) {
-                        window.clearTimeout(timeout);
-                    }
-                }
-            });
+            oneUploadAlbumFormInit($('#photo-upload'));
+            triggerSortablePhotos($('#sortable-photos'));
         });
     </script>
 {% endblock %}

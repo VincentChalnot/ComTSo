@@ -84,6 +84,13 @@ class Photo implements \JsonSerializable, Routable
     protected $exif;
 
     /**
+     * Exif data
+     * @var string
+     * @ORM\Column(type="json_array", nullable=true)
+     */
+    protected $jsonExif;
+
+    /**
      * Topics associated to this photo
      * @var PhotoTopic[]
      * @ORM\OneToMany(targetEntity="ComTSo\ForumBundle\Entity\PhotoTopic", mappedBy="photo", cascade={"persist"})
@@ -160,6 +167,9 @@ class Photo implements \JsonSerializable, Routable
 
     public function getExif()
     {
+        if ($this->jsonExif) {
+            return $this->jsonExif;
+        }
         return $this->exif;
     }
 
@@ -214,7 +224,7 @@ class Photo implements \JsonSerializable, Routable
 
     public function setExif($exif)
     {
-        $this->exif = $exif;
+        $this->jsonExif = $exif;
 
         return $this;
     }

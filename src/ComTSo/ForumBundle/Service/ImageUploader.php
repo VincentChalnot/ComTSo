@@ -3,6 +3,8 @@
 namespace ComTSo\ForumBundle\Service;
 
 use ComTSo\ForumBundle\Entity\Photo;
+use ComTSo\ForumBundle\Entity\PhotoTopic;
+use ComTSo\ForumBundle\Entity\TopicRepository;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Exception;
@@ -135,6 +137,10 @@ class ImageUploader
         return $photo;
     }
 
+    /**
+     * @param PostPersistEvent $event
+     * @throws Exception
+     */
     public function onUpload(PostPersistEvent $event)
     {
         $photo = $this->handleFile($event->getFile());
@@ -148,6 +154,11 @@ class ImageUploader
         $em = $this->doctrine->getManager();
         $em->persist($photo);
         $em->flush();
+
+        $topicId = $event->getRequest()->get('topicId');
+        if ($topicId) {
+            $this->addPhotoTopic($photo, $topicId);
+        }
 
         $response = $event->getResponse();
         $response['files'] = [
@@ -181,5 +192,25 @@ class ImageUploader
         }
 
         return $this->router->generate('comtso_photo_source_cache', ['filter' => $filter, 'filename' => $photo->getFilename()]);
+    }
+
+    protected function addPhotoTopic(Photo $photo, $topicId)
+    {
+        /** @var TopicRepository $topicRepo */
+        $topic = $this->doctrine->getRepository('ComTSoForumBundle:Topic')->find($topicId);
+        if ($topic) {
+            $lastPhoto = $this->doctrine->getRepository('ComTSoForumBundle:PhotoTopic')->findLast($topic);
+            $order = $lastPhoto ? $lastPhoto->getOrder() + 1 : 0;
+
+            $photoTopic = new PhotoTopic();
+            $photoTopic->setPhoto($photo)
+                ->setTopic($topic)
+                ->setOrder($order)
+                ->setAuthor($this->getUser());
+
+            $em = $this->doctrine->getManager();
+            $em->persist($photoTopic);
+            $em->flush();
+        }
     }
 }
