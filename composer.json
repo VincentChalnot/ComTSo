@@ -4,7 +4,9 @@
     "type": "project",
     "description": "Symfony2 based forum with photo albums",
     "autoload": {
-        "psr-0": {"": "src/"}
+        "psr-0": {
+            "ComTSo": "src/ComTSo"
+        }
     },
     "repositories": [
         {
@@ -14,7 +16,7 @@
     ],
     "require": {
         "php": ">=5.5",
-        "symfony/symfony": "~2.6",
+        "symfony/symfony": "~2.7.1",
         "doctrine/orm": "~2.2,>=2.2.3,<2.5",
         "doctrine/doctrine-bundle": "~1.2",
         "stof/doctrine-extensions-bundle": "1.2.*@dev",
@@ -26,21 +28,24 @@
         "sensio/framework-extra-bundle": "~3.0",
         "sensio/generator-bundle": "~2.3",
         "incenteev/composer-parameter-handler": "~2.0",
-        "friendsofsymfony/user-bundle": "~2.0@dev",
+        "friendsofsymfony/user-bundle": "~1.3",
+        "white-october/pagerfanta-bundle": "~1.0",
+
         "friendsofsymfony/jsrouting-bundle": "~1.5",
-        "mopa/bootstrap-bundle": "3.*@dev",
-        "twbs/bootstrap-sass": "3.*@dev",
-        "log0ymxm/bootswatch-scss": "dev-master",
-        "components/jquery": "1.11.*",
-        "components/jqueryui": "1.11.*",
         "nc/elephantio-bundle": "~2.0",
+        "mopa/bootstrap-bundle": "~3.0",
+        "twbs/bootstrap-sass": "~3.3.0",
+        "components/jquery": "~1.11",
+        "components/jqueryui": "~1.11",
+        "robloach/component-installer": "~0.2",
+        "log0ymxm/bootswatch-scss": "dev-master",
+
         "oneup/uploader-bundle": "1.3.*",
-        "liip/imagine-bundle": "1.0.*@dev",
-        "phpexiftool/phpexiftool": "0.3.*@dev",
+        "liip/imagine-bundle": "1.5.*",
+        "phpexiftool/phpexiftool": "0.4.*",
         "jolicode/jolitypo-bundle": "dev-master",
         "mjohnson/decoda": "~6.6",
-        "exercise/htmlpurifier-bundle": "~1.0@dev",
-        "white-october/pagerfanta-bundle": "~1.0"
+        "exercise/htmlpurifier-bundle": "~1.0@dev"
     },
     "scripts": {
         "post-install-cmd": [
