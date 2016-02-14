@@ -5,7 +5,7 @@
     "description": "Symfony2 based forum with photo albums",
     "autoload": {
         "psr-0": {
-            "ComTSo": "src/ComTSo"
+            "": "src/"
         }
     },
     "repositories": [

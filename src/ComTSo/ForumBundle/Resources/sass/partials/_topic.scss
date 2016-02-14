@@ -24,6 +24,7 @@
             float: left;
             display: block;
             vertical-align: middle;
+            background: image-url("ajax-loader.gif") center center no-repeat;
             &.selected {
                 border-color: $brand-primary;
             }

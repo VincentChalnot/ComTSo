@@ -1,3 +1,40 @@
+function triggerSortablePhotos(sortablePhotos) {
+    sortablePhotos.find('.img-thumbnail').on('mousedown', function (e) {
+        var t = $(this);
+        t.siblings().removeClass('selected');
+        t.addClass('selected');
+    });
+
+    sortablePhotos.find('.img-thumbnail a[data-action="remove"]').click(function (e) {
+        var t = $(this);
+        $.ajax($(this).attr('href'), {
+            success: function () {
+                t.parents('.img-thumbnail').first().remove();
+            }
+        });
+        e.preventDefault();
+        return false;
+    });
+
+    var timeout = null;
+    sortablePhotos.sortable({
+        scroll: true,
+        update: function (e, ui) {
+            var t = $(e.target);
+            if (timeout) {
+                window.clearTimeout(timeout);
+            }
+            timeout = window.setTimeout(function () {
+                updatePhotoOrder(t);
+            }, 1000);
+        },
+        start: function (e, ui) {
+            if (timeout) {
+                window.clearTimeout(timeout);
+            }
+        }
+    });
+}
 
 var timeout = null;
 var updatePhotoOrder = function (t) {
@@ -161,6 +198,34 @@ $(document).ready(function(){
             }
         });
     };
+
+    oneUploadAlbumFormInit = function (el) {
+        var t = $('.topic-photos');
+        el.fileupload({
+            // Uncomment the following to send cross-domain cookies:
+            //xhrFields: {withCredentials: true},
+            url: Routing.generate('_uploader_upload_photos', {
+                topicId: t.data('id')
+            }),
+            autoUpload: true,
+            // Enable image resizing, except for Android and Opera,
+            // which actually support image resizing, but fail to
+            // send Blob objects via XHR requests:
+            disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator.userAgent),
+            maxFileSize: 5000000,
+            acceptFileTypes: /(\.|\/)(gif|jpe?g|png|bmp)$/i,
+            done: function (e, o) {
+                t.load(Routing.generate('comtso_topic_manage_photos', {
+                    id: t.data('id'),
+                    forumId: t.data('forum-id')
+                }), function () {
+                    triggerSortablePhotos($('#sortable-photos'));
+                });
+                o.context.remove();
+            }
+        });
+    };
+
     
     $(document).on('loaded.bs.modal', '#photo-browser', function(e) {
         oneUploadFormInit($('#photo-upload'));

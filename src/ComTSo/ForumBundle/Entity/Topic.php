@@ -3,6 +3,7 @@
 namespace ComTSo\ForumBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -40,7 +41,7 @@ class Topic implements Routable
 
     /**
      * Comments associated to this topic
-     * @var PhotoTopic[]
+     * @var PhotoTopic[]|Collection
      * @ORM\OneToMany(targetEntity="ComTSo\ForumBundle\Entity\PhotoTopic", mappedBy="topic", cascade={"persist"})
      * @ORM\OrderBy({"order" = "ASC"})
      */
@@ -163,10 +164,10 @@ class Topic implements Routable
     /**
      * Add photos
      *
-     * @param  Photo $photo
+     * @param  PhotoTopic $photo
      * @return Topic
      */
-    public function addPhoto(Photo $photo)
+    public function addPhoto(PhotoTopic $photo)
     {
         $this->photos[] = $photo;
 
@@ -176,9 +177,9 @@ class Topic implements Routable
     /**
      * Remove photos
      *
-     * @param Photo $photo
+     * @param PhotoTopic $photo
      */
-    public function removePhoto(Photo $photo)
+    public function removePhoto(PhotoTopic $photo)
     {
         $this->photos->removeElement($photo);
     }
@@ -186,7 +187,7 @@ class Topic implements Routable
     /**
      * Get photos
      *
-     * @return Photo[]|ArrayCollection
+     * @return PhotoTopic[]|Collection
      */
     public function getPhotos()
     {

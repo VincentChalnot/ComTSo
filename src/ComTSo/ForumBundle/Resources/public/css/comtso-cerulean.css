@@ -10013,7 +10013,8 @@ textarea {
 .topic .topic-photos .img-thumbnail {
     float: left;
     display: block;
-    vertical-align: middle
+    vertical-align: middle;
+    background: url('../img/ajax-loader.gif?1412448000') center center no-repeat
 }
 
 .topic .topic-photos .img-thumbnail.selected {

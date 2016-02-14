@@ -58,20 +58,19 @@ class TopicController extends BaseController
         $builder->add('content', 'textarea', ['horizontal' => false, 'label_render' => false, 'attr' => ['placeholder' => 'Nouveau commentaire…']]);
 
         $form = $builder->getForm();
-        if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                $topic->setUpdatedAt(new DateTime());
-                $comment->setContent($this->cleanHtml($comment->getContent()));
-                
-                // Saving object
-                $em = $this->getManager();
-                $em->persist($comment);
-                $em->flush();
 
-                $this->addFlashMsg('success', 'Commentaire enregistré');
-                return $this->redirectToTopic($topic);
-            }
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $topic->setUpdatedAt(new DateTime());
+            $comment->setContent($this->cleanHtml($comment->getContent()));
+
+            // Saving object
+            $em = $this->getManager();
+            $em->persist($comment);
+            $em->flush();
+
+            $this->addFlashMsg('success', 'Commentaire enregistré');
+            return $this->redirectToTopic($topic);
         }
 
         $this->viewParameters['form'] = $form->createView();
@@ -99,19 +98,17 @@ class TopicController extends BaseController
 
         $form = $this->createForm(new TopicType(), $topic, ['label' => 'Édition du topic']);
 
-        if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                $topic->setUpdatedAt(new DateTime());
-                $topic->setContent($this->cleanHtml($topic->getContent()));
-                
-                $em = $this->getManager();
-                $em->persist($topic);
-                $em->flush();
+        $form->handleRequest($request);
+        if ($form->isValid()) {
+            $topic->setUpdatedAt(new DateTime());
+            $topic->setContent($this->cleanHtml($topic->getContent()));
 
-                $this->addFlashMsg('success', 'Topic mis à jour');
-                return $this->redirectToTopic($topic);
-            }
+            $em = $this->getManager();
+            $em->persist($topic);
+            $em->flush();
+
+            $this->addFlashMsg('success', 'Topic mis à jour');
+            return $this->redirectToTopic($topic);
         }
 
         $this->viewParameters['form'] = $form->createView();
@@ -121,60 +118,55 @@ class TopicController extends BaseController
 
     /**
      * @Template()
+     * @param Request $request
      * @param Topic $topic
      * @param $forumId
      * @return array|RedirectResponse
      */
-    public function managePhotosAction(Topic $topic, $forumId)
+    public function managePhotosAction(Request $request, Topic $topic, $forumId)
     {
         $response = $this->initTopic($topic, $forumId);
         if ($response instanceof Response) {
             return $response;
         }
 
-        return $this->viewParameters;
-    }
+        if ($request->get('orderByDate')) {
+            $em = $this->getManager();
+            /** @var PhotoTopic[] $photoTopics */
+            $photoTopics = [];
+            foreach ($topic->getPhotos() as $photoTopic) {
+                $photo = $photoTopic->getPhoto();
+                if (!$photo) {
+                    $em->remove($photoTopic);
+                }
+                $takenAt = $photo->getTakenAt('U');
+                if (!$takenAt) {
+                    $takenAt = $photo->getFileModifiedAt('U');
+                }
+                if (!$takenAt) {
+                    $takenAt = $photo->getCreatedAt('U');
+                }
 
-
-    /**
-     * @Template()
-     * @param Request $request
-     * @param Topic $topic
-     * @param $forumId
-     * @return array|RedirectResponse|Response
-     */
-    public function addPhotosAction(Request $request, Topic $topic, $forumId)
-    {
-        $response = $this->initTopic($topic, $forumId);
-        if ($response instanceof Response) {
-            return $response;
+                $photoTopics[$takenAt . '-' . $photoTopic->getId()] = $photoTopic;
+            }
+            ksort($photoTopics);
+            $order = 0;
+            foreach ($photoTopics as $photoTopic) {
+                $photoTopic->setOrder($order++);
+            }
+            $em->flush();
+            $this->addFlash('success', 'Les photos ont été triées selon leur date de prise');
+            return $this->redirectToRoute('comtso_topic_manage_photos', $topic->getRoutingParameters());
         }
-
-        $ids = [];
-        foreach ($topic->getPhotos() as $photo) {
-            $ids[] = $photo->getPhoto()->getId();
-        }
-        $qb = $this->getRepository('ComTSoForumBundle:Photo')->createQueryBuilder('e');
-        if ($ids) {
-            $qb->andWhere('e.id NOT IN (:ids)')
-                    ->setParameter('ids', $ids);
-        }
-        $qb->andWhere('e.author = :user')
-            ->setParameter('user', $this->getUser())
-            ->addOrderBy('e.createdAt', 'DESC');
-
-        $photos = $this->createPager($qb, $request);
-        $this->viewParameters['photos'] = $photos;
 
         if ($request->isXmlHttpRequest()) {
-            return $this->render('ComTSoForumBundle:Photo:selector.html.twig', $this->viewParameters);
+            return $this->render('ComTSoForumBundle:Topic:managePhotos.list.html.twig', $this->viewParameters);
         }
 
         return $this->viewParameters;
     }
 
     /**
-     * @Template()
      * @param Request $request
      * @param Topic $topic
      * @param $forumId
@@ -212,7 +204,6 @@ class TopicController extends BaseController
     }
 
     /**
-     * @Template()
      * @param Request $request
      * @param Topic $topic
      * @param $forumId
@@ -241,7 +232,6 @@ class TopicController extends BaseController
     }
 
     /**
-     * @Template()
      * @param Request $request
      * @param Topic $topic
      * @param $forumId
@@ -272,7 +262,6 @@ class TopicController extends BaseController
     }
 
     /**
-     * @Template()
      * @param Request $request
      * @param Topic $topic
      * @param $forumId
