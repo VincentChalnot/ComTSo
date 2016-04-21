@@ -13,7 +13,7 @@ set :composer_options,  "--verbose --prefer-dist --optimize-autoloader --no-prog
 
 set :writable_dirs,        ["app/cache", "app/logs", "app/data"]
 set :webserver_user,       "www-data"
-set :permission_method,    :acl
+set :permission_method,    :chown
 set :use_set_permissions,  true
 
 set :dump_assetic_assets, true
