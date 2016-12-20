@@ -17,7 +17,7 @@ install: required
 	php app/console assets:install web --symlink
 	php app/console assetic:dump
 	php app/console assetic:dump --env=prod --no-debug
-	php app/console doctrine:schema:validate 2> /dev/null
+	php app/console doctrine:schema:validate; true
 	
 bundle: required
 ifndef BUNDLER
