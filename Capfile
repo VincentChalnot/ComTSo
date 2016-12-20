@@ -17,7 +17,9 @@ set :dump_assetic_assets, true
 set :shared_files,        ["app/config/parameters.yml"]
 set :shared_children,     [app_path + "/logs", app_path + "/data", web_path + "/uploads"]
 set :use_composer,        true
+set :composer_bin,        "composer"
 set :update_vendors,      false
+set :copy_vendors,        true
 
 set :repository,       "git@github.com:VincentChalnot/ComTSo.git"
 set :scm,              :git
@@ -28,10 +30,17 @@ set :keep_releases,  3
 
 require 'capistrano/ext/multistage'
 
+before "symfony:composer:install", "make:install"
 after :deploy, "deploy:cleanup", "phpfpm:restart"
 
 namespace :phpfpm do
     task :restart, :roles => :app do
       run "sudo service php5-fpm restart"
+    end
+end
+
+namespace :make do
+    task :install, :roles => :app do
+      run "cd #{latest_release} && make install"
     end
 end
