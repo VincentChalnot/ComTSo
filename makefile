@@ -6,16 +6,11 @@ all:
 ifndef COMPOSER
     $(error "composer is not available please install composer https://getcomposer.org/")
 endif
-ifndef BUNDLER
-    $(error "bundler is not available please install bundler using gem")
-endif
 ifndef NPM
     $(error "npm is not available please install npm using your package manager")
 endif
 	composer install
-	bundle install
 	npm install
-
 
 install: all
 	php app/console cache:clear --env=prod --no-debug;
@@ -23,6 +18,16 @@ install: all
 	php app/console assetic:dump;
 	php app/console assetic:dump --env=prod --no-debug;
 	php app/console doctrine:schema:validate
+	
+bundle: all
+ifndef BUNDLER
+    $(error "bundler is not available please install bundler using gem")
+endif
+	bundle install
 
-deploy: all
+
+deploy: bundle
 	bundle exec cap deploy
+
+build:	bundle
+	bundle exec compass compile
