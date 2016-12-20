@@ -1,0 +1,8 @@
+{
+  "name": "comtso",
+  "version": "1.0.0",
+  "dependencies": {
+    "uglify-js": "^2.7.5",
+    "uglifycss": "^0.0.25"
+  }
+}

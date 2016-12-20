@@ -44,9 +44,9 @@ assetic:
     filters:
         cssrewrite: ~
         uglifyjs2:
-            bin: /usr/local/bin/uglifyjs
+            bin: "%kernel.root_dir%/../node_modules/uglify-js/bin/uglifyjs"
         uglifycss:
-            bin: /usr/local/bin/uglifycss
+            bin: "%kernel.root_dir%/../node_modules/uglifycss/uglifycss"
     assets:
         map1:
             input: "%kernel.root_dir%/../web/assets/jquery/jquery.min.map"
