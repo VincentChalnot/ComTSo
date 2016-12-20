@@ -2,7 +2,7 @@ COMPOSER := $(shell command -v composer 2> /dev/null)
 BUNDLER := $(shell command -v bundle 2> /dev/null)
 NPM := $(shell command -v npm 2> /dev/null)
 
-all:
+required:
 ifndef COMPOSER
     $(error "composer is not available please install composer https://getcomposer.org/")
 endif
@@ -12,19 +12,18 @@ endif
 	composer install
 	npm install
 
-install: all
+install: required
 	php app/console cache:clear --env=prod --no-debug;
 	php app/console assets:install web --symlink;
 	php app/console assetic:dump;
 	php app/console assetic:dump --env=prod --no-debug;
 	php app/console doctrine:schema:validate
 	
-bundle: all
+bundle: required
 ifndef BUNDLER
     $(error "bundler is not available please install bundler using gem")
 endif
 	bundle install
-
 
 deploy: bundle
 	bundle exec cap deploy
