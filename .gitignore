@@ -17,3 +17,6 @@
 /web/images/avatars/
 /backups
 /node_modules/
+
+.env
+.idea/

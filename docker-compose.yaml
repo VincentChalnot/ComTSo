@@ -1,0 +1,56 @@
+version: '3.4'
+
+services:
+  php-fpm:
+    build: .docker/php-fpm
+    working_dir: /var/www/html
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - .docker/php-fpm/conf.d/symfony.ini:/usr/local/etc/php/conf.d/symfony.ini
+      - ./:/var/www/html
+    environment:
+      PHP_IDE_CONFIG: 'serverName=comtso.dev.local'
+      COMPOSER_MEMORY_LIMIT: -1
+      XDEBUG_CONFIG: remote_enable=1
+
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      - php-fpm
+    networks:
+      default: ~
+      proxy:
+        aliases:
+          - 'comtso.dev.local'
+    volumes:
+      - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./:/var/www/html
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.comtso.rule=Host(`comtso.dev.local`)"
+      - "traefik.http.routers.comtso.entrypoints=http"
+#      - "traefik.http.routers.comtso.tls=true"
+#      - "traefik.http.routers.comtso.tls.certresolver=le"
+
+  mysql:
+    image: mariadb:10.3
+    ports:
+      - "3306:3306"
+    volumes:
+      - volume_mysql:/var/lib/mysql
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_DATABASE: comtso
+      MYSQL_USER: comtso
+      MYSQL_PASSWORD: comtso
+
+networks:
+  default:
+  proxy:
+    name: proxy
+    external: true
+
+volumes:
+  volume_mysql:
+    driver: local
