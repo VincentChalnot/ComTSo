@@ -10,8 +10,6 @@ services:
             - @router
             - @doctrine
             - %brand.name%
-            - %owa.baseUrl%
-            - %owa.siteId%
         tags:
             - { name: 'twig.extension' }
 

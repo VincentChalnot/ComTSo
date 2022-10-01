@@ -35,18 +35,14 @@ class ForumExtension extends Twig_Extension
     protected $doctrine;
 
     protected $brandName;
-    protected $owaBaseUrl;
-    protected $owaSiteId;
 
-    public function __construct(FilterConfiguration $liipFilterConfiguration, ConfigHandler $configHandler, RouterInterface $router, Registry $doctrine, $brandName, $owaBaseUrl, $owaSiteId)
+    public function __construct(FilterConfiguration $liipFilterConfiguration, ConfigHandler $configHandler, RouterInterface $router, Registry $doctrine, $brandName)
     {
         $this->liipFilterConfiguration = $liipFilterConfiguration;
         $this->configHandler = $configHandler;
         $this->router = $router;
         $this->doctrine = $doctrine;
         $this->brandName = $brandName;
-        $this->owaBaseUrl = $owaBaseUrl;
-        $this->owaSiteId = $owaSiteId;
     }
 
     public function getName()
@@ -127,16 +123,6 @@ class ForumExtension extends Twig_Extension
     public function getBrandName()
     {
         return $this->brandName;
-    }
-
-    public function getOwaBaseUrl()
-    {
-        return $this->owaBaseUrl;
-    }
-
-    public function getOwaSiteId()
-    {
-        return $this->owaSiteId;
     }
 
     protected function skipNonMatching($text, $terms)
