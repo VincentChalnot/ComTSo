@@ -41,10 +41,10 @@ endif
 	# Use backup vendor directory
 	ssh '${REMOTE_ADDR}' "mkdir -p '${REMOTE_FOLDER}/vendor' && rsync -a '${REMOTE_FOLDER}/vendor/' '${RELEASE}/vendor/'"
 	# Launch composer install in staging
-	ssh '${REMOTE_ADDR}' "cd '${REMOTE_FOLDER}' && docker compose run --rm staging"
+	ssh '${REMOTE_ADDR}' "cd '${REMOTE_FOLDER}' && docker compose build staging && docker compose run --rm staging"
 	# Backup vendor directory
 	ssh '${REMOTE_ADDR}' "rsync -a '${RELEASE}/vendor/' '${REMOTE_FOLDER}/vendor/'"
 	# Deploy
 	ssh '${REMOTE_ADDR}' "rm -rf '${REMOTE_FOLDER}/current' && ln -sf '${RELEASE}' '${REMOTE_FOLDER}/current'"
 	# Ensure docker compose is up
-	ssh '${REMOTE_ADDR}' "cd '${REMOTE_FOLDER}' && docker compose up --build -d"
+	ssh '${REMOTE_ADDR}' "cd '${REMOTE_FOLDER}' && docker compose up --build --force-recreate --remove-orphans -d"
