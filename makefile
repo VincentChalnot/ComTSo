@@ -48,3 +48,11 @@ endif
 	ssh '${REMOTE_ADDR}' "rm -rf '${REMOTE_FOLDER}/current' && ln -sf '${RELEASE}' '${REMOTE_FOLDER}/current'"
 	# Ensure docker compose is up
 	ssh '${REMOTE_ADDR}' "cd '${REMOTE_FOLDER}' && docker compose up --build --force-recreate --remove-orphans -d"
+
+
+.PHONY: backup
+backup: .env ## Backup remote database and files
+	# Create database backup
+	ssh '${REMOTE_ADDR}' "cd '${REMOTE_FOLDER}' && docker compose exec mysql sh -c 'mysqldump -u\"\$$MYSQL_USER\" -p\"\$$MYSQL_PASSWORD\" \"\$$MYSQL_DATABASE\"' > '${SHARED_FOLDER}/app/data/dumps/${CURRENT_DATE}.sql' && gzip '${SHARED_FOLDER}/app/data/dumps/${CURRENT_DATE}.sql'"
+	# rsync shared folder to local, excluding app/data/photos/cache:
+	rsync -aqz --exclude 'photos/cache/' '${REMOTE_ADDR}:${SHARED_FOLDER}/app/data/' './app/data/'
