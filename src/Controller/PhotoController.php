@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Photo;
 use App\Repository\PhotoRepository;
+use App\Service\ImageProcessingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -37,13 +38,22 @@ class PhotoController extends AbstractController
 
     #[Route('/api/upload', name: 'photo_api_upload', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function apiUpload(Request $request, SluggerInterface $slugger, EntityManagerInterface $entityManager): JsonResponse
-    {
+    public function apiUpload(
+        Request $request,
+        SluggerInterface $slugger,
+        EntityManagerInterface $entityManager,
+        ImageProcessingService $imageService
+    ): JsonResponse {
         /** @var UploadedFile $file */
         $file = $request->files->get('file');
 
         if (!$file) {
             return new JsonResponse(['error' => 'No file uploaded'], 400);
+        }
+
+        // Validate image
+        if (!$imageService->validateImage($file)) {
+            return new JsonResponse(['error' => 'Invalid image file'], 400);
         }
 
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -59,6 +69,8 @@ class PhotoController extends AbstractController
             return new JsonResponse(['error' => 'Upload failed'], 500);
         }
 
+        $filepath = $this->getParameter('photos_directory') . '/' . $newFilename;
+
         $photo = new Photo();
         $photo->setFilename($newFilename);
         $photo->setOriginalFilename($file->getClientOriginalName());
@@ -67,20 +79,19 @@ class PhotoController extends AbstractController
         $photo->setAuthor($this->getUser());
 
         // Extract image dimensions
-        $filepath = $this->getParameter('photos_directory') . '/' . $newFilename;
-        if ($imageInfo = @getimagesize($filepath)) {
-            $photo->setWidth($imageInfo[0]);
-            $photo->setHeight($imageInfo[1]);
+        $dimensions = $imageService->getImageDimensions($filepath);
+        if ($dimensions) {
+            $photo->setWidth($dimensions['width']);
+            $photo->setHeight($dimensions['height']);
         }
 
         // Extract EXIF data
-        if (function_exists('exif_read_data')) {
-            $exif = @exif_read_data($filepath);
-            if ($exif) {
-                $photo->setExif($exif);
-                if (isset($exif['DateTimeOriginal'])) {
-                    $photo->setTakenAt(new \DateTime($exif['DateTimeOriginal']));
-                }
+        $exif = $imageService->extractExif($filepath);
+        if ($exif) {
+            $photo->setExif($exif);
+            $takenDate = $imageService->extractTakenDate($exif);
+            if ($takenDate) {
+                $photo->setTakenAt($takenDate);
             }
         }
 
