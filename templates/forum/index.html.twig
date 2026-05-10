@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forums{% endblock %}
+
+{% block body %}
+<h1 class="title">Forums</h1>
+
+{% for forum in forums %}
+    <div class="box">
+        <h2 class="title is-4">
+            <a href="{{ path('forum_show', {'id': forum.id}) }}">{{ forum.title }}</a>
+        </h2>
+        {% if forum.content %}
+            <p>{{ forum.content }}</p>
+        {% endif %}
+    </div>
+{% endfor %}
+{% endblock %}

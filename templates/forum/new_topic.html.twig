@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Topic in {{ forum.title }}{% endblock %}
+
+{% block body %}
+<h1 class="title">New Topic in {{ forum.title }}</h1>
+
+<div class="box">
+    {{ form_start(form) }}
+        <div class="field">
+            {{ form_label(form.title, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">
+                {{ form_widget(form.title, {'attr': {'class': 'input'}}) }}
+            </div>
+            {{ form_errors(form.title) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.content, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">
+                {{ form_widget(form.content, {'attr': {'class': 'textarea'}}) }}
+            </div>
+            {{ form_errors(form.content) }}
+        </div>
+
+        <div class="field is-grouped">
+            <div class="control">
+                <button type="submit" class="button is-primary">Create Topic</button>
+            </div>
+            <div class="control">
+                <a href="{{ path('forum_show', {'id': forum.id}) }}" class="button is-light">Cancel</a>
+            </div>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

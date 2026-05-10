@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ topic.title }}{% endblock %}
+
+{% block body %}
+<nav class="breadcrumb" aria-label="breadcrumbs">
+    <ul>
+        <li><a href="{{ path('app_home') }}">Home</a></li>
+        <li><a href="{{ path('forum_show', {'id': topic.forum.id}) }}">{{ topic.forum.title }}</a></li>
+        <li class="is-active"><a href="#" aria-current="page">{{ topic.title }}</a></li>
+    </ul>
+</nav>
+
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">{{ topic.title }}</h1>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <span class="tag">{{ topic.views }} views</span>
+            <span class="tag ml-2">{{ topic.commentCount }} comments</span>
+        </div>
+    </div>
+</div>
+
+<div class="box">
+    <div class="media">
+        <div class="media-content">
+            <div class="content">
+                {% if topic.content %}
+                    <p>{{ topic.content|nl2br }}</p>
+                {% endif %}
+            </div>
+            <p class="is-size-7">
+                Posted by {{ topic.author.username }} on {{ topic.createdAt|date('Y-m-d H:i') }}
+                {% if topic.author == app.user or is_granted('ROLE_ADMIN') %}
+                    • <a href="{{ path('topic_edit', {'forumId': topic.forum.id, 'id': topic.id}) }}">Edit</a>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<h2 class="subtitle mt-5">Comments</h2>
+
+{% for comment in comments %}
+    <div class="box comment-item">
+        <div class="media">
+            <div class="media-content">
+                <div class="content">
+                    <p>{{ comment.content|nl2br }}</p>
+                </div>
+                <p class="is-size-7">
+                    by {{ comment.author.username }} on {{ comment.createdAt|date('Y-m-d H:i') }}
+                    {% if comment.author == app.user or is_granted('ROLE_ADMIN') %}
+                        • <a href="{{ path('comment_edit', {'id': comment.id}) }}">Edit</a>
+                        • <form method="post" action="{{ path('comment_delete', {'id': comment.id}) }}" style="display: inline;">
+                            <button type="submit" class="button is-small is-danger is-light" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <p>No comments yet. Be the first to comment!</p>
+{% endfor %}
+
+{% if app.user %}
+    <div class="box mt-5">
+        <h3 class="title is-5">Add a Comment</h3>
+        <form method="post" action="{{ path('comment_create', {'forumId': topic.forum.id, 'topicId': topic.id}) }}">
+            <div class="field">
+                <div class="control">
+                    <textarea name="comment[content]" class="textarea" rows="5" required></textarea>
+                </div>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <button type="submit" class="button is-primary">Post Comment</button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% else %}
+    <div class="notification is-info is-light mt-5">
+        Please <a href="{{ path('app_login') }}">log in</a> to post a comment.
+    </div>
+{% endif %}
+{% endblock %}
