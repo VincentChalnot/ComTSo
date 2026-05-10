@@ -1,0 +1,125 @@
+// Import Bulma CSS framework
+@import 'bulma/bulma.sass';
+
+// Custom variables (must come before Bulma import in a real setup)
+$primary: #00a99d;
+$link: #3273dc;
+
+// Custom theme variables for light/dark mode
+:root {
+  --background-color: #fff;
+  --text-color: #4a4a4a;
+  --border-color: #dbdbdb;
+  --card-background: #fff;
+  --navbar-background: #fff;
+}
+
+[data-theme="dark"] {
+  --background-color: #1a1a1a;
+  --text-color: #f5f5f5;
+  --border-color: #3a3a3a;
+  --card-background: #2a2a2a;
+  --navbar-background: #2a2a2a;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.card {
+  background-color: var(--card-background);
+}
+
+.navbar {
+  background-color: var(--navbar-background);
+}
+
+// Custom styles for the forum
+.forum-list {
+  margin-top: 2rem;
+}
+
+.topic-item {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+
+  &:hover {
+    background-color: rgba(0, 169, 157, 0.1);
+  }
+}
+
+.comment-item {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.photo-item {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 4px;
+  cursor: pointer;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  max-height: 500px;
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.chat-message {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: rgba(0, 169, 157, 0.1);
+}
+
+// User avatar styles
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+// Utility classes
+.is-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

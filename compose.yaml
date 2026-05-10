@@ -1,53 +1,73 @@
+---
 services:
-  php-fpm:
-    build: .docker/php-fpm
-    working_dir: /var/www/html
-    volumes:
-      - /etc/localtime:/etc/localtime
-      - .docker/php-fpm/conf.d/symfony.ini:/usr/local/etc/php/conf.d/symfony.ini
-      - ./:/var/www/html
+  php:
+    build:
+      context: .
+      target: frankenphp_dev
+    restart: unless-stopped
     environment:
-      PHP_IDE_CONFIG: 'serverName=dev.comtso.fr'
-      COMPOSER_MEMORY_LIMIT: -1
-      XDEBUG_CONFIG: remote_enable=1
-
-  nginx:
-    image: nginx:alpine
-    depends_on:
-      - php-fpm
-    networks:
-      default: ~
-      proxy:
-        aliases:
-          - 'dev.comtso.fr'
+      SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
+      DEFAULT_URI: https://${SERVER_NAME:-localhost}:${HTTPS_PORT:-443}
+      MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
+      MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
+      DATABASE_URL: mysql://${MYSQL_USER:-comtso}:${MYSQL_PASSWORD:-comtso}@database:3306/${MYSQL_DATABASE:-comtso}?serverVersion=11.4-MariaDB&charset=utf8mb4
+      MERCURE_URL: ${CADDY_MERCURE_URL:-http://php/.well-known/mercure}
+      MERCURE_PUBLIC_URL: ${CADDY_MERCURE_PUBLIC_URL:-https://${SERVER_NAME:-localhost}:${HTTPS_PORT:-443}/.well-known/mercure}
+      MERCURE_JWT_SECRET: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
     volumes:
-      - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./:/var/www/html
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-      - "traefik.http.routers.comtso.rule=Host(`dev.comtso.fr`)"
-      - "traefik.http.routers.comtso.entrypoints=http"
-#      - "traefik.http.routers.comtso.tls=true"
-#      - "traefik.http.routers.comtso.tls.certresolver=le"
-
-  mysql:
-    image: mariadb:10.3
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./:/app
+      - ./frankenphp/Caddyfile:/etc/frankenphp/Caddyfile:ro
+      - ./frankenphp/conf.d/10-app.ini:/usr/local/etc/php/app.conf.d/10-app.ini:ro
+      - ./frankenphp/conf.d/20-app.dev.ini:/usr/local/etc/php/app.conf.d/20-app.dev.ini:ro
     ports:
-      - "3306"
-    volumes:
-      - volume_mysql:/var/lib/mysql
-    environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-      MYSQL_DATABASE: comtso
-      MYSQL_USER: comtso
-      MYSQL_PASSWORD: comtso
+      - name: http
+        target: 80
+        published: ${HTTP_PORT:-80}
+        protocol: tcp
+      - name: https
+        target: 443
+        published: ${HTTPS_PORT:-443}
+        protocol: tcp
+      - name: http3
+        target: 443
+        published: ${HTTP3_PORT:-443}
+        protocol: udp
+    depends_on:
+      - database
 
-networks:
-  proxy:
-    name: proxy
-    external: true
+  database:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-comtso}
+      MYSQL_USER: ${MYSQL_USER:-comtso}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-comtso}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    volumes:
+      - database_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  node:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - php
+
+# Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
+###> symfony/mercure-bundle ###
+###< symfony/mercure-bundle ###
 
 volumes:
-  volume_mysql:
-    driver: local
+  caddy_data:
+  caddy_config:
+  database_data:
+###> symfony/mercure-bundle ###
+###< symfony/mercure-bundle ###

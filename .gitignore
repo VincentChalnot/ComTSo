@@ -1,22 +1,46 @@
-/web/bundles/
-/app/bootstrap.php.cache
-/app/cache/*
-/app/config/parameters.yml
-/app/data/*
-/app/logs/*
-!app/cache/.gitkeep
-!app/data/.gitkeep
-!app/logs/.gitkeep
-/build/
-/vendor/
-/bin/
-/web/assets/
-/web/css/*
-/web/js/*
-/.sass-cache/
-/web/images/avatars/
-/backups
-/node_modules/
 
-.env
-.idea/
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
+
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> symfony/asset-mapper ###
+/public/assets/
+###< symfony/asset-mapper ###
+
+# Node
+/node_modules/
+/assets/dist/
+
+# IDE
+/.idea/
+/.vscode/
+
+# Old Symfony 2 backup
+/.old-symfony2/
+
+# Uploads
+/public/uploads/
+/public/images/
+
+# Build
+/build/
+
+# OS
+.DS_Store
+Thumbs.db
