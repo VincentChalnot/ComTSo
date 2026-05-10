@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chat{% endblock %}
+
+{% block body %}
+<h1 class="title">Global Chat</h1>
+
+<div class="box" style="height: 600px;">
+    <div data-vue>
+        <chat-widget 
+            :initial-messages='{{ messages|json_encode|raw }}'
+            api-messages-url="{{ path('chat_api_messages') }}"
+            api-send-url="{{ path('chat_api_send') }}"
+            mercure-url="{{ mercure_public_url }}"
+        ></chat-widget>
+    </div>
+</div>
+{% endblock %}

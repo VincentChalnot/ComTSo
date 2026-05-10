@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in{% endblock %}
+
+{% block body %}
+<div class="columns is-centered">
+    <div class="column is-4">
+        <div class="card">
+            <div class="card-content">
+                <h1 class="title">Log in</h1>
+
+                {% if error %}
+                    <div class="notification is-danger is-light">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
+
+                <form method="post">
+                    <div class="field">
+                        <label class="label" for="username">Username</label>
+                        <div class="control">
+                            <input type="text" class="input" id="username" name="_username" value="{{ last_username }}" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="password">Password</label>
+                        <div class="control">
+                            <input type="password" class="input" id="password" name="_password" required>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <div class="field">
+                        <div class="control">
+                            <button type="submit" class="button is-primary is-fullwidth">Log in</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="has-text-centered mt-4">
+                    <p>Don't have an account? <a href="{{ path('app_register') }}">Register</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

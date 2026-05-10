@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Upload Photos{% endblock %}
+
+{% block body %}
+<h1 class="title">Upload Photos</h1>
+
+<div class="box">
+    <div data-vue>
+        <photo-uploader api-url="{{ path('photo_api_upload') }}"></photo-uploader>
+    </div>
+</div>
+{% endblock %}

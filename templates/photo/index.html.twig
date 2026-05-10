@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Photos{% endblock %}
+
+{% block body %}
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">Photos</h1>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            {% if app.user %}
+                <a href="{{ path('photo_upload') }}" class="button is-primary">Upload Photos</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="photo-grid">
+    {% for photo in photos %}
+        <div class="photo-item">
+            <a href="{{ path('photo_show', {'id': photo.id}) }}">
+                <img src="/uploads/photos/{{ photo.filename }}" alt="{{ photo.title ?? photo.originalFilename }}">
+            </a>
+        </div>
+    {% else %}
+        <p>No photos yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

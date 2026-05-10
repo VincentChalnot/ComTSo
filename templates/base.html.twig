@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ app.user ? app.user.theme : 'light' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ComTSo Forum{% endblock %}</title>
+
+    {% block stylesheets %}
+        <link rel="stylesheet" href="/assets/main.css">
+    {% endblock %}
+</head>
+<body>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="{{ path('app_home') }}">
+                <strong>ComTSo Forum</strong>
+            </a>
+
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMain">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarMain" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item" href="{{ path('app_home') }}">Home</a>
+                <a class="navbar-item" href="{{ path('forum_index') }}">Forums</a>
+                <a class="navbar-item" href="{{ path('photo_index') }}">Photos</a>
+                {% if app.user %}
+                    <a class="navbar-item" href="{{ path('chat_index') }}">Chat</a>
+                    <a class="navbar-item" href="{{ path('message_index') }}">Messages</a>
+                {% endif %}
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    {% if app.user %}
+                        <div class="buttons">
+                            <div data-vue>
+                                <theme-toggle></theme-toggle>
+                            </div>
+                            <a class="button is-light" href="{{ path('user_profile', {'username': app.user.username}) }}">
+                                {{ app.user.username }}
+                            </a>
+                            <a class="button is-light" href="{{ path('app_logout') }}">
+                                Logout
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="buttons">
+                            <a class="button is-primary" href="{{ path('app_register') }}">
+                                <strong>Sign up</strong>
+                            </a>
+                            <a class="button is-light" href="{{ path('app_login') }}">
+                                Log in
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="section">
+        <div class="container">
+            {% for message in app.flashes('success') %}
+                <div class="notification is-success is-light">
+                    <button class="delete"></button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="notification is-danger is-light">
+                    <button class="delete"></button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% block body %}{% endblock %}
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <p>
+                <strong>ComTSo Forum</strong> - Powered by Symfony 8 & Vue 3
+            </p>
+        </div>
+    </footer>
+
+    {% block javascripts %}
+        <script type="module" src="/assets/main.js"></script>
+    {% endblock %}
+</body>
+</html>

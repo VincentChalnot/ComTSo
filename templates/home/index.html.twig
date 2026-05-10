@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home{% endblock %}
+
+{% block body %}
+<h1 class="title">Welcome to ComTSo Forum</h1>
+
+<div class="columns">
+    <div class="column is-8">
+        <h2 class="subtitle">Recent Topics</h2>
+        <div class="box">
+            {% if recent_topics is empty %}
+                <p>No topics yet. Be the first to create one!</p>
+            {% else %}
+                {% for topic in recent_topics %}
+                    <div class="topic-item">
+                        <p class="title is-5">
+                            <a href="{{ path('topic_show', {'forumId': topic.forum.id, 'id': topic.id}) }}">
+                                {{ topic.title }}
+                            </a>
+                        </p>
+                        <p class="subtitle is-7">
+                            by {{ topic.author.username }} in {{ topic.forum.title }}
+                            • {{ topic.views }} views • {{ topic.commentCount }} comments
+                            • {{ topic.createdAt|date('Y-m-d H:i') }}
+                        </p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="column is-4">
+        <h2 class="subtitle">Forums</h2>
+        <div class="box">
+            {% for forum in forums %}
+                <div class="mb-3">
+                    <a href="{{ path('forum_show', {'id': forum.id}) }}" class="has-text-weight-bold">
+                        {{ forum.title }}
+                    </a>
+                    {% if forum.content %}
+                        <p class="is-size-7">{{ forum.content|slice(0, 100) }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
