@@ -1,14 +1,13 @@
 security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-        # Passwords imported from the legacy FOSUserBundle (sha512, 5000 iterations, base64, per-user salt)
+        # Passwords imported from the Symfony 2 forum (see App\Security\LegacyPasswordHasher)
         legacy_sha512:
-            algorithm: sha512
-            iterations: 5000
-            encode_as_base64: true
+            id: App\Security\LegacyPasswordHasher
+        # The first entry matching the user wins, so no generic interface entry may precede this one.
+        # Not "auto": with "auto" Symfony ignores migrate_from.
         App\Entity\User:
-            algorithm: auto
+            algorithm: native
             migrate_from:
                 - legacy_sha512
 
@@ -55,12 +54,9 @@ security:
 when@test:
     security:
         password_hashers:
-            # By default, password hashers are resource intensive and take time. This is
-            # important to generate secure password hashes. In tests however, secure hashes
-            # are not important, waste resources and increase test times. The following
-            # reduces the work factor to the lowest possible values.
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+            # Secure hashes are slow on purpose; tests do not need that, so use the lowest bcrypt cost.
+            App\Entity\User:
+                algorithm: native
+                cost: 4
+                migrate_from:
+                    - legacy_sha512

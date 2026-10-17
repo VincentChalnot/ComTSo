@@ -104,6 +104,7 @@ The production image (`Dockerfile`, `frankenphp_prod` target) builds the assets 
 
 ## Gotchas
 
+- Legacy passwords: the Symfony 2 forum stored `sha512 x5000 base64` of `password{salt}`, **or** of `sha1(sha1(password)){salt}` for members older than FOSUserBundle (its custom auth provider tried both). `App\Security\LegacyPasswordHasher` accepts both and `migrate_from` upgrades to bcrypt at first login. In `password_hashers`, Symfony takes the **first entry matching the user**, and `migrate_from` is ignored with `algorithm: auto`: keep `App\Entity\User` first with `algorithm: native`, and repeat the full entry in `when@test`.
 - `compose.override.yaml` mounts an anonymous volume on `/app/var`: anything written to `var/` that is not bind-mounted (`var/photos`) is lost on `docker compose down`.
 - Mercure hub runs in compatibility mode (`protocol_version_compatibility 8` in the Caddyfile / `protocol_version: '0.x'` in `config/packages/mercure.yaml`).
 - Playwright MCP calls time out after 30 s: keep scripted crawls short (a few pages per call).
