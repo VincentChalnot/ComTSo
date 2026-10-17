@@ -1,8 +1,9 @@
 {% use 'form_div_layout.html.twig' %}
 
-{# Tailwind form theme: every widget gets the shared `.input` look, rows get a label/help/error layout. #}
+{# Design-system form theme (components/_form.scss): every text-like widget is a `.input`, rows are `.field` (label, widget, help, errors),
+   checkboxes and radios are `.check` boxes styled globally, buttons are `.btn`. #}
 {% block form_row -%}
-    <div class="mb-4">
+    <div class="field mb-5">
         {{- form_label(form) -}}
         {{- form_widget(form) -}}
         {{- form_help(form) -}}
@@ -10,9 +11,29 @@
     </div>
 {%- endblock form_row %}
 
+{# A single checkbox / radio: the box and its label sit on one line. #}
+{% block checkbox_row -%}
+    {%- if label is empty and label is not same as(false) -%}{%- set label = name|humanize -%}{%- endif -%}
+    <div class="field mb-5">
+        <label class="check"{% if id %} for="{{ id }}"{% endif %}>
+            {{- form_widget(form) -}}
+            {%- if label is not same as(false) %}<span>{{ translation_domain is same as(false) ? label : label|trans(label_translation_parameters, translation_domain) }}</span>{% endif -%}
+        </label>
+        {{- form_help(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock checkbox_row %}
+
+{% block radio_row -%}
+    {{- block('checkbox_row') -}}
+{%- endblock radio_row %}
+
 {% block form_label -%}
     {%- if label is not same as(false) -%}
-        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' label')|trim}) -%}
+        {# the label of a checkbox / radio inside a `.check` is plain text #}
+        {%- if 'checkbox' not in block_prefixes and 'radio' not in block_prefixes -%}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' label')|trim}) -%}
+        {%- endif -%}
         {{- parent() -}}
     {%- endif -%}
 {%- endblock form_label %}
@@ -41,34 +62,25 @@
 {%- endblock date_widget %}
 
 {% block choice_widget_expanded -%}
-    <div {{ block('widget_container_attributes') }} class="space-y-2">
+    <div {{ block('widget_container_attributes') }} class="check-group">
         {%- for child in form %}
-            <div class="flex items-center gap-2">
-                {{- form_widget(child, {attr: {class: 'size-4 accent-[var(--c-accent)]'}}) -}}
-                {{- form_label(child, null, {label_attr: {class: '!mb-0 !font-normal'}}) -}}
+            <div class="check">
+                {{- form_widget(child) -}}
+                {{- form_label(child, null, {translation_domain: choice_translation_domain}) -}}
             </div>
         {% endfor -%}
     </div>
 {%- endblock choice_widget_expanded %}
 
-{% block checkbox_widget -%}
-    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' size-4')|trim}) -%}
-    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
-{%- endblock checkbox_widget %}
-
-{% block radio_widget -%}
-    <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
-{%- endblock radio_widget %}
-
 {% block form_help -%}
     {%- if help is not empty -%}
-        <p id="{{ id }}_help" class="mt-1 text-xs text-muted">{{ help }}</p>
+        <p id="{{ id }}_help" class="field-help">{{ help }}</p>
     {%- endif -%}
 {%- endblock form_help %}
 
 {% block form_errors -%}
     {%- if errors|length > 0 -%}
-        <ul class="mt-1 space-y-0.5">
+        <ul class="grid gap-1">
             {%- for error in errors -%}
                 <li class="field-error">{{ error.message }}</li>
             {%- endfor -%}

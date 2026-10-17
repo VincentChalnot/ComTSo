@@ -76,6 +76,7 @@ class ImageProcessingService
     public const VARIANTS = [
         'thumb' => [320, 320, 'cover'],
         'medium' => [1400, 1400, 'inset'],
+        'hero' => [1600, 1600, 'inset'],
         'avatar' => [96, 96, 'cover'],
     ];
 

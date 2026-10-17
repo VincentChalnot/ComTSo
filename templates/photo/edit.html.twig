@@ -3,15 +3,21 @@
 {% block title %}Modifier la photo · ComTSo{% endblock %}
 
 {% block body %}
-<h1 class="mb-4 text-2xl font-bold tracking-tight">Modifier la photo</h1>
-<div class="grid gap-4 md:grid-cols-[14rem_1fr]">
-    <img src="{{ path('photo_variant', {id: photo.id, variant: 'thumb'}) }}" alt="" class="w-full rounded-lg border border-line">
-    <div class="card p-5">
+<header class="page-header">
+    <p class="kicker"><a href="{{ path('photo_show', {id: photo.id}) }}">{{ photo.title ?: photo.originalFilename }}</a></p>
+    <h1 class="page-title">Modifier la photo</h1>
+</header>
+
+<div class="grid items-start gap-8 md:grid-cols-[14rem_minmax(0,1fr)]">
+    <a href="{{ path('photo_show', {id: photo.id}) }}" class="photo-thumb" aria-label="Voir la photo">
+        <img src="{{ path('photo_variant', {id: photo.id, variant: 'thumb'}) }}" alt="">
+    </a>
+    <div class="card settings-card">
         {{ form_start(form) }}
             {{ form_widget(form) }}
-            <div class="flex gap-2">
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <div class="form-actions">
                 <a href="{{ path('photo_show', {id: photo.id}) }}" class="btn">Annuler</a>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
             </div>
         {{ form_end(form) }}
     </div>

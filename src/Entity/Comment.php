@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CommentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -39,9 +41,25 @@ class Comment
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $updatedAt = null;
 
+    /** Photos attached to the message, in display order (batch-load them with CommentPhotoRepository::preload()). */
+    #[ORM\OneToMany(targetEntity: CommentPhoto::class, mappedBy: 'comment', cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['order' => 'ASC', 'id' => 'ASC'])]
+    private Collection $photos;
+
+    public function __construct()
+    {
+        $this->photos = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /** @return Collection<int, CommentPhoto> */
+    public function getPhotos(): Collection
+    {
+        return $this->photos;
     }
 
     public function getContent(): ?string

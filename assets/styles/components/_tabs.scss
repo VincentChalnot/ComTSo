@@ -1,0 +1,184 @@
+// Tabs & pills. Editorial tabs are small-caps labels on a hairline; the current one is a kraft-textured sand tab with a sand rule.
+//
+//   <nav class="tabs"><a href aria-current="page">Général</a><a href>Photos <span class="badge badge-count">3</span></a></nav>
+//   <nav class="tab-pills">…</nav>       compact pills, scroll sideways on a phone
+//   <nav class="nav-pills">…</nav>       wrapping pills (filters, sort order)         .nav-pills.is-vertical
+//   current: [aria-current=page] / [aria-selected=true] / .is-active
+@use "../abstracts" as *;
+
+@mixin tab-reset {
+  -webkit-tap-highlight-color: transparent;
+  appearance: none;
+  border: 0;
+  background-color: transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+@layer components {
+  // ---- underlined tabs ---------------------------------------------------------------------------------------------------
+  .tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0 0.25rem;
+    margin: 0 0 1.25rem;
+    padding: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border-bottom: 1px solid var(--c-line);
+    scrollbar-width: none;
+    list-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    :is(a, button, .tab):not(.badge) {
+      @include tab-reset;
+      @include texture-host;
+      --texture-ratio: 0;
+
+      display: inline-flex;
+      flex: none;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 2.75rem;
+      margin-bottom: -1px;
+      padding: 0.35rem 0.9rem;
+      border-bottom: 2px solid transparent;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      color: var(--c-muted);
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-weight: 650;
+      letter-spacing: 0.1em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      transition:
+        color 0.15s var(--ease-paper),
+        background-color 0.15s var(--ease-paper),
+        border-color 0.15s var(--ease-paper);
+
+      @include hover {
+        border-bottom-color: var(--c-line-strong);
+        background-color: var(--c-surface-2);
+        color: var(--c-fg);
+      }
+      @include pressed {
+        background-color: var(--c-surface-3);
+      }
+      @include focus {
+        @include focus-ring(-2px);
+      }
+      @include disabled {
+        opacity: 0.45;
+        pointer-events: none;
+      }
+
+      &[aria-current="page"],
+      &[aria-current="true"],
+      &[aria-selected="true"],
+      &.is-active {
+        @include texture-tone("kraft", "highlight-soft");
+        --texture-ratio: 1;
+        border-bottom-color: var(--c-highlight);
+        background-color: color-mix(in srgb, var(--c-highlight-soft) 55%, var(--c-surface));
+        color: var(--c-fg);
+      }
+    }
+    // li-wrapped markup
+    > li {
+      display: flex;
+      flex: none;
+    }
+    .badge-count {
+      margin-left: 0.1rem;
+    }
+  }
+
+  // `.tabs` on wrapping rows (many forums): flex-wrap utility still wins, nothing special needed
+
+  // ---- pills ---------------------------------------------------------------------------------------------------------------
+  .tab-pills,
+  .nav-pills {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    > li {
+      display: flex;
+    }
+    :is(a, button, .tab):not(.badge) {
+      @include tab-reset;
+      @include texture-host;
+      --texture-ratio: 0;
+
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 2.25rem;
+      padding: 0.3rem 0.85rem;
+      border-radius: var(--radius-sm);
+      color: var(--c-fg-soft);
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      line-height: 1.2;
+      transition:
+        color 0.15s var(--ease-paper),
+        background-color 0.15s var(--ease-paper);
+
+      @include hover {
+        background-color: var(--c-surface-2);
+        color: var(--c-fg);
+      }
+      @include pressed {
+        background-color: var(--c-surface-3);
+      }
+      @include focus {
+        @include focus-ring;
+      }
+      @include disabled {
+        opacity: 0.45;
+        pointer-events: none;
+      }
+
+      &[aria-current="page"],
+      &[aria-current="true"],
+      &[aria-selected="true"],
+      &.is-active {
+        @include texture-tone("kraft", "accent-soft");
+        --texture-ratio: 1;
+        background-color: var(--c-accent-soft);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-accent) 32%, transparent);
+        color: var(--c-accent-strong);
+      }
+    }
+  }
+  .tab-pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 0.25rem;
+    margin: -0.25rem;
+    scrollbar-width: none;
+
+    > * {
+      flex: none;
+    }
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  .nav-pills {
+    flex-wrap: wrap;
+
+    &.is-vertical {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+}

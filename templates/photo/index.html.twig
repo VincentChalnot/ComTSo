@@ -1,17 +1,31 @@
 {% extends 'base.html.twig' %}
 {% import '_ui/photo.html.twig' as ph %}
+{% import '_ui/icons.html.twig' as ui %}
 
 {% block title %}Photos · ComTSo{% endblock %}
 
 {% block body %}
-<h1 class="mb-4 text-2xl font-bold tracking-tight">Photos</h1>
-{% include '_layout/pagination.html.twig' with {pager: pager, route: 'photo_index', params: {}} %}
-<div class="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
-    {% for photo in photos %}
-        {{ ph.thumb(photo, 'all', 'aspect-square w-full') }}
-    {% else %}
-        <p class="col-span-full card p-6 text-center text-muted">Aucune photo.</p>
-    {% endfor %}
-</div>
+<header class="page-header">
+    <p class="kicker">Photothèque</p>
+    <h1 class="page-title">Photos</h1>
+    <p class="standfirst">
+        {% if pager.total %}{{ pager.total|number_format(0, ',', ' ') }} photo{{ pager.total > 1 ? 's' : '' }} partagée{{ pager.total > 1 ? 's' : '' }} par le cercle{% if pager.pageCount > 1 %}, page {{ pager.page }} sur {{ pager.pageCount }}{% endif %}, des plus récentes aux plus anciennes.{% else %}Les photos partagées par le cercle apparaîtront ici.{% endif %}
+    </p>
+</header>
+
+{% if photos %}
+    <div class="photo-grid">
+        {% for photo in photos %}
+            {{ ph.thumb(photo, 'all', 'aspect-square w-full') }}
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty">
+        <span class="empty-icon">{{ ui.icon('image', 'size-6') }}</span>
+        <h2 class="empty-title">Aucune photo</h2>
+        <p class="empty-text">Les photos ajoutées aux messages apparaîtront ici.</p>
+    </div>
+{% endif %}
+
 {% include '_layout/pagination.html.twig' with {pager: pager, route: 'photo_index', params: {}} %}
 {% endblock %}

@@ -1,6 +1,12 @@
 {% import '_ui/icons.html.twig' as ui %}
 {% import '_ui/avatar.html.twig' as av %}
 {% set route = app.current_route ?? '' %}
+{% set nav_links = [
+    {route: 'app_home', label: 'Accueil', match: ['app_home']},
+    {route: 'forum_index', label: 'Forums', match: ['forum_index', 'forum_show', 'topic_show', 'topic_edit', 'topic_photos', 'comment_show', 'comment_edit', 'forum_new_topic']},
+    {route: 'people_index', label: 'Les gens', match: ['people_index', 'people_show', 'people_edit']},
+    {route: 'photo_index', label: 'Photos', match: ['photo_index', 'photo_show', 'photo_edit']},
+] %}
 <!DOCTYPE html>
 <html lang="fr" data-theme="{{ app.user ? app.user.theme : 'light' }}">
 <head>
@@ -10,77 +16,111 @@
     <title>{% block title %}ComTSo{% endblock %}</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     {% if not app.user %}
-        <script>if (matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.dataset.theme = 'dark';</script>
+        {# Anonymous visitors: the choice saved by the login-page toggle (localStorage), else the OS preference. Before the stylesheet: no flash. #}
+        <script>(function(){var t=null;try{t=localStorage.getItem('comtso-theme')}catch(e){}document.documentElement.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')})();</script>
     {% endif %}
     {% block stylesheets %}<link rel="stylesheet" href="/assets/main.css">{% endblock %}
 </head>
-<body class="min-h-screen bg-page text-fg {% block body_class %}{% endblock %}">
-    <header class="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
-        <nav class="mx-auto flex max-w-6xl items-center gap-1 px-3 py-2 sm:px-4" aria-label="Navigation principale">
-            <a href="{{ path('app_home') }}" class="mr-2 text-lg font-bold tracking-tight text-fg no-underline">ComTSo</a>
+<body class="{% block body_class %}{% endblock %}">
+    <a class="skip-link" href="#main">Aller au contenu</a>
+
+    {% block masthead %}
+    <header class="masthead">
+        <div class="masthead-bar">
+            {% if app.user %}
+                <form action="{{ path('search') }}" method="get" role="search" class="masthead-search">
+                    <label for="masthead-q" class="sr-only">Rechercher</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">{{ ui.icon('search', 'size-4') }}</span>
+                        <input type="search" id="masthead-q" name="q" value="{{ app.request.query.get('q') }}" placeholder="Rechercher…" class="input has-icon">
+                    </div>
+                </form>
+            {% endif %}
+
+            <a href="{{ path('app_home') }}" class="masthead-title">ComTSo<small>Depuis 2004</small></a>
 
             {% if app.user %}
-                <button type="button" class="btn-icon ml-auto lg:hidden" data-nav-toggle aria-label="Menu" aria-expanded="false">{{ ui.icon('menu', 'size-5') }}</button>
-
-                <div id="nav-menu" class="hidden w-full flex-col gap-2 pb-2 lg:flex lg:w-auto lg:flex-1 lg:flex-row lg:items-center lg:pb-0" data-nav-menu>
-                    <div class="flex flex-col gap-1 lg:flex-row">
-                        {% set links = [
-                            {route: 'app_home', label: 'Accueil', match: ['app_home']},
-                            {route: 'forum_index', label: 'Forums', match: ['forum_index', 'forum_show', 'topic_show', 'topic_edit', 'topic_photos', 'comment_show', 'comment_edit', 'forum_new_topic']},
-                            {route: 'people_index', label: 'Les gens', match: ['people_index', 'people_show', 'people_edit']},
-                            {route: 'photo_index', label: 'Photos', match: ['photo_index', 'photo_show', 'photo_edit']},
-                        ] %}
-                        {% for link in links %}
-                            <a href="{{ path(link.route) }}" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium no-underline transition {{ route in link.match ? 'bg-accent-soft text-accent-strong' : 'text-muted hover:bg-surface-2 hover:text-fg' }}">
-                                {{ link.label }}
-                                {% if link.route == 'people_index' and unread_messages() %}
-                                    <span class="inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[0.7rem] font-semibold leading-5 text-on-accent" title="Messages privés non lus">{{ unread_messages()|reduce((carry, n) => carry + n, 0) }}</span>
-                                {% endif %}
-                            </a>
-                        {% endfor %}
-                        <a href="{{ path('chat_index') }}" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium no-underline transition {{ route == 'chat_index' ? 'bg-accent-soft text-accent-strong' : 'text-muted hover:bg-surface-2 hover:text-fg' }}">
-                            Chat
-                            <span data-chat-badge data-count="{{ chat_unread_count() }}" class="{{ chat_unread_count() > 0 ? '' : 'hidden ' }}inline-flex min-w-5 items-center justify-center rounded-full bg-danger px-1.5 text-[0.7rem] font-semibold leading-5 text-white">{{ chat_unread_count() > 99 ? '99+' : chat_unread_count() }}</span>
-                        </a>
-                    </div>
-
-                    <form action="{{ path('search') }}" method="get" role="search" class="relative lg:ml-3 lg:w-56">
-                        <input type="search" name="q" value="{{ app.request.query.get('q') }}" placeholder="Rechercher…" aria-label="Rechercher" class="input !py-1.5 pl-9">
-                        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">{{ ui.icon('search', 'size-4') }}</span>
-                    </form>
-
-                    <div class="flex items-center gap-1 lg:ml-auto">
-                        <div data-vue-component="ThemeToggle" data-props="{{ {url: path('user_theme')}|json_encode|e('html_attr') }}"></div>
-                        <a href="{{ path('people_config', {username: app.user.username}) }}" class="btn-icon" title="Configuration">{{ ui.icon('settings', 'size-5') }}</a>
-                        <a href="{{ path('people_show', {username: app.user.username}) }}" class="flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium text-fg no-underline hover:bg-surface-2">
-                            {{ av.avatar(app.user, 'size-7') }}<span>{{ app.user.username }}</span>
-                        </a>
-                        <a href="{{ path('app_logout') }}" class="btn-icon" title="Déconnexion">{{ ui.icon('log-out', 'size-5') }}</a>
-                    </div>
+                <div class="masthead-tools">
+                    <div data-vue-component="ThemeToggle" data-props="{{ {url: path('user_theme')}|json_encode|e('html_attr') }}"></div>
+                    <a href="{{ path('people_config', {username: app.user.username}) }}" class="btn-icon masthead-settings" title="Configuration" aria-label="Configuration">{{ ui.icon('settings', 'size-5') }}</a>
+                    <a href="{{ path('people_show', {username: app.user.username}) }}" class="masthead-user" title="Mon profil">
+                        {{ av.avatar(app.user, 'sm') }}<span class="masthead-user-name">{{ app.user.username }}</span>
+                    </a>
+                    <a href="{{ path('app_logout') }}" class="btn-icon masthead-logout" title="Déconnexion" aria-label="Déconnexion">{{ ui.icon('log-out', 'size-5') }}</a>
                 </div>
             {% endif %}
-        </nav>
-    </header>
+        </div>
 
-    <div class="mx-auto max-w-6xl px-3 py-5 sm:px-4">
+        {% if app.user %}
+            <nav class="masthead-nav" aria-label="Navigation principale">
+                <button type="button" class="btn-icon masthead-toggle" data-nav-toggle aria-label="Menu" aria-expanded="false" aria-controls="nav-menu">{{ ui.icon('menu', 'size-5') }}</button>
+                <ul id="nav-menu" class="masthead-menu" data-nav-menu>
+                    <li class="masthead-menu-search">
+                        <form action="{{ path('search') }}" method="get" role="search">
+                            <label for="menu-q" class="sr-only">Rechercher</label>
+                            <div class="input-wrap">
+                                <span class="input-icon">{{ ui.icon('search', 'size-4') }}</span>
+                                <input type="search" id="menu-q" name="q" value="{{ app.request.query.get('q') }}" placeholder="Rechercher…" class="input has-icon">
+                            </div>
+                        </form>
+                    </li>
+                    {% for link in nav_links %}
+                        {% set active = route in link.match %}
+                        <li>
+                            <a href="{{ path(link.route) }}" class="masthead-link{{ active ? ' is-active' : '' }}"{% if active %} aria-current="page"{% endif %}>
+                                {{ link.label }}
+                                {% if link.route == 'people_index' and unread_messages() %}
+                                    <span class="badge badge-accent badge-count" title="Messages privés non lus">{{ unread_messages()|reduce((carry, n) => carry + n, 0) }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                    <li>
+                        <a href="{{ path('chat_index') }}" class="masthead-link{{ route == 'chat_index' ? ' is-active' : '' }}"{% if route == 'chat_index' %} aria-current="page"{% endif %}>
+                            Chat
+                            <span data-chat-badge data-count="{{ chat_unread_count() }}" class="badge badge-danger badge-count{{ chat_unread_count() > 0 ? '' : ' hidden' }}">{{ chat_unread_count() > 99 ? '99+' : chat_unread_count() }}</span>
+                        </a>
+                    </li>
+                    <li class="masthead-menu-account">
+                        <a href="{{ path('people_config', {username: app.user.username}) }}" class="masthead-link">Configuration</a>
+                    </li>
+                    <li class="masthead-menu-account">
+                        <a href="{{ path('app_logout') }}" class="masthead-link">Déconnexion</a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    </header>
+    {% endblock %}
+
+    <div class="page">
         {% for type, messages in app.flashes %}
             {% for message in messages %}
-                <div class="mb-4 flex items-start justify-between gap-3 rounded-lg border px-4 py-3 text-sm {{ type == 'error' ? 'border-danger/40 bg-danger/10 text-danger' : 'border-ok/40 bg-ok/10 text-ok' }}" role="status">
-                    <span>{{ message }}</span>
-                    <button type="button" class="cursor-pointer opacity-60 hover:opacity-100" data-dismiss aria-label="Fermer">{{ ui.icon('x', 'size-4') }}</button>
+                {% set variant = type in ['error', 'danger'] ? 'danger' : (type == 'warning' ? 'warning' : (type == 'info' ? 'info' : 'ok')) %}
+                <div class="alert alert-{{ variant }}" role="{{ variant == 'danger' ? 'alert' : 'status' }}">
+                    <span class="alert-icon">{{ ui.icon(variant == 'ok' ? 'circle-check' : (variant == 'info' ? 'info' : 'circle-alert'), 'size-5') }}</span>
+                    <div class="alert-body"><p>{{ message }}</p></div>
+                    <button type="button" data-dismiss aria-label="Fermer">{{ ui.icon('x', 'size-4') }}</button>
                 </div>
             {% endfor %}
         {% endfor %}
 
         {% block content_layout %}
-            <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
-                <main class="min-w-0">{% block body %}{% endblock %}</main>
-                <aside class="space-y-5 lg:sticky lg:top-20 lg:self-start">
+            <div class="layout">
+                <main id="main" class="layout-main" tabindex="-1">{% block body %}{% endblock %}</main>
+                <aside class="layout-aside" aria-label="Raccourcis">
                     {% include '_layout/aside.html.twig' %}
                 </aside>
             </div>
         {% endblock %}
     </div>
+
+    {% block footer %}
+    <footer class="colophon">
+        <hr class="rule-double is-flush">
+        <p class="colophon-text"><strong>ComTSo</strong> — forum privé <span aria-hidden="true">·</span> depuis 2004 <span aria-hidden="true">·</span> {{ 'now'|date('Y') }}</p>
+    </footer>
+    {% endblock %}
 
     {% block javascripts %}<script type="module" src="/assets/main.js"></script>{% endblock %}
 </body>

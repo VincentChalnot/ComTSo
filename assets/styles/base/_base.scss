@@ -1,0 +1,175 @@
+// Document base: canvas, links, focus, selection, scrollbars. Lives in the `base` layer so utilities win.
+@use "../abstracts" as *;
+
+@layer base {
+  html {
+    background-color: var(--c-page);
+    color: var(--c-fg);
+    font-family: var(--font-sans);
+    font-size: 100%;
+    line-height: 1.6;
+    font-optical-sizing: auto;
+    font-kerning: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+    hanging-punctuation: first;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    background-color: var(--c-page);
+    color: var(--c-fg);
+    text-rendering: optimizeLegibility;
+    // the page canvas texture lives on body::before (see base/_textures.scss)
+    overflow-x: clip;
+  }
+
+  a {
+    color: var(--c-link);
+    text-decoration-line: underline;
+    text-decoration-thickness: 0.07em;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+    text-underline-offset: 0.2em;
+    transition: color 0.15s var(--ease-paper), text-decoration-color 0.15s var(--ease-paper);
+
+    &:hover {
+      color: var(--c-link-hover);
+      text-decoration-color: currentColor;
+    }
+  }
+
+  [hidden],
+  [x-cloak] {
+    display: none !important;
+  }
+
+  ::selection {
+    background: var(--c-selection);
+    color: var(--c-fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--c-focus);
+    outline-offset: 2px;
+  }
+
+  ::placeholder {
+    color: var(--c-muted);
+    opacity: 1;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  hr {
+    height: 0;
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px solid var(--c-line);
+    color: inherit;
+  }
+
+  abbr[title] {
+    text-decoration: underline dotted;
+    text-underline-offset: 0.2em;
+    cursor: help;
+  }
+
+  kbd {
+    padding: 0.1em 0.4em;
+    border: 1px solid var(--c-line-strong);
+    border-bottom-width: 2px;
+    border-radius: 3px;
+    background: var(--c-surface);
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+  }
+
+  code,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+  }
+
+  mark {
+    padding: 0 0.15em;
+    border-radius: 2px;
+    background: var(--c-highlight-soft);
+    color: var(--c-fg);
+    box-decoration-break: clone;
+  }
+
+  // Scrollbars: thin, paper-toned
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-line-strong) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 0.65rem;
+    height: 0.65rem;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: var(--c-line-strong);
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--c-mist-strong);
+    background-clip: content-box;
+  }
+
+  // Form controls follow the theme (date pickers, number spinners)
+  input,
+  select,
+  textarea,
+  button {
+    color-scheme: inherit;
+  }
+}
+
+// Skip link: first focusable element of every page, visible only when focused.
+@layer components {
+  .skip-link {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 100;
+    padding: 0.7rem 1.1rem;
+    border-radius: var(--radius-sm);
+    background: var(--c-accent);
+    color: var(--c-on-accent);
+    font-size: 0.875rem;
+    font-weight: 650;
+    text-decoration: none;
+    transform: translateY(-200%);
+
+    &:focus {
+      transform: none;
+      color: var(--c-on-accent);
+      outline: 2px solid var(--c-focus);
+      outline-offset: 2px;
+    }
+  }
+  // `#main` receives focus from the skip link: no ring around the whole column
+  main:focus {
+    outline: none;
+  }
+}

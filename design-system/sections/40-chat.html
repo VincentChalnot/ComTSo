@@ -1,0 +1,341 @@
+<section class="ds-section" id="chat" data-title="Chat">
+  <header class="ds-section-head">
+    <p class="kicker">Pages</p>
+    <h2>Chat</h2>
+    <p class="standfirst">Une seule feuille de papier : bandeau avec les membres en ligne, conversation en bulles-étiquettes groupées par auteur et séparées par des filets datés, barre de saisie. En vrai la page occupe toute la hauteur de la fenêtre ; ici chaque réplique du composant <code>ChatRoom</code> vit dans un cadre de hauteur fixe.</p>
+  </header>
+
+  <div class="ds-demo" data-title="Conversation en ligne (messages sur deux jours, mes messages à droite)">
+    <div class="ds-stage">
+<div class="chat-mount h-[34rem]">
+  <section class="chat-room card" aria-label="Chat">
+    <header class="chat-head">
+      <h1 class="chat-title">Chat</h1>
+      <div class="chat-online-wrap">
+        <ul class="chat-online" aria-label="Membres en ligne">
+          <li title="Camille"><span class="chat-avatar-img chat-avatar-initial chat-avatar-sm" aria-hidden="true" style="background-color: hsl(200 42% 42%)">C</span></li>
+          <li title="Julien"><span class="chat-avatar-img chat-avatar-initial chat-avatar-sm" aria-hidden="true" style="background-color: hsl(35 42% 42%)">J</span></li>
+          <li title="Marion"><span class="chat-avatar-img chat-avatar-initial chat-avatar-sm" aria-hidden="true" style="background-color: hsl(320 42% 42%)">M</span></li>
+          <li title="Théo"><span class="chat-avatar-img chat-avatar-initial chat-avatar-sm" aria-hidden="true" style="background-color: hsl(95 42% 42%)">T</span></li>
+          <li title="Sophie"><span class="chat-avatar-img chat-avatar-initial chat-avatar-sm" aria-hidden="true" style="background-color: hsl(150 42% 42%)">S</span></li>
+          <li class="chat-more" title="1 autre membre en ligne">+1</li>
+        </ul>
+        <span class="chat-online-count">6 en ligne</span>
+      </div>
+    </header>
+    <div class="chat-stage">
+      <div class="chat-scroll" role="log">
+        <div class="chat-content">
+        <p class="chat-edge">Début de la conversation</p>
+        <div class="chat-day"><span>Jeudi 15 octobre</span></div>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(200 42% 42%)">C</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Camille</strong><time datetime="2026-10-16T18:42">18h42</time></header>
+          <p class="chat-bubble">Salut la bande ! Quelqu’un a des nouvelles de la sortie de dimanche ?</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(35 42% 42%)">J</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Julien</strong><time datetime="2026-10-16T18:44">18h44</time></header>
+          <p class="chat-bubble">Oui, rendez-vous à 9h devant la gare.</p>
+          <p class="chat-bubble">Je prends la voiture, il reste deux places.</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(320 42% 42%)">M</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Marion</strong><time datetime="2026-10-16T18:51">18h51</time></header>
+          <p class="chat-bubble">Je prends une place, merci Julien 🙏</p>
+          </div>
+        </article>
+        <article class="chat-group is-mine">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(265 42% 42%)">V</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Vous</strong><time datetime="2026-10-16T18:52">18h52</time></header>
+          <p class="chat-bubble">Parfait, je confirme pour moi aussi.</p>
+          <p class="chat-bubble">Pensez aux sandwichs, il n’y aura rien sur place.</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(95 42% 42%)">T</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Théo</strong><time datetime="2026-10-16T19:07">19h07</time></header>
+          <p class="chat-bubble">Vu ce que ça donnait l’an dernier, on devrait aussi prévoir un plan B s’il pleut…</p>
+          </div>
+        </article>
+        <div class="chat-day"><span>Aujourd’hui</span></div>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(150 42% 42%)">S</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Sophie</strong><time datetime="2026-10-16T08:15">08h15</time></header>
+          <p class="chat-bubble">Bonjour ! Météo annoncée : grand soleil toute la journée ☀️</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(200 42% 42%)">C</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Camille</strong><time datetime="2026-10-16T08:20">08h20</time></header>
+          <p class="chat-bubble">Génial ! Et voilà la chanson du trajet : <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer nofollow">https://www.youtube.com/watch?v=dQw4w9WgXcQ</a></p>
+          </div>
+        </article>
+        <article class="chat-group is-mine">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(265 42% 42%)">V</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Vous</strong><time datetime="2026-10-16T08:21">08h21</time></header>
+          <p class="chat-bubble">Ahah, classique. Je la mets en boucle.</p>
+          <p class="chat-bubble">(Vraiment.)</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(95 42% 42%)">T</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Théo</strong><time datetime="2026-10-16T08:33">08h33</time></header>
+          <p class="chat-bubble">Un très long message pour vérifier que les bulles passent bien à la ligne sans jamais déborder, y compris avec des URL interminables comme https://exemple.fr/une/adresse/vraiment/tres/longue/qui/ne/finit/jamais/index.html?a=1&b=2&c=3 et ainsi de suite.</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(35 42% 42%)">J</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Julien</strong><time datetime="2026-10-16T08:40">08h40</time></header>
+          <p class="chat-bubble">On part dans 20 minutes !</p>
+          </div>
+        </article>
+        </div>
+      </div>
+    </div>
+    <form class="chat-composer" onsubmit="return false">
+      <label class="sr-only" for="chat-input-a">Votre message</label>
+      <textarea id="chat-input-a" class="input chat-input" rows="1" placeholder="Écrire un message…"></textarea>
+      <button type="submit" class="btn btn-primary chat-send" aria-label="Envoyer" disabled>
+        <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        <span class="hidden sm:inline">Envoyer</span>
+      </button>
+    </form>
+  </section>
+</div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Hors ligne (« Reconnexion… »), pastille « nouveaux messages », brouillon prêt à envoyer">
+    <div class="ds-stage">
+<div class="chat-mount h-[34rem]">
+  <section class="chat-room card" aria-label="Chat">
+    <header class="chat-head">
+      <h1 class="chat-title">Chat</h1>
+      <span class="chat-offline" role="status">Reconnexion…</span>
+      <div class="chat-online-wrap">
+        <ul class="chat-online" aria-label="Membres en ligne">
+          <li title="Camille"><span class="chat-avatar-img chat-avatar-initial chat-avatar-sm" aria-hidden="true" style="background-color: hsl(200 42% 42%)">C</span></li>
+          <li title="Julien"><span class="chat-avatar-img chat-avatar-initial chat-avatar-sm" aria-hidden="true" style="background-color: hsl(35 42% 42%)">J</span></li>
+        </ul>
+        <span class="chat-online-count">2 en ligne</span>
+      </div>
+    </header>
+    <div class="chat-stage">
+      <div class="chat-scroll" role="log">
+        <div class="chat-content">
+        <p class="chat-edge">Début de la conversation</p>
+        <div class="chat-day"><span>Jeudi 15 octobre</span></div>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(200 42% 42%)">C</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Camille</strong><time datetime="2026-10-16T18:42">18h42</time></header>
+          <p class="chat-bubble">Salut la bande ! Quelqu’un a des nouvelles de la sortie de dimanche ?</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(35 42% 42%)">J</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Julien</strong><time datetime="2026-10-16T18:44">18h44</time></header>
+          <p class="chat-bubble">Oui, rendez-vous à 9h devant la gare.</p>
+          <p class="chat-bubble">Je prends la voiture, il reste deux places.</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(320 42% 42%)">M</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Marion</strong><time datetime="2026-10-16T18:51">18h51</time></header>
+          <p class="chat-bubble">Je prends une place, merci Julien 🙏</p>
+          </div>
+        </article>
+        <article class="chat-group is-mine">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(265 42% 42%)">V</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Vous</strong><time datetime="2026-10-16T18:52">18h52</time></header>
+          <p class="chat-bubble">Parfait, je confirme pour moi aussi.</p>
+          <p class="chat-bubble">Pensez aux sandwichs, il n’y aura rien sur place.</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(95 42% 42%)">T</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Théo</strong><time datetime="2026-10-16T19:07">19h07</time></header>
+          <p class="chat-bubble">Vu ce que ça donnait l’an dernier, on devrait aussi prévoir un plan B s’il pleut…</p>
+          </div>
+        </article>
+        <div class="chat-day"><span>Aujourd’hui</span></div>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(150 42% 42%)">S</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Sophie</strong><time datetime="2026-10-16T08:15">08h15</time></header>
+          <p class="chat-bubble">Bonjour ! Météo annoncée : grand soleil toute la journée ☀️</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(200 42% 42%)">C</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Camille</strong><time datetime="2026-10-16T08:20">08h20</time></header>
+          <p class="chat-bubble">Génial ! Et voilà la chanson du trajet : <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer nofollow">https://www.youtube.com/watch?v=dQw4w9WgXcQ</a></p>
+          </div>
+        </article>
+        <article class="chat-group is-mine">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(265 42% 42%)">V</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Vous</strong><time datetime="2026-10-16T08:21">08h21</time></header>
+          <p class="chat-bubble">Ahah, classique. Je la mets en boucle.</p>
+          <p class="chat-bubble">(Vraiment.)</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(95 42% 42%)">T</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Théo</strong><time datetime="2026-10-16T08:33">08h33</time></header>
+          <p class="chat-bubble">Un très long message pour vérifier que les bulles passent bien à la ligne sans jamais déborder, y compris avec des URL interminables comme https://exemple.fr/une/adresse/vraiment/tres/longue/qui/ne/finit/jamais/index.html?a=1&b=2&c=3 et ainsi de suite.</p>
+          </div>
+        </article>
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(35 42% 42%)">J</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Julien</strong><time datetime="2026-10-16T08:40">08h40</time></header>
+          <p class="chat-bubble">On part dans 20 minutes !</p>
+          </div>
+        </article>
+        </div>
+      </div>
+    <button type="button" class="chat-pill"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+      2 nouveaux messages
+    </button>
+    </div>
+    <form class="chat-composer" onsubmit="return false">
+      <label class="sr-only" for="chat-input-b">Votre message</label>
+      <textarea id="chat-input-b" class="input chat-input" rows="1" placeholder="Écrire un message…">Je suis en route, j’arrive dans cinq minutes ! Gardez-moi une place.</textarea>
+      <button type="submit" class="btn btn-primary chat-send" aria-label="Envoyer">
+        <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        <span class="hidden sm:inline">Envoyer</span>
+      </button>
+    </form>
+  </section>
+</div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Conversation vide, bouton d’envoi désactivé">
+    <div class="ds-stage">
+<div class="chat-mount h-[22rem]">
+  <section class="chat-room card" aria-label="Chat">
+    <header class="chat-head">
+      <h1 class="chat-title">Chat</h1>
+      <div class="chat-online-wrap">
+        <ul class="chat-online" aria-label="Membres en ligne">
+          <li title="Vincent (vous)"><span class="chat-avatar-img chat-avatar-initial chat-avatar-sm" aria-hidden="true" style="background-color: hsl(265 42% 42%)">V</span></li>
+        </ul>
+        <span class="chat-online-count">1 en ligne</span>
+      </div>
+    </header>
+    <div class="chat-stage">
+      <div class="chat-scroll" role="log">
+        <div class="chat-content">
+        <p class="chat-edge">Aucun message pour l’instant. Écrivez le premier !</p>
+        </div>
+      </div>
+    </div>
+    <form class="chat-composer" onsubmit="return false">
+      <label class="sr-only" for="chat-input-c">Votre message</label>
+      <textarea id="chat-input-c" class="input chat-input" rows="1" placeholder="Écrire un message…"></textarea>
+      <button type="submit" class="btn btn-primary chat-send" aria-label="Envoyer" disabled>
+        <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        <span class="hidden sm:inline">Envoyer</span>
+      </button>
+    </form>
+  </section>
+</div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Compteur de caractères (dépassement) et erreur d’envoi">
+    <div class="ds-stage ds-grid">
+<div class="chat-mount h-[22rem]">
+  <section class="chat-room card" aria-label="Chat">
+    <header class="chat-head">
+      <h1 class="chat-title">Chat</h1>
+      <div class="chat-online-wrap">
+        <ul class="chat-online" aria-label="Membres en ligne">
+          <li title="Camille"><span class="chat-avatar-img chat-avatar-initial chat-avatar-sm" aria-hidden="true" style="background-color: hsl(200 42% 42%)">C</span></li>
+        </ul>
+        <span class="chat-online-count">1 en ligne</span>
+      </div>
+    </header>
+    <div class="chat-stage">
+      <div class="chat-scroll" role="log">
+        <div class="chat-content">
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(200 42% 42%)">C</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Camille</strong><time datetime="2026-10-16T18:42">18h42</time></header>
+          <p class="chat-bubble">Dernier message de la conversation.</p>
+          </div>
+        </article>
+        </div>
+      </div>
+    </div>
+    <form class="chat-composer" onsubmit="return false">
+      <label class="sr-only" for="chat-input-d">Votre message</label>
+      <textarea id="chat-input-d" class="input chat-input" rows="1" placeholder="Écrire un message…">Trop long…</textarea>
+      <button type="submit" class="btn btn-primary chat-send" aria-label="Envoyer">
+        <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        <span class="hidden sm:inline">Envoyer</span>
+      </button>
+    </form>
+    <p class="chat-counter text-danger">-12 caractères restants</p>
+  </section>
+</div>
+<div class="chat-mount h-[22rem]">
+  <section class="chat-room card" aria-label="Chat">
+    <header class="chat-head">
+      <h1 class="chat-title">Chat</h1>
+      <div class="chat-online-wrap">
+        <ul class="chat-online" aria-label="Membres en ligne">
+          <li title="Camille"><span class="chat-avatar-img chat-avatar-initial chat-avatar-sm" aria-hidden="true" style="background-color: hsl(200 42% 42%)">C</span></li>
+        </ul>
+        <span class="chat-online-count">1 en ligne</span>
+      </div>
+    </header>
+    <div class="chat-stage">
+      <div class="chat-scroll" role="log">
+        <div class="chat-content">
+        <article class="chat-group">
+          <span class="chat-avatar-img chat-avatar-initial chat-avatar" aria-hidden="true" style="background-color: hsl(200 42% 42%)">C</span>
+          <div class="chat-body">
+            <header class="chat-meta"><strong class="chat-name">Camille</strong><time datetime="2026-10-16T18:42">18h42</time></header>
+          <p class="chat-bubble">Dernier message de la conversation.</p>
+          </div>
+        </article>
+        </div>
+      </div>
+    </div>
+    <form class="chat-composer" onsubmit="return false">
+      <label class="sr-only" for="chat-input-e">Votre message</label>
+      <textarea id="chat-input-e" class="input chat-input" rows="1" placeholder="Écrire un message…">Un message à envoyer</textarea>
+      <button type="submit" class="btn btn-primary chat-send" aria-label="Envoyer">
+        <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        <span class="hidden sm:inline">Envoyer</span>
+      </button>
+    </form>
+    <p class="chat-error field-error" role="alert">Impossible d’envoyer le message : connexion perdue.</p>
+  </section>
+</div>
+    </div>
+  </div>
+</section>

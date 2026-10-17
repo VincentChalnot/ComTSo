@@ -1,8 +1,9 @@
-import '../styles/app.css';
+import '../styles/app.scss';
 import { createApp } from 'vue';
 import registry from '../vue/registry.js';
 import './ui.js';
 import './chat-badge.js';
+import { initThemeToggle } from './theme-toggle.js';
 
 function mountVueWidgets(root = document) {
   root.querySelectorAll('[data-vue-component]:not([data-vue-mounted])').forEach((el) => {
@@ -17,4 +18,5 @@ function mountVueWidgets(root = document) {
 }
 
 mountVueWidgets();
+initThemeToggle();
 window.comtso = { ...(window.comtso || {}), mountVueWidgets };

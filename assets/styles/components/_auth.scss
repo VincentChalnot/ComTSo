@@ -1,0 +1,122 @@
+// Login / registration: one big sheet of paper on the canvas, a masthead-style wordmark over a double rule, the form below.
+//
+//   <main class="auth">
+//     <div class="auth-card">
+//       <header class="auth-brand"><span class="auth-wordmark">ComTSo</span><span class="rule-double is-flush"></span></header>
+//       <h1 class="auth-title">Connexion</h1>
+//       <p class="auth-lead">Ce forum est privé : identifiez-vous pour continuer.</p>
+//       <div class="alert alert-danger" role="alert"><div class="alert-body"><p>…</p></div></div>   (error slot, optional)
+//       <form class="auth-form">… <div class="auth-remember">…</div> <button class="btn btn-primary btn-block">…</button></form>
+//       <p class="auth-footer">Pas encore de compte ? <a>S'inscrire</a></p>
+//     </div>
+//   </main>
+//
+// The floating theme toggle of the login page is `.theme-toggle .theme-toggle-floating` (components/_theme-toggle.scss).
+@use "../abstracts" as *;
+
+@layer components {
+  .auth {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: clamp(1.5rem, 7vh, 4.5rem) 0.25rem clamp(2rem, 8vh, 5rem);
+  }
+
+  .auth-card {
+    @include texture-host;
+    @include texture-tone("paper", "surface");
+    --texture-strength: 0.6;
+    width: 100%;
+    max-width: 26rem;
+    padding: clamp(1.5rem, 6vw, 2.75rem);
+    border-radius: var(--radius-md);
+    background: var(--c-surface);
+    // a few sheets under the top one: the guest book of the circle
+    box-shadow:
+      var(--shadow-sheet),
+      3px 3px 0 -1px var(--c-surface-2),
+      3px 3px 0 0 var(--c-line),
+      6px 6px 0 -1px var(--c-surface-2),
+      6px 6px 0 0 var(--c-line);
+    color: var(--c-fg);
+  }
+
+  // masthead wordmark
+  .auth-brand {
+    display: grid;
+    gap: 0.9rem;
+    margin-bottom: 1.75rem;
+    text-align: center;
+
+    .rule-double {
+      margin: 0;
+    }
+  }
+  .auth-wordmark {
+    color: var(--c-fg);
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 9vw, 3rem);
+    font-variation-settings: "opsz" 144;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: var(--tracking-tighter);
+    text-decoration: none;
+  }
+
+  .auth-title {
+    margin: 0 0 0.35rem;
+    font-size: var(--text-2xl);
+    text-align: center;
+  }
+  .auth-lead {
+    margin: 0 0 1.5rem;
+    color: var(--c-fg-soft);
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    line-height: 1.45;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  // error slot (wrong credentials…): the shared `.alert .alert-danger` (components/_alert.scss)
+  .auth .alert {
+    margin-bottom: 1.25rem;
+  }
+
+  .auth-form {
+    display: grid;
+    gap: 1.1rem;
+
+    // templates keep their `<div class="mb-4">` field wrappers: the grid gap does the spacing
+    > .mb-4 {
+      margin-bottom: 0;
+    }
+    .btn {
+      margin-top: 0.25rem;
+    }
+  }
+
+  // "remember me" row: checkbox + label on the left, a secondary link on the right
+  .auth-remember {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    color: var(--c-fg-soft);
+    font-size: 0.875rem;
+
+    a {
+      font-size: 0.8125rem;
+    }
+  }
+
+  .auth-footer {
+    margin: 1.5rem 0 0;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--c-line);
+    color: var(--c-muted);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+}

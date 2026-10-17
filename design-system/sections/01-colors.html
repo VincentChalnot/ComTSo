@@ -1,0 +1,27 @@
+<section class="ds-section" id="couleurs" data-title="Couleurs">
+  <header class="ds-section-head">
+    <p class="kicker">Fondations</p>
+    <h2>Palette &amp; jetons de couleur</h2>
+    <p class="standfirst">Cinq couleurs de marque, toutes les autres sont dérivées en OKLCH (échelles de 50 à 950), puis rangées en <strong>rôles sémantiques</strong> définis pour chaque thème. Un composant n’utilise jamais une couleur brute : il lit <code>var(--c-rôle)</code>, donc le thème change sans rechargement.</p>
+  </header>
+
+  <div class="ds-demo">
+    <p class="ds-label">Les cinq couleurs de base</p>
+    <div class="ds-brand-row" data-ds-brand></div>
+  </div>
+
+  <div class="ds-demo">
+    <p class="ds-label">Échelles dérivées (classes Tailwind <code>bg-plum-700</code>, <code>text-ink-900</code>, <code>border-mist-300</code>…)</p>
+    <div class="ds-col" data-ds-scales></div>
+  </div>
+
+  <div class="ds-demo">
+    <p class="ds-label">Rôles sémantiques par thème (<code>bg-surface</code>, <code>text-muted</code>, <code>border-line</code>, <code>bg-accent</code>…)</p>
+    <div class="ds-table-wrap" data-ds-roles></div>
+  </div>
+
+  <div class="ds-demo">
+    <p class="ds-label">Contraste WCAG 2.2 AA — texte 4,5 : 1, composants d’interface 3 : 1 (calculé en direct depuis les variables compilées)</p>
+    <div data-ds-contrast></div>
+  </div>
+</section>

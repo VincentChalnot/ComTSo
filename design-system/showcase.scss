@@ -1,0 +1,9 @@
+// Showcase entry: the application's own stylesheet + the showcase chrome (ds-*).
+// @source paths are relative to THIS entry file.
+@use "../assets/styles/index";
+@use "styles/ds-ui";
+
+@source "./index.html";
+@source "./sections";
+@source "./main.js";
+@source "../assets/vue";

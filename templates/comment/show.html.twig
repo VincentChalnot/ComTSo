@@ -6,14 +6,19 @@
 {% block body %}
 {% set topic = comment.topic %}
 {% include 'forum/_tabs.html.twig' with {current: topic.forum.id} %}
-<div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-    <div>
-        <h1 class="text-2xl font-bold tracking-tight">Message #{{ comment.id }}</h1>
-        <p class="text-xs text-muted">Dans <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}">{{ topic.title }}</a> · {{ topic.forum.title }}</p>
+
+<header class="page-header">
+    <p class="kicker"><a href="{{ path('forum_show', {forumId: topic.forum.id}) }}" class="text-inherit no-underline hover:underline">{{ topic.forum.title }}</a></p>
+    <h1 class="page-title">Message #{{ comment.id }}</h1>
+    <p class="byline">
+        <span>Dans <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}">{{ topic.title }}</a></span>
+    </p>
+    <div class="page-actions">
+        <a href="{{ topicUrl }}" class="btn">{{ ui.icon('arrow-left', 'size-4') }} Voir dans le sujet</a>
     </div>
-    <a href="{{ topicUrl }}" class="btn">{{ ui.icon('arrow-left', 'size-4') }} Voir dans le sujet</a>
-</div>
-<div class="card overflow-hidden">
+</header>
+
+<div class="border-b border-line">
     {% include '_post/message.html.twig' %}
 </div>
 {% endblock %}

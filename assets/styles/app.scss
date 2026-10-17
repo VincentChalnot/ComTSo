@@ -1,0 +1,9 @@
+// ComTSo stylesheet entry (imported by assets/scripts/main.js).
+// Pipeline: Sass compiles this tree first, then @tailwindcss/postcss turns the result into the final CSS
+// (see vite.config.js and docs/design-system.md). Sources Tailwind scans for utility classes are declared here because
+// @source paths are resolved relative to the ENTRY stylesheet.
+@use "index";
+
+@source "../../templates";
+@source "../vue";
+@source "../scripts";

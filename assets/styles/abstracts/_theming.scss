@@ -1,0 +1,81 @@
+// Theme-aware selectors and state helpers.
+@use "sass:list";
+@use "sass:map";
+@use "sass:selector";
+@use "../themes";
+
+/// Wraps `@content` in the selectors of ONE theme, relative to the parent selector (`&`).
+///   - `[data-theme="x"] &`                            the theme (html or any wrapper element)
+///   - `[data-theme="other"] [data-theme="x"] &`       a theme "island" nested in the other theme (showcase, previews):
+///                                                      one class more of specificity so the NEAREST theme wins
+///   - `:where(:root:not([data-theme])) &`             light fallback when <html> carries no data-theme
+@mixin themed($theme) {
+  $other: themes.other($theme);
+  $prefixes: ('[data-theme="#{$theme}"]', '[data-theme="#{$other}"] [data-theme="#{$theme}"]');
+  @if $theme == "light" {
+    $prefixes: list.append($prefixes, ":where(:root:not([data-theme]))", comma);
+  }
+  $selectors: ();
+  @each $prefix in $prefixes {
+    $selectors: list.join($selectors, selector.nest($prefix, &), comma);
+  }
+  @at-root #{$selectors} {
+    @content;
+  }
+}
+
+/// Runs `@content($theme)` once per theme.
+@mixin each-theme {
+  @each $theme in themes.$names {
+    @include themed($theme) {
+      @content ($theme);
+    }
+  }
+}
+
+// ---- interaction states: real pseudo-classes AND forced classes (used by the design-system showcase) ----
+@mixin hover {
+  &:hover,
+  &.is-hover {
+    @content;
+  }
+}
+@mixin pressed {
+  &:active,
+  &.is-pressed {
+    @content;
+  }
+}
+@mixin focus {
+  &:focus-visible,
+  &.is-focus {
+    @content;
+  }
+}
+@mixin disabled {
+  &:disabled,
+  &[aria-disabled="true"],
+  &.is-disabled {
+    @content;
+  }
+}
+
+/// Visible keyboard focus ring: 2px theme-focus colour (blue in light, sand in dark) + soft sand halo.
+@mixin focus-ring($offset: 2px) {
+  outline: 2px solid var(--c-focus);
+  outline-offset: $offset;
+  box-shadow: 0 0 0 calc(2px + #{$offset}) color-mix(in srgb, var(--c-highlight) 45%, transparent);
+}
+
+/// Media queries on the same breakpoints as Tailwind.
+$breakpoints: (sm: 40rem, md: 48rem, lg: 64rem, xl: 80rem);
+@mixin up($name) {
+  @media (min-width: map.get($breakpoints, $name)) {
+    @content;
+  }
+}
+@mixin down($name) {
+  @media (max-width: calc(#{map.get($breakpoints, $name)} - 0.02rem)) {
+    @content;
+  }
+}

@@ -1,0 +1,132 @@
+<section class="ds-section" id="navigation" data-title="Navigation">
+  <header class="ds-section-head">
+    <p class="kicker">Composants</p>
+    <h2>Navigation</h2>
+    <p class="standfirst">Onglets éditoriaux, pastilles, pagination, menus déroulants, bulles d’aide et listes verticales. L’élément courant porte une languette de papier kraft et un filet sable.</p>
+  </header>
+
+  <div class="ds-demo" data-title="Onglets soulignés (forums)">
+    <div class="ds-stage is-surface">
+      <nav class="tabs" aria-label="Forums">
+        <a href="#" aria-current="page">Général</a>
+        <a href="#">Photos <span class="badge badge-count">3</span></a>
+        <a href="#">Musique</a>
+        <a href="#">Cuisine et recettes</a>
+        <a href="#" class="is-hover">Survol</a>
+        <a href="#" class="is-focus">Focus</a>
+        <a href="#" class="is-pressed">Pressé</a>
+        <a href="#" aria-disabled="true" class="is-disabled">Désactivé</a>
+        <a href="#">Hors sujet</a>
+      </nav>
+      <p class="ds-note">Défile horizontalement sur mobile (sans barre de défilement). <code>aria-current="page"</code>, <code>aria-selected="true"</code> ou <code>.is-active</code> marquent l’onglet courant.</p>
+      <nav class="tabs" role="tablist" aria-label="Boutons">
+        <button type="button" role="tab" aria-selected="true">Messages</button>
+        <button type="button" role="tab" aria-selected="false">Photos</button>
+        <button type="button" role="tab" aria-selected="false">Favoris</button>
+      </nav>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Pastilles de navigation">
+    <div class="ds-stage is-surface">
+      <div class="ds-col" style="grid-template-columns:minmax(0,1fr)">
+        <div style="min-width:0">
+          <span class="ds-label">.tab-pills (défilement horizontal)</span>
+          <nav class="tab-pills" aria-label="Tri">
+            <a href="#" aria-current="page">Récents</a>
+            <a href="#">Populaires</a>
+            <a href="#">Sans réponse</a>
+            <a href="#" class="is-hover">Survol</a>
+            <a href="#" class="is-focus">Focus</a>
+            <a href="#" class="is-disabled" aria-disabled="true">Désactivé</a>
+            <a href="#">Archivés <span class="badge badge-count badge-muted">14</span></a>
+          </nav>
+        </div>
+        <div>
+          <span class="ds-label">.nav-pills (passent à la ligne)</span>
+          <nav class="nav-pills" aria-label="Filtres">
+            <a href="#">Tous</a><a href="#" aria-current="page">Non lus</a><a href="#">Mes sujets</a><a href="#">Favoris</a><a href="#">Avec photos</a><a href="#">Sondages</a><a href="#">Épinglés</a><a href="#">Archives 2004</a>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Pagination">
+    <div class="ds-stage is-surface">
+      <div class="ds-col">
+        <div><span class="ds-label">Première page</span>
+          <nav class="pager" aria-label="Pagination"><span class="is-disabled"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></span><span class="is-current" aria-current="page">1</span><a href="#">2</a><a href="#">3</a><a href="#">4</a><span class="border-transparent bg-transparent">…</span><a href="#">24</a><a href="#" rel="next" aria-label="Page suivante"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></nav></div>
+        <div><span class="ds-label">Au milieu, deux ellipses</span>
+          <nav class="pager" aria-label="Pagination"><a href="#" rel="prev" aria-label="Page précédente"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></a><a href="#">1</a><span class="border-transparent bg-transparent">…</span><a href="#">11</a><span class="is-current" aria-current="page">12</span><a href="#" class="is-hover">13</a><span class="border-transparent bg-transparent">…</span><a href="#">24</a><a href="#" rel="next" aria-label="Page suivante"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></nav></div>
+        <div><span class="ds-label">Dernière page, focus et pression forcés</span>
+          <nav class="pager" aria-label="Pagination"><a href="#" rel="prev" aria-label="Page précédente"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></a><a href="#">1</a><span class="border-transparent bg-transparent">…</span><a href="#" class="is-focus">22</a><a href="#" class="is-pressed">23</a><span class="is-current" aria-current="page">24</span><span class="is-disabled"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span></nav></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Menu déroulant, bulle d’aide, popover">
+    <div class="ds-stage is-surface" style="min-height:22rem">
+      <div class="ds-row" style="align-items:flex-start">
+        <div class="dropdown is-open" style="min-height:20rem">
+          <button class="btn" type="button" aria-expanded="true" aria-haspopup="menu">Actions <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="dropdown-menu" role="menu">
+            <p class="dropdown-label">Message</p>
+            <a class="dropdown-item" href="#" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>Modifier</a>
+            <a class="dropdown-item is-hover" href="#" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copier le lien <span class="dropdown-shortcut">⌘L</span></a>
+            <a class="dropdown-item is-active" href="#" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Dans mes favoris</a>
+            <button class="dropdown-item is-focus" type="button" role="menuitem">Citer le message</button>
+            <button class="dropdown-item" type="button" role="menuitem" disabled>Épingler (désactivé)</button>
+            <hr class="dropdown-divider">
+            <button class="dropdown-item is-danger" type="button" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Supprimer</button>
+          </div>
+        </div>
+
+        <details class="dropdown">
+          <summary class="btn btn-sm">Variante <code>&lt;details&gt;</code></summary>
+          <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Profil</a><a class="dropdown-item" href="#">Réglages</a><hr class="dropdown-divider"><a class="dropdown-item" href="#">Déconnexion</a></div>
+        </details>
+
+        <div class="ds-col" style="gap:3rem;padding-top:2.6rem">
+          <div class="ds-row">
+            <button class="btn btn-icon" data-tooltip="Ajouter aux favoris" aria-label="Ajouter aux favoris" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+            <button class="btn btn-icon is-hover" data-tooltip="Visible (is-hover)" aria-label="Aide" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg></button>
+            <span class="tooltip" role="tooltip">Bulle statique (<code>.tooltip</code>)</span>
+          </div>
+          <div class="popover has-arrow">
+            <p class="popover-title">Photo de la semaine</p>
+            <p>Choisie chaque lundi parmi les envois récents. Vous pouvez proposer la vôtre depuis votre galerie.</p>
+            <div class="mt-3"><a class="btn btn-sm btn-primary" href="#">Proposer une photo</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Menu vertical (colonne latérale, navigation mobile)">
+    <div class="ds-stage is-surface">
+      <div class="ds-grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr))">
+        <nav aria-label="Compte">
+          <ul class="menu">
+            <li class="menu-title">Mon compte</li>
+            <li><a class="menu-item is-active" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a></li>
+            <li><a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>Messages privés <span class="badge badge-count">2</span></a></li>
+            <li><a class="menu-item is-hover" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg>Mes photos <span class="menu-meta">48</span></a></li>
+            <li><a class="menu-item is-focus" href="#">Focus clavier</a></li>
+            <li class="menu-title">Préférences</li>
+            <li><a class="menu-item" href="#">Thème et affichage</a></li>
+            <li><a class="menu-item is-disabled" aria-disabled="true" href="#">Désactivé</a></li>
+          </ul>
+        </nav>
+        <nav aria-label="Forums">
+          <ul class="menu">
+            <li class="menu-title">Forums</li>
+            <li><a class="menu-item" href="#">Général <span class="menu-meta">1 204</span></a></li>
+            <li><a class="menu-item" href="#" aria-current="page">Photos <span class="menu-meta">386</span></a></li>
+            <li><a class="menu-item" href="#">Musique <span class="menu-meta">97</span></a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>

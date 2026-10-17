@@ -1,0 +1,60 @@
+// Small reusable pieces shared by components.
+@use "sass:math";
+
+/// Layered "paper sheet" shadow: a hairline contact shadow + two soft, offset ambient layers.
+/// Colours come from the theme-scoped custom property --c-shadow, so it works in light and dark.
+@mixin sheet-shadow($lift: 1) {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--c-shadow) 6%, transparent),
+    0 1px 1px color-mix(in srgb, var(--c-shadow) 8%, transparent),
+    0 #{2px * $lift} #{6px * $lift} -1px color-mix(in srgb, var(--c-shadow) 10%, transparent),
+    0 #{10px * $lift} #{22px * $lift} -10px color-mix(in srgb, var(--c-shadow) 22%, transparent);
+}
+
+/// "Stacked sheets": two paper edges peeking out under the element (needs a surface background).
+@mixin stacked-sheets($offset: 4px) {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--c-shadow) 6%, transparent),
+    0 1px 2px color-mix(in srgb, var(--c-shadow) 10%, transparent),
+    #{$offset} #{$offset} 0 -1px var(--c-surface-2),
+    #{$offset} #{$offset} 0 0 var(--c-line),
+    #{$offset * 2} #{$offset * 2} 0 -1px var(--c-surface-2),
+    #{$offset * 2} #{$offset * 2} 0 0 var(--c-line);
+}
+
+/// Clamp-based fluid size between two viewport widths.
+@function fluid($min, $max, $from: 22.5rem, $to: 80rem) {
+  $slope: math.div(($max - $min), ($to - $from));
+  $base: $min - $slope * $from;
+  @return clamp(#{$min}, #{$base} + #{$slope * 100vw}, #{$max});
+}
+
+/// Visually hidden but available to assistive technology.
+@mixin sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/// Eyebrow / small-caps style (kickers, card titles, table heads).
+@mixin eyebrow($size: 0.75rem, $tracking: 0.14em) {
+  font-family: var(--font-sans);
+  font-size: $size;
+  font-weight: 650;
+  line-height: 1.3;
+  letter-spacing: $tracking;
+  text-transform: uppercase;
+}
+
+/// Truncate to one line.
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

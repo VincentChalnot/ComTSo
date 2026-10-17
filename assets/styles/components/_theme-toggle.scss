@@ -1,0 +1,35 @@
+// Theme toggle buttons. The member's toggle is the Vue ThemeToggle (a `.btn-icon` swapping its own SVG); the anonymous
+// visitor's toggle is plain HTML + assets/scripts/theme-toggle.js (localStorage), see docs/design-system.md:
+//
+//   <button type="button" class="btn-icon theme-toggle" data-theme-toggle aria-label="Changer de thème">
+//     <svg data-when="light">moon</svg><svg data-when="dark">sun</svg>      (data-when = the theme in which the icon is shown)
+//   </button>
+@use "../abstracts" as *;
+
+@layer components {
+  .theme-toggle {
+    [data-when] {
+      display: none;
+    }
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+  // `data-when` is the CURRENT theme the icon is shown in: moon while light, sun while dark (same as ThemeToggle.vue)
+  [data-theme="light"] .theme-toggle [data-when="light"],
+  [data-theme="dark"] .theme-toggle [data-when="dark"] {
+    display: flex;
+  }
+  :where(:root:not([data-theme])) .theme-toggle [data-when="light"] {
+    display: flex;
+  }
+
+  // Floating variant for pages without masthead (login)
+  .theme-toggle-floating {
+    position: fixed;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 40;
+  }
+}

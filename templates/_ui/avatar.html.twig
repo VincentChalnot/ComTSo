@@ -1,10 +1,13 @@
-{# {% import '_ui/avatar.html.twig' as av %}{{ av.avatar(user, 'size-10') }} #}
-{% macro avatar(user, size = 'size-10') %}
+{# {% import '_ui/avatar.html.twig' as av %}{{ av.avatar(user, 'sm') }}
+   size: xs (1.5rem) | sm (2rem) | md (2.5rem, default) | lg (3.5rem) | xl (6rem). `class` adds extra classes (layout glue only).
+   Members without a photo get an initial on a muted tone derived from `user_hue(user)` (custom property, no colour in the template). #}
+{% macro avatar(user, size = 'md', class = '') %}
+{%- set cls = 'avatar' ~ (size != 'md' ? ' avatar-' ~ size : '') ~ (class ? ' ' ~ class : '') -%}
 {%- if user is null -%}
-    <span class="{{ size }} inline-flex shrink-0 items-center justify-center rounded-full bg-surface-2 text-xs font-semibold text-muted">?</span>
+    <span class="{{ cls }} avatar-initial" style="--avatar-hue: 30" aria-hidden="true">?</span>
 {%- elseif user.avatar -%}
-    <img src="{{ path('photo_variant', {id: user.avatar.id, variant: 'avatar'}) }}" alt="{{ user.username }}" title="{{ user.username }}" width="96" height="96" loading="lazy" class="{{ size }} shrink-0 rounded-full bg-surface-2 object-cover">
+    <img src="{{ path('photo_variant', {id: user.avatar.id, variant: 'avatar'}) }}" alt="{{ user.username }}" title="{{ user.username }}" width="96" height="96" loading="lazy" class="{{ cls }}">
 {%- else -%}
-    <span title="{{ user.username }}" class="{{ size }} inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl({{ user_hue(user) }} 42% 42%)">{{ user.username|slice(0, 1)|upper }}</span>
+    <span title="{{ user.username }}" class="{{ cls }} avatar-initial" style="--avatar-hue: {{ user_hue(user) }}">{{ user.username|slice(0, 1)|upper }}</span>
 {%- endif -%}
 {% endmacro %}

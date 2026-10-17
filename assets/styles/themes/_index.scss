@@ -1,0 +1,19 @@
+// Theme registry: role -> colour per theme, plus solid "fill" colours that must stay identical in both themes.
+@use "sass:map";
+@use "light";
+@use "dark";
+
+$themes: ("light": light.$colors, "dark": dark.$colors);
+$names: ("light", "dark");
+
+/// The Sass colour a role takes in a theme (used to compute texture tones at build time).
+@function color($theme, $role) {
+  @return map.get($themes, $theme, $role);
+}
+
+@function other($theme) {
+  @if $theme == "light" {
+    @return "dark";
+  }
+  @return "light";
+}

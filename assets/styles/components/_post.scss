@@ -1,0 +1,462 @@
+// Messages: a quiet editorial column. No boxes: a hairline between consecutive messages, the author in small caps, the
+// text in the reading serif, details (date, actions) that appear on hover / tap. User HTML (.post-body) is sanitized
+// server-side; this file only dresses what the allow-list lets through.
+//
+//   .post                 one message row (avatar | column)        .post.is-target   permalink highlight
+//   .post-author          author line (small caps)                  .post.is-active   details revealed on touch
+//   .post-body            sanitized user HTML                       .post-body.is-collapsed + .post-toggle   long messages
+//   .post-meta            date / link / edit / delete               (space reserved; revealed on hover, focus-within, .is-active, always on touch)
+@use "../abstracts" as *;
+
+@layer components {
+  // ---- the row -----------------------------------------------------------------------------------------------------
+  .post {
+    position: relative;
+    display: flex;
+    gap: 0.875rem;
+    padding: 1.25rem 1rem;
+    scroll-margin-top: 5rem;
+    color: var(--c-fg);
+    transition: background-color 0.25s var(--ease-paper);
+
+    @include up(sm) {
+      gap: 1.25rem;
+      padding: 1.5rem 1.5rem;
+    }
+
+    // hairline instead of a box
+    & + .post {
+      border-top: 1px solid var(--c-line);
+    }
+
+    // touch: the tapped message is quietly tinted while its details are open
+    &.is-active {
+      background-color: color-mix(in srgb, var(--c-surface-2) 45%, transparent);
+    }
+
+    // permalink: sand wash + a sand edge on the left
+    &.is-target {
+      background-color: color-mix(in srgb, var(--c-highlight-soft) 62%, transparent);
+      box-shadow: inset 3px 0 0 var(--c-highlight);
+
+      .post-meta {
+        color: var(--c-fg-soft);
+      }
+    }
+  }
+
+  // author line above the text
+  .post-author {
+    margin: 0 0 0.15rem;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 620;
+    line-height: 1.3;
+    letter-spacing: 0.06em;
+    font-variant-caps: all-small-caps;
+    color: var(--c-fg-soft);
+
+    a {
+      color: inherit;
+      text-decoration: none;
+
+      &:hover {
+        color: var(--c-link-hover);
+        text-decoration: underline;
+      }
+    }
+  }
+  .post-author-sub {
+    margin-left: 0.5em;
+    font-weight: 450;
+    letter-spacing: 0.02em;
+    color: var(--c-muted);
+  }
+
+  // ---- details (date, link, edit, delete) ---------------------------------------------------------------------------
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.9rem;
+    padding-block: 0.15rem;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--c-muted);
+    transition: opacity 0.18s var(--ease-paper);
+
+    time {
+      font-variant-numeric: tabular-nums;
+    }
+    a,
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--c-muted);
+      font: inherit;
+      text-decoration: none;
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+
+      svg {
+        flex: none;
+        width: 0.875rem;
+        height: 0.875rem;
+      }
+
+      &:hover,
+      &.is-hover {
+        color: var(--c-fg);
+        text-decoration: underline;
+      }
+    }
+    // the delete action keeps its brick red (utility `text-danger` in the templates)
+    .text-danger,
+    .is-danger {
+      color: var(--c-danger);
+
+      &:hover {
+        color: var(--c-danger);
+      }
+    }
+    form {
+      display: inline;
+      margin: 0;
+    }
+  }
+
+  // Space is always reserved (no layout shift): details fade in on hover / keyboard focus; touch devices always show them.
+  .post .post-meta {
+    margin-top: 0.5rem;
+    visibility: hidden;
+    opacity: 0;
+  }
+  .post:hover .post-meta,
+  .post.is-hover .post-meta,
+  .post:focus-within .post-meta,
+  .post.is-active .post-meta {
+    visibility: visible;
+    opacity: 1;
+  }
+  @media (hover: none) {
+    .post .post-meta {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .post .post-meta {
+      transition: none;
+    }
+  }
+
+  // ---- sanitized user HTML -----------------------------------------------------------------------------------------
+  .post-body {
+    max-width: 68ch;
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: var(--c-fg);
+    hyphens: auto;
+    hyphenate-limit-chars: 6 3 3;
+    overflow-wrap: anywhere;
+    font-optical-sizing: auto;
+
+    > * + * {
+      margin-top: 0.85em;
+    }
+    > :first-child {
+      margin-top: 0;
+    }
+    p {
+      min-height: 1em;
+    }
+
+    a {
+      color: var(--c-link);
+      text-decoration-line: underline;
+      text-decoration-thickness: 0.07em;
+      text-decoration-color: color-mix(in srgb, var(--c-link) 40%, transparent);
+      text-underline-offset: 0.2em;
+      hyphens: manual;
+
+      &:hover {
+        color: var(--c-link-hover);
+        text-decoration-color: currentColor;
+      }
+    }
+
+    // pictures: a printed photo laid on the page (tiny radius, hairline)
+    img {
+      display: inline-block;
+      max-width: 100%;
+      max-height: 24rem;
+      width: auto;
+      height: auto;
+      border-radius: var(--radius-md);
+      box-shadow:
+        0 0 0 1px var(--c-line),
+        0 2px 6px -2px color-mix(in srgb, var(--c-shadow) 22%, transparent);
+      vertical-align: middle;
+    }
+    // smilies: inline glyphs, no frame
+    img[src^="/smilies/"] {
+      display: inline;
+      width: auto;
+      height: auto;
+      max-height: 1.5rem;
+      border-radius: 0;
+      box-shadow: none;
+      vertical-align: text-bottom;
+    }
+
+    // quotes: an editorial pull-quote with a sand rule (current + legacy `div.cite`)
+    blockquote,
+    div.cite {
+      margin-inline: 0;
+      padding: 0.15rem 0 0.15rem 1.1rem;
+      border-left: 3px solid var(--c-highlight);
+      font-style: italic;
+      font-size: 1.03em;
+      color: var(--c-fg-soft);
+
+      > * + * {
+        margin-top: 0.5em;
+      }
+      blockquote {
+        border-left-color: var(--c-line-strong);
+        font-size: 1em;
+      }
+    }
+    cite,
+    .post-quote-author {
+      display: block;
+      margin-bottom: 0.2rem;
+      font-family: var(--font-sans);
+      font-size: 0.6875rem;
+      font-style: normal;
+      font-weight: 650;
+      line-height: 1.4;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+    }
+    // legacy: the author sits in its own paragraph right before the quote container
+    p:has(> cite:only-child) {
+      margin-bottom: -0.35em;
+    }
+
+    ul,
+    ol {
+      padding-left: 1.5rem;
+      list-style-position: outside;
+
+      li + li {
+        margin-top: 0.25em;
+      }
+      li::marker {
+        color: var(--c-muted);
+      }
+    }
+    ul {
+      list-style-type: disc;
+    }
+    ol {
+      list-style-type: decimal;
+    }
+
+    code,
+    pre {
+      font-family: var(--font-mono);
+      hyphens: none;
+    }
+    code {
+      padding: 0.08em 0.35em;
+      border-radius: var(--radius-sm);
+      background: var(--c-surface-2);
+      font-size: 0.85em;
+      color: var(--c-fg);
+    }
+    pre {
+      padding: 0.85rem 1rem;
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      background: var(--c-surface-2);
+      box-shadow:
+        var(--shadow-inset),
+        0 0 0 1px var(--c-line-soft);
+      font-size: 0.8125rem;
+      line-height: 1.55;
+      white-space: pre;
+      overflow-wrap: normal;
+      tab-size: 2;
+
+      code {
+        padding: 0;
+        background: none;
+        font-size: inherit;
+      }
+    }
+
+    // tables: editorial, horizontal hairlines only
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      line-height: 1.45;
+      hyphens: none;
+
+      // phones: the table scrolls sideways inside the message instead of crushing its words
+      @include down(sm) {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+    th,
+    td {
+      overflow-wrap: normal;
+      padding: 0.45rem 0.6rem;
+      border-bottom: 1px solid var(--c-line);
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      @include eyebrow(0.6875rem, 0.1em);
+      border-bottom: 1px solid var(--c-rule);
+      color: var(--c-fg-soft);
+    }
+    td {
+      font-variant-numeric: tabular-nums;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin-top: 1.4em;
+      font-size: 1.1875rem;
+      font-weight: 580;
+      line-height: 1.25;
+      hyphens: manual;
+    }
+    h1 {
+      font-size: 1.375rem;
+    }
+    h3 {
+      font-size: 1.0625rem;
+    }
+    h1 + *,
+    h2 + *,
+    h3 + * {
+      margin-top: 0.5em;
+    }
+
+    hr {
+      margin: 1.5rem 0;
+      border-top: 1px solid var(--c-line);
+    }
+
+    // YouTube (the only iframe the sanitizer keeps): 16:9, never wider than 42rem
+    iframe {
+      display: block;
+      width: 100%;
+      max-width: 42rem;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      border: 0;
+      border-radius: var(--radius-md);
+      background: var(--c-surface-3);
+      box-shadow: var(--shadow-sheet);
+    }
+    .youtube-embed {
+      max-width: 42rem;
+    }
+
+    mark {
+      color: var(--c-fg);
+    }
+  }
+
+  // lead text (topic description): a notch larger, soft ink
+  .post-body.is-lead {
+    max-width: 62ch;
+    font-size: 1.1875rem;
+    line-height: 1.6;
+    color: var(--c-fg-soft);
+  }
+
+  // ---- long messages: ui.js adds .is-collapsed (+ a .post-toggle after the body) -------------------------------------
+  // The text itself fades out (mask), so the paper grain of the card shows through instead of a flat colour band.
+  .post-body.is-collapsed {
+    position: relative;
+    max-height: 9rem; // keep in sync with COLLAPSED_MAX in assets/scripts/ui.js
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent);
+    mask-image: linear-gradient(to bottom, #000 45%, transparent);
+  }
+
+  .post-toggle {
+    @include texture-host;
+    @include texture-tone("kraft", "surface-2");
+    --texture-strength: 0.35;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    margin-top: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background-color: var(--c-surface-2);
+    color: var(--c-fg-soft);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition:
+      background-color 0.15s var(--ease-paper),
+      color 0.15s var(--ease-paper);
+
+    svg {
+      flex: none;
+      width: 1rem;
+      height: 1rem;
+    }
+
+    @include hover {
+      @include texture-tone("kraft", "surface-3");
+      background-color: var(--c-surface-3);
+      color: var(--c-fg);
+    }
+    @include pressed {
+      transform: translateY(1px);
+    }
+    @include focus {
+      @include focus-ring;
+    }
+  }
+
+  // ---- inside a thread preview: compact, no avatar column on small screens ------------------------------------------
+  .thread-preview-more {
+    .post {
+      padding: 0.9rem 0;
+      gap: 0.75rem;
+    }
+    .post-body {
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+    @include down(sm) {
+      .post > a:first-child,
+      .post > span:first-child {
+        display: none;
+      }
+    }
+  }
+}

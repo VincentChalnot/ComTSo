@@ -1,0 +1,32 @@
+// Theme variables. Every colour a component uses is a CSS custom property defined per theme, so toggling
+// <html data-theme> (or nesting a `data-theme` wrapper) re-colours the page instantly, without a reload or a rebuild.
+@use "sass:map";
+@use "../abstracts/functions" as fn;
+@use "../abstracts/texture";
+@use "../themes";
+
+@mixin emit($theme) {
+  color-scheme: #{$theme};
+  @each $role, $color in map.get(themes.$themes, $theme) {
+    --c-#{$role}: #{fn.hex($color)};
+  }
+  // Theme-scoped shadows (re-evaluated inside a theme island, unlike the Tailwind @theme shadows)
+  --shadow-sheet: 0 0 0 1px color-mix(in srgb, var(--c-shadow) 6%, transparent), 0 1px 1px color-mix(in srgb, var(--c-shadow) 8%, transparent), 0 2px 6px -1px color-mix(in srgb, var(--c-shadow) 10%, transparent), 0 10px 22px -10px color-mix(in srgb, var(--c-shadow) 22%, transparent);
+  --shadow-lift: 0 0 0 1px color-mix(in srgb, var(--c-shadow) 8%, transparent), 0 2px 3px color-mix(in srgb, var(--c-shadow) 10%, transparent), 0 8px 16px -4px color-mix(in srgb, var(--c-shadow) 16%, transparent), 0 22px 36px -16px color-mix(in srgb, var(--c-shadow) 30%, transparent);
+  --shadow-inset: inset 0 1px 2px color-mix(in srgb, var(--c-shadow) 14%, transparent);
+  @include texture.theme-defaults($theme);
+}
+
+:root,
+[data-theme="light"] {
+  @include emit("light");
+}
+
+[data-theme="dark"] {
+  @include emit("dark");
+}
+
+// Whatever the theme, never let an inherited theme leak a wrong colour-scheme into form controls
+:root {
+  --texture-print: 1;
+}

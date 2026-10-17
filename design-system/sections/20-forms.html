@@ -1,0 +1,176 @@
+<section class="ds-section" id="formulaires" data-title="Formulaires">
+  <header class="ds-section-head">
+    <p class="kicker">Composants</p>
+    <h2>Formulaires</h2>
+    <p class="standfirst">Des champs de papier : fond clair, filet intérieur discret, bordure lisible. Le focus dessine un anneau bleu (sable en sombre), l’erreur passe la bordure en brique. 16&nbsp;px sur mobile pour éviter le zoom d’iOS.</p>
+  </header>
+
+  <div class="ds-demo" data-title="Champs de texte">
+    <div class="ds-stage is-surface">
+      <div class="form-grid">
+        <div class="field"><label class="label" for="f-text">Pseudo</label><input class="input" id="f-text" type="text" value="Camille" autocomplete="off"></div>
+        <div class="field"><label class="label" for="f-mail">Adresse e-mail</label><input class="input" id="f-mail" type="email" placeholder="prenom@exemple.fr"></div>
+        <div class="field"><label class="label" for="f-pass">Mot de passe</label><input class="input" id="f-pass" type="password" value="motdepasse"></div>
+        <div class="field"><label class="label" for="f-num">Nombre de messages par page</label><input class="input" id="f-num" type="number" value="25" min="5" max="100"></div>
+        <div class="field"><label class="label" for="f-url">Site web</label><input class="input" id="f-url" type="url" placeholder="https://"></div>
+        <div class="field"><label class="label" for="f-tel">Téléphone</label><input class="input" id="f-tel" type="tel" placeholder="06 12 34 56 78"></div>
+        <div class="field"><label class="label" for="f-date">Date de naissance</label><input class="input" id="f-date" type="date" value="1984-03-12"></div>
+        <div class="field"><label class="label" for="f-time">Heure du rendez-vous</label><input class="input" id="f-time" type="time" value="20:30"></div>
+        <div class="field is-wide">
+          <label class="label" for="f-search">Recherche (icône à gauche, dans l’en-tête)</label>
+          <form class="relative" onsubmit="return false">
+            <input class="input !py-1.5 pl-9" id="f-search" type="search" placeholder="Rechercher…" aria-label="Rechercher">
+            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+          </form>
+        </div>
+        <div class="field"><label class="label" for="f-short">Largeur automatique (<code>!w-auto</code>)</label><input class="input !w-auto" id="f-short" type="date" value="2026-10-17"></div>
+        <div class="field"><label class="label" for="f-sm">Petit champ</label><input class="input input-sm" id="f-sm" type="text" value="input-sm"></div>
+        <div class="field is-wide"><label class="label" for="f-lg">Grand champ</label><input class="input input-lg" id="f-lg" type="text" placeholder="input-lg, pour un titre de sujet"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="États : repos, survol, focus, erreur, aide, désactivé, lecture seule">
+    <div class="ds-stage is-surface">
+      <div class="form-grid">
+        <div class="field"><label class="label" for="s-rest">Repos</label><input class="input" id="s-rest" type="text" placeholder="Placeholder"></div>
+        <div class="field"><label class="label" for="s-hover">Survol (<code>is-hover</code>)</label><input class="input is-hover" id="s-hover" type="text" value="Survolé"></div>
+        <div class="field"><label class="label" for="s-focus">Focus (<code>is-focus</code>)</label><input class="input is-focus" id="s-focus" type="text" value="Au clavier"></div>
+        <div class="field">
+          <label class="label" for="s-help">Avec aide</label>
+          <input class="input" id="s-help" type="text" aria-describedby="s-help-h" value="camille84">
+          <p class="field-help" id="s-help-h">Lettres, chiffres et tirets. Visible par tous les membres.</p>
+        </div>
+        <div class="field">
+          <label class="label is-required" for="s-err">Erreur</label>
+          <input class="input" id="s-err" type="email" value="camille@" aria-invalid="true" aria-describedby="s-err-e">
+          <p class="field-error" id="s-err-e" role="alert">Cette adresse e-mail n’est pas valide.</p>
+        </div>
+        <div class="field">
+          <label class="label" for="s-err2">Erreur (<code>is-invalid</code>, focus)</label>
+          <input class="input is-invalid is-focus" id="s-err2" type="text" value="">
+          <p class="field-error">Ce champ ne peut pas être vide.</p>
+        </div>
+        <div class="field"><label class="label" for="s-dis">Désactivé</label><input class="input" id="s-dis" type="text" value="Non modifiable" disabled></div>
+        <div class="field"><label class="label" for="s-ro">Lecture seule</label><input class="input" id="s-ro" type="text" value="membre depuis 2004" readonly></div>
+        <div class="field is-wide">
+          <label class="label" for="s-sf">Sortie du thème de formulaire Symfony</label>
+          <input class="input" id="s-sf" type="text" value="x" aria-invalid="true">
+          <p id="s-sf_help" class="mt-1 text-xs text-muted">Texte d’aide rendu par <code>form_help</code>.</p>
+          <ul class="mt-1 space-y-0.5"><li class="field-error">Le titre doit comporter au moins 3 caractères.</li><li class="field-error">Ce titre existe déjà.</li></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Zone de texte, liste déroulante, fichier">
+    <div class="ds-stage is-surface">
+      <div class="form-grid">
+        <div class="field is-wide"><label class="label" for="t-area">Message</label><textarea class="input" id="t-area" rows="4" placeholder="Votre message…">Salut tout le monde, voici quelques nouvelles de l’été, des photos arrivent bientôt.</textarea></div>
+        <div class="field"><label class="label" for="t-sel">Forum</label>
+          <select class="input" id="t-sel"><option>Général</option><option selected>Photos et souvenirs</option><option>Musique</option><option>Hors sujet</option></select></div>
+        <div class="field"><label class="label" for="t-sel-d">Liste désactivée</label>
+          <select class="input" id="t-sel-d" disabled><option>Général</option></select></div>
+        <div class="field"><label class="label" for="t-sel-e">Liste en erreur</label>
+          <select class="input" id="t-sel-e" aria-invalid="true"><option value="">Choisir…</option><option>Général</option></select></div>
+        <div class="field"><label class="label" for="t-multi">Sélection multiple</label>
+          <select class="input" id="t-multi" multiple size="3"><option>Chat</option><option selected>Forum</option><option selected>Photos</option><option>Messages privés</option></select></div>
+        <div class="field is-wide"><label class="label" for="t-file">Photo de profil</label><input class="input" id="t-file" type="file" accept="image/*"></div>
+        <div class="field is-wide"><label class="label" for="t-file-h">Fichier, bouton survolé (<code>is-hover</code>)</label><input class="input is-hover" id="t-file-h" type="file"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Cases à cocher, boutons radio, interrupteurs">
+    <div class="ds-stage is-surface">
+      <div class="form-grid">
+        <fieldset>
+          <legend>Cases à cocher</legend>
+          <div class="check-group">
+            <label class="check"><input type="checkbox"><span>Non cochée</span></label>
+            <label class="check"><input type="checkbox" checked><span>Cochée</span></label>
+            <label class="check"><input type="checkbox" class="is-hover"><span>Survol forcé</span></label>
+            <label class="check"><input type="checkbox" class="is-focus" checked><span>Focus forcé</span></label>
+            <label class="check"><input type="checkbox" class="is-indeterminate"><span>Indéterminée</span></label>
+            <label class="check"><input type="checkbox" disabled><span>Désactivée</span></label>
+            <label class="check"><input type="checkbox" checked disabled><span>Cochée et désactivée</span></label>
+            <label class="check"><input type="checkbox"><span>Avec explication<small>Recevoir un résumé chaque lundi matin.</small></span></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Boutons radio</legend>
+          <div class="check-group">
+            <label class="check"><input type="radio" name="r1" checked><span>Du plus ancien au plus récent</span></label>
+            <label class="check"><input type="radio" name="r1"><span>Du plus récent au plus ancien</span></label>
+            <label class="check"><input type="radio" name="r1" class="is-hover"><span>Survol forcé</span></label>
+            <label class="check"><input type="radio" name="r1" class="is-focus"><span>Focus forcé</span></label>
+            <label class="check"><input type="radio" name="r2" disabled><span>Désactivé</span></label>
+            <label class="check"><input type="radio" name="r2" checked disabled><span>Coché et désactivé</span></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Interrupteurs</legend>
+          <div class="check-group">
+            <label class="switch"><input type="checkbox" role="switch"><span>Notifications par e-mail</span></label>
+            <label class="switch"><input type="checkbox" role="switch" checked><span>Thème sombre automatique</span></label>
+            <label class="switch"><input type="checkbox" role="switch" class="is-focus"><span>Focus forcé</span></label>
+            <label class="switch"><input type="checkbox" role="switch" disabled><span>Désactivé</span></label>
+            <label class="switch"><input type="checkbox" role="switch" checked disabled><span>Activé et désactivé</span></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Sortie Symfony (expanded)</legend>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2"><input type="radio" name="sf" id="sf1" class="size-4 accent-[var(--c-accent)]" checked><label for="sf1" class="label !mb-0 !font-normal">Clair</label></div>
+            <div class="flex items-center gap-2"><input type="radio" name="sf" id="sf2" class="size-4 accent-[var(--c-accent)]"><label for="sf2" class="label !mb-0 !font-normal">Sombre</label></div>
+            <div class="flex items-center gap-2"><input type="checkbox" id="sf3" class="size-4"><label for="sf3" class="label !mb-0 !font-normal">Supprimer la photo</label></div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Groupes de champs et adornements">
+    <div class="ds-stage is-surface">
+      <div class="ds-col" style="max-width:34rem">
+        <div class="input-group"><span class="input-addon">@</span><input class="input" type="text" placeholder="pseudo" aria-label="Pseudo"></div>
+        <div class="input-group"><input class="input" type="search" placeholder="Rechercher un sujet…" aria-label="Rechercher"><button class="btn btn-primary" type="button">Chercher</button></div>
+        <div class="input-group"><input class="input" type="number" value="12" aria-label="Quantité"><span class="input-addon">messages</span></div>
+        <div class="input-wrap">
+          <span class="input-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+          <input class="input has-icon" type="email" placeholder="Icône dans le champ" aria-label="E-mail">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Formulaire complet : nouveau sujet">
+    <div class="ds-stage">
+      <form class="card mx-auto max-w-2xl p-5 sm:p-7" onsubmit="return false">
+        <p class="kicker">Forum Photos et souvenirs</p>
+        <h3 class="mt-2">Ouvrir un nouveau sujet</h3>
+        <p class="standfirst mt-2 mb-6">Un titre clair, quelques lignes, et c’est parti.</p>
+        <div class="alert alert-info alert-sm"><span class="alert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span><div class="alert-body">Les photos ajoutées sont privées : seuls les membres les voient.</div></div>
+        <div class="space-y-5">
+          <div class="field"><label class="label is-required" for="n-title">Titre</label><input class="input" id="n-title" type="text" value="Retrouvailles d’été" aria-invalid="true"><p class="field-error">Ce titre est trop proche d’un sujet existant.</p></div>
+          <div class="form-grid">
+            <div class="field"><label class="label" for="n-forum">Forum</label><select class="input" id="n-forum"><option>Photos et souvenirs</option><option>Général</option></select></div>
+            <div class="field"><label class="label" for="n-date">Date de l’événement</label><input class="input" id="n-date" type="date"></div>
+          </div>
+          <div class="field"><label class="label" for="n-body">Description</label><textarea class="input" id="n-body" rows="5" placeholder="Racontez…"></textarea><p class="field-help">Le texte riche est autorisé : gras, liens, images.</p></div>
+          <fieldset>
+            <legend>Options</legend>
+            <div class="check-group">
+              <label class="check"><input type="checkbox" checked><span>Me prévenir des réponses</span></label>
+              <label class="check"><input type="checkbox"><span>Épingler en haut du forum</span></label>
+            </div>
+          </fieldset>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-ghost" type="button">Annuler</button>
+          <button class="btn btn-primary" type="submit">Publier le sujet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

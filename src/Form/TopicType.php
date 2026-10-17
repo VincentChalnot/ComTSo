@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Forum;
 use App\Entity\Topic;
+use App\Form\Type\PhotoUploadType;
 use App\Form\Type\RichTextType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -28,6 +29,11 @@ class TopicType extends AbstractType
                 'help' => 'Optionnelle : s\'affiche sous le titre du sujet.',
             ]);
 
+        // New topics: photos are attached to the topic itself (App\Entity\PhotoTopic), no need to open the photo manager afterwards.
+        if ($options['with_photos']) {
+            $builder->add('photos', PhotoUploadType::class);
+        }
+
         if ($options['allow_move']) {
             $builder->add('forum', EntityType::class, [
                 'label' => 'Forum',
@@ -40,7 +46,13 @@ class TopicType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => Topic::class, 'allow_move' => false]);
+        $resolver->setDefaults([
+            'data_class' => Topic::class,
+            'allow_move' => false,
+            'with_photos' => false,
+            'post_max_size_message' => 'L\'envoi est trop volumineux : joignez moins de photos ou des photos plus légères.',
+        ]);
         $resolver->setAllowedTypes('allow_move', 'bool');
+        $resolver->setAllowedTypes('with_photos', 'bool');
     }
 }

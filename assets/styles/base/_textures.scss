@@ -1,0 +1,74 @@
+// Paper textures: the page canvas, the ad-hoc `.texture-*` utility API and the print / accessibility switches.
+// The recipe tables and mixins live in abstracts/_texture.scss; see docs/design-system.md for the full API.
+@use "sass:map";
+@use "../abstracts" as *;
+
+// ---- page canvas ---------------------------------------------------------------------------------------------------
+// body::before carries the watercolour tile over the page colour. It is `position: absolute` (scrolls with the page,
+// painted once with the content) rather than `fixed`: a fixed layer needs a per-frame blend of two compositor layers
+// while scrolling, an attached one is simply raster. Body is the isolated host, so the blend sees the page colour.
+@layer base {
+  body {
+    @include texture-host("before", relative);
+    @include texture-tone("paper", "page");
+    --texture-strength: var(--canvas-texture-strength, 0.4);
+  }
+  // the canvas carries less grain than a coloured control: text sits on it
+  :root {
+    --canvas-texture-strength: 0.4;
+  }
+  [data-theme="dark"] {
+    --canvas-texture-strength: 0.55;
+  }
+}
+
+// ---- ad-hoc utility API -----------------------------------------------------------------------------------------------
+//   <div class="texture-paper">                        host with the watercolour tile, tone follows the current theme
+//   <div class="texture-kraft is-tone-dark">           hard paper tile, recipe forced for a DARK host colour
+//   <div class="texture-paper" style="--texture-ratio:.4">   dial: 0 = flat colour, 1 = calibrated, up to ~2 = strong
+// Modifiers: .is-tone-paper | .is-tone-light | .is-tone-mid | .is-tone-dark | .texture-subtle | .texture-strong | .texture-off
+@layer components {
+  @each $family, $fam in $families {
+    .texture-#{$family} {
+      @include texture-host;
+      --texture-image: var(--tx-#{$family}-image);
+      --texture-blend: var(--tx-#{$family}-blend);
+      --texture-filter: var(--tx-#{$family}-filter);
+      --texture-gain: var(--tx-#{$family}-gain);
+      --texture-size: var(--tx-#{$family}-size);
+
+      @each $tone in map.keys($tone-floors) {
+        &.is-tone-#{$tone} {
+          @include texture-vars($family, $tone);
+        }
+      }
+    }
+  }
+
+  // `.texture-card`: a sheet of paper (surface colour + paper tile + layered shadow)
+  .texture-card {
+    @include texture-host;
+    @include texture-tone("paper", "surface");
+    background-color: var(--c-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .texture-subtle {
+    --texture-ratio: 0.5;
+  }
+  .texture-strong {
+    --texture-ratio: 1.6;
+  }
+  .texture-off {
+    --texture-ratio: 0;
+  }
+}
+
+// ---- switches -------------------------------------------------------------------------------------------------------------
+// One custom property multiplies every texture opacity: print, forced colours and high-contrast users get flat colour.
+@media print, (forced-colors: active), (prefers-contrast: more) {
+  :root {
+    --texture-print: 0;
+  }
+}

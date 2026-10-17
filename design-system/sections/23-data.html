@@ -1,0 +1,154 @@
+<section class="ds-section" id="donnees" data-title="Données">
+  <header class="ds-section-head">
+    <p class="kicker">Composants</p>
+    <h2>Données et personnes</h2>
+    <p class="standfirst">Tableaux à filets, listes de définitions pour les profils, avatars ronds avec repli en initiales et piles de participants.</p>
+  </header>
+
+  <div class="ds-demo" data-title="Tableau">
+    <div class="ds-stage is-surface">
+      <div class="table-responsive">
+        <table class="table">
+          <caption>Derniers sujets du forum Photos</caption>
+          <thead><tr><th scope="col">Sujet</th><th scope="col">Auteur</th><th scope="col" class="num">Messages</th><th scope="col" class="num">Dernier message</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><a href="#">Retrouvailles d’été</a></th><td>Camille</td><td class="num">128</td><td class="num"><time>12/10/2026</time></td></tr>
+            <tr><th scope="row"><a href="#">Vieilles photos de 2004</a></th><td>Maxime</td><td class="num">1 042</td><td class="num"><time>11/10/2026</time></td></tr>
+            <tr><th scope="row"><a href="#">Le concert de la rentrée</a></th><td>Inès</td><td class="num">57</td><td class="num"><time>03/10/2026</time></td></tr>
+          </tbody>
+          <tfoot><tr><th scope="row" colspan="2">Total</th><td class="num">1 227</td><td></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Tableau : rayé, survol, compact, ligne sélectionnée">
+    <div class="ds-stage is-surface">
+      <div class="ds-col">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead><tr><th scope="col">Membre</th><th scope="col">Inscription</th><th scope="col" class="num">Messages</th></tr></thead>
+            <tbody>
+              <tr><td>Camille</td><td><time>14/03/2004</time></td><td class="num">8 412</td></tr>
+              <tr class="is-hover"><td>Maxime (survol forcé)</td><td><time>02/09/2005</time></td><td class="num">6 120</td></tr>
+              <tr class="is-selected"><td>Inès (sélectionnée)</td><td><time>21/01/2008</time></td><td class="num">3 007</td></tr>
+              <tr><td>Hugo</td><td><time>30/06/2011</time></td><td class="num">912</td></tr>
+              <tr><td>Léa</td><td><time>05/12/2019</time></td><td class="num">241</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead><tr><th scope="col">Compact</th><th scope="col" class="num">Valeur</th></tr></thead>
+            <tbody><tr><td>Sujets</td><td class="num">4 120</td></tr><tr><td>Messages</td><td class="num">286 310</td></tr><tr><td>Photos</td><td class="num">12 054</td></tr></tbody>
+          </table>
+        </div>
+        <div class="table-responsive" style="--table-max-height:11rem">
+          <table class="table table-sm table-sticky table-striped">
+            <thead><tr><th scope="col">En-tête fixe</th><th scope="col" class="num">N°</th></tr></thead>
+            <tbody>
+              <tr><td>Ligne 1</td><td class="num">1</td></tr><tr><td>Ligne 2</td><td class="num">2</td></tr><tr><td>Ligne 3</td><td class="num">3</td></tr><tr><td>Ligne 4</td><td class="num">4</td></tr><tr><td>Ligne 5</td><td class="num">5</td></tr><tr><td>Ligne 6</td><td class="num">6</td></tr><tr><td>Ligne 7</td><td class="num">7</td></tr><tr><td>Ligne 8</td><td class="num">8</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Liste de définitions (profil)">
+    <div class="ds-stage">
+      <div class="ds-grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr))">
+        <div class="card p-5">
+          <h3 class="card-title">Profil</h3>
+          <dl class="dl mt-3">
+            <dt>Membre depuis</dt><dd><time>14 mars 2004</time></dd>
+            <dt>Messages</dt><dd>8&nbsp;412</dd>
+            <dt>Dernière visite</dt><dd>il y a 2 heures</dd>
+            <dt>Ville</dt><dd>Villeurbanne, un nom de ville très long qui doit passer à la ligne proprement</dd>
+          </dl>
+        </div>
+        <div class="card p-5">
+          <h3 class="card-title">Photo (empilé)</h3>
+          <dl class="dl dl-stacked mt-3">
+            <dt>Prise le</dt><dd><time>3 août 2026</time></dd>
+            <dt>Appareil</dt><dd>Olympus OM-1</dd>
+            <dt>Taille</dt><dd>4&nbsp;032 × 3&nbsp;024 · 3,1&nbsp;Mo</dd>
+          </dl>
+        </div>
+        <div class="card p-5">
+          <h3 class="card-title">Gabarit actuel</h3>
+          <dl class="mx-auto mt-3 grid max-w-xl grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
+            <dt class="text-muted">Pseudo</dt><dd>camille84</dd>
+            <dt class="text-muted">Titre</dt><dd>Ancien</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Avatars : tailles et repli en initiales">
+    <div class="ds-stage is-surface">
+      <div class="ds-col">
+        <div class="ds-row" style="align-items:flex-end">
+          <img class="avatar avatar-xs" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23a8805a'/%3E%3Ccircle cx='32' cy='25' r='11' fill='%23f1e3cd'/%3E%3Cpath d='M10 64c3-16 13-22 22-22s19 6 22 22z' fill='%23f1e3cd'/%3E%3C/svg%3E" alt="">
+          <img class="avatar avatar-sm" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23a8805a'/%3E%3Ccircle cx='32' cy='25' r='11' fill='%23f1e3cd'/%3E%3Cpath d='M10 64c3-16 13-22 22-22s19 6 22 22z' fill='%23f1e3cd'/%3E%3C/svg%3E" alt="">
+          <img class="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23a8805a'/%3E%3Ccircle cx='32' cy='25' r='11' fill='%23f1e3cd'/%3E%3Cpath d='M10 64c3-16 13-22 22-22s19 6 22 22z' fill='%23f1e3cd'/%3E%3C/svg%3E" alt="">
+          <img class="avatar avatar-lg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23a8805a'/%3E%3Ccircle cx='32' cy='25' r='11' fill='%23f1e3cd'/%3E%3Cpath d='M10 64c3-16 13-22 22-22s19 6 22 22z' fill='%23f1e3cd'/%3E%3C/svg%3E" alt="">
+          <img class="avatar avatar-xl" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23a8805a'/%3E%3Ccircle cx='32' cy='25' r='11' fill='%23f1e3cd'/%3E%3Cpath d='M10 64c3-16 13-22 22-22s19 6 22 22z' fill='%23f1e3cd'/%3E%3C/svg%3E" alt="">
+        </div>
+        <div class="ds-row" style="align-items:flex-end">
+          <span class="avatar avatar-xs avatar-initial" style="--avatar-hue: 210">AB</span>
+          <span class="avatar avatar-sm avatar-initial" style="--avatar-hue: 340">C</span>
+          <span class="avatar avatar-initial" style="--avatar-hue: 150">M</span>
+          <span class="avatar avatar-lg avatar-initial" style="--avatar-hue: 40">IN</span>
+          <span class="avatar avatar-xl avatar-initial" style="--avatar-hue: 280">HL</span>
+        </div>
+        <div class="ds-row">
+          <span class="avatar avatar-initial" style="--avatar-hue: 0">R</span>
+          <span class="avatar avatar-initial" style="--avatar-hue: 30">O</span>
+          <span class="avatar avatar-initial" style="--avatar-hue: 60">J</span>
+          <span class="avatar avatar-initial" style="--avatar-hue: 90">V</span>
+          <span class="avatar avatar-initial" style="--avatar-hue: 120">V</span>
+          <span class="avatar avatar-initial" style="--avatar-hue: 180">C</span>
+          <span class="avatar avatar-initial" style="--avatar-hue: 240">B</span>
+          <span class="avatar avatar-initial" style="--avatar-hue: 300">M</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Avatars : présence et piles">
+    <div class="ds-stage is-surface">
+      <div class="ds-col">
+        <div class="ds-row">
+          <span class="avatar-wrap"><img class="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23a8805a'/%3E%3Ccircle cx='32' cy='25' r='11' fill='%23f1e3cd'/%3E%3Cpath d='M10 64c3-16 13-22 22-22s19 6 22 22z' fill='%23f1e3cd'/%3E%3C/svg%3E" alt=""><span class="avatar-status is-online" role="img" aria-label="En ligne"></span></span>
+          <span class="avatar-wrap"><span class="avatar avatar-initial" style="--avatar-hue: 210">AB</span><span class="avatar-status is-away" role="img" aria-label="Absent"></span></span>
+          <span class="avatar-wrap"><span class="avatar avatar-initial" style="--avatar-hue: 340">CL</span><span class="avatar-status" role="img" aria-label="Hors ligne"></span></span>
+          <span class="avatar-wrap"><span class="avatar avatar-lg avatar-initial" style="--avatar-hue: 150">MX</span><span class="avatar-status is-online" role="img" aria-label="En ligne"></span></span>
+          <span class="avatar-wrap"><img class="avatar avatar-xl" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23a8805a'/%3E%3Ccircle cx='32' cy='25' r='11' fill='%23f1e3cd'/%3E%3Cpath d='M10 64c3-16 13-22 22-22s19 6 22 22z' fill='%23f1e3cd'/%3E%3C/svg%3E" alt=""><span class="avatar-status is-online" role="img" aria-label="En ligne"></span></span>
+          <span class="avatar-wrap"><span class="avatar avatar-xs avatar-initial" style="--avatar-hue: 20">X</span><span class="avatar-status is-busy" role="img" aria-label="Occupé"></span></span>
+        </div>
+        <div class="ds-row">
+          <ul class="avatar-stack" aria-label="Participants">
+            <li title="alice"><span class="avatar avatar-sm avatar-initial" style="--avatar-hue: 210">A</span></li>
+            <li title="bruno"><span class="avatar avatar-sm avatar-initial" style="--avatar-hue: 340">B</span></li>
+            <li title="chloé"><img class="avatar avatar-sm" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23a8805a'/%3E%3Ccircle cx='32' cy='25' r='11' fill='%23f1e3cd'/%3E%3Cpath d='M10 64c3-16 13-22 22-22s19 6 22 22z' fill='%23f1e3cd'/%3E%3C/svg%3E" alt=""></li>
+            <li class="avatar-stack-more" title="3 autres participants" aria-label="3 autres participants">+3</li>
+          </ul>
+          <span class="text-sm text-muted">Pile sur une carte</span>
+        </div>
+        <div class="ds-row">
+          <ul class="avatar-stack" aria-label="Participants">
+            <li title="alice"><span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white" style="background-color:hsl(210 40% 35%)">A</span></li>
+            <li title="bruno"><span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white" style="background-color:hsl(30 40% 35%)">B</span></li>
+            <li class="avatar-stack-more" aria-label="2 autres participants">+2</li>
+          </ul>
+          <span class="text-sm text-muted">Avatars Tailwind actuels (<code>size-8 rounded-full</code>)</span>
+        </div>
+        <div class="card p-4" style="width:fit-content">
+          <ul class="avatar-stack"><li><span class="avatar avatar-initial avatar-sm" style="--avatar-hue: 90">A</span></li><li><span class="avatar avatar-initial avatar-sm" style="--avatar-hue: 250">B</span></li><li><span class="avatar avatar-initial avatar-sm" style="--avatar-hue: 10">C</span></li><li class="avatar-stack-more">+12</li></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

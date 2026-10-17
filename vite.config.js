@@ -1,10 +1,14 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import tailwindcss from '@tailwindcss/vite';
+import tailwindcss from '@tailwindcss/postcss';
 import { resolve } from 'path';
 
+// Stylesheet pipeline (see docs/design-system.md): Vite compiles Sass first (assets/styles/app.scss), then PostCSS runs
+// @tailwindcss/postcss on the result, which resolves @import / @source / @theme / @apply / @custom-variant. Tailwind's own
+// Vite plugin only handles `.css` files, hence PostCSS instead of `@tailwindcss/vite`.
 export default defineConfig({
-  plugins: [vue(), tailwindcss()],
+  plugins: [vue()],
+  css: { postcss: { plugins: [tailwindcss()] } },
   root: './',
   base: '/assets/',
   // public/ is the Symfony web root and also holds outDir: never copy it into the build output
@@ -21,13 +25,17 @@ export default defineConfig({
       output: {
         entryFileNames: `[name].js`,
         chunkFileNames: `[name].js`,
-        assetFileNames: `[name].[ext]`,
+        // main.css keeps a stable name (referenced by base.html.twig); fonts and textures are fingerprinted
+        assetFileNames: (asset) => (/\.css$/.test(asset.names?.[0] ?? asset.name ?? '') ? '[name].[ext]' : '[name]-[hash].[ext]'),
       },
     },
   },
   resolve: {
-    alias: {
-      '@': resolve(__dirname, 'assets'),
-    },
+    alias: [
+      // paper textures (tracked in assets/images/textures) and self-hosted fonts, referenced from SCSS url()
+      { find: /^@textures\//, replacement: resolve(__dirname, 'assets/images/textures') + '/' },
+      { find: /^@fontsource-variable\//, replacement: resolve(__dirname, 'node_modules/@fontsource-variable') + '/' },
+      { find: '@', replacement: resolve(__dirname, 'assets') },
+    ],
   },
 });

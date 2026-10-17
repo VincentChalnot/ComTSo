@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Form\CommentType;
 use App\Form\TopicType;
 use App\Pagination\Pager;
+use App\Repository\CommentPhotoRepository;
 use App\Repository\CommentRepository;
 use App\Repository\PhotoTopicRepository;
 use App\Service\PhotoUploader;
@@ -41,6 +42,7 @@ class TopicController extends AbstractController
         #[CurrentUser] User $user,
         CommentRepository $comments,
         PhotoTopicRepository $photoTopics,
+        CommentPhotoRepository $commentPhotos,
         EntityManagerInterface $em,
     ): Response {
         if ($redirect = $this->canonicalRedirect($topic, $forumId, $request)) {
@@ -59,9 +61,12 @@ class TopicController extends AbstractController
             'action' => $this->generateUrl('comment_create', ['forumId' => $topic->getForum()->getId(), 'id' => $topic->getId()]),
         ]);
 
+        $pageComments = $comments->findPage($topic, $order, $pager->offset(), $pager->perPage);
+        $commentPhotos->preload($pageComments);
+
         return $this->render('topic/show.html.twig', [
             'topic' => $topic,
-            'comments' => $comments->findPage($topic, $order, $pager->offset(), $pager->perPage),
+            'comments' => $pageComments,
             'photos' => $photoTopics->findForTopic($topic),
             'pager' => $pager,
             'order' => $order,

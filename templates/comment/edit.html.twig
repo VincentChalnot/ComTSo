@@ -3,14 +3,35 @@
 {% block title %}Modifier le message #{{ comment.id }}{% endblock %}
 
 {% block body %}
-<h1 class="mb-1 text-2xl font-bold tracking-tight">Modifier le message</h1>
-<p class="mb-4 text-xs text-muted">Dans <a href="{{ path('topic_show', {forumId: comment.topic.forum.id, id: comment.topic.id}) }}">{{ comment.topic.title }}</a></p>
-<div class="card p-5">
+<header class="page-header">
+    <p class="kicker"><a href="{{ path('topic_show', {forumId: comment.topic.forum.id, id: comment.topic.id}) }}" class="text-inherit no-underline hover:underline">{{ comment.topic.title }}</a></p>
+    <h1 class="page-title">Modifier le message</h1>
+</header>
+
+<div class="card p-5 sm:p-8">
     {{ form_start(form) }}
+        {{ form_errors(form) }}
         {{ form_row(form.content) }}
-        <div class="flex gap-2">
+        {% if form.remove_photos is defined %}
+            <fieldset class="mb-6">
+                <legend>Photos jointes</legend>
+                <ul class="attach-tray">
+                    {% for child in form.remove_photos %}
+                        {% set photo = form.remove_photos.vars.choices[loop.index0].data.photo %}
+                        <li class="attach-item">
+                            <img src="{{ path('photo_variant', {id: photo.id, variant: 'thumb'}) }}" alt="" width="80" height="80" loading="lazy">
+                            <span class="attach-item-name">{{ photo.title ?: photo.originalFilename }}</span>
+                            <span class="attach-item-remove">{{ form_widget(child) }} {{ form_label(child, 'Retirer') }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {{ form_errors(form.remove_photos) }}
+            </fieldset>
+        {% endif %}
+        {{ form_row(form.photos) }}
+        <div class="form-actions">
+            <a href="{{ path('comment_show', {id: comment.id}) }}" class="btn btn-ghost">Annuler</a>
             <button type="submit" class="btn btn-primary">Enregistrer</button>
-            <a href="{{ path('comment_show', {id: comment.id}) }}" class="btn">Annuler</a>
         </div>
     {{ form_end(form) }}
 </div>

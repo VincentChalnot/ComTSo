@@ -1,0 +1,312 @@
+<section class="ds-section" id="attach" data-title="Photos jointes">
+  <header class="ds-section-head"><p class="kicker">Zone de dépôt</p><h2>Photos jointes</h2><p class="standfirst">Le widget d’ajout de photos : un champ natif toujours utilisable, enrichi par Vue (glisser-déposer, collage, vignettes).</p></header>
+
+  <div class="ds-demo" data-title="Sans JavaScript (champ natif)">
+    <p class="ds-note">Le vrai <code>&lt;input type=file&gt;</code> reste visible et utilisable : son bouton est un petit onglet de papier.</p>
+    <div class="ds-stage is-surface">
+<div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div class="attach-zone">
+        <input type="file" id="demo_photos_nojs" name="comment[photos][]" multiple class="attach-input" accept="image/jpeg,image/png,image/gif,image/webp">
+        <p class="attach-hint">Jusqu'à 10 photos (JPEG, PNG, GIF ou WebP, 25 Mo maximum chacune).</p>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Vide">
+    <div class="ds-stage is-surface">
+<div style="max-width:34rem">
+    <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div>
+        <div class="attach-zone" tabindex="0" role="group" aria-label="Ajouter des photos : glissez-déposez, collez ou choisissez des fichiers">
+          <input class="attach-input" type="file" multiple id="demo_photos" name="comment[photos][]" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="demo_photos-hint">
+          <p class="attach-hint" id="demo_photos-hint">Glissez-déposez des photos ici, collez-les depuis le presse-papiers ou choisissez des fichiers — 10 photos possibles, 25,0 Mo maximum chacune.</p>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Survol, focus clavier, glisser-déposer">
+    <p class="ds-note"><code>.is-dragover</code> : fond teinté prune, trait plein.</p>
+    <div class="ds-stage is-surface">
+<div class="ds-col" style="max-width:34rem">
+    <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div>
+        <div class="attach-zone is-hover" tabindex="0" role="group" aria-label="Ajouter des photos : glissez-déposez, collez ou choisissez des fichiers">
+          <input class="attach-input" type="file" multiple id="demo_h" name="comment[photos][]" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="demo_h-hint">
+          <p class="attach-hint" id="demo_h-hint">Glissez-déposez des photos ici, collez-les depuis le presse-papiers ou choisissez des fichiers — 10 photos possibles, 25,0 Mo maximum chacune.</p>
+        </div>
+      </div>
+    </div>
+    <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div>
+        <div class="attach-zone is-focus" tabindex="0" role="group" aria-label="Ajouter des photos : glissez-déposez, collez ou choisissez des fichiers">
+          <input class="attach-input" type="file" multiple id="demo_f" name="comment[photos][]" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="demo_f-hint">
+          <p class="attach-hint" id="demo_f-hint">Glissez-déposez des photos ici, collez-les depuis le presse-papiers ou choisissez des fichiers — 10 photos possibles, 25,0 Mo maximum chacune.</p>
+        </div>
+      </div>
+    </div>
+    <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div>
+        <div class="attach-zone is-dragover" tabindex="0" role="group" aria-label="Ajouter des photos : glissez-déposez, collez ou choisissez des fichiers">
+          <input class="attach-input" type="file" multiple id="demo_d" name="comment[photos][]" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="demo_d-hint">
+          <p class="attach-hint" id="demo_d-hint">Glissez-déposez des photos ici, collez-les depuis le presse-papiers ou choisissez des fichiers — 10 photos possibles, 25,0 Mo maximum chacune.</p>
+        </div>
+      </div>
+    </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Avec trois vignettes (normale, envoi en cours, refusée)">
+    <p class="ds-note">Le bouton rond « × » devient brique au survol. Les états <code>.is-uploading</code> (spinner) et <code>.is-error</code> sont portés par le <code>li</code>.</p>
+    <div class="ds-stage is-surface">
+<div style="max-width:34rem">
+    <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div>
+        <div class="attach-zone" tabindex="0" role="group" aria-label="Ajouter des photos : glissez-déposez, collez ou choisissez des fichiers">
+          <input class="attach-input" type="file" multiple id="demo_t" name="comment[photos][]" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="demo_t-hint">
+          <p class="attach-hint" id="demo_t-hint">Glissez-déposez des photos ici, collez-les depuis le presse-papiers ou choisissez des fichiers — 10 photos possibles, 25,0 Mo maximum chacune.</p>
+        </div>
+        <ul class="attach-tray">
+        <li class="attach-item">
+          <img src="/photos/demo-1.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="pointe-du-raz.jpg">pointe-du-raz.jpg</span>
+          <span class="attach-item-size">1,2 Mo</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer pointe-du-raz.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        <li class="attach-item is-uploading">
+          <img src="/photos/demo-2.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="marche.jpg">marche.jpg</span>
+          <span class="attach-item-size">842 Ko</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer marche.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        <li class="attach-item is-error">
+          <img src="/photos/demo-3.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="photo-trop-lourde.jpg">photo-trop-lourde.jpg</span>
+          <span class="attach-item-size">31 Mo</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer photo-trop-lourde.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        </ul>
+        <p class="attach-count" aria-live="polite">3 photos sur 10 possibles</p>
+        <p class="attach-error" role="alert"><span class="block">« photo-trop-lourde.jpg » est trop lourde (31 Mo) : 25 Mo au maximum.</span><span class="block">« notes.pdf » n'est pas une image acceptée (JPEG, PNG, GIF ou WebP).</span></p>
+      </div>
+    </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Plateau chargé">
+    <div class="ds-stage is-surface">
+<div style="max-width:34rem">
+    <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div>
+        <div class="attach-zone" tabindex="0" role="group" aria-label="Ajouter des photos : glissez-déposez, collez ou choisissez des fichiers">
+          <input class="attach-input" type="file" multiple id="demo_m" name="comment[photos][]" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="demo_m-hint">
+          <p class="attach-hint" id="demo_m-hint">Glissez-déposez des photos ici, collez-les depuis le presse-papiers ou choisissez des fichiers — 10 photos possibles, 25,0 Mo maximum chacune.</p>
+        </div>
+        <ul class="attach-tray">
+        <li class="attach-item">
+          <img src="/photos/demo-1.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="photo-1.jpg">photo-1.jpg</span>
+          <span class="attach-item-size">1,0 Mo</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer photo-1.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        <li class="attach-item">
+          <img src="/photos/demo-2.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="photo-2.jpg">photo-2.jpg</span>
+          <span class="attach-item-size">2,1 Mo</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer photo-2.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        <li class="attach-item">
+          <img src="/photos/demo-3.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="photo-3.jpg">photo-3.jpg</span>
+          <span class="attach-item-size">3,2 Mo</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer photo-3.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        <li class="attach-item">
+          <img src="/photos/demo-4.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="photo-4.jpg">photo-4.jpg</span>
+          <span class="attach-item-size">4,3 Mo</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer photo-4.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        <li class="attach-item">
+          <img src="/photos/demo-5.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="photo-5.jpg">photo-5.jpg</span>
+          <span class="attach-item-size">5,4 Mo</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer photo-5.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        <li class="attach-item">
+          <img src="/photos/demo-6.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="photo-6.jpg">photo-6.jpg</span>
+          <span class="attach-item-size">6,5 Mo</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer photo-6.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        <li class="attach-item">
+          <img src="/photos/demo-7.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="photo-7.jpg">photo-7.jpg</span>
+          <span class="attach-item-size">7,6 Mo</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer photo-7.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        </ul>
+        <p class="attach-count" aria-live="polite">7 photos sur 10 possibles</p>
+      </div>
+    </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Page de modification d'un message">
+    <p class="ds-note"><code>.attach-item-remove</code> enveloppe ici une case à cocher + libellé.</p>
+    <div class="ds-stage is-surface">
+<fieldset class="mb-6" style="max-width:34rem">
+      <legend>Photos jointes</legend>
+      <ul class="attach-tray">
+        <li class="attach-item">
+          <img src="/photos/demo-4.svg" alt="" width="80" height="80" loading="lazy">
+          <span class="attach-item-name">cidre-et-cartes.jpg</span>
+          <span class="attach-item-remove"><input type="checkbox" id="comment_remove_photos_0" name="comment[remove_photos][]" value="12"> <label for="comment_remove_photos_0">Retirer</label></span>
+        </li>
+        <li class="attach-item">
+          <img src="/photos/demo-5.svg" alt="" width="80" height="80" loading="lazy">
+          <span class="attach-item-name">brume.jpg</span>
+          <span class="attach-item-remove"><input type="checkbox" id="comment_remove_photos_1" name="comment[remove_photos][]" value="13" checked> <label for="comment_remove_photos_1">Retirer</label></span>
+        </li>
+      </ul>
+    </fieldset>
+    <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div>
+        <div class="attach-zone" tabindex="0" role="group" aria-label="Ajouter des photos : glissez-déposez, collez ou choisissez des fichiers">
+          <input class="attach-input" type="file" multiple id="demo_e" name="comment[photos][]" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="demo_e-hint">
+          <p class="attach-hint" id="demo_e-hint">Glissez-déposez des photos ici, collez-les depuis le presse-papiers ou choisissez des fichiers — 10 photos possibles, 25,0 Mo maximum chacune.</p>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+<section class="ds-section" id="reply" data-title="Réponse">
+  <header class="ds-section-head"><p class="kicker">Formulaire de réponse</p><h2>Réponse</h2><p class="standfirst">Le bloc de réponse : une feuille de papier posée sous le fil de discussion, avec l’éditeur, les photos et le bouton d’envoi.</p></header>
+
+  <div class="ds-demo" data-title="Vide (éditeur riche réel + champ natif)">
+    <p class="ds-note">Le bloc <code>.reply</code> est une feuille de papier : avatar à gauche (≥ sm), éditeur et photos dans le corps, bouton d'envoi dessous, à droite. Les <code>.reply-actions</code> sont frères de <code>.reply-body</code>.</p>
+    <div class="ds-stage">
+<form onsubmit="return false" style="max-width:52rem">
+      <section class="reply mt-8" aria-labelledby="reply-t1">
+        <span class="reply-avatar"><span class="avatar avatar-initial" style="--avatar-hue: 340">CL</span></span>
+        <div class="reply-body">
+          <h2 id="reply-t1" class="card-title mb-2">Répondre</h2>
+          <div class="field mb-5"><div data-vue-component="RichEditor" data-props='{"name": "reply_empty", "id": "reply_empty", "value": "", "placeholder": "Écrivez votre réponse…", "ariaLabel": "Votre réponse", "compact": false, "minHeight": "6rem", "required": false}' class="rich-text-field"><textarea id="reply_empty_ta" name="reply_empty" class="input" rows="4" placeholder="Écrivez votre réponse…"></textarea></div></div>
+          <div class="field mb-5"><label class="label" for="rp_a">Ajouter des photos</label> <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div class="attach-zone">
+        <input type="file" id="rp_a" name="comment[photos][]" multiple class="attach-input" accept="image/jpeg,image/png,image/gif,image/webp">
+        <p class="attach-hint">Jusqu'à 10 photos (JPEG, PNG, GIF ou WebP, 25 Mo maximum chacune).</p>
+      </div>
+    </div></div>
+        </div>
+        <div class="reply-actions">
+          <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Envoyer</button>
+        </div>
+      </section>
+    </form>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Rédigé, avec photos">
+    <div class="ds-stage">
+<form onsubmit="return false" style="max-width:52rem">
+      <section class="reply mt-8" aria-labelledby="reply-t2">
+        <span class="reply-avatar"><span class="avatar avatar-initial" style="--avatar-hue: 340">CL</span></span>
+        <div class="reply-body">
+          <h2 id="reply-t2" class="card-title mb-2">Répondre</h2>
+          <div class="field mb-5"><div data-vue-component="RichEditor" data-props='{"name": "reply_filled", "id": "reply_filled", "value": "<p>Pour la Toussaint je suis partant ! Je m’occupe des <strong>cartes</strong> et du cidre.</p>", "placeholder": "", "ariaLabel": "Votre réponse", "compact": false, "minHeight": "6rem", "required": false}' class="rich-text-field"></div></div>
+          <div class="field mb-5"><label class="label" for="rp_b">Ajouter des photos</label> <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div>
+        <div class="attach-zone" tabindex="0" role="group" aria-label="Ajouter des photos : glissez-déposez, collez ou choisissez des fichiers">
+          <input class="attach-input" type="file" multiple id="rp_b" name="comment[photos][]" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="rp_b-hint">
+          <p class="attach-hint" id="rp_b-hint">Glissez-déposez des photos ici, collez-les depuis le presse-papiers ou choisissez des fichiers — 10 photos possibles, 25,0 Mo maximum chacune.</p>
+        </div>
+        <ul class="attach-tray">
+        <li class="attach-item">
+          <img src="/photos/demo-1.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="pointe-du-raz.jpg">pointe-du-raz.jpg</span>
+          <span class="attach-item-size">1,2 Mo</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer pointe-du-raz.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        <li class="attach-item ">
+          <img src="/photos/demo-2.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="marche.jpg">marche.jpg</span>
+          <span class="attach-item-size">842 Ko</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer marche.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        <li class="attach-item ">
+          <img src="/photos/demo-3.svg" alt="" width="80" height="80">
+          <span class="attach-item-name" title="photo-trop-lourde.jpg">photo-trop-lourde.jpg</span>
+          <span class="attach-item-size">31 Mo</span>
+          <button type="button" class="attach-item-remove" aria-label="Retirer photo-trop-lourde.jpg"><span aria-hidden="true">×</span></button>
+        </li>
+        </ul>
+        <p class="attach-count" aria-live="polite">3 photos sur 10 possibles</p>
+      </div>
+    </div></div>
+        </div>
+        <div class="reply-actions">
+          <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Envoyer</button>
+        </div>
+      </section>
+    </form>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Focus dans le bloc">
+    <p class="ds-note"><code>:focus-within</code> / <code>.is-focus</code> : la feuille se soulève.</p>
+    <div class="ds-stage">
+<form onsubmit="return false" style="max-width:52rem">
+      <section class="reply is-focus mt-8" aria-labelledby="reply-t4">
+        <span class="reply-avatar"><span class="avatar avatar-initial" style="--avatar-hue: 340">CL</span></span>
+        <div class="reply-body">
+          <h2 id="reply-t4" class="card-title mb-2">Répondre</h2>
+          <div class="field mb-5"><p class="text-sm text-muted">(éditeur)</p></div>
+          <div class="field mb-5"><label class="label" for="rp_d">Ajouter des photos</label> <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div class="attach-zone">
+        <input type="file" id="rp_d" name="comment[photos][]" multiple class="attach-input" accept="image/jpeg,image/png,image/gif,image/webp">
+        <p class="attach-hint">Jusqu'à 10 photos (JPEG, PNG, GIF ou WebP, 25 Mo maximum chacune).</p>
+      </div>
+    </div></div>
+        </div>
+        <div class="reply-actions">
+          <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Envoyer</button>
+        </div>
+      </section>
+    </form>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Mobile (390 px)">
+    <p class="ds-note">Empilé, bouton d'envoi pleine largeur.</p>
+    <div class="ds-stage">
+<div style="max-width:390px;margin-inline:auto"><form onsubmit="return false" style="max-width:100%">
+      <section class="reply mt-8" aria-labelledby="reply-t3">
+        <span class="reply-avatar"><span class="avatar avatar-initial" style="--avatar-hue: 340">CL</span></span>
+        <div class="reply-body">
+          <h2 id="reply-t3" class="card-title mb-2">Répondre</h2>
+          <div class="field mb-5"><div data-vue-component="RichEditor" data-props='{"name": "reply_mobile", "id": "reply_mobile", "value": "<p>Pour la Toussaint je suis partant ! Je m’occupe des <strong>cartes</strong> et du cidre.</p>", "placeholder": "", "ariaLabel": "Votre réponse", "compact": false, "minHeight": "6rem", "required": false}' class="rich-text-field"></div></div>
+          <div class="field mb-5"><label class="label" for="rp_c">Ajouter des photos</label> <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div>
+        <div class="attach-zone" tabindex="0" role="group" aria-label="Ajouter des photos : glissez-déposez, collez ou choisissez des fichiers">
+          <input class="attach-input" type="file" multiple id="rp_c" name="comment[photos][]" accept="image/jpeg,image/png,image/gif,image/webp" aria-describedby="rp_c-hint">
+          <p class="attach-hint" id="rp_c-hint">Glissez-déposez des photos ici, collez-les depuis le presse-papiers ou choisissez des fichiers — 10 photos possibles, 25,0 Mo maximum chacune.</p>
+        </div>
+      </div>
+    </div></div>
+        </div>
+        <div class="reply-actions">
+          <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Envoyer</button>
+        </div>
+      </section>
+    </form></div>
+    </div>
+  </div>
+</section>

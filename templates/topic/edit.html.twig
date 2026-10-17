@@ -3,13 +3,17 @@
 {% block title %}Modifier « {{ topic.title }} »{% endblock %}
 
 {% block body %}
-<h1 class="mb-4 text-2xl font-bold tracking-tight">Modifier le sujet</h1>
-<div class="card p-5">
+<header class="page-header">
+    <p class="kicker"><a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}" class="text-inherit no-underline hover:underline">{{ topic.title }}</a></p>
+    <h1 class="page-title">Modifier le sujet</h1>
+</header>
+
+<div class="card p-5 sm:p-8">
     {{ form_start(form) }}
         {{ form_widget(form) }}
-        <div class="flex gap-2">
+        <div class="form-actions">
+            <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}" class="btn btn-ghost">Annuler</a>
             <button type="submit" class="btn btn-primary">Enregistrer</button>
-            <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}" class="btn">Annuler</a>
         </div>
     {{ form_end(form) }}
 </div>

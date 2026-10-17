@@ -1,0 +1,23 @@
+{#
+    Form theme block of PhotoUploadType. The real `<input type="file" multiple>` inside the zone is the no-JavaScript
+    fallback: the Vue widget AttachPhotos (assets/vue/components/AttachPhotos.vue) takes over the mount point and keeps
+    submitting the chosen files through its own input with the same name.
+    Props: `existing` = number of photos already attached (edit form), subtracted from the limit client-side.
+#}
+{% block photo_upload_widget -%}
+    {%- set attach_props = {
+        name: full_name,
+        id: id,
+        maxFiles: max_files,
+        maxSize: max_size,
+        accept: accept,
+        existing: existing_photos|default(0),
+    } -%}
+    {%- set attr = attr|merge({class: 'attach-input', accept: accept}) -%}
+    <div class="attach" data-vue-component="AttachPhotos" data-props="{{ attach_props|json_encode|e('html_attr') }}">
+        <div class="attach-zone">
+            <input type="file" {{ block('widget_attributes') }}>
+            <p class="attach-hint">Jusqu'à {{ max_files }} photos (JPEG, PNG, GIF ou WebP, {{ (max_size / 1048576)|round }} Mo maximum chacune).</p>
+        </div>
+    </div>
+{%- endblock photo_upload_widget %}

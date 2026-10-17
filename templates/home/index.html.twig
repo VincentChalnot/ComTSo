@@ -4,26 +4,32 @@
 {% block title %}Activités récentes · ComTSo{% endblock %}
 
 {% block body %}
-<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
-    <h1 class="text-2xl font-bold tracking-tight">Activités récentes</h1>
-    <form method="get" action="{{ path('app_home') }}" class="flex items-center gap-2 text-sm">
-        <label for="since" class="text-muted">Nouveautés depuis le</label>
-        <input id="since" type="date" name="since" value="{{ since|date('Y-m-d') }}" max="{{ 'now'|date('Y-m-d') }}" class="input !w-auto !py-1.5" data-autosubmit>
+<h1 class="sr-only">Activités récentes</h1>
+{% if hero %}
+    {% include 'home/_hero.html.twig' with {hero: hero} only %}
+{% endif %}
+
+<section class="section" aria-labelledby="digest-title">
+    <h2 id="digest-title" class="section-title">Activités récentes</h2>
+
+    <form method="get" action="{{ path('app_home') }}" class="mb-10 flex flex-wrap items-center gap-x-3 gap-y-2">
+        <label for="since" class="label !mb-0">Nouveautés depuis le</label>
+        <input id="since" type="date" name="since" value="{{ since|date('Y-m-d') }}" max="{{ 'now'|date('Y-m-d') }}" class="input input-sm !w-auto" data-autosubmit>
         <button type="submit" class="btn btn-sm">OK</button>
     </form>
-</div>
 
-{% if cards is empty %}
-    <div class="card p-8 text-center text-muted">
-        <p class="text-lg">Aucun nouveau message depuis le {{ since|date('d/m/Y') }}.</p>
-        <p class="mt-2 text-sm">Choisissez une date plus ancienne ci-dessus, ou parcourez <a href="{{ path('forum_index') }}">les forums</a>.</p>
-    </div>
-{% else %}
-    <div class="space-y-5">
-        {% for card in cards %}
-            {% include '_digest/topic_card.html.twig' with card only %}
-        {% endfor %}
-    </div>
-    {% include '_layout/pagination.html.twig' with {pager: pager, route: 'app_home', params: {}} %}
-{% endif %}
+    {% if cards is empty %}
+        <div class="empty">
+            <p class="empty-title">Aucun nouveau message depuis le {{ since|date('d/m/Y') }}.</p>
+            <p class="empty-text">Choisissez une date plus ancienne ci-dessus, ou parcourez <a href="{{ path('forum_index') }}">les forums</a>.</p>
+        </div>
+    {% else %}
+        <div class="digest-list">
+            {% for card in cards %}
+                {% include '_digest/topic_card.html.twig' with card only %}
+            {% endfor %}
+        </div>
+        {% include '_layout/pagination.html.twig' with {pager: pager, route: 'app_home', params: {}} %}
+    {% endif %}
+</section>
 {% endblock %}

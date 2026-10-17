@@ -1,0 +1,70 @@
+// Dark theme "night paper": the ink brown is the canvas, cream text, plum fills with lifted plum text, sand highlights.
+@use "../abstracts/palette" as p;
+@use "../abstracts/functions" as fn;
+
+$paper-50: p.color("paper", 50);
+$colors: (
+  // surfaces (ink brown, a few OKLCH lightness steps up)
+  "page": p.$ink,
+  "surface": fn.relight(p.$ink, 0.3, 1),
+  "surface-2": fn.relight(p.$ink, 0.34, 1),
+  "surface-3": fn.relight(p.$ink, 0.39, 1),
+  "overlay": fn.relight(p.$ink, 0.32, 1),
+  // lines
+  "line": fn.mix-ok(p.$mist, p.$ink, 22%),
+  "line-soft": fn.mix-ok(p.$mist, p.$ink, 13%),
+  "line-strong": fn.mix-ok(p.$mist, p.$ink, 78%),
+  "rule": p.color("paper", 300),
+  // text
+  "fg": p.color("paper", 100),
+  "fg-soft": p.color("paper", 300),
+  "muted": fn.relight(p.$ink, 0.79, 0.75),
+  // plum
+  "accent": p.$plum,
+  "accent-hover": p.color("plum", 600),
+  "accent-active": p.color("plum", 800),
+  "accent-strong": p.color("plum", 300),
+  "accent-soft": fn.relight(p.$plum, 0.34, 0.6),
+  "on-accent": $paper-50,
+  // blue
+  "secondary": fn.relight(p.$blue, 0.46, 1),
+  "secondary-hover": p.color("blue", 600),
+  "secondary-active": fn.relight(p.$blue, 0.4, 1),
+  "secondary-soft": fn.relight(p.$blue, 0.33, 0.8),
+  "on-secondary": p.color("paper", 50),
+  "link": p.color("blue", 300),
+  "link-hover": p.$sand,
+  // sand
+  "highlight": p.$sand,
+  "highlight-hover": p.color("sand", 200),
+  "highlight-active": p.color("sand", 400),
+  "highlight-soft": fn.relight(p.$sand, 0.36, 0.5),
+  "on-highlight": p.$ink,
+  "kicker": p.$sand,
+  "star": p.$sand,
+  // mist
+  "mist": p.$mist,
+  "mist-soft": fn.mix-ok(p.$mist, p.$ink, 16%),
+  "mist-strong": p.color("mist", 300),
+  // neutral (paper) button
+  "btn": fn.relight(p.$ink, 0.36, 1),
+  "btn-hover": fn.relight(p.$ink, 0.41, 1),
+  "btn-active": fn.relight(p.$ink, 0.46, 1),
+  "on-btn": p.color("paper", 100),
+  // status
+  "danger": fn.oklch-color(0.76, 0.12, 30),
+  "danger-fill": p.$brick,
+  "danger-fill-hover": fn.relight(p.$brick, 0.54),
+  "danger-soft": fn.oklch-color(0.33, 0.07, 30),
+  "on-danger": $paper-50,
+  "ok": fn.oklch-color(0.78, 0.1, 150),
+  "ok-fill": p.$sage,
+  "ok-fill-hover": fn.relight(p.$sage, 0.52),
+  "ok-soft": fn.oklch-color(0.33, 0.05, 150),
+  "on-ok": $paper-50,
+  // misc
+  "focus": p.$sand,
+  "selection": fn.relight(p.$sand, 0.42, 0.7),
+  "shadow": #000,
+  "scrim": #000,
+);

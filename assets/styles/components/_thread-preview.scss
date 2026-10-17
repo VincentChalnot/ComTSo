@@ -1,0 +1,687 @@
+// Thread preview: a magazine teaser for a topic in a listing, laid on the page like a sheet of paper.
+//
+//   <article class="thread-preview [has-cover] [is-new]">
+//     <a class="thread-preview-cover"><img></a>
+//     <div class="thread-preview-body">
+//       .kicker  .thread-preview-title  .standfirst.thread-preview-excerpt  blockquote.thread-preview-last
+//       footer.thread-preview-meta ( form[star] ul.avatar-stack .thread-preview-stat×n .badge a.btn .thread-preview-toggle )
+//       .thread-preview-more[hidden]
+//     </div>
+//   </article>
+//
+// Layout is intrinsic (flex-wrap): the cover sits left (30 %, between 14 and 20 rem: 20 rem = the 320 px thumbnail, never upscaled) as long as the card is wide enough for it AND a readable text
+// column, and wraps on top otherwise. So mobile, narrow containers and the 2-column grid need no breakpoint.
+//   .thread-preview-list        vertical rhythm for a stack of previews        .is-grid  two columns from lg
+@use "../abstracts" as *;
+
+// Lucide icon as a mask (painted with currentColor), so the markup needs no inline SVG.
+@function icon($body) {
+  @return url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E#{$body}%3C/svg%3E");
+}
+$icon-chat: icon("%3Cpath d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/%3E");
+$icon-eye: icon("%3Cpath d='M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E");
+$icon-image: icon("%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21'/%3E");
+$icon-chevron: icon("%3Cpath d='m6 9 6 6 6-6'/%3E");
+
+@mixin mask-icon($image, $size) {
+  content: "";
+  flex: none;
+  width: $size;
+  height: $size;
+  background-color: currentColor;
+  -webkit-mask: #{$image} center / contain no-repeat;
+  mask: #{$image} center / contain no-repeat;
+}
+
+@layer components {
+  // ---- list container ----------------------------------------------------------------------------------------------
+  .thread-preview-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include up(md) {
+      gap: 2rem;
+    }
+    &.is-grid {
+      @include up(lg) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  }
+
+  // ---- the card ----------------------------------------------------------------------------------------------------
+  .thread-preview {
+    @include texture-host;
+    @include texture-tone("paper", "surface");
+    --texture-strength: 0.85;
+    --tp-pad: clamp(1.1rem, 3vw, 1.6rem);
+
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
+    border-radius: var(--radius-md);
+    background-color: var(--c-surface);
+    box-shadow: var(--shadow-sheet);
+    color: var(--c-fg);
+    transition:
+      transform 0.22s var(--ease-paper),
+      box-shadow 0.22s var(--ease-paper);
+
+    // lift: only where hovering exists, and only without reduced motion
+    @media (hover: hover) {
+      &:hover {
+        box-shadow: var(--shadow-lift);
+      }
+    }
+    @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+      &:hover {
+        transform: translateY(-2px);
+      }
+    }
+    &.is-hover {
+      box-shadow: var(--shadow-lift);
+      transform: translateY(-2px);
+    }
+    // keyboard: the whole sheet lifts and gets a hairline of focus colour (links / buttons keep their own ring)
+    &:has(:focus-visible),
+    &.is-focus {
+      box-shadow:
+        var(--shadow-lift),
+        0 0 0 1px color-mix(in srgb, var(--c-focus) 60%, transparent);
+    }
+
+    // new since the last visit: a 3px sand edge on the left, the kicker rule turns plum
+    &.is-new {
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 3px;
+        border-radius: var(--radius-md) 0 0 var(--radius-md);
+        background: var(--c-highlight);
+        pointer-events: none;
+      }
+      .kicker::before {
+        width: 2.4em;
+        background: var(--c-accent);
+      }
+    }
+  }
+
+  // ---- cover -------------------------------------------------------------------------------------------------------
+  .thread-preview-cover {
+    position: relative;
+    display: block;
+    flex: 1 1 clamp(14rem, 30%, 20rem);
+    max-width: calc(100% - 1rem);
+    aspect-ratio: 2 / 1;
+    margin: 0.5rem;
+    overflow: hidden;
+    border-radius: var(--radius-xs);
+    background-color: var(--c-surface-3);
+
+    img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      object-fit: cover;
+      transition: transform 0.6s var(--ease-paper);
+    }
+    // printed edge of the photo
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-shadow) 22%, transparent);
+    }
+  }
+  // expanded preview: the card grows tall, the cover stays a square print at the top instead of stretching
+  .thread-preview.has-cover:has(.thread-preview-more:not([hidden])) .thread-preview-cover {
+    align-self: flex-start;
+    aspect-ratio: 1;
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .thread-preview:hover .thread-preview-cover img,
+    .thread-preview.is-hover .thread-preview-cover img {
+      transform: scale(1.035);
+    }
+  }
+
+  // ---- text column ---------------------------------------------------------------------------------------------------
+  .thread-preview-body {
+    display: flex;
+    flex: 999 1 24rem;
+    flex-direction: column;
+    gap: 0.7rem;
+    min-width: 0;
+    padding: var(--tp-pad);
+
+    > * {
+      margin: 0;
+    }
+    > .kicker {
+      align-self: flex-start;
+      max-width: 100%;
+    }
+  }
+
+  .thread-preview-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 560;
+    line-height: 1.16;
+    letter-spacing: var(--tracking-tight);
+    font-optical-sizing: auto;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    overflow: hidden;
+
+    a {
+      color: var(--c-fg);
+      text-decoration: none;
+      // an ink underline draws itself under the headline
+      background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+      transition:
+        color 0.15s var(--ease-paper),
+        background-size 0.3s var(--ease-paper);
+
+      &:hover,
+      &:focus-visible {
+        color: var(--c-accent-strong);
+        background-size: 100% 1px;
+      }
+      &:focus-visible {
+        @include focus-ring(3px);
+        border-radius: var(--radius-xs);
+      }
+    }
+  }
+
+  .thread-preview .thread-preview-excerpt {
+    max-width: 62ch;
+    font-size: var(--text-base);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+
+    @include up(md) {
+      font-size: var(--text-lg);
+    }
+  }
+
+  // pull-quote of the latest reply
+  .thread-preview-last {
+    max-width: 62ch;
+    margin: 0.15rem 0 0.2rem;
+    padding: 0.1rem 0 0.1rem 1rem;
+    border-left: 2px solid var(--c-highlight);
+    font-family: var(--font-serif);
+    font-size: 0.9375rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--c-fg-soft);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    font-optical-sizing: auto;
+
+    time {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      font-style: normal;
+      color: var(--c-muted);
+      white-space: nowrap;
+
+      &::before {
+        content: "· ";
+      }
+    }
+  }
+  .thread-preview-last-author {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-style: normal;
+    font-weight: 650;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-fg);
+
+    &::after {
+      content: "—";
+      margin: 0 0.4em 0 0.5em;
+      font-weight: 400;
+      color: var(--c-muted);
+    }
+  }
+
+  // ---- meta row ----------------------------------------------------------------------------------------------------------
+  // One row when there is room. The meta row is its own size container, so the layout follows the width it is given (cover
+  // or not, list, grid, sidebar, phone) instead of the viewport:
+  //   wide    star, avatars, stats, badge ............ [Lire] [Aperçu]
+  //   medium  star, avatars ................ [Lire] [Aperçu] / stats, badge
+  //   narrow  star, avatars / stats, badge / ............ [Lire] [Aperçu]
+  // (the ::before / ::after pseudo-elements are the forced line breaks)
+  .thread-preview-meta {
+    container: thread-meta / inline-size;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: auto;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--c-line);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    letter-spacing: 0.015em;
+    color: var(--c-muted);
+
+    &::before,
+    &::after {
+      content: "";
+      display: none;
+      flex: 0 0 100%;
+      height: 0;
+      margin: -0.5rem 0 0;
+    }
+    > form {
+      margin: 0 -0.35rem 0 -0.6rem;
+    }
+    > .avatar-stack {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    // actions on the right (the first button/link pushes itself and what follows)
+    > .btn {
+      margin-left: auto;
+    }
+    > .btn ~ .btn {
+      margin-left: 0;
+    }
+  }
+  @container thread-meta (max-width: 54rem) {
+    .thread-preview-meta {
+      > .btn {
+        order: 1;
+      }
+      > .thread-preview-stat,
+      > .badge {
+        order: 2;
+      }
+      &::after {
+        display: block;
+        order: 1;
+      }
+    }
+  }
+  @container thread-meta (max-width: 30rem) {
+    .thread-preview-meta {
+      > .btn {
+        order: 4;
+      }
+      &::before {
+        display: block;
+        order: 1;
+      }
+      &::after {
+        order: 3;
+      }
+    }
+  }
+
+  .thread-preview-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+
+    // message / view / photo count icons; ignored when the markup carries its own <svg>
+    &::before {
+      @include mask-icon($icon-chat, 1rem);
+      opacity: 0.8;
+    }
+    &:nth-of-type(2)::before {
+      -webkit-mask-image: #{$icon-eye};
+      mask-image: #{$icon-eye};
+    }
+    &:nth-of-type(3)::before {
+      -webkit-mask-image: #{$icon-image};
+      mask-image: #{$icon-image};
+    }
+    &:has(> svg)::before {
+      display: none;
+    }
+    > svg {
+      flex: none;
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  // "Aperçu": the chevron flips when the panel is open. `hidden` (set until the script enables it) wins over .btn's display.
+  .thread-preview-toggle {
+    &[hidden] {
+      display: none;
+    }
+    &::after {
+      @include mask-icon($icon-chevron, 0.95em);
+      transition: transform 0.2s var(--ease-paper);
+    }
+    &:has(> svg)::after {
+      display: none;
+    }
+    > svg {
+      transition: transform 0.2s var(--ease-paper);
+    }
+    &[aria-expanded="true"] {
+      &::after,
+      > svg {
+        transform: rotate(180deg);
+      }
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .thread-preview,
+    .thread-preview-cover img,
+    .thread-preview-title a,
+    .thread-preview-toggle::after,
+    .thread-preview-toggle > svg {
+      transition: none;
+    }
+  }
+
+  // ---- expanded area: a recessed sheet holding the latest messages ---------------------------------------------------
+  .thread-preview-more {
+    @include texture-host;
+    @include texture-tone("paper", "surface-2");
+    --texture-strength: 0.7;
+
+    margin-top: 0.15rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--c-surface-2);
+    box-shadow:
+      var(--shadow-inset),
+      0 0 0 1px var(--c-line-soft);
+    font-size: 0.875rem;
+
+    &[hidden] {
+      display: none;
+    }
+    &:focus-visible {
+      @include focus-ring;
+    }
+    &[aria-busy="true"] {
+      opacity: 0.75;
+    }
+
+    // loading / error / empty / footer-link paragraphs
+    > p {
+      margin: 0;
+      padding: 0.85rem 1rem;
+    }
+    > p[role="status"] {
+      color: var(--c-muted);
+      font-style: italic;
+    }
+    > p[role="alert"] {
+      color: var(--c-danger);
+      padding-bottom: 0.4rem;
+    }
+    > p[role="alert"] + .btn {
+      margin: 0 1rem 1rem;
+    }
+    > p:last-child:has(> .btn) {
+      border-top: 1px solid var(--c-line-soft);
+    }
+
+    // messages are shown compact
+    .post {
+      padding: 0.7rem 0.85rem;
+      gap: 0.7rem;
+    }
+    .post-body {
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+  }
+
+  // ---- digest: a topic as a magazine entry on the home page (templates/_digest/topic_card.html.twig) -------------------
+  //   .digest-list > section.digest > header.digest-head ( .kicker  .digest-title-row ( h3.digest-title  form[star] ) )
+  //                                   .post-body.is-lead  ul.post-photos  p.digest-note  .digest-posts > .post…  footer.digest-foot
+  .digest-list {
+    margin: 0;
+  }
+  .digest {
+    display: grid;
+    gap: 1.25rem;
+    padding-block: clamp(2rem, 5vw, 3.25rem);
+    border-top: 1px solid var(--c-rule);
+
+    &:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+    &:last-child {
+      padding-bottom: 0;
+    }
+    // photos and long texts keep the column's measure, the posts use the full width
+    .post-photos {
+      margin: 0;
+    }
+  }
+  .digest-head {
+    display: grid;
+    gap: 0.65rem;
+    justify-items: start;
+
+    .kicker a {
+      color: inherit;
+      text-decoration: none;
+
+      &:hover {
+        color: var(--c-link-hover);
+        text-decoration: underline;
+      }
+    }
+  }
+  .digest-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+  }
+  .digest-title {
+    min-width: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 540;
+    line-height: 1.08;
+    letter-spacing: var(--tracking-tight);
+    font-optical-sizing: auto;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+
+    a {
+      color: var(--c-fg);
+      text-decoration: none;
+
+      &:hover {
+        color: var(--c-link-hover);
+        text-decoration: underline;
+        text-decoration-thickness: 0.05em;
+        text-underline-offset: 0.18em;
+      }
+    }
+  }
+  .digest-note {
+    margin: 0;
+    padding-left: 0.9rem;
+    border-left: 2px solid var(--c-highlight);
+    color: var(--c-muted);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+  .digest-posts {
+    // the messages hang off a hairline, the avatar column is the only indent
+    border-block: 1px solid var(--c-line);
+
+    .post {
+      padding-inline: 0;
+    }
+    .post + .post {
+      border-top-color: var(--c-line-soft);
+    }
+  }
+  .digest-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  // ---- forum table of contents (templates/forum/index.html.twig) ----------------------------------------------------
+  //   ol.toc > li.toc-entry ( span.toc-index  div.toc-body ( h2.toc-title > a  .toc-desc )  p.toc-meta )
+  // The title link is stretched over the whole row (::after), links inside the description stay clickable above it.
+  .toc {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--c-rule);
+  }
+  .toc-entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: 0.5rem 1rem;
+    padding-block: clamp(1.4rem, 3.5vw, 2.25rem);
+    border-bottom: 1px solid var(--c-line);
+    transition: background-color 0.2s var(--ease-paper);
+
+    @include up(md) {
+      grid-template-columns: 5rem minmax(0, 1fr) 15rem;
+      column-gap: 2rem;
+    }
+    @media (hover: hover) {
+      &:hover {
+        background-color: color-mix(in srgb, var(--c-surface-2) 40%, transparent);
+      }
+    }
+    &:has(:focus-visible) {
+      @include focus-ring(-2px);
+    }
+  }
+  .toc-index {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 300;
+    font-variant-numeric: lining-nums tabular-nums;
+    line-height: 1;
+    color: var(--c-kicker);
+    transition: color 0.2s var(--ease-paper);
+
+    @include up(md) {
+      font-size: var(--text-5xl);
+    }
+  }
+  .toc-entry:hover .toc-index {
+    color: var(--c-accent-strong);
+  }
+  .toc-body {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+    min-width: 0;
+  }
+  .toc-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 560;
+    line-height: 1.12;
+    letter-spacing: var(--tracking-tight);
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+
+    a {
+      color: var(--c-fg);
+      text-decoration: none;
+
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+      }
+      &:hover {
+        color: var(--c-link-hover);
+      }
+      &:focus-visible {
+        outline: 0;
+      }
+    }
+  }
+  .toc-desc {
+    max-width: 52ch;
+    color: var(--c-fg-soft);
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    line-height: 1.5;
+
+    > * + * {
+      margin-top: 0.5em;
+    }
+    a {
+      position: relative;
+      z-index: 1;
+      color: var(--c-link);
+    }
+  }
+  .toc-meta {
+    grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.75rem;
+    margin: 0;
+    color: var(--c-muted);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+
+    strong {
+      color: var(--c-fg);
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+    }
+    @include up(md) {
+      grid-column: 3;
+      grid-row: 1;
+      display: grid;
+      align-content: start;
+      justify-items: end;
+      text-align: right;
+    }
+  }
+}

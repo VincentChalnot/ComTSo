@@ -27,6 +27,22 @@ services:
       # Ensure that host.docker.internal is correctly defined on Linux
       - host.docker.internal:host-gateway
     tty: true
+  # Design-system showcase (dev only, NOT in compose.yaml nor in the production image): Vite dev server compiling the same
+  # Sass/Tailwind sources as the application. http://localhost:${DESIGN_SYSTEM_PORT:-5174}/  (plain HTTP, published on the host)
+  design-system:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    # `node` runs `npm install`; wait for it instead of racing it on the shared bind mount
+    command: sh -c "until [ -x node_modules/.bin/vite ] && [ -d node_modules/sass ]; do sleep 2; done; npm run design-system"
+    environment:
+      DESIGN_SYSTEM_INTERNAL_PORT: "5174"
+    ports:
+      - "${DESIGN_SYSTEM_PORT:-5174}:5174"
+    depends_on:
+      - node
+
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
 

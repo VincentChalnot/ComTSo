@@ -1,0 +1,84 @@
+<section class="ds-section" id="typographie" data-title="Typographie">
+  <header class="ds-section-head">
+    <p class="kicker">Fondations</p>
+    <h2>Typographie éditoriale</h2>
+    <p class="standfirst">Trois voix, auto-hébergées (npm, aucun CDN) : un serif d’affichage à axe optique pour les titres, un serif de lecture pour les messages, une humaniste sans empattement pour l’interface. Échelle modulaire fluide, titres équilibrés, paragraphes « pretty », césure française automatique.</p>
+  </header>
+
+  <div class="ds-demo" data-title="Familles">
+    <div class="ds-stage ds-col">
+      <div>
+        <p class="ds-label">Affichage — Fraunces Variable (opsz 9–144, 100–900) · <code>font-display</code></p>
+        <p class="display-2">Le forum de la bande, <em class="display-italic">depuis 2004</em></p>
+      </div>
+      <div>
+        <p class="ds-label">Lecture — Newsreader Variable (opsz 6–72, 200–800) · <code>font-serif</code></p>
+        <p class="prose" style="max-width:62ch">Il y a des endroits où l’on revient sans savoir pourquoi : un fil de discussion qui sent le papier chaud, des voix qu’on reconnaît à la première ligne. <em>Œuvres, cœur, être</em> — les ligatures et les accents français sont de la partie. <strong>Gras</strong>, <em>italique</em> et <a href="#typographie">lien</a> en contexte.</p>
+      </div>
+      <div>
+        <p class="ds-label">Interface — Inter Variable (100–900) · <code>font-sans</code></p>
+        <p style="max-width:62ch">Navigation, formulaires, métadonnées et petits libellés. <span class="tabular">0123456789</span> — chiffres tabulaires pour les compteurs et les dates : <time>17/10/2026 à 16:42</time>.</p>
+      </div>
+      <div>
+        <p class="ds-label">Chasse fixe · <code>font-mono</code></p>
+        <p><code>docker compose exec node npm run build</code></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Échelle fluide (clamp) — classes text-2xs … text-6xl">
+    <div class="ds-stage ds-col" style="gap:.6rem">
+      <p class="text-2xs"><span class="eyebrow" style="display:inline-block;width:6rem">2xs · 11</span> Marginalia, légendes de photo</p>
+      <p class="text-xs"><span class="eyebrow" style="display:inline-block;width:6rem">xs · 12</span> Métadonnées, dates, aides de formulaire</p>
+      <p class="text-sm"><span class="eyebrow" style="display:inline-block;width:6rem">sm · 14</span> Interface, boutons, navigation</p>
+      <p class="text-base"><span class="eyebrow" style="display:inline-block;width:6rem">base · 16</span> Texte courant</p>
+      <p class="text-lg font-serif"><span class="eyebrow" style="display:inline-block;width:6rem">lg · 19</span> Chapô, citation</p>
+      <p class="text-xl font-display"><span class="eyebrow" style="display:inline-block;width:6rem">xl · 22</span> Titre de carte</p>
+      <p class="text-2xl font-display"><span class="eyebrow" style="display:inline-block;width:6rem">2xl · 24→28</span> Titre de sujet</p>
+      <p class="text-3xl font-display"><span class="eyebrow" style="display:inline-block;width:6rem">3xl · 28→38</span> Titre de section</p>
+      <p class="text-4xl font-display"><span class="eyebrow" style="display:inline-block;width:6rem">4xl · 34→52</span> Titre de page</p>
+      <p class="text-5xl font-display"><span class="eyebrow" style="display:inline-block;width:6rem">5xl · 42→72</span> Affiche</p>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Titres h1 → h6 et affichages">
+    <div class="ds-stage ds-col">
+      <h1>h1 — Un titre de page qui respire</h1>
+      <h2>h2 — Titre de section, équilibré sur deux lignes si nécessaire</h2>
+      <h3>h3 — Titre de sujet ou d’article</h3>
+      <h4>h4 — Titre de bloc</h4>
+      <h5>h5 — Intertitre</h5>
+      <h6>h6 — Libellé en petites capitales</h6>
+      <p class="display-1">Display 1</p>
+      <p class="display-2">Display 2</p>
+      <p class="display-3">Display 3</p>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Kicker, chapô, signature, filets">
+    <div class="ds-stage ds-col">
+      <p class="kicker">Photo de la semaine</p>
+      <p class="kicker is-plain">Surtitre sans filet</p>
+      <h2>Une lumière de fin d’été sur le lac</h2>
+      <p class="standfirst">Quand le chapô est bien posé, on lit la suite sans y penser : deux ou trois lignes, un ton, une promesse. Rien de plus.</p>
+      <p class="byline">Par <a href="#typographie">Camille</a> <time datetime="2026-10-12">12/10/2026</time> <span>dans Voyages</span></p>
+      <hr class="rule">
+      <p class="ds-note">.rule — filet simple</p>
+      <hr class="rule-double">
+      <p class="ds-note">.rule-double — double filet de presse</p>
+      <hr class="rule-hair">
+      <p class="ds-note">.rule-hair — filet de séparation discret</p>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Lettrine .drop-cap et texte de lecture (mesure ≤ 68ch, césure auto)">
+    <div class="ds-stage is-surface">
+      <div class="prose drop-cap">
+        <p>Quand j’ai ouvert ce vieux fil, la première chose qui m’a frappé, c’est le silence entre les messages : des jours entiers, parfois, puis trois réponses en dix minutes. Les anciens se reconnaissent à leur manière d’écrire les accents, de couper une phrase, de lâcher un point d’exclamation au bon endroit. Anticonstitutionnellement, disait l’un d’eux, pour tout et n’importe quoi.</p>
+        <p>Le deuxième paragraphe reprend le fil sans lettrine. La césure automatique (<code>hyphens: auto</code>, <code>lang="fr"</code>) évite les trous dans les lignes courtes, et <code>text-wrap: pretty</code> évite les veuves en fin de paragraphe.</p>
+        <blockquote>« On ne revient pas sur un forum, on y rentre. » — un ancien</blockquote>
+        <ul><li>Une liste à puces</li><li>qui reste lisible</li></ul>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,153 @@
+// Paper textures: tone -> recipe tables and the mixins that apply them through a pseudo-element.
+//
+// How it works
+//  * The HOST keeps its own background-colour. Its ::before layers a tile image on top (z-index:-1 inside an isolated
+//    stacking context, so under the content) with a blend mode and an opacity.
+//  * What blends well depends on the brightness of the host colour: a near-white tile multiplied over a light colour is
+//    subtle grain; over a dark colour it vanishes. So for every host colour (computed at build time with the WCAG
+//    luminance of the colour, per theme) we pick a recipe: image variant + mix-blend-mode + filter + strength.
+//  * The recipe is exposed as custom properties (--texture-image/-blend/-filter/-gain/-size). Three strength knobs multiply:
+//        --texture-gain      owned by the recipe (tone-calibrated, set by texture-tone / texture-vars): do not set it by hand
+//        --texture-strength  per-component tuning ("this sheet carries half the grain"), default 1
+//        --texture-ratio     the USER dial (inline style, utility class, per theme/variant), default 1, 0 = flat colour
+//    opacity = min(1, ratio × strength × gain × print)      (print = 0 under @media print / forced-colors / high contrast)
+//    Custom properties inherit (the ::before reads them from its host, so they cannot be registered `inherits: false`):
+//    `texture-host` therefore resets --texture-strength to 1 through a zero-specificity `:where()` rule so a host never leaks its
+//    strength into hosts nested inside it, and every recipe sets all of its properties. The ratio inherits on purpose
+//    (one slider for a whole region).
+@use "sass:list";
+@use "sass:map";
+@use "sass:math";
+@use "functions" as fn;
+@use "theming";
+@use "../themes";
+
+// Resolved by Vite through the `@textures` alias (assets/images/textures, tracked in git): the tiles are bundled and
+// fingerprinted into public/assets/ by the main build, and served by the showcase dev server.
+$texture-dir: "@textures" !default;
+
+// Image variants per family (see design-system/scripts/make-textures.py).
+$families: (
+  "paper": ("multiply": "paper-multiply.webp", "neutral": "paper-neutral.webp", "screen": "paper-screen.webp", "size": 200px),
+  "kraft": ("multiply": "kraft-multiply.webp", "neutral": "kraft-neutral.webp", "screen": "kraft-screen.webp", "size": 480px),
+);
+
+// Tone buckets from the WCAG relative luminance of the host colour. A colour is in the first bucket whose floor it reaches.
+// `deep` = near-black hosts (dark-theme canvas, cards, neutral buttons): the same grain would look muddy there, it gets less.
+$tone-floors: ("paper": 0.6, "light": 0.3, "mid": 0.1, "dark": 0.055, "deep": 0);
+
+// Recipe per family and tone: which image variant, blend mode, CSS filter and strength (gain) to use.
+$recipes: (
+  "paper": (
+    // near-white hosts show grain at once (and carry text): a lighter hand than on colours
+    "paper": ("image": "multiply", "blend": multiply, "filter": none, "gain": 0.2),
+    "light": ("image": "multiply", "blend": multiply, "filter": none, "gain": 0.2),
+    "mid": ("image": "neutral", "blend": soft-light, "filter": none, "gain": 0.2),
+    "dark": ("image": "screen", "blend": screen, "filter": none, "gain": 0.2),
+    "deep": ("image": "screen", "blend": screen, "filter": none, "gain": 0.1),
+  ),
+  "kraft": (
+    "paper": ("image": "multiply", "blend": multiply, "filter": none, "gain": 0.2),
+    "light": ("image": "multiply", "blend": multiply, "filter": "none", "gain": 0.2),
+    "mid": ("image": "neutral", "blend": overlay, "filter": none, "gain": 0.15),
+    "dark": ("image": "screen", "blend": screen, "filter": none, "gain": 0.15),
+    "deep": ("image": "screen", "blend": screen, "filter": none, "gain": 0.2),
+  ),
+);
+
+@function tone($color) {
+  $lum: fn.luminance($color);
+  @each $name, $floor in $tone-floors {
+    @if $lum >= $floor {
+      @return $name;
+    }
+  }
+  @return "deep";
+}
+
+/// Recipe map for a family and a tone name.
+@function recipe($family, $tone) {
+  @return map.get($recipes, $family, $tone);
+}
+
+/// Emits the custom properties of a recipe.
+@mixin texture-vars($family, $tone) {
+  $fam: map.get($families, $family);
+  $r: recipe($family, $tone);
+  $filter: map.get($r, "filter");
+  --texture-image: url("#{$texture-dir}/#{map.get($fam, map.get($r, 'image'))}");
+  --texture-blend: #{map.get($r, "blend")};
+  --texture-filter: #{$filter};
+  --texture-gain: #{map.get($r, "gain")};
+  --texture-size: #{map.get($fam, "size")};
+}
+
+/// Makes the element a texture host: isolated stacking context + the pseudo-element that carries the image.
+/// The recipe variables come from `texture-tone`, `texture-vars`, or the `.texture-*` utilities.
+@mixin texture-host($pseudo: "before", $position: relative) {
+  @if $position != null {
+    position: $position;
+  }
+  isolation: isolate;
+  @at-root :where(#{&}) {
+    --texture-strength: 1;
+  }
+  &::#{$pseudo} {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image: var(--texture-image, none);
+    background-size: var(--texture-size, 200px);
+    background-repeat: repeat;
+    background-position: var(--texture-position, 0 0);
+    mix-blend-mode: var(--texture-blend, normal);
+    filter: var(--texture-filter, none);
+    opacity: min(1, calc(var(--texture-ratio, 1) * var(--texture-strength, 1) * var(--texture-gain, 1) * var(--texture-print, 1)));
+  }
+}
+
+/// Picks the recipe from the colour a theme ROLE has in each theme (light + dark rules are emitted).
+///   @include texture-tone("kraft", "accent");
+/// `$mix-with`: for translucent roles, also composite over this role first (e.g. a tint over the card surface).
+@mixin texture-tone($family, $role, $over: null) {
+  @each $theme in themes.$names {
+    $color: themes.color($theme, $role);
+    @if $over != null {
+      $color: fn.over($color, themes.color($theme, $over));
+    }
+    @include theming.themed($theme) {
+      @include texture-vars($family, tone($color));
+    }
+  }
+}
+
+/// Same for an explicit pair of Sass colours: ("light": #fff, "dark": #000).
+@mixin texture-tone-colors($family, $colors-by-theme) {
+  @each $theme, $color in $colors-by-theme {
+    @include theming.themed($theme) {
+      @include texture-vars($family, tone($color));
+    }
+  }
+}
+
+/// Theme-scoped default recipes for the ad-hoc `.texture-*` utilities: the tone of the theme's `surface` colour.
+/// Declared on the theme element, so the NEAREST theme wins through normal custom-property inheritance.
+@mixin theme-defaults($theme) {
+  $surface: themes.color($theme, "surface");
+  @each $family, $fam in $families {
+    $r: recipe($family, tone($surface));
+    --tx-#{$family}-image: url("#{$texture-dir}/#{map.get($fam, map.get($r, 'image'))}");
+    --tx-#{$family}-blend: #{map.get($r, "blend")};
+    --tx-#{$family}-filter: #{map.get($r, "filter")};
+    --tx-#{$family}-gain: #{map.get($r, "gain")};
+    --tx-#{$family}-size: #{map.get($fam, "size")};
+  }
+}
+
+/// Switches the texture off (flat colour).
+@mixin texture-off {
+  --texture-ratio: 0;
+}

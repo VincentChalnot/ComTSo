@@ -1,0 +1,134 @@
+// Alerts: a note slipped into the page. Soft tint over paper, a coloured edge on the left, an icon slot, a title, a close hook.
+//
+//   <div class="alert alert-ok" role="status">
+//     <span class="alert-icon">…svg</span>
+//     <div class="alert-body"><p class="alert-title">Titre</p><p>Texte</p></div>
+//     <button type="button" data-dismiss aria-label="Fermer">…svg</button>
+//   </div>
+//
+//   .alert-danger  .alert-ok (.alert-success)  .alert-info  .alert-warning  .alert-neutral      .alert-sm
+@use "../abstracts" as *;
+
+// One variant = tint role, edge colour and the colour of the icon.
+@mixin alert-variant($soft, $edge, $icon) {
+  --alert-bg: var(--c-#{$soft});
+  --alert-edge: var(--c-#{$edge});
+  --alert-icon: var(--c-#{$icon});
+  @include texture-tone("paper", $soft);
+}
+
+@layer components {
+  .alert {
+    @include texture-host;
+    @include alert-variant("mist-soft", "line-strong", "fg-soft");
+    --texture-strength: 0.8;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.8rem 0.9rem 0.8rem 1rem;
+    border-left: 3px solid var(--alert-edge);
+    border-radius: var(--radius-sm);
+    background-color: var(--alert-bg);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--alert-edge) 22%, transparent),
+      0 1px 2px color-mix(in srgb, var(--c-shadow) 8%, transparent);
+    color: var(--c-fg);
+    font-size: 0.875rem;
+    line-height: 1.5;
+
+    p {
+      margin: 0;
+    }
+    p + p {
+      margin-top: 0.25rem;
+    }
+    a {
+      color: inherit;
+      font-weight: 600;
+      text-decoration-color: currentColor;
+    }
+
+    > [data-dismiss],
+    .alert-dismiss {
+      display: inline-flex;
+      flex: none;
+      align-items: center;
+      justify-content: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      margin: -0.2rem -0.3rem -0.2rem 0;
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: color-mix(in srgb, var(--c-fg) 72%, transparent);
+      cursor: pointer;
+      transition:
+        background-color 0.15s var(--ease-paper),
+        color 0.15s var(--ease-paper);
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+      @include hover {
+        background-color: color-mix(in srgb, var(--c-fg) 10%, transparent);
+        color: var(--c-fg);
+      }
+      @include focus {
+        @include focus-ring(0);
+      }
+    }
+  }
+
+  .alert-icon {
+    display: flex;
+    flex: none;
+    margin-top: 0.1rem;
+    color: var(--alert-icon);
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+  .alert-body {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .alert-title {
+    margin: 0 0 0.1rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--c-fg);
+  }
+
+  // ---- variants ----------------------------------------------------------------------------------------------------------
+  .alert-danger {
+    @include alert-variant("danger-soft", "danger", "danger");
+  }
+  .alert-ok,
+  .alert-success {
+    @include alert-variant("ok-soft", "ok", "ok");
+  }
+  .alert-info {
+    @include alert-variant("secondary-soft", "secondary", "link");
+  }
+  .alert-warning {
+    // sand: the house highlight colour
+    @include alert-variant("highlight-soft", "highlight", "kicker");
+  }
+  .alert-neutral {
+    @include alert-variant("mist-soft", "line-strong", "fg-soft");
+  }
+
+  .alert-sm {
+    padding: 0.5rem 0.7rem 0.5rem 0.8rem;
+    font-size: 0.8125rem;
+  }
+}

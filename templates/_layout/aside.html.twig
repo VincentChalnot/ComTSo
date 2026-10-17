@@ -2,38 +2,36 @@
 {% set favorites = favorite_topics() %}
 {% block aside_top %}{% endblock %}
 
-<section class="card p-4" aria-labelledby="aside-fav">
-    <h2 id="aside-fav" class="card-title mb-2 flex items-center gap-1.5">{{ ui.icon('star', 'size-3.5', true) }} Accès rapide</h2>
-    {% if favorites %}
-        <ul class="space-y-0.5 text-sm">
-            {% for topic in favorites %}
-                {% set isNew = app.user.previousLogin and topic.lastActivityAt > app.user.previousLogin %}
-                <li>
-                    <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}" class="flex items-center justify-between gap-2 rounded-md px-2 py-1 text-fg no-underline hover:bg-surface-2">
-                        <span class="truncate">{{ topic.title }}</span>
-                        {% if isNew %}<span class="size-2 shrink-0 rounded-full bg-accent" title="Nouveautés depuis votre dernière visite"></span>{% endif %}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="text-sm text-muted">Marquez un sujet avec l'étoile pour le retrouver ici.</p>
-    {% endif %}
-</section>
-
-<section class="card p-4" aria-labelledby="aside-forums">
-    <h2 id="aside-forums" class="card-title mb-2">Forums</h2>
-    <ul class="space-y-0.5 text-sm">
-        {% for forum in nav_forums() %}
-            <li><a href="{{ path('forum_show', {forumId: forum.id}) }}" class="block rounded-md px-2 py-1 text-fg no-underline hover:bg-surface-2">{{ forum.title }}</a></li>
+<nav aria-label="Accès rapide">
+    <ul class="menu">
+        <li class="menu-title">{{ ui.icon('star', 'size-3.5', true) }} Accès rapide</li>
+        {% for topic in favorites %}
+            {% set isNew = app.user.previousLogin and topic.lastActivityAt > app.user.previousLogin %}
+            <li>
+                <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}" class="menu-item">
+                    <span class="truncate">{{ topic.title }}</span>
+                    {% if isNew %}<span class="badge badge-dot badge-accent" title="Nouveautés depuis votre dernière visite"><span class="sr-only">Nouveautés</span></span>{% endif %}
+                </a>
+            </li>
+        {% else %}
+            <li class="menu-note">Marquez un sujet avec l'étoile pour le retrouver ici.</li>
         {% endfor %}
     </ul>
-</section>
+</nav>
+
+<nav aria-label="Forums">
+    <ul class="menu">
+        <li class="menu-title">Forums</li>
+        {% for forum in nav_forums() %}
+            <li><a href="{{ path('forum_show', {forumId: forum.id}) }}" class="menu-item">{{ forum.title }}</a></li>
+        {% endfor %}
+    </ul>
+</nav>
 
 {% set quote = random_quote() %}
 {% if quote %}
-    <figure class="card border-l-4 !border-l-accent p-4">
-        <blockquote class="text-sm italic leading-relaxed">{{ quote.content }}</blockquote>
-        {% if quote.originalAuthor %}<figcaption class="mt-2 text-xs text-muted">— {{ quote.originalAuthor }}</figcaption>{% endif %}
+    <figure class="aside-quote">
+        <blockquote>{{ quote.content }}</blockquote>
+        {% if quote.originalAuthor %}<figcaption>— {{ quote.originalAuthor }}</figcaption>{% endif %}
     </figure>
 {% endif %}

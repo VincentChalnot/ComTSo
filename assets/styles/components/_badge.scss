@@ -1,0 +1,168 @@
+// Badges: small-caps chips cut from hard paper (kraft). Soft tint by default, `.badge-solid` for the filled version.
+//
+//   .badge                 neutral            .badge-accent  plum        .badge-secondary  blue      .badge-highlight  sand
+//   .badge-muted           mist               .badge-danger  brick       .badge-ok         sage
+//   .badge-solid           + any colour above, filled          .badge-lg
+//   .badge-dot             a dot before the label; EMPTY it is a bare status dot
+//   .badge-count           nav counter pill (min 1.25rem, tabular figures)
+@use "../abstracts" as *;
+
+// $bg / $fg: the chip; $edge: its hairline; $dot: the colour of `.badge-dot`.
+@mixin badge-variant($bg, $fg, $edge, $dot: $edge, $hover: null) {
+  --badge-bg: var(--c-#{$bg});
+  --badge-fg: var(--c-#{$fg});
+  --badge-edge: var(--c-#{$edge});
+  --badge-dot: var(--c-#{$dot});
+  @include texture-tone("kraft", $bg);
+  @if $hover {
+    &:is(a, button) {
+      @include hover {
+        --badge-bg: var(--c-#{$hover});
+        @include texture-tone("kraft", $hover);
+      }
+    }
+  }
+}
+
+@layer components {
+  .badge {
+    @include texture-host;
+    @include badge-variant("btn", "on-btn", "line-strong", "mist-strong", "btn-hover");
+
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-height: 1.25rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--badge-bg);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--badge-edge) 38%, transparent);
+    color: var(--badge-fg);
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    vertical-align: middle;
+
+    &:is(a, button) {
+      cursor: pointer;
+
+      @include focus {
+        @include focus-ring;
+      }
+    }
+    svg {
+      flex: none;
+      width: 1em;
+      height: 1em;
+    }
+  }
+
+  // ---- colours (soft: text stays ink, the colour lives in the tint and the hairline) --------------------------------------
+  .badge-muted {
+    @include badge-variant("mist-soft", "fg", "line-strong", "mist-strong");
+  }
+  .badge-accent {
+    @include badge-variant("accent-soft", "accent-strong", "accent", "accent", "accent-soft");
+  }
+  .badge-secondary {
+    @include badge-variant("secondary-soft", "fg", "secondary", "secondary");
+  }
+  .badge-highlight {
+    @include badge-variant("highlight-soft", "fg", "highlight", "highlight");
+  }
+  .badge-danger {
+    @include badge-variant("danger-soft", "fg", "danger-fill", "danger-fill");
+  }
+  .badge-ok {
+    @include badge-variant("ok-soft", "fg", "ok-fill", "ok-fill");
+  }
+
+  // ---- solid: filled chips -------------------------------------------------------------------------------------------------
+  .badge-solid {
+    --badge-edge: transparent;
+    @include badge-variant("accent", "on-accent", "accent", "on-accent", "accent-hover");
+
+    &.badge-muted {
+      @include badge-variant("btn", "on-btn", "line-strong", "mist-strong");
+      --badge-edge: var(--c-line-strong);
+    }
+    &.badge-accent {
+      @include badge-variant("accent", "on-accent", "accent", "on-accent", "accent-hover");
+    }
+    &.badge-secondary {
+      @include badge-variant("secondary", "on-secondary", "secondary", "on-secondary", "secondary-hover");
+    }
+    &.badge-highlight {
+      @include badge-variant("highlight", "on-highlight", "highlight", "on-highlight", "highlight-hover");
+    }
+    &.badge-danger {
+      @include badge-variant("danger-fill", "on-danger", "danger-fill", "on-danger", "danger-fill-hover");
+    }
+    &.badge-ok {
+      @include badge-variant("ok-fill", "on-ok", "ok-fill", "on-ok", "ok-fill-hover");
+    }
+    // `.badge-solid` alone is the plum one; the plain variants above set their own edge back
+    box-shadow: none;
+  }
+
+  .badge-lg {
+    min-height: 1.6rem;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.75rem;
+  }
+
+  // ---- dot: a coloured dot before the label; empty = a bare status dot ----------------------------------------------------
+  .badge-dot::after {
+    content: "";
+    flex: none;
+    order: -1;
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    background-color: var(--badge-dot);
+  }
+  .badge-dot:empty {
+    --texture-ratio: 0;
+    width: 0.65rem;
+    min-height: 0;
+    height: 0.65rem;
+    padding: 0;
+    border-radius: 50%;
+    background-color: var(--badge-dot);
+    box-shadow: 0 0 0 2px var(--c-surface);
+
+    &::after {
+      display: none;
+    }
+  }
+
+  // ---- count pill: nav counters ---------------------------------------------------------------------------------------------
+  .badge-count {
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    min-height: 1.25rem;
+    padding: 0 0.35rem;
+    border-radius: var(--radius-md);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-transform: none;
+
+    // a counter is solid plum unless a colour variant says otherwise
+    &:not(.badge-solid, .badge-muted, .badge-secondary, .badge-highlight, .badge-danger, .badge-ok, .badge-accent) {
+      @include badge-variant("accent", "on-accent", "accent", "on-accent");
+      box-shadow: none;
+    }
+    &.badge-accent:not(.badge-solid) {
+      @include badge-variant("accent", "on-accent", "accent", "on-accent");
+      box-shadow: none;
+    }
+  }
+}

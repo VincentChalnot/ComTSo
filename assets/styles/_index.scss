@@ -1,0 +1,39 @@
+// Everything the application stylesheet is made of, in cascade order. `app.scss` (the entry) and the design-system
+// showcase both `@use` this file, so the showcase renders the very same CSS.
+@use "base/tailwind";
+@use "base/fonts";
+@use "base/theme-vars";
+@use "base/base";
+@use "base/typography";
+@use "base/textures";
+
+@use "layout/page";
+@use "layout/masthead";
+
+@use "components/button";
+@use "components/card";
+@use "components/form";
+@use "components/alert";
+@use "components/badge";
+@use "components/avatar";
+@use "components/tabs";
+@use "components/dropdown";
+@use "components/pager";
+@use "components/table";
+@use "components/skeleton";
+@use "components/post";
+@use "components/post-photos";
+@use "components/photo";
+@use "components/attach";
+@use "components/reply";
+@use "components/lightbox";
+@use "components/hero";
+@use "components/thread-preview";
+@use "components/chat";
+@use "components/rich-editor";
+@use "components/people";
+@use "components/auth";
+@use "components/error";
+@use "components/theme-toggle";
+
+@use "base/a11y-print";

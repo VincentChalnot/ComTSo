@@ -1,0 +1,309 @@
+// Photo attach widget (reply form, edit page, new topic): a dashed paper drop area around the NATIVE file input (which
+// stays visible and usable without JavaScript), then a tray of print-like thumbnails.
+//
+//   .attach > .attach-zone (+ .is-dragover) > input.attach-input + p.attach-hint
+//   after Vue mounted:   .attach-tray > li.attach-item[.is-uploading|.is-error] > img + .attach-item-name + .attach-item-size + .attach-item-remove
+//   .attach-count   .attach-error
+//   edit page:           li.attach-item > … + span.attach-item-remove > input[type=checkbox] + label
+@use "../abstracts" as *;
+
+// the "image" glyph of the icon set, drawn as a mask so it takes the text colour
+$attach-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21'/%3E%3C/svg%3E");
+
+@layer components {
+  .attach {
+    display: block;
+    min-width: 0;
+  }
+
+  // ---- drop area ----------------------------------------------------------------------------------------------------
+  .attach-zone {
+    @include texture-host;
+    @include texture-tone("paper", "surface-2");
+    --texture-strength: 0.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.1rem 1rem 1.25rem;
+    border: 1.5px dashed var(--c-line-strong);
+    border-radius: var(--radius-md);
+    background-color: color-mix(in srgb, var(--c-surface-2) 55%, transparent);
+    color: var(--c-fg-soft);
+    text-align: center;
+    transition:
+      border-color 0.15s var(--ease-paper),
+      background-color 0.15s var(--ease-paper);
+
+    // decorative picture glyph above the content
+    &::after {
+      content: "";
+      order: -1;
+      width: 1.75rem;
+      height: 1.75rem;
+      background-color: var(--c-muted);
+      -webkit-mask: $attach-icon center / contain no-repeat;
+      mask: $attach-icon center / contain no-repeat;
+    }
+
+    @include hover {
+      border-color: var(--c-fg-soft);
+    }
+    @include focus {
+      @include focus-ring;
+    }
+    &:focus-within {
+      border-color: var(--c-focus);
+    }
+    // a file is being dragged over the area
+    &.is-dragover {
+      border-style: solid;
+      border-color: var(--c-accent);
+      background-color: var(--c-accent-soft);
+      color: var(--c-fg);
+
+      &::after {
+        background-color: var(--c-accent-strong);
+      }
+      .attach-hint {
+        color: var(--c-fg);
+      }
+    }
+    &.is-disabled,
+    &[aria-disabled="true"] {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  // the native input: visible, usable without JS; its button is a small kraft-paper tab
+  .attach-input {
+    max-width: 100%;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    color: var(--c-fg-soft);
+    cursor: pointer;
+
+    &::file-selector-button {
+      margin-right: 0.75rem;
+      padding: 0.45rem 1rem;
+      border: 1px solid var(--c-line-strong);
+      border-radius: var(--radius-sm);
+      background-color: var(--c-btn);
+      color: var(--c-on-btn);
+      font: inherit;
+      font-weight: 620;
+      letter-spacing: 0.035em;
+      cursor: pointer;
+      box-shadow:
+        0 1px 0 color-mix(in srgb, var(--c-shadow) 16%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #fff 28%, transparent);
+      transition: background-color 0.15s var(--ease-paper);
+    }
+    &:hover::file-selector-button {
+      background-color: var(--c-btn-hover);
+    }
+    &:active::file-selector-button {
+      background-color: var(--c-btn-active);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--c-focus);
+      outline-offset: 3px;
+    }
+  }
+
+  .attach-hint {
+    max-width: 44ch;
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--c-fg-soft);
+    text-wrap: balance;
+  }
+
+  // ---- tray: small prints with a paper frame ------------------------------------------------------------------------
+  .attach-tray {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(5.75rem, 1fr));
+    gap: 1rem 0.75rem;
+    margin: 0.9rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .attach-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: 0.1rem;
+    min-width: 0;
+    font-family: var(--font-sans);
+
+    img {
+      grid-row: 1;
+      grid-column: 1;
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      margin-bottom: 0.3rem;
+      padding: 3px;
+      border: 1px solid var(--c-line);
+      border-radius: var(--radius-md);
+      background-color: var(--c-surface);
+      box-shadow: 0 1px 2px color-mix(in srgb, var(--c-shadow) 14%, transparent);
+      object-fit: cover;
+      transition: opacity 0.2s var(--ease-paper);
+    }
+
+    // uploading: the picture waits under a small spinner
+    &.is-uploading {
+      img {
+        opacity: 0.5;
+      }
+      &::after {
+        content: "";
+        grid-row: 1;
+        grid-column: 1;
+        place-self: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-bottom: 0.3rem;
+        border: 2px solid var(--c-line-strong);
+        border-top-color: var(--c-accent);
+        border-radius: 50%;
+        animation: attach-spin 0.8s linear infinite;
+      }
+    }
+    // refused / failed
+    &.is-error {
+      img {
+        border-color: var(--c-danger);
+        box-shadow: 0 0 0 1px var(--c-danger);
+      }
+      .attach-item-name {
+        color: var(--c-danger);
+      }
+      &::after {
+        content: "!";
+        grid-row: 1;
+        grid-column: 1;
+        place-self: end start;
+        display: grid;
+        place-items: center;
+        width: 1.25rem;
+        height: 1.25rem;
+        margin: 0 0 0.7rem 0.5rem;
+        border-radius: 50%;
+        background: var(--c-danger-fill);
+        color: var(--c-on-danger);
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+    }
+  }
+  @keyframes attach-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .attach-item.is-uploading::after {
+      animation-duration: 3s;
+    }
+  }
+
+  .attach-item-name {
+    overflow: hidden;
+    font-size: 0.75rem;
+    font-weight: 560;
+    line-height: 1.35;
+    color: var(--c-fg-soft);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .attach-item-size {
+    font-size: 0.6875rem;
+    line-height: 1.3;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-muted);
+  }
+
+  // remove: a round kraft button hanging off the corner of the thumbnail (Vue tray), …
+  .attach-item-remove {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.15rem;
+    font-size: 0.75rem;
+    color: var(--c-fg-soft);
+
+    input[type="checkbox"] {
+      accent-color: var(--c-accent);
+    }
+    label {
+      cursor: pointer;
+    }
+  }
+  button.attach-item-remove {
+    @include texture-host;
+    @include texture-tone("kraft", "surface");
+    position: absolute;
+    top: -0.45rem;
+    right: -0.45rem;
+    z-index: 1;
+    display: inline-grid;
+    place-items: center;
+    width: 1.625rem;
+    height: 1.625rem;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--c-line-strong);
+    border-radius: 50%;
+    background-color: var(--c-surface);
+    color: var(--c-fg);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--c-shadow) 28%, transparent);
+    transition:
+      background-color 0.15s var(--ease-paper),
+      color 0.15s var(--ease-paper);
+
+    // a comfortable touch target without a bigger visible button
+    &::after {
+      content: "";
+      position: absolute;
+      inset: -0.5rem;
+    }
+    @include hover {
+      @include texture-tone("kraft", "danger-fill");
+      border-color: var(--c-danger-fill);
+      background-color: var(--c-danger-fill);
+      color: var(--c-on-danger);
+    }
+    @include focus {
+      @include focus-ring(1px);
+    }
+  }
+
+  .attach-count {
+    margin: 0.6rem 0 0;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-muted);
+  }
+  .attach-error {
+    margin: 0.6rem 0 0;
+    padding-left: 0.7rem;
+    border-left: 2px solid var(--c-danger);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--c-danger);
+  }
+}

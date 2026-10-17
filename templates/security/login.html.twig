@@ -1,32 +1,42 @@
 {% extends 'base.html.twig' %}
+{% import '_ui/icons.html.twig' as ui %}
 
 {% block title %}Connexion · ComTSo{% endblock %}
 
+{# The card carries its own wordmark: no masthead, no colophon, and the visitor's theme toggle (localStorage) floats top right. #}
+{% block masthead %}
+    <button type="button" class="btn-icon theme-toggle theme-toggle-floating" data-theme-toggle aria-label="Changer de thème">
+        <span data-when="light">{{ ui.icon('moon', 'size-5') }}</span><span data-when="dark">{{ ui.icon('sun', 'size-5') }}</span>
+    </button>
+{% endblock %}
+{% block footer %}{% endblock %}
+
 {% block content_layout %}
-<main class="mx-auto mt-10 max-w-sm">
-    <div class="card p-6">
-        <h1 class="mb-1 text-2xl font-bold tracking-tight">Connexion</h1>
-        <p class="mb-5 text-sm text-muted">Ce forum est privé : identifiez-vous pour continuer.</p>
+<main id="main" class="auth" tabindex="-1">
+    <div class="auth-card">
+        <header class="auth-brand"><span class="auth-wordmark">ComTSo</span><span class="rule-double is-flush"></span></header>
+        <h1 class="auth-title">Connexion</h1>
+        <p class="auth-lead">Ce forum est privé : identifiez-vous pour continuer.</p>
 
         {% if error %}
-            <div class="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            <div class="alert alert-danger" role="alert"><div class="alert-body"><p>{{ error.messageKey|trans(error.messageData, 'security') }}</p></div></div>
         {% endif %}
 
-        <form method="post">
-            <div class="mb-4">
+        <form method="post" class="auth-form">
+            <div class="field">
                 <label for="username" class="label">Pseudo</label>
                 <input type="text" id="username" name="_username" value="{{ last_username }}" class="input" required autofocus autocomplete="username">
             </div>
-            <div class="mb-4">
+            <div class="field">
                 <label for="password" class="label">Mot de passe</label>
                 <input type="password" id="password" name="_password" class="input" required autocomplete="current-password">
             </div>
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-            <button type="submit" class="btn btn-primary w-full">Se connecter</button>
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Se connecter</button>
         </form>
 
         {% if registration_enabled %}
-            <p class="mt-4 text-center text-sm text-muted">Pas encore de compte ? <a href="{{ path('app_register') }}">S'inscrire</a></p>
+            <p class="auth-footer">Pas encore de compte ? <a href="{{ path('app_register') }}">S'inscrire</a></p>
         {% endif %}
     </div>
 </main>

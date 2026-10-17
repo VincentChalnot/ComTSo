@@ -1,6 +1,6 @@
 twig:
     file_name_pattern: '*.twig'
-    form_themes: ['form/theme.html.twig', 'form/rich_text.html.twig']
+    form_themes: ['form/theme.html.twig', 'form/rich_text.html.twig', 'form/photo_upload.html.twig']
     globals:
         app_name: 'ComTSo'
         mercure_public_url: '%env(default::MERCURE_PUBLIC_URL)%'

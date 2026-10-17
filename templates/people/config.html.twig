@@ -3,12 +3,21 @@
 {% block title %}Configuration · ComTSo{% endblock %}
 
 {% block body %}
-<h1 class="mb-4 text-2xl font-bold tracking-tight">Configuration</h1>
-<div class="card max-w-xl p-5">
-    {{ form_start(form) }}
-        {{ form_row(form.message_order) }}
-        <p class="mb-4 text-sm text-muted">Le thème clair / sombre se change avec le bouton ☀︎ / ☾ de la barre de navigation.</p>
-        <button type="submit" class="btn btn-primary">Sauvegarder</button>
-    {{ form_end(form) }}
+<header class="page-header">
+    <p class="kicker"><a href="{{ path('people_show', {username: person.username}) }}">{{ person.username }}</a></p>
+    <h1 class="page-title">Configuration</h1>
+    <p class="standfirst">Quelques réglages de lecture, propres à votre compte.</p>
+</header>
+
+<div class="settings">
+    <div class="card settings-card">
+        {{ form_start(form) }}
+            {{ form_row(form.message_order) }}
+            <p class="settings-hint">Le thème clair / sombre se change avec le bouton ☀︎ / ☾ de la barre de navigation.</p>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Sauvegarder</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
 </div>
 {% endblock %}

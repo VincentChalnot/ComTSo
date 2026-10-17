@@ -1,0 +1,178 @@
+// Photo lightbox (DOM built by `class Lightbox` in assets/scripts/ui.js). Theme-independent: always a dark scrim with
+// light paper-toned controls, so it uses the brand scales (`--color-ink-*`, `--color-paper-*`) instead of the theme roles.
+//
+//   .lightbox
+//     .lightbox-bar        .lightbox-counter  +  .lightbox-actions (.lightbox-btn links / close button)
+//     .lightbox-stage      .lightbox-nav.is-prev  .lightbox-image  .lightbox-spinner  .lightbox-nav.is-next
+//     .lightbox-caption
+//   JS hooks kept as `data-lb-*` attributes; `.is-loading` on the root hides the picture while it loads, `hidden` hides
+//   the spinner and the arrows of a single photo.
+@use "../abstracts" as *;
+
+@layer components {
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background-color: color-mix(in srgb, var(--color-ink-950) 93%, transparent);
+    color: var(--color-paper-50);
+    font-family: var(--font-sans);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    outline: 0;
+    animation: lightbox-in 0.18s var(--ease-paper);
+  }
+
+  .lightbox-bar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  .lightbox-counter {
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.8;
+  }
+  .lightbox-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .lightbox-stage {
+    position: relative;
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    padding-inline: 0.5rem;
+
+    @include up(sm) {
+      padding-inline: 3.5rem;
+    }
+  }
+  .lightbox-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    user-select: none;
+    border-radius: var(--radius-xs);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-paper-50) 10%, transparent),
+      0 30px 60px -30px color-mix(in srgb, var(--color-ink-950) 90%, transparent);
+    transition: opacity 0.2s var(--ease-paper);
+  }
+  .lightbox.is-loading .lightbox-image {
+    opacity: 0;
+  }
+  .lightbox-spinner {
+    position: absolute;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid color-mix(in srgb, var(--color-paper-50) 30%, transparent);
+    border-top-color: var(--color-paper-50);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: lightbox-spin 0.8s linear infinite;
+  }
+  .lightbox-caption {
+    flex: none;
+    min-height: 3rem;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--color-paper-100);
+    text-align: center;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+
+  @keyframes lightbox-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes lightbox-spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox {
+      animation: none;
+    }
+    .lightbox-image {
+      transition: none;
+    }
+    .lightbox-spinner {
+      animation: none;
+    }
+  }
+
+  // round translucent paper-tone control with a grain of hard paper
+  .lightbox-btn {
+    @include texture-host;
+    @include texture-tone-colors("kraft", ("light": #2c2a28, "dark": #2c2a28));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--color-paper-50) 22%, transparent);
+    border-radius: 50%;
+    background-color: color-mix(in srgb, var(--color-paper-50) 12%, transparent);
+    color: var(--color-paper-50);
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 0.15s var(--ease-paper),
+      border-color 0.15s var(--ease-paper);
+
+    svg {
+      flex: none;
+    }
+    @include hover {
+      border-color: color-mix(in srgb, var(--color-paper-50) 40%, transparent);
+      background-color: color-mix(in srgb, var(--color-paper-50) 26%, transparent);
+    }
+    @include pressed {
+      background-color: color-mix(in srgb, var(--color-paper-50) 36%, transparent);
+    }
+    @include focus {
+      outline: 2px solid var(--color-sand-300);
+      outline-offset: 2px;
+    }
+    @include disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+  // previous / next arrows float over the sides of the stage (after .lightbox-btn: same specificity, later wins)
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    translate: 0 -50%;
+
+    &.is-prev {
+      left: 0.5rem;
+    }
+    &.is-next {
+      right: 0.5rem;
+    }
+  }
+}

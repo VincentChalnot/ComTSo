@@ -1,0 +1,234 @@
+// Masthead: a centred display wordmark between a thin and a double rule, small-caps navigation in a sticky paper strip.
+//
+//   <header class="masthead">
+//     <div class="masthead-bar">
+//       <form class="masthead-search" role="search">…input.input…</form>
+//       <a class="masthead-title" href="/">ComTSo</a>
+//       <div class="masthead-tools"> theme toggle · settings · .masthead-user · logout </div>
+//     </div>
+//     <nav class="masthead-nav" aria-label="Navigation principale">
+//       <button class="masthead-toggle btn-icon" data-nav-toggle aria-expanded="false">…</button>
+//       <ul class="masthead-menu" data-nav-menu>
+//         <li><a class="masthead-link is-active" aria-current="page" href="/">Accueil</a></li>
+//         <li><a class="masthead-link" href="/chat">Chat <span class="badge badge-accent">3</span></a></li>
+//       </ul>
+//     </nav>
+//   </header>
+@use "../abstracts" as *;
+
+@layer components {
+  .masthead {
+    position: relative;
+    z-index: 30;
+    color: var(--c-fg);
+  }
+
+  // ---- top bar: search | wordmark | tools ------------------------------------------------------------------------------
+  .masthead-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: var(--container-page);
+    margin-inline: auto;
+    padding: clamp(0.75rem, 2vw, 1.5rem) clamp(1rem, 4vw, 3rem) clamp(0.6rem, 1.5vw, 1rem);
+  }
+  .masthead-title {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    grid-column: 2;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1.1rem + 3.6vw, 3.5rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.035em;
+    color: var(--c-fg);
+    text-decoration: none;
+    font-variation-settings: "opsz" 144;
+
+    &:hover {
+      color: var(--c-fg);
+    }
+    // optional tagline under the wordmark
+    small {
+      @include eyebrow(0.625rem, 0.3em);
+      margin-top: 0.45rem;
+      color: var(--c-kicker);
+    }
+  }
+  .masthead-search {
+    position: relative;
+    grid-column: 1;
+    width: min(100%, 16rem);
+    justify-self: start;
+  }
+  .masthead-tools {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    grid-column: 3;
+  }
+  .masthead-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.2rem 0.6rem 0.2rem 0.25rem;
+    border-radius: var(--radius-sm);
+    color: var(--c-fg);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      background: var(--c-surface-2);
+      color: var(--c-fg);
+    }
+  }
+
+  // ---- navigation strip -----------------------------------------------------------------------------------------------
+  .masthead-nav {
+    @include texture-host("before", sticky);
+    @include texture-tone("paper", "page");
+    --texture-strength: 0.5;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding-inline: clamp(0.5rem, 3vw, 2rem);
+    background-color: var(--c-page);
+    // thin rule above (under the wordmark: a double one), hairline below
+    border-top: 3px double var(--c-rule);
+    border-bottom: 1px solid var(--c-line);
+  }
+  .masthead-menu {
+    display: none;
+    flex-direction: column;
+    flex-basis: 100%;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0.5rem 0 0.75rem;
+    list-style: none;
+
+    &.is-open {
+      display: flex;
+    }
+
+    @include up(lg) {
+      display: flex;
+      flex-direction: row;
+      flex-basis: auto;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.35rem 0;
+    }
+  }
+  // `.masthead` prefix: the `.btn-icon` rule (same layer, defined later) must not win over `display: none`
+  .masthead .masthead-toggle {
+    margin: 0.25rem 0 0.25rem auto;
+
+    @include up(lg) {
+      display: none;
+    }
+  }
+
+  // Small-caps links; the active one is a small kraft pill
+  .masthead-link {
+    @include texture-host;
+    @include texture-tone("kraft", "page");
+    --texture-ratio: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.95rem;
+    border-radius: var(--radius-sm);
+    background-color: transparent;
+    color: var(--c-muted);
+    @include eyebrow(0.75rem, 0.14em);
+    text-decoration: none;
+    transition: color 0.15s var(--ease-paper), background-color 0.15s var(--ease-paper);
+
+    @include hover {
+      background-color: var(--c-surface-2);
+      color: var(--c-fg);
+      @include texture-tone("kraft", "surface-2");
+    }
+    @include focus {
+      @include focus-ring(0);
+    }
+    &.is-active,
+    &[aria-current="page"] {
+      --texture-ratio: 1;
+      --texture-strength: 0.35;
+      background-color: var(--c-accent-soft);
+      color: var(--c-accent-strong);
+      @include texture-tone("kraft", "accent-soft");
+    }
+  }
+
+  // The in-menu search and the account links exist for small screens only (the bar carries them from lg up)
+  .masthead-menu-search,
+  .masthead-menu-account {
+    display: none;
+  }
+
+  // Mobile: the wordmark stays centred, the bar keeps only the theme toggle and the avatar; search, settings and logout
+  // move into the burger menu. Touch targets stay >= 2.5rem.
+  @include down(lg) {
+    .masthead .masthead-search,
+    .masthead .masthead-settings,
+    .masthead .masthead-logout,
+    .masthead .masthead-user-name {
+      display: none;
+    }
+    .masthead-user {
+      padding: 0.25rem;
+    }
+    .masthead-menu-search,
+    .masthead-menu-account {
+      display: block;
+    }
+    .masthead-menu-search {
+      padding: 0.25rem 0 0.5rem;
+    }
+    .masthead-menu-account {
+      border-top: 1px solid var(--c-line);
+    }
+    .masthead-menu-account + .masthead-menu-account {
+      border-top: 0;
+    }
+    .masthead-link {
+      min-height: 2.75rem;
+    }
+    .masthead-toggle {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+    .btn-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
+
+  // Footer colophon
+  .colophon {
+    width: 100%;
+    max-width: var(--container-page);
+    margin: 0 auto;
+    padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .colophon-text {
+    @include eyebrow(0.6875rem, 0.16em);
+    margin: 1rem 0 0;
+    text-align: center;
+    color: var(--c-muted);
+
+    strong {
+      color: var(--c-fg);
+    }
+  }
+}

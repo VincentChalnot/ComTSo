@@ -1,0 +1,71 @@
+<section class="ds-section" id="textures" data-title="Textures">
+  <header class="ds-section-head">
+    <p class="kicker">Fondations</p>
+    <h2>Textures papier</h2>
+    <p class="standfirst">Deux papiers, posés en pseudo-élément sur la couleur de l’élément : le papier aquarelle donne le grain des fonds, le carton kraft celui des boutons. La recette (mode de fusion, variante d’image, force) dépend de la luminosité de la couleur de l’hôte et est calculée à la compilation, pour chaque thème.</p>
+  </header>
+
+  <div class="ds-demo" data-title="Curseur --texture-ratio (0 = couleur plate · 1 = calibré · 2 = fort)">
+    <div class="ds-stage" id="tx-matrix">
+      <p class="ds-note">Le curseur règle <code>--texture-ratio</code> sur tout le bloc ci-dessous : l’opacité de chaque pseudo-élément vaut <code>min(1, ratio × gain × print)</code>. Utilisez « Clair | Sombre » pour comparer les deux thèmes.</p>
+      <label class="ds-row" data-ds-ignore><span class="ds-label">Ratio</span>
+        <input type="range" min="0" max="2" step="0.05" value="1" data-ds-var="--texture-ratio" data-ds-target="#tx-matrix" aria-label="Ratio de texture" style="width:min(100%,24rem)">
+        <output>1.00</output>
+      </label>
+      <h3 class="ds-label" style="margin-top:2rem">Papier aquarelle — fonds, cartes, en-tête</h3>
+      <div class="ds-grid">
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-paper" style="background-color: #fdfbf7"></div><span><strong>paper-50</strong> <code>#fdfbf7</code></span><span class="text-muted">tone « paper » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-paper" style="background-color: #f9f4eb"></div><span><strong>paper-100</strong> <code>#f9f4eb</code></span><span class="text-muted">tone « paper » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-paper" style="background-color: #e8dccb"></div><span><strong>paper-300</strong> <code>#e8dccb</code></span><span class="text-muted">tone « paper » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-light" style="background-color: #95b2b8"></div><span><strong>mist-400</strong> <code>#95b2b8</code></span><span class="text-muted">tone « light » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-light" style="background-color: #f0a868"></div><span><strong>sand-300</strong> <code>#f0a868</code></span><span class="text-muted">tone « light » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-light" style="background-color: #d989a4"></div><span><strong>plum-400</strong> <code>#d989a4</code></span><span class="text-muted">tone « light » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-mid" style="background-color: #ac376a"></div><span><strong>plum-600</strong> <code>#ac376a</code></span><span class="text-muted">tone « mid » → soft-light / overlay</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-mid" style="background-color: #3a6d9c"></div><span><strong>blue-600</strong> <code>#3a6d9c</code></span><span class="text-muted">tone « mid » → soft-light / overlay</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-dark" style="background-color: #950952"></div><span><strong>plum-700 · brand</strong> <code>#950952</code></span><span class="text-muted">tone « dark » → screen</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-dark" style="background-color: #00487c"></div><span><strong>blue-700 · brand</strong> <code>#00487c</code></span><span class="text-muted">tone « dark » → screen</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-deep" style="background-color: #2b2118"></div><span><strong>ink-900 · brand</strong> <code>#2b2118</code></span><span class="text-muted">tone « deep » → screen</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-paper is-tone-deep" style="background-color: #40362d"></div><span><strong>ink-800</strong> <code>#40362d</code></span><span class="text-muted">tone « deep » → screen</span></div>
+      </div>
+      <h3 class="ds-label" style="margin-top:2rem">Carton kraft — boutons, pastilles, onglets</h3>
+      <div class="ds-grid">
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-paper" style="background-color: #fdfbf7"></div><span><strong>paper-50</strong> <code>#fdfbf7</code></span><span class="text-muted">tone « paper » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-paper" style="background-color: #f9f4eb"></div><span><strong>paper-100</strong> <code>#f9f4eb</code></span><span class="text-muted">tone « paper » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-paper" style="background-color: #e8dccb"></div><span><strong>paper-300</strong> <code>#e8dccb</code></span><span class="text-muted">tone « paper » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-light" style="background-color: #95b2b8"></div><span><strong>mist-400</strong> <code>#95b2b8</code></span><span class="text-muted">tone « light » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-light" style="background-color: #f0a868"></div><span><strong>sand-300</strong> <code>#f0a868</code></span><span class="text-muted">tone « light » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-light" style="background-color: #d989a4"></div><span><strong>plum-400</strong> <code>#d989a4</code></span><span class="text-muted">tone « light » → multiply</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-mid" style="background-color: #ac376a"></div><span><strong>plum-600</strong> <code>#ac376a</code></span><span class="text-muted">tone « mid » → overlay</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-mid" style="background-color: #3a6d9c"></div><span><strong>blue-600</strong> <code>#3a6d9c</code></span><span class="text-muted">tone « mid » → overlay</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-dark" style="background-color: #950952"></div><span><strong>plum-700 · brand</strong> <code>#950952</code></span><span class="text-muted">tone « dark » → screen</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-dark" style="background-color: #00487c"></div><span><strong>blue-700 · brand</strong> <code>#00487c</code></span><span class="text-muted">tone « dark » → screen</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-deep" style="background-color: #2b2118"></div><span><strong>ink-900 · brand</strong> <code>#2b2118</code></span><span class="text-muted">tone « deep » → screen</span></div>
+      <div class="ds-swatch"><div class="ds-swatch-chip texture-kraft is-tone-deep" style="background-color: #40362d"></div><span><strong>ink-800</strong> <code>#40362d</code></span><span class="text-muted">tone « deep » → screen</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Pourquoi la recette dépend de la couleur : mauvais mode vs bon mode">
+    <div class="ds-stage">
+      <p class="ds-note">Multiplier une image presque blanche sur une couleur sombre ne change rien (rien à assombrir) ; l’écran (<code>screen</code>) d’une image inversée y ajoute au contraire de la lumière. À l’inverse, <code>screen</code> sur un fond clair le délave. Chaque ligne montre la même couleur avec un mode forcé.</p>
+      <div class="ds-grid" style="grid-template-columns:repeat(auto-fill,minmax(10rem,1fr))">
+        <div class="ds-swatch"><div class="ds-swatch-chip ds-tx-multiply" style="background:#950952"></div><span><strong>Prune · multiply</strong></span><span class="text-muted">invisible : mauvais</span></div>
+        <div class="ds-swatch"><div class="ds-swatch-chip ds-tx-screen" style="background:#950952"></div><span><strong>Prune · screen</strong></span><span class="text-muted">grain clair : bon</span></div>
+        <div class="ds-swatch"><div class="ds-swatch-chip ds-tx-screen" style="background:#f9f4eb"></div><span><strong>Papier · screen</strong></span><span class="text-muted">délavé : mauvais</span></div>
+        <div class="ds-swatch"><div class="ds-swatch-chip ds-tx-multiply" style="background:#f9f4eb"></div><span><strong>Papier · multiply</strong></span><span class="text-muted">grain : bon</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="API utilitaire (CSS pur)">
+    <div class="ds-stage">
+      <div class="ds-grid">
+        <div class="texture-card" style="padding:1.25rem"><p class="eyebrow">.texture-card</p><p>Feuille de papier : surface + tuile aquarelle + ombre en couches.</p></div>
+        <div class="texture-paper" style="padding:1.25rem; background-color:var(--c-surface-2)"><p class="eyebrow">.texture-paper</p><p>Hôte quelconque, teinte suivant le thème courant.</p></div>
+        <div class="texture-kraft is-tone-dark" style="padding:1.25rem; background-color:var(--c-secondary); color:var(--c-on-secondary)"><p class="eyebrow" style="color:inherit">.texture-kraft.is-tone-dark</p><p>Carton kraft sur une couleur sombre.</p></div>
+        <div class="texture-kraft is-tone-light texture-strong" style="padding:1.25rem; background-color:var(--c-highlight); color:var(--c-on-highlight)"><p class="eyebrow" style="color:inherit">.is-tone-light.texture-strong</p><p>Ratio ×1,6 (<code>--texture-ratio</code>).</p></div>
+        <div class="texture-paper texture-off" style="padding:1.25rem; background-color:var(--c-surface-2)"><p class="eyebrow">.texture-off</p><p>Couleur plate (ratio 0).</p></div>
+      </div>
+    </div>
+  </div>
+</section>

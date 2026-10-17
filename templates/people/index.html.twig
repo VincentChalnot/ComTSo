@@ -4,18 +4,23 @@
 {% block title %}Les gens · ComTSo{% endblock %}
 
 {% block body %}
-<h1 class="mb-4 text-2xl font-bold tracking-tight">Les gens</h1>
-<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+<header class="page-header">
+    <p class="kicker">Le cercle</p>
+    <h1 class="page-title">Les gens</h1>
+    <p class="standfirst">{{ people|length }} membre{{ people|length > 1 ? 's' : '' }} du cercle, depuis 2004.</p>
+</header>
+
+<div class="people-grid">
     {% for person in people %}
-        <a href="{{ path('people_show', {username: person.username}) }}" class="card flex flex-col items-center gap-2 p-4 text-center text-fg no-underline transition hover:border-accent">
-            <span class="relative">
-                {{ av.avatar(person, 'size-20') }}
+        <a href="{{ path('people_show', {username: person.username}) }}" class="card card-hover person-card">
+            <span class="person-card-avatar">
+                {{ av.avatar(person, 'xl') }}
                 {% if unread_messages()[person.id] is defined %}
-                    <span class="absolute -right-1 -top-1 inline-flex min-w-6 items-center justify-center rounded-full bg-accent px-1.5 text-xs font-semibold leading-6 text-on-accent" title="Messages privés non lus">{{ unread_messages()[person.id] }}</span>
+                    <span class="badge badge-accent badge-count person-card-count" title="Messages privés non lus">{{ unread_messages()[person.id] }}<span class="sr-only"> messages privés non lus</span></span>
                 {% endif %}
             </span>
-            <span class="font-semibold">{{ person.username }}</span>
-            {% if person.name or person.surname %}<span class="-mt-1 text-xs text-muted">{{ person.name }} {{ person.surname }}</span>{% endif %}
+            <span class="person-card-name">{{ person.username }}</span>
+            {% if person.name or person.surname %}<span class="person-card-meta">{{ person.name }} {{ person.surname }}</span>{% endif %}
         </a>
     {% endfor %}
 </div>

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>ComTSo — Design system</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script>
+      // Theme before first paint: the saved choice, else the visitor's system preference.
+      (function () {
+        var saved = null;
+        try { saved = localStorage.getItem('comtso-theme'); } catch (e) {}
+        var dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      })();
+    </script>
+  </head>
+  <body class="ds-body">
+    <header class="ds-header">
+      <a class="ds-brand" href="#top">ComTSo <span>design system</span></a>
+      <nav class="ds-nav" aria-label="Sections" id="ds-nav"></nav>
+      <div class="ds-header-tools">
+        <button type="button" class="btn btn-sm" id="ds-theme" data-theme-toggle aria-pressed="false" title="Changer de thème">
+          <span data-when="light">Clair</span><span data-when="dark">Sombre</span>
+        </button>
+      </div>
+    </header>
+    <main class="ds-main" id="top">
+      <div id="ds-root"></div>
+    </main>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

@@ -1,52 +1,55 @@
 <template>
-  <div>
-    <p class="mb-3 text-sm text-muted">Glissez-déposez les photos pour les réordonner. Les nouvelles photos sont ajoutées à la fin.</p>
+  <div class="photo-manager">
+    <p class="photo-manager-hint">Glissez-déposez les photos pour les réordonner. Les nouvelles photos sont ajoutées à la fin.</p>
 
-    <ul v-if="items.length" class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4" @dragover.prevent>
+    <ul v-if="items.length" class="photo-manager-grid" aria-label="Photos du sujet" @dragover.prevent>
       <li
         v-for="(item, index) in items"
         :key="item.link"
-        class="card group relative overflow-hidden"
-        :class="{ 'opacity-40': dragIndex === index }"
+        class="photo-tile"
+        :class="{ 'is-dragging': dragIndex === index }"
         draggable="true"
         @dragstart="dragIndex = index"
         @dragend="dragIndex = null"
         @dragenter.prevent="moveTo(index)"
         @drop.prevent="saveOrder"
       >
-        <a :href="item.page" class="block aspect-square bg-surface-2"><img :src="item.thumb" :alt="item.title" class="size-full object-cover" draggable="false" /></a>
-        <p class="truncate px-2 pt-1 text-xs text-muted" :title="item.title">{{ item.title }}</p>
-        <div class="flex gap-1 p-2">
-          <button type="button" class="btn btn-sm flex-1" @click="remove(item, false)">Retirer</button>
+        <a :href="item.page"><img :src="item.thumb" :alt="item.title" draggable="false" /></a>
+        <p class="photo-tile-name" :title="item.title">{{ item.title }}</p>
+        <div class="photo-tile-actions">
+          <button type="button" class="btn btn-sm" @click="remove(item, false)">Retirer</button>
           <button type="button" class="btn btn-sm btn-danger" title="Supprimer définitivement la photo" @click="remove(item, true)">Supprimer</button>
         </div>
       </li>
     </ul>
-    <p v-else class="card mb-6 p-6 text-center text-muted">Aucune photo dans ce sujet.</p>
+    <div v-else class="empty empty-sm mb-6">
+      <p class="empty-text">Aucune photo dans ce sujet.</p>
+    </div>
 
     <section
-      class="card border-2 border-dashed p-6 text-center transition"
-      :class="hover ? 'border-accent bg-accent-soft' : 'border-line'"
+      class="photo-dropzone"
+      :class="{ 'is-dragover': hover }"
+      aria-labelledby="photo-dropzone-title"
       @dragover.prevent="hover = true"
       @dragleave="hover = false"
       @drop.prevent="onDrop"
     >
-      <h2 class="mb-2 font-semibold">Ajouter des photos</h2>
+      <h2 id="photo-dropzone-title">Ajouter des photos</h2>
       <label class="btn btn-primary">
         Choisir des fichiers…
-        <input ref="file" type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple class="hidden" @change="onPick" />
+        <input ref="file" type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple class="sr-only" @change="onPick" />
       </label>
-      <p class="mt-2 text-xs text-muted">ou déposez-les ici — JPEG, PNG, GIF, WebP, 25 Mo maximum chacune.</p>
+      <p class="field-help">ou déposez-les ici — JPEG, PNG, GIF, WebP, 25 Mo maximum chacune.</p>
 
-      <ul v-if="uploads.length" class="mx-auto mt-4 max-w-md space-y-1 text-left text-sm">
-        <li v-for="(u, i) in uploads" :key="i" class="flex items-center justify-between gap-3">
-          <span class="truncate">{{ u.name }}</span>
-          <span :class="u.state === 'error' ? 'text-danger' : u.state === 'done' ? 'text-ok' : 'text-muted'">{{ u.message }}</span>
+      <ul v-if="uploads.length" class="photo-uploads" aria-live="polite">
+        <li v-for="(u, i) in uploads" :key="i">
+          <span class="photo-upload-name">{{ u.name }}</span>
+          <span class="photo-upload-state" :class="{ 'is-error': u.state === 'error', 'is-done': u.state === 'done' }">{{ u.message }}</span>
         </li>
       </ul>
     </section>
 
-    <p class="mt-6"><a :href="backUrl" class="btn">Retour au sujet</a></p>
+    <p class="mt-8"><a :href="backUrl" class="btn btn-ghost">Retour au sujet</a></p>
   </div>
 </template>
 

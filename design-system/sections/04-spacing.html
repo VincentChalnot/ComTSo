@@ -1,0 +1,53 @@
+<section class="ds-section" id="espaces" data-title="Espaces & reliefs">
+  <header class="ds-section-head">
+    <p class="kicker">Fondations</p>
+    <h2>Espaces, rayons, feuilles de papier</h2>
+    <p class="standfirst">Beaucoup d’air, des filets plutôt que des boîtes, des rayons minuscules et des ombres en couches : des feuilles posées sur un bureau, pas des cartes flottantes.</p>
+  </header>
+
+  <div class="ds-demo" data-title="Échelle d’espacement (--spacing: 0,25 rem — classes p-*, m-*, gap-*)">
+    <div class="ds-stage ds-col" style="gap:.4rem">
+      <div class="ds-row"><span class="ds-label" style="width:5rem;margin:0">1 · 4px</span><span style="display:block;height:.75rem;width:.25rem;background:var(--c-accent)"></span></div>
+      <div class="ds-row"><span class="ds-label" style="width:5rem;margin:0">2 · 8px</span><span style="display:block;height:.75rem;width:.5rem;background:var(--c-accent)"></span></div>
+      <div class="ds-row"><span class="ds-label" style="width:5rem;margin:0">4 · 16px</span><span style="display:block;height:.75rem;width:1rem;background:var(--c-accent)"></span></div>
+      <div class="ds-row"><span class="ds-label" style="width:5rem;margin:0">6 · 24px</span><span style="display:block;height:.75rem;width:1.5rem;background:var(--c-accent)"></span></div>
+      <div class="ds-row"><span class="ds-label" style="width:5rem;margin:0">8 · 32px</span><span style="display:block;height:.75rem;width:2rem;background:var(--c-accent)"></span></div>
+      <div class="ds-row"><span class="ds-label" style="width:5rem;margin:0">12 · 48px</span><span style="display:block;height:.75rem;width:3rem;background:var(--c-accent)"></span></div>
+      <div class="ds-row"><span class="ds-label" style="width:5rem;margin:0">16 · 64px</span><span style="display:block;height:.75rem;width:4rem;background:var(--c-accent)"></span></div>
+      <div class="ds-row"><span class="ds-label" style="width:5rem;margin:0">24 · 96px</span><span style="display:block;height:.75rem;width:6rem;background:var(--c-accent)"></span></div>
+      <p class="ds-note" style="margin-top:1rem">Rythme vertical : <code>.stack</code> (1,5 rem), <code>.section</code> (2,5 → 4,5 rem), marges de page fluides <code>clamp(1rem, 4vw, 3rem)</code>, colonne de lecture 44 rem + aside 17,5 rem, largeur de page 76 rem.</p>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Rayons (rounded-xs … rounded-xl : 1 → 4px · rounded-full pour avatars et pastilles)">
+    <div class="ds-stage ds-row">
+      <div class="texture-card rounded-xs" style="padding:1rem 1.5rem">xs · 1px</div>
+      <div class="texture-card rounded-sm" style="padding:1rem 1.5rem">sm · 2px</div>
+      <div class="texture-card rounded-md" style="padding:1rem 1.5rem">md · 3px</div>
+      <div class="texture-card rounded-lg" style="padding:1rem 1.5rem">lg · 4px</div>
+      <div class="texture-card rounded-2xl" style="padding:1rem 1.5rem">2xl · 6px</div>
+      <div class="avatar avatar-initial" style="--avatar-hue:210">AB</div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Reliefs : feuille, feuilles empilées, soulevée, en creux (--shadow-sheet, --shadow-lift, --shadow-inset)">
+    <div class="ds-stage ds-grid" style="gap:2rem">
+      <div class="card" style="padding:1.25rem"><p class="eyebrow">.card</p><p>Feuille posée : contour d’un pixel + ombre de contact + ombre ambiante décalée.</p></div>
+      <div class="card card-stack" style="padding:1.25rem"><p class="eyebrow">.card-stack</p><p>Deux feuilles dépassent dessous, comme un tas de papiers.</p></div>
+      <div class="card card-hover" style="padding:1.25rem"><p class="eyebrow">.card-hover</p><p>Survolez : la feuille se soulève de deux pixels.</p></div>
+      <div class="card card-sunken" style="padding:1.25rem"><p class="eyebrow">.card-sunken</p><p>Surface en creux pour les zones secondaires.</p></div>
+      <div class="card card-flat" style="padding:1.25rem"><p class="eyebrow">.card-flat</p><p>Simple filet, texture réduite.</p></div>
+      <div class="card card-accent" style="padding:1.25rem"><p class="eyebrow">.card-accent</p><p>Liseré sable (citations, notes).</p></div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Utilitaires Tailwind de relief (shadow-xs … shadow-2xl)">
+    <div class="ds-stage ds-row" style="gap:1.75rem">
+      <div class="bg-surface shadow-xs rounded-md" style="padding:1rem 1.25rem">shadow-xs</div>
+      <div class="bg-surface shadow-sm rounded-md" style="padding:1rem 1.25rem">shadow-sm</div>
+      <div class="bg-surface shadow-md rounded-md" style="padding:1rem 1.25rem">shadow-md</div>
+      <div class="bg-surface shadow-lg rounded-md" style="padding:1rem 1.25rem">shadow-lg</div>
+      <div class="bg-surface shadow-xl rounded-md" style="padding:1rem 1.25rem">shadow-xl</div>
+    </div>
+  </div>
+</section>

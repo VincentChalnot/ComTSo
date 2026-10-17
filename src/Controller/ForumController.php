@@ -6,14 +6,15 @@ use App\Entity\Forum;
 use App\Entity\Topic;
 use App\Entity\User;
 use App\Form\TopicType;
+use App\Forum\ThreadPreviewBuilder;
 use App\Pagination\Pager;
-use App\Repository\CommentRepository;
+use App\Photo\PostPhotos;
 use App\Repository\ForumRepository;
-use App\Repository\PhotoTopicRepository;
 use App\Repository\TopicRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -38,21 +39,17 @@ class ForumController extends AbstractController
     public function show(
         Request $request,
         #[MapEntity(id: 'forumId')] Forum $forum,
+        #[CurrentUser] User $user,
         TopicRepository $topics,
-        CommentRepository $comments,
-        PhotoTopicRepository $photoTopics,
+        ThreadPreviewBuilder $previews,
     ): Response {
         $pager = new Pager($topics->countInForum($forum), self::TOPICS_PER_PAGE, $request->query->getInt('page', 1));
-        $cards = [];
-        foreach ($topics->findPageInForum($forum, $pager->offset(), $pager->perPage) as $topic) {
-            $cards[] = [
-                'topic' => $topic,
-                'latest' => $comments->findLatest($topic, 2),
-                'photos' => $photoTopics->findForTopic($topic),
-            ];
-        }
 
-        return $this->render('forum/show.html.twig', ['forum' => $forum, 'cards' => $cards, 'pager' => $pager]);
+        return $this->render('forum/show.html.twig', [
+            'forum' => $forum,
+            'previews' => $previews->build($topics->findPageInForum($forum, $pager->offset(), $pager->perPage), $user),
+            'pager' => $pager,
+        ]);
     }
 
     #[Route('/forums/{forumId}/nouveau', name: 'forum_new_topic', requirements: ['forumId' => '[a-z0-9-]+'])]
@@ -61,13 +58,23 @@ class ForumController extends AbstractController
         #[MapEntity(id: 'forumId')] Forum $forum,
         #[CurrentUser] User $user,
         EntityManagerInterface $em,
+        PostPhotos $postPhotos,
     ): Response {
         $topic = (new Topic())->setForum($forum)->setAuthor($user);
-        $form = $this->createForm(TopicType::class, $topic);
+        $form = $this->createForm(TopicType::class, $topic, ['with_photos' => true]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $photos = $postPhotos->store($form->get('photos')->getData() ?? [], $user);
+            } catch (\InvalidArgumentException $e) {
+                $form->get('photos')->addError(new FormError($e->getMessage()));
+
+                return $this->render('forum/new_topic.html.twig', ['forum' => $forum, 'form' => $form]);
+            }
+
             $em->persist($topic);
+            $postPhotos->attachToTopic($topic, $photos, $user);
             $em->flush();
             $this->addFlash('success', 'Le sujet a été créé.');
 

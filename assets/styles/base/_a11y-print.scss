@@ -1,0 +1,63 @@
+// Reduced motion and print.
+@use "../abstracts" as *;
+
+// Motion is tiny to begin with (colour/shadow fades, 2px lifts); users who ask for none get none.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+// Print: flat ink on white paper. Textures are already switched off (--texture-print: 0, see base/_textures.scss).
+@media print {
+  :root,
+  [data-theme="dark"],
+  [data-theme="light"] {
+    --c-page: #fff;
+    --c-surface: #fff;
+    --c-surface-2: #fff;
+    --c-fg: #000;
+    --c-fg-soft: #222;
+    --c-muted: #444;
+    --c-link: #000;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .masthead-search,
+  .masthead-tools,
+  .masthead-nav,
+  .layout-aside,
+  .reply,
+  .pager,
+  .btn,
+  .btn-icon,
+  .lightbox,
+  [data-nav-toggle],
+  .theme-toggle,
+  .thread-preview-toggle,
+  header.sticky {
+    display: none !important;
+  }
+  .card,
+  .post,
+  .thread-preview {
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #444;
+  }
+  .layout {
+    display: block;
+  }
+}

@@ -1,0 +1,7 @@
+{# HTML fragment (no layout) loaded by ui.js into the "Aperçu" of a thread preview. Params: topic, comments #}
+{% for comment in comments %}
+    {% include '_post/message.html.twig' with {comment: comment, hide_actions: true} %}
+{% else %}
+    <p>Aucun message dans ce sujet pour le moment.</p>
+{% endfor %}
+<p><a class="btn btn-primary btn-sm" href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}">Lire le sujet</a></p>

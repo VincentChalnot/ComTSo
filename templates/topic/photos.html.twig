@@ -1,11 +1,13 @@
 {% extends 'base.html.twig' %}
-{% import '_ui/icons.html.twig' as ui %}
 
 {% block title %}Photos de « {{ topic.title }} » · ComTSo{% endblock %}
 
 {% block body %}
-<h1 class="mb-1 text-2xl font-bold tracking-tight">Gestion des photos</h1>
-<p class="mb-4 text-sm text-muted">Sujet : <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}">{{ topic.title }}</a></p>
+<header class="page-header">
+    <p class="kicker"><a href="{{ path('forum_show', {forumId: topic.forum.id}) }}" class="text-inherit no-underline hover:underline">{{ topic.forum.title }}</a></p>
+    <h1 class="page-title">Gestion des photos</h1>
+    <p class="standfirst">Sujet : <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}">{{ topic.title }}</a></p>
+</header>
 
 <div data-vue-component="PhotoManager" data-props="{{ {
     uploadUrl: path('topic_photos_upload', {forumId: topic.forum.id, id: topic.id}),

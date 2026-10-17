@@ -4,48 +4,66 @@
 {% block title %}{{ photo.title ?: photo.originalFilename }} · ComTSo{% endblock %}
 
 {% block body %}
-<header class="mb-4 flex flex-wrap items-start justify-between gap-3">
-    <div class="min-w-0">
-        <h1 class="text-2xl font-bold leading-tight tracking-tight">{{ photo.title ?: photo.originalFilename }}</h1>
-        <p class="mt-0.5 text-xs text-muted">
-            {% if photo.author %}Ajoutée par <a href="{{ path('people_show', {username: photo.author.username}) }}" class="text-muted">{{ photo.author.username }}</a> le {% else %}Ajoutée le {% endif %}
-            {{ photo.createdAt|date('d/m/Y à H:i') }}{% if photo.updatedAt and photo.updatedAt.timestamp - photo.createdAt.timestamp > 120 %} · modifiée le {{ photo.updatedAt|date('d/m/Y à H:i') }}{% endif %}
-        </p>
+{% set caption = photo.title ?: photo.originalFilename %}
+<header class="page-header">
+    <p class="kicker"><a href="{{ path('photo_index') }}">Photothèque</a></p>
+    <h1 class="page-title">{{ caption }}</h1>
+    <div class="page-actions">
+        <a href="{{ path('photo_source', {id: photo.id, download: 1}) }}" class="btn">{{ ui.icon('download', 'size-4') }} Télécharger ({{ (photo.fileSize / 1024)|round(1) }} Ko)</a>
+        {% if app.user and (photo.author == app.user or is_granted('ROLE_ADMIN')) %}
+            <a href="{{ path('photo_edit', {id: photo.id}) }}" class="btn btn-ghost">{{ ui.icon('pencil', 'size-4') }} Modifier</a>
+        {% endif %}
     </div>
-    {% if app.user and (photo.author == app.user or is_granted('ROLE_ADMIN')) %}
-        <a href="{{ path('photo_edit', {id: photo.id}) }}" class="btn btn-sm">{{ ui.icon('pencil', 'size-3.5') }} Modifier</a>
-    {% endif %}
 </header>
 
-<figure class="card overflow-hidden">
-    <a href="{{ path('photo_show', {id: photo.id}) }}" class="block bg-surface-2 text-center"
+<figure class="photo-figure">
+    <a href="{{ path('photo_show', {id: photo.id}) }}"
        data-lightbox="photo-{{ photo.id }}" data-src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}" data-full="{{ path('photo_source', {id: photo.id}) }}"
-       data-download="{{ path('photo_source', {id: photo.id, download: 1}) }}" data-caption="{{ photo.title ?: photo.originalFilename }}">
-        <img src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}" alt="{{ photo.title ?: photo.originalFilename }}" class="mx-auto max-h-[75vh] w-auto max-w-full">
+       data-download="{{ path('photo_source', {id: photo.id, download: 1}) }}" data-caption="{{ caption }}">
+        <img src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}" alt="{{ caption }}">
     </a>
-    <figcaption class="flex justify-center border-t border-line p-3">
-        <a href="{{ path('photo_source', {id: photo.id, download: 1}) }}" class="btn">{{ ui.icon('download', 'size-4') }} Télécharger ({{ (photo.fileSize / 1024)|round(1) }} Ko)</a>
+    <figcaption>
+        {% if photo.content %}<p>{{ photo.content|e|nl2br }}</p>{% endif %}
+        <p class="byline">
+            <span>{% if photo.author %}Ajoutée par <a href="{{ path('people_show', {username: photo.author.username}) }}">{{ photo.author.username }}</a> le {% else %}Ajoutée le {% endif %}<time datetime="{{ photo.createdAt|date('c') }}">{{ photo.createdAt|date('d/m/Y à H:i') }}</time></span>
+            {% if photo.updatedAt and photo.updatedAt.timestamp - photo.createdAt.timestamp > 120 %}<span>modifiée le <time datetime="{{ photo.updatedAt|date('c') }}">{{ photo.updatedAt|date('d/m/Y à H:i') }}</time></span>{% endif %}
+        </p>
     </figcaption>
 </figure>
 
-{% if photo.content %}<p class="mt-4">{{ photo.content|e|nl2br }}</p>{% endif %}
+<div class="section grid gap-x-16 gap-y-12 md:grid-cols-2">
+    <section aria-labelledby="photo-details">
+        <h2 class="section-title" id="photo-details">Détails</h2>
+        <dl class="dl">
+            {% if photo.takenAt %}<dt>Date de prise</dt><dd>{{ photo.takenAt|date('d/m/Y à H:i') }}</dd>{% endif %}
+            <dt>Taille</dt><dd>{{ (photo.fileSize / 1024)|round(1) }} Ko{% if photo.width and photo.height %} · {{ photo.width }}×{{ photo.height }}{% endif %}</dd>
+            {% if photo.exif.Make is defined %}<dt>Appareil</dt><dd>{{ photo.exif.Make }} {{ photo.exif.Model|default('') }}</dd>{% endif %}
+            {% if photo.exif.ExposureTime is defined %}<dt>Exposition</dt><dd>{{ photo.exif.ExposureTime }}</dd>{% endif %}
+            {% if photo.exif.FNumber is defined %}<dt>Ouverture</dt><dd>f/{{ photo.exif.FNumber }}</dd>{% endif %}
+            {% if photo.exif.ISOSpeedRatings is defined %}<dt>ISO</dt><dd>{{ photo.exif.ISOSpeedRatings }}</dd>{% endif %}
+            {% if photo.exif.FocalLength is defined %}<dt>Focale</dt><dd>{{ photo.exif.FocalLength }} mm</dd>{% endif %}
+        </dl>
+    </section>
 
-<dl class="mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-    {% if photo.takenAt %}<dt class="font-medium text-muted">Date de prise</dt><dd>{{ photo.takenAt|date('d/m/Y à H:i') }}</dd>{% endif %}
-    <dt class="font-medium text-muted">Taille</dt><dd>{{ (photo.fileSize / 1024)|round(1) }} Ko{% if photo.width and photo.height %} · {{ photo.width }}×{{ photo.height }}{% endif %}</dd>
-    {% if photo.exif.Make is defined %}<dt class="font-medium text-muted">Appareil</dt><dd>{{ photo.exif.Make }} {{ photo.exif.Model|default('') }}</dd>{% endif %}
-    {% if photo.exif.ExposureTime is defined %}<dt class="font-medium text-muted">Exposition</dt><dd>{{ photo.exif.ExposureTime }}</dd>{% endif %}
-    {% if photo.exif.FNumber is defined %}<dt class="font-medium text-muted">Ouverture</dt><dd>f/{{ photo.exif.FNumber }}</dd>{% endif %}
-    {% if photo.exif.ISOSpeedRatings is defined %}<dt class="font-medium text-muted">ISO</dt><dd>{{ photo.exif.ISOSpeedRatings }}</dd>{% endif %}
-    {% if photo.exif.FocalLength is defined %}<dt class="font-medium text-muted">Focale</dt><dd>{{ photo.exif.FocalLength }} mm</dd>{% endif %}
-</dl>
-
-{% if photo.topics|length %}
-    <h2 class="card-title mb-2 mt-6">Cette photo apparaît dans</h2>
-    <ul class="space-y-1 text-sm">
-        {% for link in photo.topics %}
-            <li><a href="{{ path('topic_show', {forumId: link.topic.forum.id, id: link.topic.id}) }}">{{ link.topic.title }}</a> <span class="text-muted">· {{ link.topic.forum.title }}</span></li>
-        {% endfor %}
-    </ul>
-{% endif %}
+    {% if photo.topics|length or messageUsages %}
+        <section aria-labelledby="photo-usages">
+            <h2 class="section-title" id="photo-usages">Cette photo apparaît dans</h2>
+            <ul class="photo-usages">
+                {% for link in photo.topics %}
+                    <li>
+                        <p class="photo-usage-title"><a href="{{ path('topic_show', {forumId: link.topic.forum.id, id: link.topic.id}) }}">{{ link.topic.title }}</a></p>
+                        <p class="photo-usage-meta">Sujet · {{ link.topic.forum.title }}</p>
+                    </li>
+                {% endfor %}
+                {% for link in messageUsages %}
+                    {% set comment = link.comment %}
+                    <li>
+                        <p class="photo-usage-title"><a href="{{ path('comment_show', {id: comment.id}) }}">Message de {{ comment.author ? comment.author.username : 'un ancien membre' }}</a></p>
+                        <p class="photo-usage-meta">du {{ comment.createdAt|date('d/m/Y') }} · dans <a href="{{ path('topic_show', {forumId: comment.topic.forum.id, id: comment.topic.id}) }}">{{ comment.topic.title }}</a> · {{ comment.topic.forum.title }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+</div>
 {% endblock %}

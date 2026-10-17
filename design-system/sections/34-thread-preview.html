@@ -1,0 +1,576 @@
+<section class="ds-section" id="thread-preview" data-title="Aperçu de sujet">
+  <header class="ds-section-head">
+    <p class="kicker">Composants éditoriaux</p>
+    <h2>Aperçu de sujet</h2>
+    <p class="standfirst">Le chapeau d'un sujet dans une liste : une petite feuille de papier avec sa couverture, son titre, un chapô, la citation du dernier message et une ligne d'infos. L'aperçu déplie les derniers messages sans quitter la liste.</p>
+  </header>
+<div class="ds-demo" data-title="Avec couverture">
+  <p class="ds-note">Couverture à gauche (30 %, entre 14 et 20 rem) tant que la carte est assez large pour garder une colonne de texte lisible ; au-dessus sinon.</p>
+  <div class="ds-stage ">
+    <div class="thread-preview-list">
+      <article class="thread-preview has-cover" aria-labelledby="thread-title-1">
+        <a class="thread-preview-cover" href="#" tabindex="-1" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2326365e'/%3E%3Cstop offset='.5' stop-color='%23b8667b'/%3E%3Cstop offset='1' stop-color='%23f5ae62'/%3E%3C/linearGradient%3E %3ClinearGradient id='w' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23e8955c'/%3E%3Cstop offset='.35' stop-color='%236d5a7e'/%3E%3Cstop offset='1' stop-color='%231f2c4d'/%3E%3C/linearGradient%3E %3CradialGradient id='g' cx='.62' cy='.62' r='.45'%3E%3Cstop offset='0' stop-color='%23fff0c4' stop-opacity='.95'/%3E%3Cstop offset='1' stop-color='%23ffd28a' stop-opacity='0'/%3E%3C/radialGradient%3E %3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='5'/%3E%3C/filter%3E%3C/defs%3E %3Crect width='1600' height='650' fill='url(%23s)'/%3E%3Crect width='1600' height='650' fill='url(%23g)'/%3E %3Cellipse cx='990' cy='640' rx='90' ry='60' fill='%23fff6d8' opacity='.9' filter='url(%23b)'/%3E %3Cpath d='M0 560 L170 470 L300 530 L470 400 L640 520 L760 470 L900 570 L1060 440 L1250 540 L1400 480 L1600 560 V660 H0Z' fill='%235a4766' opacity='.7' filter='url(%23b)'/%3E %3Cpath d='M0 625 L220 545 L380 605 L560 505 L760 615 L980 535 L1180 615 L1380 555 L1600 625 V690 H0Z' fill='%232b2a47'/%3E %3Crect y='650' width='1600' height='350' fill='url(%23w)'/%3E %3Cg stroke='%23ffe0a6' stroke-linecap='round' opacity='.55'%3E%3Cpath d='M930 690H1050' stroke-width='7'/%3E%3Cpath d='M880 730H1100' stroke-width='6'/%3E%3Cpath d='M840 775H1140' stroke-width='5'/%3E%3Cpath d='M800 825H1180' stroke-width='4'/%3E%3Cpath d='M760 885H1220' stroke-width='3'/%3E%3C/g%3E %3Cpath d='M0 690 L180 690 L260 650 L480 690 H0Z' fill='%231b2340' opacity='.5'/%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='1600' height='1000' filter='url(%23n)'/%3E%3C/svg%3E" alt="" width="320" height="320" loading="lazy"></a>
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-1"><a href="#">Randonnée au lever du soleil : le sentier secret du Parmelan</a></h2>
+          <p class="standfirst thread-preview-excerpt">On a trouvé le sentier par hasard en redescendant du Parmelan : trois heures de marche, un lever de soleil qui valait largement le réveil à cinq heures, et un refuge ouvert hors saison.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Je ramène le thermos et les madeleines, on se retrouve au parking à 7 h. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="true" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">12 messages</span>
+            <span class="thread-preview-stat">340 vues</span>
+            <span class="thread-preview-stat">4 photos</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-1" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-1" tabindex="-1" hidden></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+<div class="ds-demo" data-title="Sans couverture, sans chapô, sans citation, sans avatars">
+  <div class="ds-stage ">
+    <div class="thread-preview-list">
+      <article class="thread-preview" aria-labelledby="thread-title-2">
+        <div class="thread-preview-body">
+          <p class="kicker">Questions pratiques · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">hier</time></p>
+          <h2 class="thread-preview-title" id="thread-title-2"><a href="#">Qui connaît un bon plombier dans le 12e arrondissement ?</a></h2>
+          <p class="standfirst thread-preview-excerpt">Fuite sous l'évier depuis ce matin, le robinet d'arrêt ne tient plus. Je cherche quelqu'un de fiable, dispo ce week-end si possible.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">dorian</span>
+            Chez moi c'est Mehdi, il est passé en urgence un dimanche. Je te mets son numéro en message privé. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">8 messages</span>
+            <span class="thread-preview-stat">120 vues</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-2" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-2" tabindex="-1" hidden></div>
+        </div>
+      </article>
+      <article class="thread-preview" aria-labelledby="thread-title-3">
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 2 j</time></p>
+          <h2 class="thread-preview-title" id="thread-title-3"><a href="#">Sondage : date de la prochaine rencontre annuelle</a></h2>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Je ramène le thermos et les madeleines, on se retrouve au parking à 7 h. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li></ul>
+            <span class="thread-preview-stat">31 messages</span>
+            <span class="thread-preview-stat">410 vues</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-3" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-3" tabindex="-1" hidden></div>
+        </div>
+      </article>
+      <article class="thread-preview" aria-labelledby="thread-title-4">
+        <div class="thread-preview-body">
+          <p class="kicker">Présentations · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 5 j</time></p>
+          <h2 class="thread-preview-title" id="thread-title-4"><a href="#">Bienvenue à Gaspard</a></h2>
+          <p class="standfirst thread-preview-excerpt">Un nouveau membre nous rejoint !</p>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+      
+            <span class="thread-preview-stat">1 message</span>
+            <span class="thread-preview-stat">25 vues</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+      
+          </footer>
+          <div class="thread-preview-more" id="preview-more-4" tabindex="-1" hidden></div>
+        </div>
+      </article>
+      <article class="thread-preview" aria-labelledby="thread-title-5">
+        <div class="thread-preview-body">
+          <p class="kicker">Divers · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 1 sem.</time></p>
+          <h2 class="thread-preview-title" id="thread-title-5"><a href="#">Message sans rien d'autre</a></h2>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+      
+            <span class="thread-preview-stat">0 message</span>
+            <span class="thread-preview-stat">3 vues</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+      
+          </footer>
+          <div class="thread-preview-more" id="preview-more-5" tabindex="-1" hidden></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+<div class="ds-demo" data-title="Nouveau depuis la dernière visite — .is-new">
+  <p class="ds-note">Discret : liseré sable de 3 px sur le bord gauche, trait du kicker en prune, badge « nouveaux » dans la ligne d'infos.</p>
+  <div class="ds-stage ">
+    <div class="thread-preview-list">
+      <article class="thread-preview has-cover is-new" aria-labelledby="thread-title-6">
+        <a class="thread-preview-cover" href="#" tabindex="-1" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%239fb8b2'/%3E%3Cstop offset='1' stop-color='%23e9ead6'/%3E%3C/linearGradient%3E %3ClinearGradient id='f' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23f4f1e2' stop-opacity='0'/%3E%3Cstop offset='.5' stop-color='%23f4f1e2' stop-opacity='.8'/%3E%3Cstop offset='1' stop-color='%23f4f1e2' stop-opacity='0'/%3E%3C/linearGradient%3E %3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='4'/%3E%3C/filter%3E%3C/defs%3E %3Crect width='1600' height='1000' fill='url(%23s)'/%3E %3Cpath d='M0 520 l40-120 40 120 40-150 40 150 50-110 50 110 40-170 40 170 60-120 60 120 40-140 40 140 60-160 60 160 50-120 50 120 40-150 40 150 60-110 60 110 40-130 40 130 60-140 60 140 40-120 40 120 H1600 V700 H0Z' fill='%237c9a8e' opacity='.75' filter='url(%23b)'/%3E %3Crect y='430' width='1600' height='220' fill='url(%23f)'/%3E %3Cpath d='M0 640 l60-190 60 190 50-230 50 230 70-200 70 200 60-260 60 260 70-210 70 210 60-250 60 250 70-200 70 200 60-240 60 240 70-190 70 190 60-230 60 230 70-210 70 210 H1600 V800 H0Z' fill='%234a6b5d' opacity='.9'/%3E %3Crect y='560' width='1600' height='200' fill='url(%23f)' opacity='.8'/%3E %3Cpath d='M0 800 l80-300 80 300 70-360 70 360 90-320 90 320 80-380 80 380 90-330 90 330 80-370 80 370 90-310 90 310 80-350 80 350 90-300 90 300 H1600 V1000 H0Z' fill='%2323382f'/%3E %3Cpath d='M0 900 H1600 V1000 H0Z' fill='%23162520'/%3E %3Cg fill='%23ffe9a8' opacity='.18'%3E%3Cpath d='M900 0 L1080 0 L760 900 L620 900Z'/%3E%3Cpath d='M1180 0 L1260 0 L1020 900 L940 900Z'/%3E%3C/g%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='1600' height='1000' filter='url(%23n)'/%3E%3C/svg%3E" alt="" width="320" height="320" loading="lazy"></a>
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-6"><a href="#">Randonnée au lever du soleil : le sentier secret du Parmelan</a></h2>
+          <p class="standfirst thread-preview-excerpt">On a trouvé le sentier par hasard en redescendant du Parmelan : trois heures de marche, un lever de soleil qui valait largement le réveil à cinq heures, et un refuge ouvert hors saison.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Je ramène le thermos et les madeleines, on se retrouve au parking à 7 h. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">12 messages</span>
+            <span class="thread-preview-stat">340 vues</span>
+            <span class="thread-preview-stat">4 photos</span>
+            <span class="badge badge-accent">2 nouveaux</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-6" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-6" tabindex="-1" hidden></div>
+        </div>
+      </article>
+      <article class="thread-preview is-new" aria-labelledby="thread-title-7">
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-7"><a href="#">Panne de chauffage collective : on s'organise ?</a></h2>
+          <p class="standfirst thread-preview-excerpt">Plusieurs d'entre nous sont touchés par la panne, je propose de centraliser les infos ici.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Même problème chez moi depuis hier soir, j'appelle le syndic demain à la première heure. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li title="dorian" aria-label="dorian"><span title="dorian" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(285 42% 42%)">D</span></li><li class="avatar-stack-more" title="6 autres participants" aria-label="6 autres participants">+6</li></ul>
+            <span class="thread-preview-stat">54 messages</span>
+            <span class="thread-preview-stat">1200 vues</span>
+            <span class="badge badge-accent">1 nouveau</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-7" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-7" tabindex="-1" hidden></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+<div class="ds-demo" data-title="Aperçu ouvert — 3 messages, chargement, erreur">
+  <p class="ds-note"><code>aria-expanded="true"</code> retourne le chevron du bouton ; <code>.thread-preview-more</code> est un panneau en creux qui contient des <code>.post</code> compacts. Rendu <code>hidden</code> tant que le script ne l'ouvre pas.</p>
+  <div class="ds-stage ">
+    <div class="thread-preview-list">
+      <article class="thread-preview has-cover" aria-labelledby="thread-title-8">
+        <a class="thread-preview-cover" href="#" tabindex="-1" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2326365e'/%3E%3Cstop offset='.5' stop-color='%23b8667b'/%3E%3Cstop offset='1' stop-color='%23f5ae62'/%3E%3C/linearGradient%3E %3ClinearGradient id='w' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23e8955c'/%3E%3Cstop offset='.35' stop-color='%236d5a7e'/%3E%3Cstop offset='1' stop-color='%231f2c4d'/%3E%3C/linearGradient%3E %3CradialGradient id='g' cx='.62' cy='.62' r='.45'%3E%3Cstop offset='0' stop-color='%23fff0c4' stop-opacity='.95'/%3E%3Cstop offset='1' stop-color='%23ffd28a' stop-opacity='0'/%3E%3C/radialGradient%3E %3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='5'/%3E%3C/filter%3E%3C/defs%3E %3Crect width='1600' height='650' fill='url(%23s)'/%3E%3Crect width='1600' height='650' fill='url(%23g)'/%3E %3Cellipse cx='990' cy='640' rx='90' ry='60' fill='%23fff6d8' opacity='.9' filter='url(%23b)'/%3E %3Cpath d='M0 560 L170 470 L300 530 L470 400 L640 520 L760 470 L900 570 L1060 440 L1250 540 L1400 480 L1600 560 V660 H0Z' fill='%235a4766' opacity='.7' filter='url(%23b)'/%3E %3Cpath d='M0 625 L220 545 L380 605 L560 505 L760 615 L980 535 L1180 615 L1380 555 L1600 625 V690 H0Z' fill='%232b2a47'/%3E %3Crect y='650' width='1600' height='350' fill='url(%23w)'/%3E %3Cg stroke='%23ffe0a6' stroke-linecap='round' opacity='.55'%3E%3Cpath d='M930 690H1050' stroke-width='7'/%3E%3Cpath d='M880 730H1100' stroke-width='6'/%3E%3Cpath d='M840 775H1140' stroke-width='5'/%3E%3Cpath d='M800 825H1180' stroke-width='4'/%3E%3Cpath d='M760 885H1220' stroke-width='3'/%3E%3C/g%3E %3Cpath d='M0 690 L180 690 L260 650 L480 690 H0Z' fill='%231b2340' opacity='.5'/%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='1600' height='1000' filter='url(%23n)'/%3E%3C/svg%3E" alt="" width="320" height="320" loading="lazy"></a>
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-8"><a href="#">Randonnée au lever du soleil : le sentier secret du Parmelan</a></h2>
+          <p class="standfirst thread-preview-excerpt">On a trouvé le sentier par hasard en redescendant du Parmelan : trois heures de marche, un lever de soleil qui valait largement le réveil à cinq heures, et un refuge ouvert hors saison.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Je ramène le thermos et les madeleines, on se retrouve au parking à 7 h. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">12 messages</span>
+            <span class="thread-preview-stat">340 vues</span>
+            <span class="thread-preview-stat">4 photos</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="true" aria-controls="preview-more-8" data-preview-url="#">Masquer l’aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-8" tabindex="-1">
+      <article class="post" data-post>
+        <span class="shrink-0 self-start"><span title="baptiste" class="size-10 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></span>
+        <div class="min-w-0 flex-1">
+          <p class="post-author">baptiste</p>
+          <div class="post-body" data-collapsible><p>Magnifique, la lumière sur le Parmelan est incroyable. Tu étais là-haut vers quelle heure&nbsp;?</p></div>
+          <div class="post-meta"><time datetime="2026-10-12T18:40:00+02:00">Posté le 12/10/2026 à 18:40</time></div>
+        </div>
+      </article>
+      <article class="post" data-post>
+        <span class="shrink-0 self-start"><span title="camille" class="size-10 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></span>
+        <div class="min-w-0 flex-1">
+          <p class="post-author">camille</p>
+          <div class="post-body" data-collapsible><p>On y retourne le week-end du 1er novembre si le temps tient, qui est partant&nbsp;?</p></div>
+          <div class="post-meta"><time datetime="2026-10-12T18:40:00+02:00">Posté le 12/10/2026 à 19:12</time></div>
+        </div>
+      </article>
+      <article class="post" data-post>
+        <span class="shrink-0 self-start"><span title="alice" class="size-10 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></span>
+        <div class="min-w-0 flex-1">
+          <p class="post-author">alice</p>
+          <div class="post-body" data-collapsible><p>Moi&nbsp;! Je ramène le thermos et les madeleines <img src="/smilies/icon_cool.gif" alt=":cool:"></p></div>
+          <div class="post-meta"><time datetime="2026-10-12T18:40:00+02:00">Posté le 12/10/2026 à 19:31</time></div>
+        </div>
+      </article>
+      <p class="mt-3"><a class="btn btn-primary btn-sm" href="#">Lire le sujet</a></p>
+          </div>
+        </div>
+      </article>
+      <article class="thread-preview" aria-labelledby="thread-title-9">
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-9"><a href="#">Chargement de l'aperçu</a></h2>
+          <p class="standfirst thread-preview-excerpt">Le bouton est ouvert, les messages arrivent.</p>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">12 messages</span>
+            <span class="thread-preview-stat">340 vues</span>
+            <span class="thread-preview-stat">4 photos</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="true" aria-controls="preview-more-9" data-preview-url="#">Masquer l’aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-9" tabindex="-1" aria-busy="true">
+      <p role="status">Chargement…</p>
+          </div>
+        </div>
+      </article>
+      <article class="thread-preview" aria-labelledby="thread-title-10">
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-10"><a href="#">Erreur de chargement</a></h2>
+          <p class="standfirst thread-preview-excerpt">Le serveur n'a pas répondu.</p>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">12 messages</span>
+            <span class="thread-preview-stat">340 vues</span>
+            <span class="thread-preview-stat">4 photos</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="true" aria-controls="preview-more-10" data-preview-url="#">Masquer l’aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-10" tabindex="-1">
+      <p role="alert">Impossible de charger l'aperçu.</p><button type="button" class="btn btn-sm">Réessayer</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+<div class="ds-demo" data-title="Textes très longs">
+  <p class="ds-note">Le titre est limité à 4 lignes, le chapô et la citation à 3 ; aucun débordement horizontal.</p>
+  <div class="ds-stage ">
+    <div class="thread-preview-list">
+      <article class="thread-preview has-cover is-new" aria-labelledby="thread-title-11">
+        <a class="thread-preview-cover" href="#" tabindex="-1" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%239fb8b2'/%3E%3Cstop offset='1' stop-color='%23e9ead6'/%3E%3C/linearGradient%3E %3ClinearGradient id='f' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23f4f1e2' stop-opacity='0'/%3E%3Cstop offset='.5' stop-color='%23f4f1e2' stop-opacity='.8'/%3E%3Cstop offset='1' stop-color='%23f4f1e2' stop-opacity='0'/%3E%3C/linearGradient%3E %3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='4'/%3E%3C/filter%3E%3C/defs%3E %3Crect width='1600' height='1000' fill='url(%23s)'/%3E %3Cpath d='M0 520 l40-120 40 120 40-150 40 150 50-110 50 110 40-170 40 170 60-120 60 120 40-140 40 140 60-160 60 160 50-120 50 120 40-150 40 150 60-110 60 110 40-130 40 130 60-140 60 140 40-120 40 120 H1600 V700 H0Z' fill='%237c9a8e' opacity='.75' filter='url(%23b)'/%3E %3Crect y='430' width='1600' height='220' fill='url(%23f)'/%3E %3Cpath d='M0 640 l60-190 60 190 50-230 50 230 70-200 70 200 60-260 60 260 70-210 70 210 60-250 60 250 70-200 70 200 60-240 60 240 70-190 70 190 60-230 60 230 70-210 70 210 H1600 V800 H0Z' fill='%234a6b5d' opacity='.9'/%3E %3Crect y='560' width='1600' height='200' fill='url(%23f)' opacity='.8'/%3E %3Cpath d='M0 800 l80-300 80 300 70-360 70 360 90-320 90 320 80-380 80 380 90-330 90 330 80-370 80 370 90-310 90 310 80-350 80 350 90-300 90 300 H1600 V1000 H0Z' fill='%2323382f'/%3E %3Cpath d='M0 900 H1600 V1000 H0Z' fill='%23162520'/%3E %3Cg fill='%23ffe9a8' opacity='.18'%3E%3Cpath d='M900 0 L1080 0 L760 900 L620 900Z'/%3E%3Cpath d='M1180 0 L1260 0 L1020 900 L940 900Z'/%3E%3C/g%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='1600' height='1000' filter='url(%23n)'/%3E%3C/svg%3E" alt="" width="320" height="320" loading="lazy"></a>
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-11"><a href="#">Retour sur trois semaines de randonnée entre le col du Galibier, la vallée de la Clarée et les lacs Laramon, avec un détour imprévu par le refuge de Péas</a></h2>
+          <p class="standfirst thread-preview-excerpt">Voici le compte rendu détaillé de nos trois semaines de randonnée, jour après jour, avec les dénivelés, les temps de marche réels (souvent plus longs que prévu), les refuges où l'on a dormi, les bons plans ravitaillement, les photos du matériel que je referais autrement, et quelques réflexions sur la façon d'organiser un groupe de neuf personnes aux rythmes très différents sans s'engueuler au bout de la deuxième journée.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Merci pour ce super récit, je n'avais jamais pensé à passer par le col de Vallouise en repartant de la Clarée, ça change tout pour notre itinéraire de l'été prochain, et la remarque sur le poids des sacs est très juste : on a fini par laisser trois kilos de nourriture au refuge, et on ne les a pas regrettés une seule seconde. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li title="dorian" aria-label="dorian"><span title="dorian" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(285 42% 42%)">D</span></li><li class="avatar-stack-more" title="12 autres participants" aria-label="12 autres participants">+12</li></ul>
+            <span class="thread-preview-stat">248 messages</span>
+            <span class="thread-preview-stat">5400 vues</span>
+            <span class="thread-preview-stat">86 photos</span>
+            <span class="badge badge-accent">3 nouveaux</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-11" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-11" tabindex="-1" hidden></div>
+        </div>
+      </article>
+      <article class="thread-preview" aria-labelledby="thread-title-12">
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-12"><a href="#">Supercalifragilisticexpialidocious_et_autres_mots_sans_aucun_espace_dans_un_titre_vraiment_trop_long_pour_un_telephone</a></h2>
+          <p class="standfirst thread-preview-excerpt">Pasdespacepasdespacepasdespacepasdespacepasdespacepasdespacepasdespacepasdespacepasdespacepasdespace</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Unmotsanscesuredepuisletempsquidoitquandmemetenirdansunecartesansdebordementhorizontal <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">12 messages</span>
+            <span class="thread-preview-stat">340 vues</span>
+            <span class="thread-preview-stat">4 photos</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-12" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-12" tabindex="-1" hidden></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+<div class="ds-demo" data-title="États forcés — survol et focus clavier">
+  <div class="ds-stage ">
+    <div class="thread-preview-list">
+      <article class="thread-preview has-cover is-hover" aria-labelledby="thread-title-13">
+        <a class="thread-preview-cover" href="#" tabindex="-1" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%236da3c9'/%3E%3Cstop offset='1' stop-color='%23f6e4c4'/%3E%3C/linearGradient%3E %3ClinearGradient id='w' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23cfe0e0'/%3E%3Cstop offset='.3' stop-color='%233f8fa8'/%3E%3Cstop offset='1' stop-color='%2314465f'/%3E%3C/linearGradient%3E %3CradialGradient id='g' cx='.3' cy='.46' r='.3'%3E%3Cstop offset='0' stop-color='%23fffbe8'/%3E%3Cstop offset='1' stop-color='%23fffbe8' stop-opacity='0'/%3E%3C/radialGradient%3E %3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='3'/%3E%3C/filter%3E%3C/defs%3E %3Crect width='1600' height='1000' fill='url(%23s)'/%3E%3Crect width='1600' height='1000' fill='url(%23g)'/%3E %3Cg fill='%23fff' opacity='.85' filter='url(%23b)'%3E%3Cellipse cx='1100' cy='190' rx='260' ry='34'/%3E%3Cellipse cx='1260' cy='230' rx='200' ry='24'/%3E%3Cellipse cx='520' cy='120' rx='200' ry='22'/%3E%3C/g%3E %3Crect y='520' width='1600' height='480' fill='url(%23w)'/%3E %3Cg stroke='%23fff' stroke-linecap='round' opacity='.5'%3E%3Cpath d='M300 560H520' stroke-width='6'/%3E%3Cpath d='M260 610H600' stroke-width='5'/%3E%3Cpath d='M200 680H700' stroke-width='5'/%3E%3Cpath d='M120 770H800' stroke-width='4'/%3E%3C/g%3E %3Cpath d='M1600 0 V1000 H1020 C1060 820 1130 790 1160 640 C1190 520 1240 470 1330 330 C1400 220 1500 160 1600 80Z' fill='%236c5a4c'/%3E %3Cpath d='M1600 300 V1000 H1160 C1200 860 1260 800 1300 700 C1340 600 1390 560 1450 470 C1500 400 1550 360 1600 300Z' fill='%2343352f'/%3E %3Cpath d='M1020 1000 C1070 930 1130 900 1180 940 C1230 980 1290 960 1330 1000Z' fill='%23e8f4f4' opacity='.8'/%3E %3Cpath d='M1360 330 C1400 300 1460 280 1500 290 L1530 330 L1420 360Z' fill='%237da05f'/%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='1600' height='1000' filter='url(%23n)'/%3E%3C/svg%3E" alt="" width="320" height="320" loading="lazy"></a>
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-13"><a href="#">Survol (.is-hover) : la feuille se soulève</a></h2>
+          <p class="standfirst thread-preview-excerpt">On a trouvé le sentier par hasard en redescendant du Parmelan : trois heures de marche, un lever de soleil qui valait largement le réveil à cinq heures, et un refuge ouvert hors saison.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Je ramène le thermos et les madeleines, on se retrouve au parking à 7 h. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">12 messages</span>
+            <span class="thread-preview-stat">340 vues</span>
+            <span class="thread-preview-stat">4 photos</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-13" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-13" tabindex="-1" hidden></div>
+        </div>
+      </article>
+      <article class="thread-preview is-focus" aria-labelledby="thread-title-14">
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-14"><a href="#">Focus (.is-focus) : anneau de focus sur la feuille</a></h2>
+          <p class="standfirst thread-preview-excerpt">On a trouvé le sentier par hasard en redescendant du Parmelan : trois heures de marche, un lever de soleil qui valait largement le réveil à cinq heures, et un refuge ouvert hors saison.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Je ramène le thermos et les madeleines, on se retrouve au parking à 7 h. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">12 messages</span>
+            <span class="thread-preview-stat">340 vues</span>
+            <span class="thread-preview-stat">4 photos</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-14" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-14" tabindex="-1" hidden></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+<div class="ds-demo" data-title="Liste — .thread-preview-list">
+  <p class="ds-note">Marge verticale 1,5 rem (2 rem dès md). Utilisé à la place de <code>space-y-6</code>.</p>
+  <div class="ds-stage ">
+    <div class="thread-preview-list">
+      <article class="thread-preview has-cover is-new" aria-labelledby="thread-title-15">
+        <a class="thread-preview-cover" href="#" tabindex="-1" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2326365e'/%3E%3Cstop offset='.5' stop-color='%23b8667b'/%3E%3Cstop offset='1' stop-color='%23f5ae62'/%3E%3C/linearGradient%3E %3ClinearGradient id='w' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23e8955c'/%3E%3Cstop offset='.35' stop-color='%236d5a7e'/%3E%3Cstop offset='1' stop-color='%231f2c4d'/%3E%3C/linearGradient%3E %3CradialGradient id='g' cx='.62' cy='.62' r='.45'%3E%3Cstop offset='0' stop-color='%23fff0c4' stop-opacity='.95'/%3E%3Cstop offset='1' stop-color='%23ffd28a' stop-opacity='0'/%3E%3C/radialGradient%3E %3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='5'/%3E%3C/filter%3E%3C/defs%3E %3Crect width='1600' height='650' fill='url(%23s)'/%3E%3Crect width='1600' height='650' fill='url(%23g)'/%3E %3Cellipse cx='990' cy='640' rx='90' ry='60' fill='%23fff6d8' opacity='.9' filter='url(%23b)'/%3E %3Cpath d='M0 560 L170 470 L300 530 L470 400 L640 520 L760 470 L900 570 L1060 440 L1250 540 L1400 480 L1600 560 V660 H0Z' fill='%235a4766' opacity='.7' filter='url(%23b)'/%3E %3Cpath d='M0 625 L220 545 L380 605 L560 505 L760 615 L980 535 L1180 615 L1380 555 L1600 625 V690 H0Z' fill='%232b2a47'/%3E %3Crect y='650' width='1600' height='350' fill='url(%23w)'/%3E %3Cg stroke='%23ffe0a6' stroke-linecap='round' opacity='.55'%3E%3Cpath d='M930 690H1050' stroke-width='7'/%3E%3Cpath d='M880 730H1100' stroke-width='6'/%3E%3Cpath d='M840 775H1140' stroke-width='5'/%3E%3Cpath d='M800 825H1180' stroke-width='4'/%3E%3Cpath d='M760 885H1220' stroke-width='3'/%3E%3C/g%3E %3Cpath d='M0 690 L180 690 L260 650 L480 690 H0Z' fill='%231b2340' opacity='.5'/%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='1600' height='1000' filter='url(%23n)'/%3E%3C/svg%3E" alt="" width="320" height="320" loading="lazy"></a>
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-15"><a href="#">Randonnée au lever du soleil : le sentier secret du Parmelan</a></h2>
+          <p class="standfirst thread-preview-excerpt">On a trouvé le sentier par hasard en redescendant du Parmelan : trois heures de marche, un lever de soleil qui valait largement le réveil à cinq heures, et un refuge ouvert hors saison.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Je ramène le thermos et les madeleines, on se retrouve au parking à 7 h. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">12 messages</span>
+            <span class="thread-preview-stat">340 vues</span>
+            <span class="thread-preview-stat">4 photos</span>
+            <span class="badge badge-accent">2 nouveaux</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-15" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-15" tabindex="-1" hidden></div>
+        </div>
+      </article>
+      <article class="thread-preview" aria-labelledby="thread-title-16">
+        <div class="thread-preview-body">
+          <p class="kicker">Questions pratiques · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">hier</time></p>
+          <h2 class="thread-preview-title" id="thread-title-16"><a href="#">Qui connaît un bon plombier dans le 12e arrondissement ?</a></h2>
+          <p class="standfirst thread-preview-excerpt">Fuite sous l'évier depuis ce matin, le robinet d'arrêt ne tient plus.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">dorian</span>
+            Chez moi c'est Mehdi, il est passé en urgence un dimanche. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">8 messages</span>
+            <span class="thread-preview-stat">120 vues</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-16" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-16" tabindex="-1" hidden></div>
+        </div>
+      </article>
+      <article class="thread-preview has-cover" aria-labelledby="thread-title-17">
+        <a class="thread-preview-cover" href="#" tabindex="-1" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23d9a074'/%3E%3Cstop offset='1' stop-color='%23f7dcae'/%3E%3C/linearGradient%3E %3ClinearGradient id='d1' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%23d89a5c'/%3E%3Cstop offset='1' stop-color='%23b4703d'/%3E%3C/linearGradient%3E %3ClinearGradient id='d2' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%239a5a34'/%3E%3Cstop offset='1' stop-color='%236d3c26'/%3E%3C/linearGradient%3E%3C/defs%3E %3Crect width='1600' height='1000' fill='url(%23s)'/%3E %3Ccircle cx='1180' cy='300' r='90' fill='%23fff3d6' opacity='.9'/%3E %3Cpath d='M0 560 C260 470 520 500 760 560 C1000 620 1260 540 1600 480 V1000 H0Z' fill='url(%23d1)'/%3E %3Cpath d='M0 700 C300 600 620 720 900 700 C1180 680 1400 620 1600 660 V1000 H0Z' fill='url(%23d2)' opacity='.95'/%3E %3Cpath d='M0 840 C300 780 640 880 960 850 C1250 820 1450 800 1600 830 V1000 H0Z' fill='%234a2a1d'/%3E %3Cpath d='M760 560 C860 600 900 680 900 700 C820 690 760 640 700 590Z' fill='%236d3c26' opacity='.5'/%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='1600' height='1000' filter='url(%23n)'/%3E%3C/svg%3E" alt="" width="320" height="320" loading="lazy"></a>
+        <div class="thread-preview-body">
+          <p class="kicker">Photos · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 2 j</time></p>
+          <h2 class="thread-preview-title" id="thread-title-17"><a href="#">Photos de la rencontre de septembre</a></h2>
+          <p class="standfirst thread-preview-excerpt">Les trois cents clichés triés, à vous de jouer pour les favoris.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Le portrait de groupe devant la grange est parfait. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">42 messages</span>
+            <span class="thread-preview-stat">880 vues</span>
+            <span class="thread-preview-stat">120 photos</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-17" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-17" tabindex="-1" hidden></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+<div class="ds-demo" data-title="Grille — .thread-preview-list.is-grid (2 colonnes dès lg)">
+  <div class="ds-stage ">
+    <div class="thread-preview-list is-grid">
+      <article class="thread-preview has-cover is-new" aria-labelledby="thread-title-18">
+        <a class="thread-preview-cover" href="#" tabindex="-1" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2326365e'/%3E%3Cstop offset='.5' stop-color='%23b8667b'/%3E%3Cstop offset='1' stop-color='%23f5ae62'/%3E%3C/linearGradient%3E %3ClinearGradient id='w' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23e8955c'/%3E%3Cstop offset='.35' stop-color='%236d5a7e'/%3E%3Cstop offset='1' stop-color='%231f2c4d'/%3E%3C/linearGradient%3E %3CradialGradient id='g' cx='.62' cy='.62' r='.45'%3E%3Cstop offset='0' stop-color='%23fff0c4' stop-opacity='.95'/%3E%3Cstop offset='1' stop-color='%23ffd28a' stop-opacity='0'/%3E%3C/radialGradient%3E %3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='5'/%3E%3C/filter%3E%3C/defs%3E %3Crect width='1600' height='650' fill='url(%23s)'/%3E%3Crect width='1600' height='650' fill='url(%23g)'/%3E %3Cellipse cx='990' cy='640' rx='90' ry='60' fill='%23fff6d8' opacity='.9' filter='url(%23b)'/%3E %3Cpath d='M0 560 L170 470 L300 530 L470 400 L640 520 L760 470 L900 570 L1060 440 L1250 540 L1400 480 L1600 560 V660 H0Z' fill='%235a4766' opacity='.7' filter='url(%23b)'/%3E %3Cpath d='M0 625 L220 545 L380 605 L560 505 L760 615 L980 535 L1180 615 L1380 555 L1600 625 V690 H0Z' fill='%232b2a47'/%3E %3Crect y='650' width='1600' height='350' fill='url(%23w)'/%3E %3Cg stroke='%23ffe0a6' stroke-linecap='round' opacity='.55'%3E%3Cpath d='M930 690H1050' stroke-width='7'/%3E%3Cpath d='M880 730H1100' stroke-width='6'/%3E%3Cpath d='M840 775H1140' stroke-width='5'/%3E%3Cpath d='M800 825H1180' stroke-width='4'/%3E%3Cpath d='M760 885H1220' stroke-width='3'/%3E%3C/g%3E %3Cpath d='M0 690 L180 690 L260 650 L480 690 H0Z' fill='%231b2340' opacity='.5'/%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='1600' height='1000' filter='url(%23n)'/%3E%3C/svg%3E" alt="" width="320" height="320" loading="lazy"></a>
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-18"><a href="#">Randonnée au lever du soleil : le sentier secret du Parmelan</a></h2>
+          <p class="standfirst thread-preview-excerpt">On a trouvé le sentier par hasard en redescendant du Parmelan : trois heures de marche, un lever de soleil qui valait largement le réveil à cinq heures, et un refuge ouvert hors saison.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Je ramène le thermos et les madeleines, on se retrouve au parking à 7 h. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">12 messages</span>
+            <span class="thread-preview-stat">340 vues</span>
+            <span class="thread-preview-stat">4 photos</span>
+            <span class="badge badge-accent">2 nouveaux</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-18" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-18" tabindex="-1" hidden></div>
+        </div>
+      </article>
+      <article class="thread-preview has-cover" aria-labelledby="thread-title-19">
+        <a class="thread-preview-cover" href="#" tabindex="-1" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23d9a074'/%3E%3Cstop offset='1' stop-color='%23f7dcae'/%3E%3C/linearGradient%3E %3ClinearGradient id='d1' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%23d89a5c'/%3E%3Cstop offset='1' stop-color='%23b4703d'/%3E%3C/linearGradient%3E %3ClinearGradient id='d2' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%239a5a34'/%3E%3Cstop offset='1' stop-color='%236d3c26'/%3E%3C/linearGradient%3E%3C/defs%3E %3Crect width='1600' height='1000' fill='url(%23s)'/%3E %3Ccircle cx='1180' cy='300' r='90' fill='%23fff3d6' opacity='.9'/%3E %3Cpath d='M0 560 C260 470 520 500 760 560 C1000 620 1260 540 1600 480 V1000 H0Z' fill='url(%23d1)'/%3E %3Cpath d='M0 700 C300 600 620 720 900 700 C1180 680 1400 620 1600 660 V1000 H0Z' fill='url(%23d2)' opacity='.95'/%3E %3Cpath d='M0 840 C300 780 640 880 960 850 C1250 820 1450 800 1600 830 V1000 H0Z' fill='%234a2a1d'/%3E %3Cpath d='M760 560 C860 600 900 680 900 700 C820 690 760 640 700 590Z' fill='%236d3c26' opacity='.5'/%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='1600' height='1000' filter='url(%23n)'/%3E%3C/svg%3E" alt="" width="320" height="320" loading="lazy"></a>
+        <div class="thread-preview-body">
+          <p class="kicker">Photos · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 2 j</time></p>
+          <h2 class="thread-preview-title" id="thread-title-19"><a href="#">Photos de la rencontre de septembre</a></h2>
+          <p class="standfirst thread-preview-excerpt">Les trois cents clichés triés, à vous de jouer pour les favoris.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Le portrait de groupe devant la grange est parfait. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">42 messages</span>
+            <span class="thread-preview-stat">880 vues</span>
+            <span class="thread-preview-stat">120 photos</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-19" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-19" tabindex="-1" hidden></div>
+        </div>
+      </article>
+      <article class="thread-preview" aria-labelledby="thread-title-20">
+        <div class="thread-preview-body">
+          <p class="kicker">Questions pratiques · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">hier</time></p>
+          <h2 class="thread-preview-title" id="thread-title-20"><a href="#">Qui connaît un bon plombier dans le 12e arrondissement ?</a></h2>
+          <p class="standfirst thread-preview-excerpt">Fuite sous l'évier depuis ce matin, le robinet d'arrêt ne tient plus.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">dorian</span>
+            Chez moi c'est Mehdi, il est passé en urgence un dimanche. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+            <span class="thread-preview-stat">8 messages</span>
+            <span class="thread-preview-stat">120 vues</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-20" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-20" tabindex="-1" hidden></div>
+        </div>
+      </article>
+      <article class="thread-preview is-new" aria-labelledby="thread-title-21">
+        <div class="thread-preview-body">
+          <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+          <h2 class="thread-preview-title" id="thread-title-21"><a href="#">Panne de chauffage collective : on s'organise ?</a></h2>
+          <p class="standfirst thread-preview-excerpt">Plusieurs d'entre nous sont touchés par la panne.</p>
+          <blockquote class="thread-preview-last">
+            <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+            Même problème chez moi depuis hier soir. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+          </blockquote>
+          <footer class="thread-preview-meta">
+            <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+            <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li title="dorian" aria-label="dorian"><span title="dorian" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(285 42% 42%)">D</span></li><li class="avatar-stack-more" title="6 autres participants" aria-label="6 autres participants">+6</li></ul>
+            <span class="thread-preview-stat">54 messages</span>
+            <span class="thread-preview-stat">1200 vues</span>
+            <span class="badge badge-accent">1 nouveau</span>
+            <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-21" data-preview-url="#">Aperçu</button>
+          </footer>
+          <div class="thread-preview-more" id="preview-more-21" tabindex="-1" hidden></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+<div class="ds-demo" data-title="Conteneur étroit (20 rem et 28 rem)">
+  <p class="ds-note">La mise en page est intrinsèque (flex-wrap) : pas de media query, la couverture passe au-dessus dès que la colonne de texte manquerait de place.</p>
+  <div class="ds-stage ">
+<div class="ds-row" style="align-items:flex-start;gap:2rem">
+<div style="width:20rem;max-width:100%">
+    <article class="thread-preview has-cover is-new" aria-labelledby="thread-title-22">
+      <a class="thread-preview-cover" href="#" tabindex="-1" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2326365e'/%3E%3Cstop offset='.5' stop-color='%23b8667b'/%3E%3Cstop offset='1' stop-color='%23f5ae62'/%3E%3C/linearGradient%3E %3ClinearGradient id='w' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23e8955c'/%3E%3Cstop offset='.35' stop-color='%236d5a7e'/%3E%3Cstop offset='1' stop-color='%231f2c4d'/%3E%3C/linearGradient%3E %3CradialGradient id='g' cx='.62' cy='.62' r='.45'%3E%3Cstop offset='0' stop-color='%23fff0c4' stop-opacity='.95'/%3E%3Cstop offset='1' stop-color='%23ffd28a' stop-opacity='0'/%3E%3C/radialGradient%3E %3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='5'/%3E%3C/filter%3E%3C/defs%3E %3Crect width='1600' height='650' fill='url(%23s)'/%3E%3Crect width='1600' height='650' fill='url(%23g)'/%3E %3Cellipse cx='990' cy='640' rx='90' ry='60' fill='%23fff6d8' opacity='.9' filter='url(%23b)'/%3E %3Cpath d='M0 560 L170 470 L300 530 L470 400 L640 520 L760 470 L900 570 L1060 440 L1250 540 L1400 480 L1600 560 V660 H0Z' fill='%235a4766' opacity='.7' filter='url(%23b)'/%3E %3Cpath d='M0 625 L220 545 L380 605 L560 505 L760 615 L980 535 L1180 615 L1380 555 L1600 625 V690 H0Z' fill='%232b2a47'/%3E %3Crect y='650' width='1600' height='350' fill='url(%23w)'/%3E %3Cg stroke='%23ffe0a6' stroke-linecap='round' opacity='.55'%3E%3Cpath d='M930 690H1050' stroke-width='7'/%3E%3Cpath d='M880 730H1100' stroke-width='6'/%3E%3Cpath d='M840 775H1140' stroke-width='5'/%3E%3Cpath d='M800 825H1180' stroke-width='4'/%3E%3Cpath d='M760 885H1220' stroke-width='3'/%3E%3C/g%3E %3Cpath d='M0 690 L180 690 L260 650 L480 690 H0Z' fill='%231b2340' opacity='.5'/%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='1600' height='1000' filter='url(%23n)'/%3E%3C/svg%3E" alt="" width="320" height="320" loading="lazy"></a>
+      <div class="thread-preview-body">
+        <p class="kicker">Vie du forum · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 3 h</time></p>
+        <h2 class="thread-preview-title" id="thread-title-22"><a href="#">Randonnée au lever du soleil : le sentier secret du Parmelan</a></h2>
+        <p class="standfirst thread-preview-excerpt">On a trouvé le sentier par hasard en redescendant du Parmelan : trois heures de marche, un lever de soleil qui valait largement le réveil à cinq heures, et un refuge ouvert hors saison.</p>
+        <blockquote class="thread-preview-last">
+          <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+          Je ramène le thermos et les madeleines, on se retrouve au parking à 7 h. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+        </blockquote>
+        <footer class="thread-preview-meta">
+          <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+          <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+          <span class="thread-preview-stat">12 messages</span>
+          <span class="thread-preview-stat">340 vues</span>
+          <span class="thread-preview-stat">4 photos</span>
+          <span class="badge badge-accent">2 nouveaux</span>
+          <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+          <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-22" data-preview-url="#">Aperçu</button>
+        </footer>
+        <div class="thread-preview-more" id="preview-more-22" tabindex="-1" hidden></div>
+      </div>
+    </article>
+</div>
+<div style="width:28rem;max-width:100%">
+    <article class="thread-preview has-cover" aria-labelledby="thread-title-23">
+      <a class="thread-preview-cover" href="#" tabindex="-1" aria-hidden="true"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000' preserveAspectRatio='xMidYMid slice'%3E %3Cdefs%3E %3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23d9a074'/%3E%3Cstop offset='1' stop-color='%23f7dcae'/%3E%3C/linearGradient%3E %3ClinearGradient id='d1' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%23d89a5c'/%3E%3Cstop offset='1' stop-color='%23b4703d'/%3E%3C/linearGradient%3E %3ClinearGradient id='d2' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%239a5a34'/%3E%3Cstop offset='1' stop-color='%236d3c26'/%3E%3C/linearGradient%3E%3C/defs%3E %3Crect width='1600' height='1000' fill='url(%23s)'/%3E %3Ccircle cx='1180' cy='300' r='90' fill='%23fff3d6' opacity='.9'/%3E %3Cpath d='M0 560 C260 470 520 500 760 560 C1000 620 1260 540 1600 480 V1000 H0Z' fill='url(%23d1)'/%3E %3Cpath d='M0 700 C300 600 620 720 900 700 C1180 680 1400 620 1600 660 V1000 H0Z' fill='url(%23d2)' opacity='.95'/%3E %3Cpath d='M0 840 C300 780 640 880 960 850 C1250 820 1450 800 1600 830 V1000 H0Z' fill='%234a2a1d'/%3E %3Cpath d='M760 560 C860 600 900 680 900 700 C820 690 760 640 700 590Z' fill='%236d3c26' opacity='.5'/%3E %3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='1600' height='1000' filter='url(%23n)'/%3E%3C/svg%3E" alt="" width="320" height="320" loading="lazy"></a>
+      <div class="thread-preview-body">
+        <p class="kicker">Photos · <time datetime="2026-10-12T17:10:00+02:00" title="12/10/2026 à 17:10">il y a 2 j</time></p>
+        <h2 class="thread-preview-title" id="thread-title-23"><a href="#">Photos de la rencontre de septembre</a></h2>
+        <p class="standfirst thread-preview-excerpt">Les trois cents clichés triés, à vous de jouer pour les favoris.</p>
+        <blockquote class="thread-preview-last">
+          <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">camille</span>
+          Le portrait de groupe devant la grange est parfait. <time datetime="2026-10-12T19:31:00+02:00" title="12/10/2026 à 19:31">il y a 2 h</time>
+        </blockquote>
+        <footer class="thread-preview-meta">
+          <form method="post" action="#" data-star-form class="shrink-0"><button type="submit" class="btn-icon group" aria-pressed="false" title="Ajouter aux favoris" aria-label="Favori"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button></form>
+          <ul class="avatar-stack" aria-label="Participants"><li title="alice" aria-label="alice"><span title="alice" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(12 42% 42%)">A</span></li><li title="baptiste" aria-label="baptiste"><span title="baptiste" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(210 42% 42%)">B</span></li><li title="camille" aria-label="camille"><span title="camille" class="size-8 inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: hsl(150 42% 42%)">C</span></li><li class="avatar-stack-more" title="2 autres participants" aria-label="2 autres participants">+2</li></ul>
+          <span class="thread-preview-stat">42 messages</span>
+          <span class="thread-preview-stat">880 vues</span>
+          <span class="thread-preview-stat">120 photos</span>
+          <a class="btn btn-sm btn-ghost" href="#">Lire le sujet</a>
+          <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-23" data-preview-url="#">Aperçu</button>
+        </footer>
+        <div class="thread-preview-more" id="preview-more-23" tabindex="-1" hidden></div>
+      </div>
+    </article>
+</div>
+</div>
+  </div>
+</div>
+</section>

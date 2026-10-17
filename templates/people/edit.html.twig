@@ -3,14 +3,21 @@
 {% block title %}Modifier le profil · ComTSo{% endblock %}
 
 {% block body %}
-<h1 class="mb-4 text-2xl font-bold tracking-tight">Modifier le profil de {{ person.username }}</h1>
-<div class="card p-5">
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <div class="flex gap-2">
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-            <a href="{{ path('people_show', {username: person.username}) }}" class="btn">Annuler</a>
-        </div>
-    {{ form_end(form) }}
+<header class="page-header">
+    <p class="kicker"><a href="{{ path('people_show', {username: person.username}) }}">{{ person.username }}</a></p>
+    <h1 class="page-title">Modifier le profil</h1>
+    <p class="standfirst">Ce que les autres membres voient sur votre fiche.</p>
+</header>
+
+<div class="settings">
+    <div class="card settings-card">
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="form-actions">
+                <a href="{{ path('people_show', {username: person.username}) }}" class="btn">Annuler</a>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
 </div>
 {% endblock %}

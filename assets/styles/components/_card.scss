@@ -1,0 +1,63 @@
+// Cards are sheets of paper: surface colour, watercolour tile on top, layered shadow instead of a border.
+@use "../abstracts" as *;
+
+@layer components {
+  .card {
+    @include texture-host;
+    @include texture-tone("paper", "surface");
+    --texture-strength: 0.5;
+    background-color: var(--c-surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sheet);
+    color: var(--c-fg);
+
+    // cards that hold a list (messages, rows) clip their children to the paper edge
+    &.overflow-hidden > .post:first-child,
+    &.overflow-hidden > :first-child {
+      border-top-left-radius: inherit;
+      border-top-right-radius: inherit;
+    }
+  }
+
+  // Quiet variants
+  .card-flat {
+    box-shadow: 0 0 0 1px var(--c-line);
+    --texture-strength: 0.25;
+  }
+  .card-sunken {
+    background-color: var(--c-surface-2);
+    box-shadow: var(--shadow-inset), 0 0 0 1px var(--c-line-soft);
+    @include texture-tone("paper", "surface-2");
+  }
+  // Two sheets peeking out under the first one
+  .card-stack {
+    box-shadow: none;
+    @include stacked-sheets(4px);
+    margin-bottom: 0.5rem;
+    margin-right: 0.5rem;
+  }
+  .card-hover {
+    transition:
+      transform 0.2s var(--ease-paper),
+      box-shadow 0.2s var(--ease-paper);
+
+    &:hover,
+    &:focus-within {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lift);
+    }
+  }
+  // Accent edge (quotes, notes)
+  .card-accent {
+    border-left: 3px solid var(--c-highlight);
+  }
+
+  // Section heading inside a card / widget: small caps over a hairline
+  .card-title {
+    @include eyebrow(0.6875rem, 0.16em);
+    margin: 0;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid var(--c-line);
+    color: var(--c-muted);
+  }
+}

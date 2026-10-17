@@ -1,0 +1,94 @@
+// Reply form block: a sheet of paper laid under the thread. Avatar left on ≥sm, editor + attach widget in the body,
+// the send button underneath on the right (full width on phones).
+//
+//   section.reply > span.reply-avatar + div.reply-body + div.reply-actions      (actions are a SIBLING of the body)
+@use "../abstracts" as *;
+
+@layer components {
+  .reply {
+    @include texture-host;
+    @include texture-tone("paper", "surface");
+    --texture-strength: 0.85;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "avatar"
+      "body"
+      "actions";
+    gap: 0.75rem;
+    padding: 1.25rem 1rem 1rem;
+    border-radius: var(--radius-md);
+    background-color: var(--c-surface);
+    box-shadow: var(--shadow-sheet);
+    color: var(--c-fg);
+    transition: box-shadow 0.25s var(--ease-paper);
+
+    // a short sand rule on the top edge, like the tab of an index card
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 1rem;
+      width: 3rem;
+      height: 3px;
+      background: var(--c-highlight);
+
+      @include up(sm) {
+        left: 1.5rem;
+      }
+    }
+
+    @include up(sm) {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas:
+        "avatar body"
+        ".      actions";
+      column-gap: 1.25rem;
+      padding: 1.75rem 1.5rem 1.25rem;
+    }
+
+    &:focus-within,
+    &.is-focus {
+      box-shadow: var(--shadow-lift);
+    }
+  }
+
+  .reply-avatar {
+    grid-area: avatar;
+    align-self: start;
+    display: flex;
+  }
+  .reply-body {
+    grid-area: body;
+    min-width: 0;
+
+    // the heading is the card title: quiet small caps over a hairline
+    > .card-title {
+      margin-bottom: 1rem;
+    }
+    // form_row spacing
+    > div:last-child {
+      margin-bottom: 0;
+    }
+  }
+  .reply-actions {
+    grid-area: actions;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .btn {
+      width: 100%;
+    }
+
+    @include up(sm) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
+
+      .btn {
+        width: auto;
+      }
+    }
+  }
+}

@@ -69,7 +69,7 @@
       </button>
     </form>
     <p v-if="error" class="chat-error field-error" role="alert">{{ error }}</p>
-    <p v-else-if="remaining < 200" class="chat-counter" :class="{ 'text-danger': remaining < 0 }">{{ remaining }} caractères restants</p>
+    <p v-else-if="remaining < 200" class="chat-counter" :class="{ 'is-over': remaining < 0 }">{{ remaining }} caractères restants</p>
   </section>
 </template>
 

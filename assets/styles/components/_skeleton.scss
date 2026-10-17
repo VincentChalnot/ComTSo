@@ -1,0 +1,263 @@
+// Loading & emptiness: skeleton shimmer, empty states, spinner, progress.
+//
+//   .skeleton + .skeleton-text / -title / -avatar / -photo       .empty (.empty-icon .empty-title .empty-text .empty-actions)
+//   .spinner (.spinner-sm / .spinner-lg)                          <progress class="progress"> or .progress > .progress-bar
+@use "../abstracts" as *;
+
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes spinner-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes spinner-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes progress-slide {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 2rem 0;
+  }
+}
+
+@layer components {
+  // ---- skeleton -------------------------------------------------------------------------------------------------------------------
+  .skeleton {
+    display: block;
+    border-radius: var(--radius-sm);
+    background-color: var(--c-surface-2);
+    background-image: linear-gradient(
+      100deg,
+      transparent 30%,
+      color-mix(in srgb, var(--c-surface-3) 80%, transparent) 50%,
+      transparent 70%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: skeleton-shimmer 1.8s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+  .skeleton-text {
+    height: 0.85rem;
+    margin: 0.55rem 0;
+    border-radius: var(--radius-xs);
+
+    &.is-short {
+      width: 60%;
+    }
+  }
+  .skeleton-title {
+    width: 55%;
+    height: 1.6rem;
+    margin: 0.4rem 0 0.8rem;
+  }
+  .skeleton-avatar {
+    flex: none;
+    width: var(--avatar-size, 2.5rem);
+    height: var(--avatar-size, 2.5rem);
+    border-radius: 50%;
+  }
+  .skeleton-photo {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+
+  // ---- empty state -------------------------------------------------------------------------------------------------------------------
+  .empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: 2.75rem 1.5rem;
+    border: 1px dashed var(--c-line-strong);
+    border-radius: var(--radius-md);
+    color: var(--c-fg);
+    text-align: center;
+
+    &.is-plain {
+      border-color: transparent;
+    }
+  }
+  .empty-icon {
+    @include texture-host;
+    @include texture-tone("paper", "surface");
+
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--c-surface);
+    box-shadow: var(--shadow-sheet);
+    color: var(--c-muted);
+    transform: rotate(-3deg);
+
+    svg {
+      width: 1.6rem;
+      height: 1.6rem;
+    }
+  }
+  .empty-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 560;
+    line-height: 1.2;
+  }
+  .empty-text {
+    max-width: 38ch;
+    margin: 0;
+    color: var(--c-muted);
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+  .empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+  // compact: inline in a card ("Aucun message")
+  .empty-sm {
+    padding: 1.5rem 1rem;
+
+    .empty-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+
+      svg {
+        width: 1.2rem;
+        height: 1.2rem;
+      }
+    }
+    .empty-title {
+      font-size: 1.0625rem;
+    }
+  }
+
+  // ---- spinner -------------------------------------------------------------------------------------------------------------------------
+  .spinner {
+    display: inline-block;
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid color-mix(in srgb, currentColor 22%, transparent);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    color: var(--c-accent-strong);
+    vertical-align: middle;
+    animation: spinner-turn 0.75s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      // no rotation: a slow pulse says "busy" without motion
+      animation: spinner-pulse 1.8s ease-in-out infinite;
+    }
+  }
+  .spinner-sm {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-width: 1.5px;
+  }
+  .spinner-lg {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-width: 3px;
+  }
+
+  // ---- progress ---------------------------------------------------------------------------------------------------------------------------
+  // native <progress> and the div version share the track
+  progress.progress,
+  .progress {
+    display: block;
+    width: 100%;
+    height: 0.5rem;
+    overflow: hidden;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background-color: var(--c-surface-3);
+    box-shadow: var(--shadow-inset);
+    color: var(--c-accent);
+  }
+  progress.progress {
+    appearance: none;
+
+    &::-webkit-progress-bar {
+      background-color: transparent;
+    }
+    &::-webkit-progress-value {
+      border-radius: var(--radius-sm);
+      background-color: currentColor;
+      transition: width 0.25s var(--ease-paper);
+    }
+    &::-moz-progress-bar {
+      border-radius: var(--radius-sm);
+      background-color: currentColor;
+    }
+    // indeterminate: a slow barber pole on the track
+    &:indeterminate {
+      background-image: repeating-linear-gradient(
+        -45deg,
+        color-mix(in srgb, currentColor 55%, transparent) 0 0.5rem,
+        transparent 0.5rem 1rem
+      );
+      background-size: 2rem 100%;
+      animation: progress-slide 0.9s linear infinite;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+  }
+  .progress-bar {
+    @include texture-host;
+    @include texture-tone("kraft", "accent");
+
+    display: block;
+    width: var(--progress, 0%);
+    height: 100%;
+    border-radius: inherit;
+    background-color: var(--c-accent);
+    transition: width 0.25s var(--ease-paper);
+  }
+  .progress-ok {
+    color: var(--c-ok-fill);
+
+    .progress-bar {
+      @include texture-tone("kraft", "ok-fill");
+      background-color: var(--c-ok-fill);
+    }
+  }
+  .progress-danger {
+    color: var(--c-danger-fill);
+
+    .progress-bar {
+      @include texture-tone("kraft", "danger-fill");
+      background-color: var(--c-danger-fill);
+    }
+  }
+  .progress-sm {
+    height: 0.3rem;
+  }
+  .progress-lg {
+    height: 0.8rem;
+  }
+}

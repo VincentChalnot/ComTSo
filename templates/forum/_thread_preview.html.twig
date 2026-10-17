@@ -1,0 +1,47 @@
+{# Editorial preview of a topic in a listing. Param: preview (App\Forum\ThreadPreview).
+   Every text coming from members is auto-escaped; excerpts are plain text built by App\Content\TextExcerpt (never |raw).
+   The "Aperçu" button needs JavaScript (ui.js, initThreadPreviews): it is rendered `hidden` and revealed by the script,
+   the headline link and "Lire le sujet" work without it. #}
+{% import '_ui/avatar.html.twig' as av %}
+{% set topic = preview.topic %}
+{% set topicUrl = path('topic_show', {forumId: topic.forum.id, id: topic.id}) %}
+{% set starred = app.user.starredTopics.contains(topic) %}
+<article class="thread-preview{{ preview.coverPhoto ? ' has-cover' }}{{ preview.isNew ? ' is-new' }}" aria-labelledby="thread-title-{{ topic.id }}">
+    {% if preview.coverPhoto %}
+        <a class="thread-preview-cover" href="{{ topicUrl }}" tabindex="-1" aria-hidden="true"><img src="{{ path('photo_variant', {id: preview.coverPhoto.id, variant: 'thumb'}) }}" alt="" width="320" height="320" loading="lazy"></a>
+    {% endif %}
+    <div class="thread-preview-body">
+        <p class="kicker">{{ topic.forum.title }} · <time datetime="{{ topic.lastActivityAt|date('c') }}" title="{{ topic.lastActivityAt|date('d/m/Y à H:i') }}">{{ topic.lastActivityAt|ago }}</time></p>
+        <h2 class="thread-preview-title" id="thread-title-{{ topic.id }}"><a href="{{ topicUrl }}">{{ topic.title }}</a></h2>
+        {% if preview.excerpt %}<p class="standfirst thread-preview-excerpt">{{ preview.excerpt }}</p>{% endif %}
+        {% if preview.lastReply %}
+            {% set reply = preview.lastReply %}
+            <blockquote class="thread-preview-last">
+                <span class="sr-only">Dernier message de </span><span class="thread-preview-last-author">{{ reply.author ? reply.author.username : 'Ancien membre' }}</span>
+                {% if reply.excerpt %}{{ reply.excerpt }}{% else %}(photo){% endif %}
+                <time datetime="{{ reply.comment.createdAt|date('c') }}" title="{{ reply.comment.createdAt|date('d/m/Y à H:i') }}">{{ reply.comment.createdAt|ago }}</time>
+            </blockquote>
+        {% endif %}
+        <footer class="thread-preview-meta">
+            {% include 'topic/_star.html.twig' with {topic: topic, starred: starred} only %}
+            {% if preview.participants %}
+                <ul class="avatar-stack" aria-label="Participants">
+                    {% for user in preview.participants %}
+                        <li title="{{ user.username }}" aria-label="{{ user.username }}">{{ av.avatar(user, 'sm') }}</li>
+                    {% endfor %}
+                    {% if preview.moreParticipants > 0 %}
+                        {% set label = preview.moreParticipants == 1 ? '1 autre participant' : preview.moreParticipants ~ ' autres participants' %}
+                        <li class="avatar-stack-more" title="{{ label }}" aria-label="{{ label }}">+{{ preview.moreParticipants }}</li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+            <span class="thread-preview-stat">{{ preview.messageCount }} message{{ preview.messageCount > 1 ? 's' }}</span>
+            <span class="thread-preview-stat">{{ preview.viewCount }} vue{{ preview.viewCount > 1 ? 's' }}</span>
+            {% if preview.photoCount > 0 %}<span class="thread-preview-stat">{{ preview.photoCount }} photo{{ preview.photoCount > 1 ? 's' }}</span>{% endif %}
+            {% if preview.isNew %}<span class="badge badge-accent">{{ preview.newCount }} {{ preview.newCount > 1 ? 'nouveaux' : 'nouveau' }}</span>{% endif %}
+            <a class="btn btn-sm btn-ghost" href="{{ topicUrl }}">Lire le sujet</a>
+            <button type="button" class="btn btn-sm thread-preview-toggle" aria-expanded="false" aria-controls="preview-more-{{ topic.id }}" data-preview-url="{{ path('topic_preview', {forumId: topic.forum.id, id: topic.id}) }}" hidden>Aperçu</button>
+        </footer>
+        <div class="thread-preview-more" id="preview-more-{{ topic.id }}" tabindex="-1" hidden></div>
+    </div>
+</article>

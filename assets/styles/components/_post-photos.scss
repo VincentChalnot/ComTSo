@@ -1,0 +1,169 @@
+// Photos under a message: a tidy mosaic (1 large, 2 side by side, 3 = one big + two, 4 = 2×2, 5+ = 3 columns).
+// The layout is decided by the number of tiles through :has(), so the markup stays
+//   <ul class="post-photos"><li class="post-photo"><a data-lightbox …><img></a></li>…</ul>
+// A tile can carry a "+N" overlay: <li class="post-photo post-photo-more" data-more="+3"> (or a child .post-photo-more).
+@use "../abstracts" as *;
+
+@layer components {
+  .post-photos {
+    display: grid;
+    gap: 0.375rem;
+    width: 100%;
+    max-width: 34rem;
+    margin: 0.9rem 0 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: minmax(0, 1fr);
+
+    // 2 → two columns
+    &:has(> :nth-child(2)) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    // 3 → one big tile spanning two rows + two stacked
+    &:has(> :nth-child(3)):not(:has(> :nth-child(4))) {
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      aspect-ratio: 16 / 10;
+
+      > :first-child {
+        grid-row: span 2;
+      }
+    }
+    // 4 → 2 × 2 (the base 2-column rule already applies)
+    // 5+ → three columns, square tiles
+    &:has(> :nth-child(5)) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  // many photos (topic album, digest): a responsive contact sheet of squares instead of the 3-column mosaic
+  .post-photos.is-wide {
+    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+    grid-template-rows: none;
+    aspect-ratio: auto;
+    max-width: none;
+
+    > :first-child {
+      grid-row: auto;
+    }
+    .post-photo {
+      aspect-ratio: 1;
+      max-width: none;
+    }
+  }
+
+  // a tile = a small print: paper passe-partout + hairline
+  .post-photo {
+    position: relative;
+    min-width: 0;
+    aspect-ratio: 4 / 3;
+    padding: 3px;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-md);
+    background-color: var(--c-surface);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--c-shadow) 12%, transparent);
+    transition: box-shadow 0.2s var(--ease-paper);
+
+    &:hover,
+    &:focus-within {
+      box-shadow:
+        0 1px 2px color-mix(in srgb, var(--c-shadow) 14%, transparent),
+        0 6px 14px -6px color-mix(in srgb, var(--c-shadow) 28%, transparent);
+    }
+  }
+  // one photo: large, 16:10 cap
+  .post-photos:not(:has(> :nth-child(2))) .post-photo {
+    max-width: 30rem;
+    aspect-ratio: 16 / 10;
+  }
+  // 3 photos: the grid container owns the ratio
+  .post-photos:has(> :nth-child(3)):not(:has(> :nth-child(4))) .post-photo {
+    aspect-ratio: auto;
+  }
+  // 5+ photos: squares
+  .post-photos:has(> :nth-child(5)) .post-photo {
+    aspect-ratio: 1;
+  }
+
+  // "+N" tile: the label sits over a dimmed photo (ink scrim, paper text)
+  .post-photo-more {
+    // as the tile itself (data-more="+3")
+    &::after {
+      content: attr(data-more);
+      position: absolute;
+      inset: 3px;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-sm);
+      background: color-mix(in srgb, var(--c-scrim) 62%, transparent);
+      color: var(--color-paper-50);
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      font-variant-numeric: tabular-nums;
+      pointer-events: none;
+    }
+  }
+  // …or as a child of the tile
+  .post-photo > .post-photo-more {
+    position: absolute;
+    inset: 3px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--c-scrim) 62%, transparent);
+    color: var(--color-paper-50);
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+
+    &::after {
+      content: none;
+    }
+  }
+}
+
+// ---- tile geometry: UNLAYERED on purpose --------------------------------------------------------------------------------
+// The thumb link is the shared macro `ph.thumb()` and carries Tailwind sizing/ornament utilities
+// (`size-24 sm:size-32 rounded-lg border border-line bg-surface-2 …`). Utilities live in a cascade layer that beats
+// `@layer components`, so the mosaic sizing has to sit OUTSIDE any layer to win without !important.
+.post-photo > a[data-lightbox] {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background-color: var(--c-surface-2);
+  overflow: hidden;
+  cursor: zoom-in;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--c-focus);
+    outline-offset: 2px;
+  }
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    transition: scale 0.4s var(--ease-paper);
+  }
+  &:hover img {
+    scale: 1.04;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .post-photo > a[data-lightbox] img {
+    transition: none;
+  }
+  .post-photo > a[data-lightbox]:hover img {
+    scale: 1;
+  }
+}

@@ -1,0 +1,414 @@
+// Rich text editor (assets/vue/components/RichEditor.vue, templates/form/rich_text.html.twig).
+//
+//   .rich-editor                 the frame: a paper input (surface colour, strong border, focus ring)
+//   .rich-editor-bar             toolbar + popover + link prompt, one `surface-2` strip with a paper tile
+//   .rich-editor-btn             small kraft toolbar buttons (.is-active = toggled on, .is-disabled)
+//   .rich-editor-surface         the writing area: paper, content typeset like a message body
+//   .rich-editor.is-compact      shorter variant (signatures, short messages)
+//
+// Until the Tiptap chunk is loaded the field is a plain `.input` textarea inside the frame (no `.is-ready`).
+@use "../abstracts" as *;
+
+@layer components {
+  .rich-editor {
+    --re-min-h: 10rem;
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--radius-md);
+    background: var(--c-surface);
+    color: var(--c-fg);
+    transition: border-color 0.15s var(--ease-paper);
+
+    &:focus-within,
+    &.is-focus {
+      border-color: var(--c-focus);
+      @include focus-ring(0);
+    }
+
+    // the no-JS / not-yet-loaded textarea sits flat inside the frame
+    > .input,
+    > .input:focus {
+      border: 0;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      box-shadow: none;
+      outline: 0;
+    }
+  }
+
+  // ---- bar ---------------------------------------------------------------------------------------------------------------
+  // z-index: the popover opens over the surface below, which is itself a (texture) stacking context.
+  .rich-editor-bar {
+    @include texture-host;
+    @include texture-tone("paper", "surface-2");
+    --texture-strength: 0.6;
+    z-index: 2;
+    border-bottom: 1px solid var(--c-line);
+    border-radius: calc(var(--radius-md) - 1px) calc(var(--radius-md) - 1px) 0 0;
+    background: var(--c-surface-2);
+  }
+  .rich-editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    padding: 0.25rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .rich-editor-sep {
+    flex: none;
+    width: 1px;
+    height: 1.25rem;
+    margin-inline: 0.3rem;
+    background: var(--c-line-strong);
+    opacity: 0.55;
+  }
+
+  // ---- toolbar buttons: ghost at rest, a kraft tab when hovered / on --------------------------------------------------
+  .rich-editor-btn {
+    @include texture-host;
+    @include texture-tone("kraft", "surface");
+    --texture-ratio: 0;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--c-muted);
+    cursor: pointer;
+    transition:
+      background-color 0.12s var(--ease-paper),
+      color 0.12s var(--ease-paper),
+      box-shadow 0.12s var(--ease-paper);
+
+    @include up(sm) {
+      width: 2rem;
+      height: 2rem;
+    }
+    svg {
+      width: 1.125rem;
+      height: 1.125rem;
+    }
+
+    @include hover {
+      --texture-ratio: 1;
+      border-color: var(--c-line);
+      background: var(--c-surface);
+      box-shadow: 0 1px 1px color-mix(in srgb, var(--c-shadow) 10%, transparent);
+      color: var(--c-fg);
+    }
+    @include pressed {
+      @include texture-tone("kraft", "surface-3");
+      --texture-ratio: 1;
+      background: var(--c-surface-3);
+      box-shadow: inset 0 1px 2px color-mix(in srgb, var(--c-shadow) 22%, transparent);
+      color: var(--c-fg);
+    }
+    @include focus {
+      @include focus-ring(-2px);
+    }
+    // toggled on (bold while the caret is in bold text…): plum tint, pressed-in
+    &.is-active,
+    &[aria-pressed="true"],
+    &[aria-expanded="true"] {
+      @include texture-tone("kraft", "accent-soft");
+      --texture-ratio: 1;
+      border-color: color-mix(in srgb, var(--c-accent) 30%, transparent);
+      background: var(--c-accent-soft);
+      box-shadow: inset 0 1px 2px color-mix(in srgb, var(--c-shadow) 16%, transparent);
+      color: var(--c-accent-strong);
+    }
+    @include disabled {
+      --texture-ratio: 0;
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
+      color: var(--c-muted);
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+  }
+
+  // ---- popover (smileys) -------------------------------------------------------------------------------------------------
+  .rich-editor-popover {
+    @include texture-host;
+    @include texture-tone("paper", "overlay");
+    --texture-strength: 0.6;
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    z-index: 20;
+    display: grid;
+    max-height: 14rem;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    overflow-y: auto;
+    border: 1px solid var(--c-line-strong);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    background: var(--c-overlay);
+    box-shadow: var(--shadow-lift);
+    grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr));
+
+    @include up(sm) {
+      inset-inline: 0 auto;
+      max-width: 28rem;
+    }
+  }
+  .rich-editor-smiley {
+    display: inline-flex;
+    height: 2.25rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    cursor: pointer;
+
+    img {
+      width: auto;
+      height: auto;
+      max-width: 1.5rem;
+      max-height: 1.5rem;
+    }
+    @include hover {
+      border-color: var(--c-line);
+      background: var(--c-surface-2);
+    }
+    @include pressed {
+      background: var(--c-surface-3);
+    }
+    @include focus {
+      @include focus-ring(-2px);
+    }
+  }
+
+  // ---- link / video address row --------------------------------------------------------------------------------------------
+  .rich-editor-prompt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-top: 1px solid var(--c-line);
+
+    .input {
+      flex: 1 1 12rem;
+      min-width: 0;
+    }
+  }
+
+  // ---- writing surface: typeset like a message body --------------------------------------------------------------------------
+  .rich-editor-surface {
+    @include texture-host;
+    @include texture-tone("paper", "surface");
+    --texture-strength: 0.5;
+    border-radius: 0 0 calc(var(--radius-md) - 1px) calc(var(--radius-md) - 1px);
+
+    .ProseMirror {
+      min-height: var(--re-min-h);
+      padding: 0.75rem 1rem;
+      outline: none;
+      color: var(--c-fg);
+      cursor: text;
+      // same typesetting as a message body (`.post-body`); 17px also keeps iOS Safari from zooming into the editable area
+      font-family: var(--font-serif);
+      font-size: 1.0625rem;
+      line-height: 1.65;
+      font-optical-sizing: auto;
+      overflow-wrap: anywhere;
+
+      > * + * {
+        margin-top: 0.85em;
+      }
+      > :first-child {
+        margin-top: 0;
+      }
+      p {
+        min-height: 1em;
+      }
+      p + p {
+        margin-top: 0.85em;
+      }
+      a {
+        color: var(--c-link);
+        text-decoration: underline;
+        text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+        text-underline-offset: 0.2em;
+        cursor: text;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 600;
+        line-height: 1.25;
+      }
+      ul,
+      ol {
+        padding-left: 1.5rem;
+      }
+      ul {
+        list-style: disc;
+      }
+      ol {
+        list-style: decimal;
+      }
+      li > p {
+        margin: 0;
+      }
+      // quotes: same editorial pull-quote as a message body (current + legacy `div.cite`)
+      blockquote,
+      div.cite {
+        margin-inline: 0;
+        padding: 0.15rem 0 0.15rem 1.1rem;
+        border-left: 3px solid var(--c-highlight);
+        color: var(--c-fg-soft);
+        font-size: 1.03em;
+        font-style: italic;
+
+        > * + * {
+          margin-top: 0.5em;
+        }
+        blockquote {
+          border-left-color: var(--c-line-strong);
+          font-size: 1em;
+        }
+      }
+      cite {
+        display: block;
+        margin-bottom: 0.2rem;
+        color: var(--c-muted);
+        font-family: var(--font-sans);
+        font-size: 0.6875rem;
+        font-style: normal;
+        font-weight: 650;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      code,
+      pre {
+        background: var(--c-surface-2);
+        font-family: var(--font-mono);
+      }
+      code {
+        padding: 0.08em 0.35em;
+        border-radius: var(--radius-sm);
+        font-size: 0.85em;
+      }
+      pre {
+        padding: 0.85rem 1rem;
+        overflow-x: auto;
+        border-radius: var(--radius-md);
+        box-shadow:
+          var(--shadow-inset),
+          0 0 0 1px var(--c-line-soft);
+        font-size: 0.8125rem;
+        line-height: 1.55;
+        white-space: pre;
+
+        code {
+          padding: 0;
+          background: none;
+          font-size: inherit;
+        }
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: var(--font-sans);
+        font-size: 0.875rem;
+      }
+      td,
+      th {
+        padding: 0.4rem 0.6rem;
+        border-bottom: 1px solid var(--c-line);
+        text-align: left;
+      }
+      th {
+        border-bottom-color: var(--c-rule);
+      }
+      // pictures: a printed photo laid on the page
+      img {
+        display: inline-block;
+        max-width: 100%;
+        max-height: 24rem;
+        border-radius: var(--radius-md);
+        box-shadow:
+          0 0 0 1px var(--c-line),
+          0 2px 6px -2px color-mix(in srgb, var(--c-shadow) 22%, transparent);
+      }
+      // smileys stay inline text-sized
+      img[src^="/smilies/"] {
+        display: inline;
+        width: auto;
+        max-height: 1.5rem;
+        border-radius: 0;
+        box-shadow: none;
+        vertical-align: text-bottom;
+      }
+      iframe {
+        width: 100%;
+        max-width: 42rem;
+        height: auto;
+        aspect-ratio: 16 / 9;
+        border-radius: var(--radius-md);
+      }
+      hr {
+        margin: 1rem 0;
+      }
+
+      // placeholder (Tiptap marks the empty first paragraph)
+      > p.is-editor-empty:first-child::before {
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        color: var(--c-muted);
+        pointer-events: none;
+      }
+
+      // selected image / video
+      img.ProseMirror-selectednode,
+      .re-embed.ProseMirror-selectednode {
+        outline: 2px solid var(--c-focus);
+        outline-offset: 2px;
+      }
+    }
+
+    .re-embed {
+      max-width: 42rem;
+
+      iframe {
+        pointer-events: none;
+      }
+    }
+  }
+
+  // ---- compact -----------------------------------------------------------------------------------------------------------------
+  .rich-editor.is-compact {
+    .rich-editor-toolbar {
+      padding: 0.125rem;
+    }
+    .rich-editor-btn {
+      width: 2rem;
+      height: 2rem;
+
+      @include up(sm) {
+        width: 1.75rem;
+        height: 1.75rem;
+      }
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+    .rich-editor-surface .ProseMirror {
+      padding: 0.375rem 0.625rem;
+    }
+  }
+}

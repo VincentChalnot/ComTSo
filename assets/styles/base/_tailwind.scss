@@ -1,0 +1,115 @@
+// Tailwind CSS 4 inside Sass.
+//
+// Tailwind is "not designed for preprocessors", so the contract is: Sass runs FIRST (Vite's CSS pipeline), the compiled
+// output then goes through PostCSS where @tailwindcss/postcss resolves @import/@source/@theme/@apply/@custom-variant.
+//  - `@import "….css"` is a *plain CSS import* for Sass (the `.css` suffix) and is hoisted untouched to the top;
+//  - `@theme`, `@custom-variant`, `@source`, `@apply`, `@utility` are unknown at-rules for Sass and pass straight through
+//    (Sass features such as loops and #{interpolation} work inside them);
+//  - `--color-*: initial` is not a valid Sass declaration, hence the interpolated `--color-#{"*"}` spelling.
+@use "sass:map";
+@use "../abstracts/palette" as p;
+@use "../abstracts/functions" as fn;
+@use "../themes";
+
+// `source(none)`: Tailwind must only scan the paths listed with @source in app.scss (PHP code and docs hold look-alike
+// strings such as [quote:uid="x"]).
+@import "tailwindcss/index.css" source(none);
+
+// Dark mode follows <html data-theme="light|dark"> (stored in the member's config), not prefers-color-scheme.
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  // The default Tailwind palette is dropped: only the design-system tokens exist.
+  --color-#{"*"}: initial;
+  --color-white: #fff;
+  --color-black: #000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  // Typography
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-serif: "Newsreader Variable", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-display: "Fraunces Variable", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+  // Fluid modular scale (≈ minor third, ratio 1.2; the big steps are fluid)
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1.45;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.55;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.1875rem;
+  --text-lg--line-height: 1.5;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.35;
+  --text-2xl: clamp(1.5rem, 1.38rem + 0.55vw, 1.75rem);
+  --text-2xl--line-height: 1.25;
+  --text-3xl: clamp(1.75rem, 1.5rem + 1.1vw, 2.375rem);
+  --text-3xl--line-height: 1.15;
+  --text-4xl: clamp(2.1rem, 1.7rem + 1.8vw, 3.25rem);
+  --text-4xl--line-height: 1.08;
+  --text-5xl: clamp(2.6rem, 2rem + 3vw, 4.5rem);
+  --text-5xl--line-height: 1.02;
+  --text-6xl: clamp(3.2rem, 2.2rem + 5vw, 6rem);
+  --text-6xl--line-height: 1;
+
+  --tracking-tighter: -0.03em;
+  --tracking-tight: -0.018em;
+  --tracking-kicker: 0.14em;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.08em;
+  --tracking-widest: 0.16em;
+
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+  --leading-prose: 1.7;
+
+  // Small radii: paper has corners, not pills (rounded-full stays for avatars).
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 6px;
+  --radius-3xl: 8px;
+  --radius-4xl: 12px;
+
+  // Reading measure & page width
+  --container-prose: 68ch;
+  --container-page: 76rem;
+  --container-reading: 44rem;
+
+  --ease-paper: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+// Brand scales: always emitted (used by the showcase, inline styles and `var(--color-plum-700)` references).
+@theme static {
+  @each $name, $scale in p.$scales {
+    @each $step, $c in $scale {
+      --color-#{$name}-#{$step}: #{fn.hex($c)};
+    }
+  }
+  --color-plum: #{fn.hex(p.$plum)};
+  --color-sand: #{fn.hex(p.$sand)};
+  --color-brick: #{fn.hex(p.$brick)};
+  --color-sage: #{fn.hex(p.$sage)};
+}
+
+// Semantic tokens: utilities such as `bg-surface`, `text-muted`, `border-line` resolve to the theme variables defined in
+// base/_theme-vars.scss, so a theme switch needs no rebuild and no reload.
+@theme inline {
+  @each $role, $color in map.get(themes.$themes, "light") {
+    --color-#{$role}: var(--c-#{$role});
+  }
+  --shadow-2xs: 0 1px 0 color-mix(in srgb, var(--c-shadow) 8%, transparent);
+  --shadow-xs: 0 1px 1px color-mix(in srgb, var(--c-shadow) 10%, transparent);
+  --shadow-sm: 0 1px 1px color-mix(in srgb, var(--c-shadow) 8%, transparent), 0 2px 4px -1px color-mix(in srgb, var(--c-shadow) 10%, transparent);
+  --shadow-md: 0 1px 1px color-mix(in srgb, var(--c-shadow) 6%, transparent), 0 4px 10px -3px color-mix(in srgb, var(--c-shadow) 14%, transparent), 0 10px 18px -12px color-mix(in srgb, var(--c-shadow) 22%, transparent);
+  --shadow-lg: 0 1px 2px color-mix(in srgb, var(--c-shadow) 8%, transparent), 0 8px 18px -6px color-mix(in srgb, var(--c-shadow) 16%, transparent), 0 22px 34px -18px color-mix(in srgb, var(--c-shadow) 26%, transparent);
+  --shadow-xl: 0 2px 3px color-mix(in srgb, var(--c-shadow) 8%, transparent), 0 14px 28px -8px color-mix(in srgb, var(--c-shadow) 18%, transparent), 0 34px 54px -24px color-mix(in srgb, var(--c-shadow) 30%, transparent);
+  --shadow-2xl: 0 3px 4px color-mix(in srgb, var(--c-shadow) 8%, transparent), 0 22px 40px -10px color-mix(in srgb, var(--c-shadow) 22%, transparent), 0 50px 80px -30px color-mix(in srgb, var(--c-shadow) 34%, transparent);
+}

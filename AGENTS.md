@@ -22,6 +22,8 @@ docker compose up -d                       # php (FrankenPHP), database (MariaDB
 docker compose exec php bin/console ...    # Symfony console
 docker compose exec php composer ...
 docker compose exec node npm ...           # assets are rebuilt automatically into public/assets (git-ignored)
+docker compose up -d design-system         # DEV ONLY showcase of the design system: http://localhost:5174/ (Vite dev server, compose.override.yaml only)
+docker compose exec node npm run contrast  # WCAG AA check of every text/background pair in both themes
 ```
 
 ### Reverse proxy (Traefik) and TLS
@@ -35,7 +37,7 @@ The app is exposed **only** through the shared Traefik instance (`../traefik`, e
   internal calls such as the Mercure publish to `http://php/.well-known/mercure` also work). The original request asked for port `8843`;
   nothing listens on that port in this stack, so `80` is used.
 - Symfony trusts the proxy headers (`TRUSTED_PROXIES=private_ranges`, `framework.trusted_proxies`) so generated URLs and cookies are `https`.
-- No port is published on the host except MariaDB (`DATABASE_PORT`, default `3307`).
+- No port is published on the host except MariaDB (`DATABASE_PORT`, default `3307`) and, in dev only (`compose.override.yaml`, never in the production image), the design-system showcase (`DESIGN_SYSTEM_PORT`, default `5174`, plain HTTP).
 
 ### Database
 
@@ -61,12 +63,26 @@ private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `t
 ## Architecture notes
 
 - **Photos are private**: originals in `var/photos/originals` (bind-mounted from the host in dev), thumbnails generated lazily in
-  `var/photos/cache/{thumb,medium}` by `App\Service\ImageProcessingService` (imagine/imagine, GD). Served only by authenticated controllers.
+  `var/photos/cache/{thumb,medium,hero,avatar}` by `App\Service\ImageProcessingService` (imagine/imagine, GD). Served only by authenticated controllers (`photo_variant`).
+  `hero` (≤1600 px, inset, never upscaled) feeds the home hero; `app:photos:warm --variants=avatar,thumb,medium,hero` pre-generates them.
+- **Home hero** (`App\Photo\FeaturedPhotoProvider`, partial `templates/home/_hero.html.twig`): photos of the last 7 days, else 30 days, else the whole library; landscape ≥ 1200 px preferred;
+  weighted by a hash of the ISO week + photo id (stable for everybody during the week, avatars excluded); no photo = no hero. Kicker names the rule that matched.
+- **Photos on messages**: `App\Entity\CommentPhoto` (`ctso_comment_photo`, unique comment+photo, ON DELETE CASCADE) links photos to a message; `PhotoTopic` still links them to a topic
+  (the new-topic form attaches uploads to the topic). The unmapped `PhotoUploadType` field (`comment[photos][]`, max `PostPhotos::MAX_PER_POST` = 10 files of `PhotoUploader::MAX_SIZE` = 25 MB, real
+  content type checked by `Image` + `PhotoUploader::store`) is enhanced by `assets/vue/components/AttachPhotos.vue` (drag & drop, paste, thumbnails, keeps the input's `FileList` in sync, so a plain
+  submit works). `App\Photo\PostPhotos` stores all-or-nothing, links, detaches and `releaseOrphans()` (file + row deleted only when no topic, message or avatar still uses the photo): used by
+  create/edit/delete of a comment (only author/admin; the edit page lists attached photos with a remove checkbox). PHP limits live in `frankenphp/conf.d/10-app.ini`
+  (`upload_max_filesize=25M`, `post_max_size=256M`; restart `php` after changing). Pages rendering many messages call `CommentPhotoRepository::preload($comments)` (one query) before
+  rendering `_post/message.html.twig`: do the same in any new listing. In tests, `em()->clear()` before a request that must lazy-load collections created in the same test.
+- **Thread previews** (forum page): `App\Forum\ThreadPreviewBuilder` builds the read model of a whole page of topics with batch queries (query count asserted in `ForumPageTest`);
+  excerpts are plain text from `App\Content\TextExcerpt` (twig `excerpt_text`, auto-escaped), relative dates come from the `ago` filter. The inline "Aperçu" fetches
+  `GET /forum/{forumId}/{id}/preview` (`TopicPreviewController`, HTML fragment of the last 5 messages, private/no-store) through `initThreadPreviews()` in `assets/scripts/ui.js`.
+  Markup of the new components is documented in `docs/components-markup.md`.
 - **Legacy-compatible URLs** (old links were shared in messages): `/forums/`, `/forums/{forum}`, `/forum/{forum}/{topic}`, `/comment/{id}`, `/gens/{username}`, `/photos/{id}`.
 - Entities keep the legacy table names (`fos_user`, `ctso_*`). Imported rows carry `legacy_ref` (unique) so imports are idempotent.
 - User preferences live in `fos_user.config` (JSON): `theme` (`light|dark`), `message_order` (`asc|desc`).
 - `previous_login`/`last_activity` on users drive "what's new since your last visit" on the home page.
-- Tailwind 4 with semantic colour tokens (`assets/styles/app.css`); light/dark is `html[data-theme]`. Retheming = editing the CSS variables.
+- **Design system** (`docs/design-system.md` is the reference; showcase at `http://localhost:5174/`): Tailwind 4 written in **SCSS** (`assets/styles/app.scss` -> `_index.scss`, Sass runs first then `@tailwindcss/postcss` in `vite.config.js`; `@tailwindcss/vite` is not used). Colours are theme-scoped CSS variables (`--c-<role>`, roles in `assets/styles/themes/_light.scss` / `_dark.scss`, derived from the five brand colours in `abstracts/_palette.scss`); light/dark is `html[data-theme]` (a `data-theme` on any element re-themes its subtree). Retheming = editing a role colour, then `npm run contrast` (AA is mandatory in both themes). Components live one-per-file in `assets/styles/components/`, inside `@layer components` so utilities win; class names (`.btn .card .post .chat-* .rich-editor* .hero .thread-preview …`) are a stable API (see `docs/components-markup.md`). Paper textures are pseudo-elements (`texture-host` + `texture-tone` mixins, recipe computed from the host colour's luminance per theme, dial `--texture-ratio`; tiles tracked in `assets/images/textures/`, **not** in the git-ignored `public/images/`). Fonts are self-hosted (`@fontsource-variable`, no CDN). New component = new partial + `@use` in `_index.scss` + a showcase section in `design-system/sections/`.
 - **Chat** (`/chat`, `App\Controller\ChatController`, `assets/vue/components/ChatRoom.vue`): messages are PLAIN TEXT (rendered as text nodes, URLs linkified by the widget, never `v-html`).
   Real time is **private Mercure**: every update is published with `private: true` (`App\Chat\ChatPublisher`; topic `chat` for messages,
   `chat/users/{id}` for a member's read pointer), the Caddy hub has no `anonymous` directive, and members subscribe with the subscriber JWT cookie
@@ -93,7 +109,7 @@ Older platforms (old PHP forum MySQL dump, two phpBB installs) live in `var/lega
 ```bash
 docker compose exec php bin/console app:user:create <pseudo> <password> [--admin]   # accounts are created by the owner (registration is off)
 docker compose exec php bin/console app:user:promote <pseudo> [--revoke]            # grant/remove ROLE_ADMIN (moderate everything)
-docker compose exec -T -e XDEBUG_MODE=off php php bin/console app:photos:warm       # pre-generate thumbnails (lazy otherwise); --variants=avatar,thumb,medium
+docker compose exec -T -e XDEBUG_MODE=off php php bin/console app:photos:warm       # pre-generate thumbnails (lazy otherwise); --variants=avatar,thumb,medium,hero
 docker compose --profile legacy up -d legacy-mysql legacy-postgres                  # old dumps loaded from var/legacy/ (not started by default)
 docker compose exec -T php php bin/console app:content:sanitize --dry-run --no-debug
 ```
@@ -101,6 +117,7 @@ docker compose exec -T php php bin/console app:content:sanitize --dry-run --no-d
 Front-end: `assets/scripts/main.js` is the only entry; Vue components in `assets/vue/components/*.vue` are registered **automatically** (`import.meta.glob`) and
 mounted on `[data-vue-component="Name"][data-props='{json}']`. If `public/assets` is empty or the watcher died on an import error, fix it and `docker compose restart node`.
 The production image (`Dockerfile`, `frankenphp_prod` target) builds the assets in a `frontend_builder` stage.
+Styling pipeline in one line: `assets/scripts/main.js` imports `assets/styles/app.scss`; fonts/textures are bundled and fingerprinted into `public/assets/` through the `@fontsource-variable` / `@textures` Vite aliases (also defined in `design-system/vite.config.js`).
 
 ## Gotchas
 

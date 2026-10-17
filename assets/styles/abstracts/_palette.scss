@@ -1,0 +1,67 @@
+// Brand palette: exactly five base colours, everything else is derived from them in OKLCH.
+@use "sass:color";
+@use "sass:map";
+@use "sass:math";
+@use "functions" as fn;
+
+$plum: #950952; // deep plum        -> primary action, brand
+$mist: #95b2b8; // mist teal-grey   -> hairlines, secondary surfaces, avatars
+$sand: #f0a868; // sand / apricot   -> highlight: stars, kickers, focus (dark), hero accents
+$blue: #00487c; // deep blue        -> links, info, secondary action
+$ink: #2b2118; // ink brown        -> text on light, page base of the dark theme
+
+$brand: ("plum": $plum, "mist": $mist, "sand": $sand, "blue": $blue, "ink": $ink);
+
+// OKLCH lightness ladder (Tailwind-like steps). The brand colour replaces the step closest to its own lightness.
+$ladder: (50: 0.975, 100: 0.945, 200: 0.89, 300: 0.81, 400: 0.72, 500: 0.62, 600: 0.52, 700: 0.43, 800: 0.34, 900: 0.25, 950: 0.18);
+$base-step: ("plum": 700, "mist": 400, "sand": 300, "blue": 700, "ink": 900);
+
+@function _scale-step($base, $name, $step, $lightness) {
+  @if map.get($base-step, $name) == $step {
+    @return fn.srgb($base);
+  }
+  $base-l: math.div(color.channel($base, "lightness", $space: oklch), 100%);
+  // chroma follows the brand colour near its own lightness and fades towards white / black
+  $dist: math.div($base-l - $lightness, $base-l);
+  @if $lightness > $base-l {
+    $dist: math.div($lightness - $base-l, 1 - $base-l);
+  }
+  $factor: math.max(0.08, 1 - 0.95 * math.pow($dist, 1.25));
+  @return fn.relight($base, $lightness, $factor);
+}
+
+@function scale($name) {
+  $base: map.get($brand, $name);
+  $out: ();
+  @each $step, $lightness in $ladder {
+    $out: map.set($out, $step, _scale-step($base, $name, $step, $lightness));
+  }
+  @return $out;
+}
+
+// Warm "paper" neutrals (hue of the sand, almost no chroma) – canvas, sheets, sunken surfaces.
+$paper-hue: 78;
+$paper: (
+  50: fn.oklch-color(0.988, 0.006, $paper-hue),
+  100: fn.oklch-color(0.968, 0.013, $paper-hue),
+  200: fn.oklch-color(0.94, 0.02, $paper-hue),
+  300: fn.oklch-color(0.9, 0.026, $paper-hue),
+  400: fn.oklch-color(0.83, 0.03, $paper-hue),
+);
+
+$scales: (
+  "plum": scale("plum"),
+  "mist": scale("mist"),
+  "sand": scale("sand"),
+  "blue": scale("blue"),
+  "ink": scale("ink"),
+  "paper": $paper,
+);
+
+// Semantic hues (not part of the five): brick red and sage green, hue-matched to the warm palette.
+$brick: fn.oklch-color(0.48, 0.15, 30);
+$sage: fn.oklch-color(0.46, 0.085, 150);
+
+@function color($name, $step) {
+  @return map.get($scales, $name, $step);
+}

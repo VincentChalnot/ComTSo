@@ -1,0 +1,82 @@
+// Colour helpers: gamut mapping, hex output, WCAG relative luminance / contrast, compositing.
+@use "sass:color";
+@use "sass:list";
+@use "sass:map";
+@use "sass:math";
+@use "sass:string";
+
+$hex-digits: "0123456789abcdef";
+
+@function _byte-hex($n) {
+  $n: math.max(0, math.min(255, math.round($n)));
+  $hi: math.floor(math.div($n, 16));
+  $lo: $n - $hi * 16;
+  @return string.slice($hex-digits, $hi + 1, $hi + 1) + string.slice($hex-digits, $lo + 1, $lo + 1);
+}
+
+/// Gamut-maps any colour (oklch, srgb…) to a legacy sRGB colour with integer channels.
+@function srgb($c) {
+  $g: color.to-space(color.to-gamut($c, $space: rgb, $method: local-minde), rgb);
+  @return rgb(
+    math.round(color.channel($g, "red", $space: rgb)),
+    math.round(color.channel($g, "green", $space: rgb)),
+    math.round(color.channel($g, "blue", $space: rgb))
+  );
+}
+
+/// `#rrggbb` as an unquoted string, for readable custom-property output.
+@function hex($c) {
+  $c: srgb($c);
+  @return string.unquote("#" + _byte-hex(color.channel($c, "red", $space: rgb)) + _byte-hex(color.channel($c, "green", $space: rgb)) + _byte-hex(color.channel($c, "blue", $space: rgb)));
+}
+
+/// Builds a colour from OKLCH numbers (lightness 0–1, chroma, hue in degrees), gamut-mapped to sRGB.
+@function oklch-color($lightness, $chroma, $hue) {
+  @return srgb(color.change(#000, $lightness: $lightness * 100%, $chroma: $chroma, $hue: $hue * 1deg, $space: oklch));
+}
+
+/// Keeps the hue of `$base`, forces lightness and scales its chroma.
+@function relight($base, $lightness, $chroma-factor: 1) {
+  $chroma: color.channel($base, "chroma", $space: oklch);
+  $hue: math.div(color.channel($base, "hue", $space: oklch), 1deg);
+  @return oklch-color($lightness, $chroma * $chroma-factor, $hue);
+}
+
+/// Perceptual mix in OKLCH, returned as sRGB.
+@function mix-ok($a, $b, $weight-a: 50%) {
+  @return srgb(color.mix($a, $b, $weight-a, $method: oklab));
+}
+
+/// WCAG 2.x relative luminance (0 = black, 1 = white).
+@function luminance($c) {
+  $c: srgb($c);
+  $sum: 0;
+  $weights: (red: 0.2126, green: 0.7152, blue: 0.0722);
+  @each $channel, $w in $weights {
+    $v: math.div(color.channel($c, "#{$channel}", $space: rgb), 255);
+    $lin: math.div($v, 12.92);
+    @if $v > 0.04045 {
+      $lin: math.pow(math.div($v + 0.055, 1.055), 2.4);
+    }
+    $sum: $sum + $lin * $w;
+  }
+  @return $sum;
+}
+
+/// WCAG contrast ratio between two opaque colours.
+@function contrast($a, $b) {
+  $la: luminance($a);
+  $lb: luminance($b);
+  @return math.div(math.max($la, $lb) + 0.05, math.min($la, $lb) + 0.05);
+}
+
+/// Composites a translucent colour over an opaque backdrop (what the eye sees).
+@function over($top, $backdrop) {
+  $a: color.channel($top, "alpha");
+  @return srgb(color.mix(color.change($top, $alpha: 1), $backdrop, $a * 100%));
+}
+
+/// `rgb(r g b / a)` helper for shadows from a hex colour.
+@function alpha($c, $a) {
+  @return color.change(srgb($c), $alpha: $a);
+}

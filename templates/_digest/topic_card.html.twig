@@ -1,44 +1,46 @@
-{# A topic as a card: title + favourite toggle, photos, then messages. Params: topic, comments, photos, created (bool), hidden (int) #}
-{% import '_ui/icons.html.twig' as ui %}
+{# A topic as a magazine entry: forum kicker, display title + favourite toggle, new description / photos, the new messages.
+   Params: topic, comments, photos, created (bool), hidden (int) #}
 {% import '_ui/photo.html.twig' as ph %}
 {% set starred = app.user.starredTopics.contains(topic) %}
-<section class="card overflow-hidden" aria-labelledby="topic-{{ topic.id }}">
-    <header class="flex items-start gap-2 border-b border-line bg-surface-2 px-4 py-3">
-        {% include 'topic/_star.html.twig' %}
-        <div class="min-w-0 flex-1">
-            <h3 id="topic-{{ topic.id }}" class="truncate text-lg font-semibold leading-snug">
-                <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}" class="text-fg no-underline hover:underline">{{ topic.title }}</a>
-            </h3>
-            <p class="text-xs text-muted">
-                <a href="{{ path('forum_show', {forumId: topic.forum.id}) }}" class="text-muted">{{ topic.forum.title }}</a>
-                · {{ topic.commentCount }} message{{ topic.commentCount > 1 ? 's' : '' }}
-                {% if created %}· <span class="font-medium text-accent-strong">nouveau sujet</span>{% endif %}
-            </p>
+{% set topicUrl = path('topic_show', {forumId: topic.forum.id, id: topic.id}) %}
+<section class="digest" aria-labelledby="topic-{{ topic.id }}">
+    <header class="digest-head">
+        <p class="kicker">
+            <span><a href="{{ path('forum_show', {forumId: topic.forum.id}) }}">{{ topic.forum.title }}</a>
+            · {{ topic.commentCount }} message{{ topic.commentCount > 1 ? 's' : '' }}{% if created %} · nouveau sujet{% endif %}</span>
+        </p>
+        <div class="digest-title-row">
+            <h3 id="topic-{{ topic.id }}" class="digest-title"><a href="{{ topicUrl }}">{{ topic.title }}</a></h3>
+            {% include 'topic/_star.html.twig' %}
         </div>
     </header>
 
     {% if created and topic.content %}
-        <div class="border-b border-line px-4 py-3"><div class="post-body" data-collapsible>{{ topic.content|rich_text }}</div></div>
+        <div class="post-body is-lead" data-collapsible>{{ topic.content|rich_text }}</div>
     {% endif %}
 
     {% if photos %}
-        <div class="flex flex-wrap gap-2 border-b border-line px-4 py-3">
-            {% for link in photos %}{{ ph.thumb(link.photo, 'digest-' ~ topic.id, 'size-24 sm:size-28') }}{% endfor %}
-        </div>
+        <ul class="post-photos{{ photos|length > 6 ? ' is-wide' }}" aria-label="Photos du sujet">
+            {% for link in photos %}<li class="post-photo">{{ ph.thumb(link.photo, 'digest-' ~ topic.id, 'size-24 sm:size-28') }}</li>{% endfor %}
+        </ul>
     {% endif %}
 
     {% if hidden > 0 %}
-        <p class="border-b border-line bg-surface-2 px-4 py-2 text-center text-xs text-muted">
+        <p class="digest-note">
             {{ hidden }} message{{ hidden > 1 ? 's' : '' }} plus ancien{{ hidden > 1 ? 's' : '' }} non affiché{{ hidden > 1 ? 's' : '' }} —
-            <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}">voir le sujet</a>
+            <a href="{{ topicUrl }}">voir le sujet</a>
         </p>
     {% endif %}
 
-    {% for comment in comments %}
-        {% include '_post/message.html.twig' %}
-    {% endfor %}
+    {% if comments %}
+        <div class="digest-posts">
+            {% for comment in comments %}
+                {% include '_post/message.html.twig' %}
+            {% endfor %}
+        </div>
+    {% endif %}
 
-    <footer class="border-t border-line bg-surface-2 px-4 py-3 text-center">
-        <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}" class="btn btn-primary">Voir le sujet</a>
+    <footer class="digest-foot">
+        <a href="{{ topicUrl }}" class="btn btn-primary">Voir le sujet</a>
     </footer>
 </section>

@@ -1,0 +1,162 @@
+// Avatars: round, the only fully round thing on the page (besides dots). Photo avatars carry a hairline ring; the fallback
+// is an initial on a muted tone computed from a hue, with a kraft grain.
+//
+//   <img class="avatar" src alt>                           .avatar-xs 1.5rem / .avatar-sm 2rem / (2.5rem) / .avatar-lg 3.5rem / .avatar-xl 6rem
+//   <span class="avatar avatar-initial" style="--avatar-hue: 210">AB</span>
+//   <span class="avatar-wrap"><img class="avatar"><span class="avatar-status is-online"></span></span>
+//   <ul class="avatar-stack"><li><img class="avatar avatar-sm"></li> … <li class="avatar-stack-more">+3</li></ul>
+//     (the `li` carries the paper ring and the overlap, so a legacy avatar element inside works as well)
+@use "../abstracts" as *;
+
+@layer components {
+  .avatar {
+    --avatar-size: 2.5rem;
+
+    display: inline-block;
+    flex: none;
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    border-radius: 50%;
+    background-color: var(--c-surface-2);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-shadow) 14%, transparent);
+    object-fit: cover;
+    vertical-align: middle;
+  }
+
+  // initial on a toned background: hsl(hue 30% 32%) keeps ≥ 5:1 with the cream `on-accent` text for every hue
+  .avatar-initial {
+    @include texture-host;
+    @include texture-vars("kraft", "dark");
+    --texture-strength: 0.55;
+
+    display: inline-grid;
+    place-items: center;
+    background-color: hsl(var(--avatar-hue, 210) 30% 32%);
+    color: var(--c-on-accent);
+    font-family: var(--font-sans);
+    font-size: calc(var(--avatar-size) * 0.4);
+    font-weight: 650;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    text-transform: uppercase;
+    user-select: none;
+  }
+
+  // sizes: declared after the stack default below on purpose
+  .avatar-stack {
+    --stack-ring: var(--avatar-ring, var(--c-surface));
+
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    :where(&) > li > .avatar {
+      --avatar-size: 2rem;
+    }
+    > li {
+      position: relative;
+      display: flex;
+      flex: none;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px var(--stack-ring);
+
+      // the legacy tailwind avatar (`size-8 rounded-full`) and `.avatar` both sit flush in their ring
+      > .avatar {
+        box-shadow: none;
+      }
+      & + li {
+        margin-left: -0.45rem;
+      }
+    }
+    // "+N": a kraft chip the size of a small avatar
+    > .avatar-stack-more {
+      @include texture-host;
+      @include texture-tone("kraft", "btn");
+
+      align-items: center;
+      justify-content: center;
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 0.3rem;
+      border-radius: 1rem;
+      background-color: var(--c-btn);
+      color: var(--c-on-btn);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.01em;
+      line-height: 1;
+      white-space: nowrap;
+    }
+  }
+
+  .avatar-xs {
+    --avatar-size: 1.5rem;
+  }
+  .avatar-sm {
+    --avatar-size: 2rem;
+  }
+  .avatar-lg {
+    --avatar-size: 3.5rem;
+  }
+  .avatar-xl {
+    --avatar-size: 6rem;
+  }
+  .avatar-xl.avatar-initial {
+    letter-spacing: 0.03em;
+  }
+  // big avatars deserve a paper passe-partout
+  .avatar-xl:not(.avatar-initial),
+  .avatar-framed {
+    box-shadow:
+      0 0 0 3px var(--c-surface),
+      0 0 0 4px color-mix(in srgb, var(--c-shadow) 14%, transparent),
+      0 6px 14px -6px color-mix(in srgb, var(--c-shadow) 35%, transparent);
+  }
+
+  // ---- presence dot ------------------------------------------------------------------------------------------------------
+  .avatar-wrap {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    vertical-align: middle;
+  }
+  .avatar-status {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background-color: var(--c-mist-strong);
+    box-shadow: 0 0 0 2px var(--avatar-ring, var(--c-surface));
+
+    &.is-online {
+      background-color: var(--c-ok-fill);
+    }
+    &.is-away {
+      background-color: var(--c-highlight);
+    }
+    &.is-busy {
+      background-color: var(--c-danger-fill);
+    }
+  }
+  .avatar-wrap:has(> .avatar-lg) > .avatar-status {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+  .avatar-wrap:has(> .avatar-xl) > .avatar-status {
+    right: 0.25rem;
+    bottom: 0.25rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    box-shadow: 0 0 0 3px var(--avatar-ring, var(--c-surface));
+  }
+  .avatar-wrap:has(> .avatar-xs) > .avatar-status {
+    width: 0.5rem;
+    height: 0.5rem;
+    box-shadow: 0 0 0 1.5px var(--avatar-ring, var(--c-surface));
+  }
+}

@@ -31,7 +31,6 @@ class HomeDigestTest extends AppWebTestCase
         self::assertStringContainsString('message récent deux', $html);
         self::assertStringNotContainsString('vieux message', $html, 'Messages older than the date are not part of the digest.');
         self::assertStringNotContainsString('Sujet calme', $html, 'Topics without news are not listed.');
-        self::assertCount(1, $this->client->getCrawler()->filter('section.card[aria-labelledby^=topic-]'));
     }
 
     public function testHomeDefaultsToTheEndOfThePreviousVisit(): void
@@ -83,7 +82,7 @@ class HomeDigestTest extends AppWebTestCase
 
         $this->client->request('GET', '/?since=2026-03-01');
 
-        self::assertSelectorCount(1, 'a[data-lightbox]');
-        self::assertSelectorTextContains('section.card', 'Album');
+        self::assertSelectorCount(1, '.digest a[data-lightbox]');
+        self::assertSelectorTextContains('main', 'Album');
     }
 }

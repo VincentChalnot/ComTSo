@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Photo;
 use App\Form\PhotoType;
 use App\Pagination\Pager;
+use App\Repository\CommentPhotoRepository;
 use App\Repository\PhotoRepository;
 use App\Service\ImageProcessingService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,7 +52,7 @@ class PhotoController extends AbstractController
         return $this->cacheable($response);
     }
 
-    #[Route('/photos/{id}/{variant}', name: 'photo_variant', requirements: ['id' => '\d+', 'variant' => 'avatar|thumb|medium'])]
+    #[Route('/photos/{id}/{variant}', name: 'photo_variant', requirements: ['id' => '\d+', 'variant' => 'avatar|thumb|medium|hero'])]
     public function variant(Photo $photo, string $variant, ImageProcessingService $images): Response
     {
         $path = $images->thumbnailPath($photo->getFilename(), $variant);
@@ -63,9 +64,9 @@ class PhotoController extends AbstractController
     }
 
     #[Route('/photos/{id}', name: 'photo_show', requirements: ['id' => '\d+'])]
-    public function show(Photo $photo): Response
+    public function show(Photo $photo, CommentPhotoRepository $commentPhotos): Response
     {
-        return $this->render('photo/show.html.twig', ['photo' => $photo]);
+        return $this->render('photo/show.html.twig', ['photo' => $photo, 'messageUsages' => $commentPhotos->findUsages($photo)]);
     }
 
     #[Route('/photos/{id}/edit', name: 'photo_edit', requirements: ['id' => '\d+'])]

@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Pagination\Pager;
+use App\Photo\FeaturedPhotoProvider;
+use App\Repository\CommentPhotoRepository;
 use App\Repository\CommentRepository;
 use App\Repository\PhotoTopicRepository;
 use App\Repository\TopicRepository;
@@ -26,6 +28,8 @@ class HomeController extends AbstractController
         TopicRepository $topics,
         CommentRepository $comments,
         PhotoTopicRepository $photoTopics,
+        FeaturedPhotoProvider $featuredPhoto,
+        CommentPhotoRepository $commentPhotos,
     ): Response {
         $since = $this->resolveSince($request, $user);
         $order = $user->getMessageOrder();
@@ -43,11 +47,13 @@ class HomeController extends AbstractController
                 'created' => $topic->getCreatedAt() >= $since,
             ];
         }
+        $commentPhotos->preload(array_merge(...array_column($cards, 'comments')));
 
         return $this->render('home/index.html.twig', [
             'since' => $since,
             'cards' => $cards,
             'pager' => $pager,
+            'hero' => $featuredPhoto->select(),
         ]);
     }
 

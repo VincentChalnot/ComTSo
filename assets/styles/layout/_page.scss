@@ -1,0 +1,197 @@
+// Page skeleton: generous margins, a reading column + aside, magazine section headings.
+//
+//   <div class="page">
+//     <header class="page-header"><p class="kicker">…</p><h1 class="page-title">…</h1><p class="standfirst">…</p></header>
+//     <div class="layout">
+//       <main class="layout-main"> <section class="section"><h2 class="section-title">…</h2> … </section> </main>
+//       <aside class="layout-aside"> … </aside>
+//     </div>
+//   </div>
+@use "../abstracts" as *;
+
+@layer components {
+  .page {
+    width: 100%;
+    max-width: var(--container-page);
+    margin-inline: auto;
+    padding: clamp(1.25rem, 3vw, 2.5rem) clamp(1rem, 4vw, 3rem) clamp(3rem, 7vw, 6rem);
+  }
+  .page-narrow {
+    max-width: var(--container-reading);
+  }
+
+  .page-header {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+    margin-bottom: clamp(1.75rem, 4vw, 3rem);
+    padding-bottom: clamp(1.25rem, 3vw, 2rem);
+    border-bottom: 1px solid var(--c-rule);
+
+    &.is-double {
+      border-bottom: 0;
+      padding-bottom: 0;
+
+      &::after {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 5px;
+        margin-top: clamp(1.25rem, 3vw, 2rem);
+        border-top: 2px solid var(--c-rule);
+        border-bottom: 1px solid var(--c-rule);
+      }
+    }
+    &.is-centered {
+      justify-items: center;
+      text-align: center;
+    }
+  }
+  .page-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    font-weight: 540;
+    line-height: 1.04;
+    letter-spacing: var(--tracking-tighter);
+    text-wrap: balance;
+
+    @include up(md) {
+      font-size: var(--text-5xl);
+    }
+  }
+  .page-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  // Reading column + aside: the aside is a calm side rail, separated by a hairline from the main column on large screens
+  .layout {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.5rem);
+    grid-template-columns: minmax(0, 1fr);
+
+    @include up(lg) {
+      grid-template-columns: minmax(0, 1fr) 17.5rem;
+      align-items: start;
+    }
+  }
+  .layout-main {
+    min-width: 0;
+  }
+  .layout-aside {
+    display: grid;
+    gap: 1.5rem;
+
+    @include up(lg) {
+      position: sticky;
+      top: 4.5rem;
+      padding-left: clamp(1.5rem, 3vw, 2.5rem);
+      border-left: 1px solid var(--c-line);
+    }
+  }
+  // Single reading column (topic, article): measure kept comfortable
+  .reading {
+    max-width: var(--container-reading);
+    margin-inline: auto;
+  }
+
+  .section {
+    margin-block: clamp(2.5rem, 6vw, 4.5rem);
+
+    &:first-child {
+      margin-top: 0;
+    }
+    &.is-tight {
+      margin-block: clamp(1.5rem, 3vw, 2.5rem);
+    }
+  }
+  // Section heading: small caps followed by a hairline that runs to the edge (the classic magazine department head)
+  .section-title {
+    @include eyebrow(0.75rem, 0.16em);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0 0 clamp(1.25rem, 3vw, 2rem);
+    color: var(--c-fg);
+    text-wrap: nowrap;
+
+    &::after {
+      content: "";
+      flex: 1;
+      order: 2;
+      height: 1px;
+      background: var(--c-rule);
+      opacity: 0.55;
+    }
+    // a "see all" link sits at the far end of the rule
+    .section-more {
+      order: 3;
+      margin-left: 0;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+
+      &:hover {
+        color: var(--c-link-hover);
+      }
+    }
+  }
+  .section-more {
+    @include eyebrow(0.6875rem, 0.12em);
+    margin-left: auto;
+    color: var(--c-link);
+  }
+
+  // Vertical rhythm helper for stacks of blocks
+  .stack > * + * {
+    margin-top: var(--stack-space, 1.5rem);
+  }
+
+  // ---- aside widgets (templates/_layout/aside.html.twig) ------------------------------------------------------------------
+  .layout-aside .menu-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.35rem;
+    padding-inline: 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--c-line);
+  }
+  .menu-note {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--c-muted);
+  }
+  // A saying of the day: serif italic with a sand rule, no box
+  .aside-quote {
+    margin: 0;
+    padding: 0.25rem 0 0.25rem 1rem;
+    border-left: 2px solid var(--c-highlight);
+
+    blockquote {
+      margin: 0;
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      font-style: italic;
+      line-height: 1.5;
+      color: var(--c-fg-soft);
+      text-wrap: pretty;
+      // some sayings are whole paragraphs
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 9;
+      overflow: hidden;
+    }
+    figcaption {
+      margin-top: 0.5rem;
+      @include eyebrow(0.625rem, 0.14em);
+      color: var(--c-muted);
+    }
+  }
+}

@@ -2,14 +2,19 @@
 
 {% block title %}Chat · ComTSo{% endblock %}
 
-{# The chat takes the whole viewport under the navbar: see the "CHAT" block of assets/styles/app.css. #}
+{# The chat takes the whole viewport under the masthead: see the unlayered "page layout" block of components/_chat.scss.
+   `div.page` (a direct child of <body>, holds the flash messages and this block) becomes the flex column. #}
 {% block body_class %}chat-page{% endblock %}
 
 {% block content_layout %}
-    <div class="chat-mount" data-vue-component="ChatRoom" data-props="{{ props|json_encode|e('html_attr') }}">
-        <div class="card flex flex-1 items-center justify-center text-sm text-muted">
-            <noscript>Le chat nécessite JavaScript.</noscript>
-            <span>Chargement du chat…</span>
+    <main id="main" class="chat-main" tabindex="-1">
+        <div class="chat-mount" data-vue-component="ChatRoom" data-props="{{ props|json_encode|e('html_attr') }}">
+            <div class="chat-room card chat-loading">
+                <noscript><p class="chat-edge">Le chat nécessite JavaScript.</p></noscript>
+                <p class="chat-edge" role="status">Chargement du chat…</p>
+            </div>
         </div>
-    </div>
+    </main>
 {% endblock %}
+
+{% block footer %}{% endblock %}

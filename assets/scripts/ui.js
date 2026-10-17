@@ -1,5 +1,5 @@
 // Vanilla UI behaviours: mobile nav, flash dismissal, collapsible messages, tap-to-reveal details,
-// favourites toggle, confirmations, auto-submit and the photo lightbox.
+// favourites toggle, confirmations, auto-submit, the photo lightbox and the inline thread previews.
 // Everything is progressive enhancement: pages stay usable with JavaScript disabled.
 
 const ready = (fn) => (document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn) : fn());
@@ -18,20 +18,28 @@ const ICON = {
 function initNav() {
   const toggle = document.querySelector('[data-nav-toggle]');
   const menu = document.querySelector('[data-nav-menu]');
-  toggle?.addEventListener('click', () => {
-    const open = menu.classList.toggle('hidden') === false;
-    menu.classList.toggle('flex', open);
+  const setOpen = (open) => {
+    menu.classList.toggle('is-open', open);
     toggle.setAttribute('aria-expanded', String(open));
-  });
+  };
+  if (toggle && menu) {
+    toggle.addEventListener('click', () => setOpen(!menu.classList.contains('is-open')));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && menu.classList.contains('is-open')) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
 
   document.addEventListener('click', (event) => {
     const dismiss = event.target.closest('[data-dismiss]');
-    if (dismiss) dismiss.parentElement.remove();
+    if (dismiss) (dismiss.closest('.alert') ?? dismiss.parentElement).remove();
   });
 }
 
 /* ------------------------------------------------------------------ messages */
-const COLLAPSED_MAX = 160; // px, keep in sync with .post-body.is-collapsed (max-h-36 = 144px + slack)
+const COLLAPSED_MAX = 160; // px, keep in sync with .post-body.is-collapsed (`max-height: 9rem` = 144px + slack in components/_post.scss)
 
 function collapse(body) {
   if (body.dataset.collapseReady) return;
@@ -59,11 +67,15 @@ function collapse(body) {
   if (post && location.hash === `#${post.id}`) button.click();
 }
 
-function initMessages() {
-  const bodies = document.querySelectorAll('[data-collapsible]');
+function collapseMessages(root) {
+  const bodies = root.querySelectorAll('[data-collapsible]');
   bodies.forEach(collapse);
   // Images inside messages change the height once loaded.
   bodies.forEach((body) => body.querySelectorAll('img').forEach((img) => img.addEventListener('load', () => collapse(body), { once: true })));
+}
+
+function initMessages() {
+  collapseMessages(document);
 
   // Touch devices have no hover: tapping a message reveals its details and actions.
   document.addEventListener('click', (event) => {
@@ -144,21 +156,21 @@ class Lightbox {
     root.setAttribute('aria-modal', 'true');
     root.setAttribute('aria-label', 'Visionneuse de photos');
     root.innerHTML = `
-      <div class="flex items-center justify-between gap-3 p-3 text-sm">
-        <span data-lb-counter class="tabular-nums opacity-80"></span>
-        <div class="flex items-center gap-2">
+      <div class="lightbox-bar">
+        <span data-lb-counter class="lightbox-counter"></span>
+        <div class="lightbox-actions">
           <a data-lb-page class="lightbox-btn" title="Page de la photo" aria-label="Page de la photo">${ICON.page}</a>
           <a data-lb-download class="lightbox-btn" title="Télécharger" aria-label="Télécharger" download>${ICON.download}</a>
           <button type="button" data-lb-close class="lightbox-btn" title="Fermer (Échap)" aria-label="Fermer">${ICON.close}</button>
         </div>
       </div>
-      <div data-lb-backdrop class="relative flex min-h-0 flex-1 items-center justify-center px-2 sm:px-14">
-        <button type="button" data-lb-prev class="lightbox-btn absolute left-2 top-1/2 -translate-y-1/2" title="Précédente (←)" aria-label="Photo précédente">${ICON.left}</button>
-        <img data-lb-image alt="" draggable="false">
-        <div data-lb-spinner class="absolute size-8 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
-        <button type="button" data-lb-next class="lightbox-btn absolute right-2 top-1/2 -translate-y-1/2" title="Suivante (→)" aria-label="Photo suivante">${ICON.right}</button>
+      <div data-lb-backdrop class="lightbox-stage">
+        <button type="button" data-lb-prev class="lightbox-btn lightbox-nav is-prev" title="Précédente (←)" aria-label="Photo précédente">${ICON.left}</button>
+        <img data-lb-image class="lightbox-image" alt="" draggable="false">
+        <div data-lb-spinner class="lightbox-spinner" role="status" aria-label="Chargement"></div>
+        <button type="button" data-lb-next class="lightbox-btn lightbox-nav is-next" title="Suivante (→)" aria-label="Photo suivante">${ICON.right}</button>
       </div>
-      <p data-lb-caption class="min-h-12 p-3 text-center text-sm"></p>`;
+      <p data-lb-caption class="lightbox-caption"></p>`;
     document.body.append(root);
     this.root = root;
     this.img = root.querySelector('[data-lb-image]');
@@ -206,15 +218,15 @@ class Lightbox {
   show(index) {
     this.index = index;
     const item = this.items[index];
-    this.spinner.classList.remove('hidden');
-    this.img.classList.add('opacity-0');
+    this.spinner.hidden = false;
+    this.root.classList.add('is-loading');
     const loader = new Image();
     loader.onload = loader.onerror = () => {
       if (this.items[this.index] !== item) return;
       this.img.src = item.src;
       this.img.alt = item.caption;
-      this.img.classList.remove('opacity-0');
-      this.spinner.classList.add('hidden');
+      this.root.classList.remove('is-loading');
+      this.spinner.hidden = true;
     };
     loader.src = item.src;
 
@@ -223,7 +235,7 @@ class Lightbox {
     this.root.querySelector('[data-lb-page]').href = item.page;
     const download = this.root.querySelector('[data-lb-download]');
     download.href = item.download || item.full;
-    this.root.querySelectorAll('[data-lb-prev], [data-lb-next]').forEach((b) => b.classList.toggle('hidden', this.items.length < 2));
+    this.root.querySelectorAll('[data-lb-prev], [data-lb-next]').forEach((b) => { b.hidden = this.items.length < 2; });
 
     // Preload neighbours for instant navigation.
     [index - 1, index + 1].forEach((i) => {
@@ -258,9 +270,88 @@ function initLightbox() {
   });
 }
 
+/* ------------------------------------------------------------------ thread previews */
+// "Aperçu" of a topic in a listing: loads the latest messages (server-rendered fragment) on first open.
+// The buttons are rendered `hidden` (no dead control without JavaScript) and revealed here.
+function initThreadPreviews() {
+  const state = new WeakMap(); // toggle button -> { open, loaded, loading }
+  const setOpen = (button, panel, open) => {
+    state.get(button).open = open;
+    panel.hidden = !open;
+    button.setAttribute('aria-expanded', String(open));
+    button.textContent = open ? 'Masquer l\u2019aperçu' : 'Aperçu';
+  };
+
+  const showStatus = (panel, message, retry) => {
+    panel.replaceChildren();
+    const text = document.createElement('p');
+    text.textContent = message;
+    if (retry) {
+      text.setAttribute('role', 'alert');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'btn btn-sm';
+      button.textContent = 'Réessayer';
+      button.addEventListener('click', retry);
+      panel.append(text, button);
+    } else {
+      text.setAttribute('role', 'status');
+      panel.append(text);
+    }
+  };
+
+  const load = async (button, panel) => {
+    const info = state.get(button);
+    info.loading = true;
+    panel.setAttribute('aria-busy', 'true');
+    showStatus(panel, 'Chargement…');
+    try {
+      const response = await fetch(button.dataset.previewUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' });
+      // A redirect means the session ended (login page) or the topic moved: never inject a whole page.
+      if (!response.ok || response.redirected) throw new Error(String(response.status));
+      const html = await response.text();
+      panel.innerHTML = html; // trusted: sanitized server-side fragment
+      info.loaded = true;
+      collapseMessages(panel);
+      if (info.open) panel.focus();
+    } catch {
+      showStatus(panel, 'Impossible de charger l\u2019aperçu.', () => load(button, panel));
+      panel.querySelector('button')?.focus();
+    } finally {
+      info.loading = false;
+      panel.removeAttribute('aria-busy');
+    }
+  };
+
+  document.querySelectorAll('.thread-preview-toggle').forEach((button) => {
+    state.set(button, { open: false, loaded: false, loading: false });
+    button.hidden = false;
+  });
+
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('.thread-preview-toggle');
+    const panel = button && document.getElementById(button.getAttribute('aria-controls'));
+    if (!panel || !state.has(button)) return;
+
+    const info = state.get(button);
+    if (info.open) {
+      setOpen(button, panel, false);
+      return;
+    }
+    setOpen(button, panel, true);
+    if (info.loaded) {
+      collapseMessages(panel); // messages measured while hidden need another pass
+      panel.focus();
+    } else if (!info.loading) {
+      load(button, panel);
+    }
+  });
+}
+
 ready(() => {
   initNav();
   initMessages();
   initForms();
   initLightbox();
+  initThreadPreviews();
 });

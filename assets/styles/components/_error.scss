@@ -1,0 +1,62 @@
+// Error page (templates/bundles/TwigBundle/Exception/error.html.twig): a giant outlined numeral, a kicker, a short
+// headline and a way home.
+//
+//   <main class="error-page">
+//     <p class="error-code" aria-hidden="true">404</p>
+//     <p class="kicker">Erreur 404</p>
+//     <h1 class="error-title">Cette page n'existe pas.</h1>
+//     <p class="error-text">Le lien est peut-être ancien…</p>
+//     <hr class="rule-double">
+//     <p class="error-actions"><a class="btn btn-primary" href="/">Retour à l'accueil</a></p>
+//   </main>
+@use "../abstracts" as *;
+
+@layer components {
+  .error-page {
+    display: flex;
+    max-width: 34rem;
+    flex-direction: column;
+    align-items: center;
+    margin: clamp(1.5rem, 8vh, 5rem) auto;
+    text-align: center;
+
+    .rule-double {
+      width: 100%;
+      max-width: 16rem;
+      margin: 2rem 0 1.75rem;
+    }
+  }
+
+  // Outlined in sand: a translucent sand fill inside a `kicker` (AA on the page) stroke; the headline below carries the meaning.
+  .error-code {
+    margin: 0 0 0.5rem;
+    color: color-mix(in srgb, var(--c-highlight) 22%, transparent);
+    font-family: var(--font-display);
+    font-size: clamp(6rem, 26vw, 11rem);
+    font-variation-settings: "opsz" 144;
+    font-variant-numeric: lining-nums;
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    -webkit-text-stroke: 2px var(--c-kicker);
+    paint-order: stroke fill;
+    user-select: none;
+  }
+  .error-title {
+    margin: 0.85rem 0 0;
+    font-size: var(--text-3xl);
+    text-wrap: balance;
+  }
+  .error-text {
+    max-width: 30rem;
+    margin: 0.85rem 0 0;
+    color: var(--c-fg-soft);
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+  .error-actions {
+    margin: 0;
+  }
+}

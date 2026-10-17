@@ -1,0 +1,464 @@
+// Chat (templates/chat/index.html.twig, assets/vue/components/ChatRoom.vue): one paper sheet holding a masthead strip
+// (title + who is online), the conversation (day rules, grouped bubbles) and a composer bar.
+//
+// Bubbles are small paper slips, not cartoon balloons: others on `surface-2`, own messages on the plum tint (`accent-soft`),
+// both with the watercolour tile; the first slip of a group keeps one square corner on the avatar side.
+@use "../abstracts" as *;
+
+// ---- page layout: UNLAYERED on purpose -------------------------------------------------------------------------------
+// These rules must beat the utilities of the base layout (`min-h-screen`, `py-5`, `max-w-*`…) that live in the Tailwind
+// `utilities` layer: unlayered CSS always wins over layered CSS. Only layout is unlayered, the look stays in `components`.
+
+// The chat page never scrolls: the masthead on top, the chat sheet takes ALL the remaining viewport height.
+body.chat-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+body.chat-page > header {
+  flex: none;
+}
+// The page container of the base layout (`div.page`: flash messages + the template's <main>); the dev toolbar is a sibling too.
+body.chat-page > :has(.chat-mount) {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  padding-block: 0.5rem;
+
+  @include up(sm) {
+    padding-block: 1rem;
+  }
+}
+// <main id="main"> of templates/chat/index.html.twig (it replaces the `.layout` grid of the base template)
+.chat-main {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-height: 0;
+}
+.chat-mount {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-height: 0;
+}
+.chat-room {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+// ---- look ---------------------------------------------------------------------------------------------------------------
+@layer components {
+  // The sheet itself is a `.card` (paper + shadow); small touches only.
+  .chat-room {
+    border-radius: var(--radius-md);
+
+    // server-rendered placeholder shown until Vue mounts
+    &.chat-loading {
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  // ---- head: title on the left, online members on the right, magazine double rule underneath ----------------------------
+  .chat-head {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 0.875rem 0.65rem;
+    border-bottom: 3px double var(--c-line-strong);
+  }
+  .chat-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 560;
+    line-height: 1.1;
+    letter-spacing: var(--tracking-tight);
+  }
+  .chat-offline {
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background: var(--c-highlight-soft);
+    color: var(--c-fg);
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .chat-online-wrap {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.625rem;
+    margin-left: auto;
+  }
+  .chat-online {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    margin: 0;
+    padding: 0 0 0 0.4rem;
+    list-style: none;
+  }
+  // stacked avatars, each one ringed with the colour of the paper
+  .chat-online > li {
+    flex: none;
+    margin-left: -0.4rem;
+    border-radius: 9999px;
+    box-shadow: 0 0 0 2px var(--c-surface);
+  }
+  .chat-more {
+    @include texture-host;
+    @include texture-tone("kraft", "surface-3");
+    display: inline-flex;
+    height: 1.75rem;
+    min-width: 1.75rem;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 0.3rem;
+    background: var(--c-surface-3);
+    color: var(--c-fg);
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+  .chat-online-count {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--c-muted);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+
+    // the green dot is decoration, the count carries the information
+    &::before {
+      content: "";
+      width: 0.45rem;
+      height: 0.45rem;
+      border-radius: 9999px;
+      background: var(--c-ok-fill);
+    }
+  }
+  @media (max-width: 480px) {
+    .chat-online > li:nth-child(n + 5):not(.chat-more) {
+      display: none;
+    }
+  }
+
+  // ---- avatars ---------------------------------------------------------------------------------------------------------
+  .chat-avatar-img {
+    display: block;
+    flex: none;
+    border-radius: 9999px;
+    background: var(--c-surface-2);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--c-shadow) 12%, transparent);
+    object-fit: cover;
+  }
+  .chat-avatar {
+    width: 2rem;
+    height: 2rem;
+  }
+  .chat-avatar-sm {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  // The hue is an inline `background-color: hsl(h 42% 42%)`: a darkening veil keeps the label readable (≥ 4.5:1) on every hue,
+  // a little kraft grain on top makes it a cardboard disc.
+  .chat-avatar-initial {
+    @include texture-host;
+    @include texture-tone("kraft", "mist-strong");
+    --texture-strength: 0.6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-image: linear-gradient(color-mix(in srgb, var(--c-shadow) 32%, transparent), color-mix(in srgb, var(--c-shadow) 32%, transparent));
+    color: var(--c-on-accent);
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 650;
+    line-height: 1;
+  }
+  .chat-avatar-sm.chat-avatar-initial {
+    font-size: 0.7rem;
+  }
+
+  // ---- history ---------------------------------------------------------------------------------------------------------
+  .chat-stage {
+    position: relative;
+    display: flex;
+    flex: 1 1 0%;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .chat-scroll {
+    flex: 1 1 0%;
+    min-height: 0;
+    padding: 0.5rem 0.875rem 0.75rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .chat-content {
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-edge {
+    margin: 0;
+    padding: 0.75rem 0;
+    color: var(--c-muted);
+    font-family: var(--font-serif);
+    font-size: 0.9375rem;
+    font-style: italic;
+    text-align: center;
+  }
+  .chat-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--c-accent-strong);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-style: normal;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--c-link-hover);
+    }
+    &:focus-visible {
+      @include focus-ring;
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  // Day separator: small caps between two hairlines
+  .chat-day {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    margin: 1.25rem 0 0.25rem;
+    color: var(--c-muted);
+    @include eyebrow(0.6875rem, 0.16em);
+
+    &::before,
+    &::after {
+      content: "";
+      flex: 1 1 0%;
+      height: 1px;
+      background: var(--c-line);
+    }
+  }
+
+  // ---- groups & bubbles ------------------------------------------------------------------------------------------------
+  .chat-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    margin-top: 0.875rem;
+
+    &.is-mine {
+      flex-direction: row-reverse;
+    }
+  }
+  .chat-body {
+    display: flex;
+    min-width: 0;
+    max-width: min(40rem, 85%);
+    flex-direction: column;
+    align-items: flex-start;
+
+    .chat-group.is-mine & {
+      align-items: flex-end;
+    }
+  }
+  .chat-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.2rem;
+    color: var(--c-muted);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .chat-name {
+    color: var(--c-fg);
+    font-weight: 650;
+  }
+
+  .chat-bubble {
+    @include texture-host;
+    @include texture-tone("paper", "surface-2");
+    --texture-strength: 0.6;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-lg);
+    background: var(--c-surface-2);
+    box-shadow:
+      0 1px 1px color-mix(in srgb, var(--c-shadow) 8%, transparent),
+      0 2px 4px -2px color-mix(in srgb, var(--c-shadow) 12%, transparent);
+    color: var(--c-fg);
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    + .chat-bubble {
+      margin-top: 0.2rem;
+    }
+    // the first slip of a group points at its avatar with one square corner
+    .chat-meta + & {
+      border-top-left-radius: 0;
+    }
+    a {
+      color: var(--c-accent-strong);
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+
+      &:hover {
+        color: var(--c-link-hover);
+      }
+    }
+  }
+  .chat-group.is-mine .chat-bubble {
+    @include texture-tone("paper", "accent-soft");
+    border-color: color-mix(in srgb, var(--c-accent) 22%, transparent);
+    background: var(--c-accent-soft);
+  }
+  .chat-group.is-mine .chat-meta + .chat-bubble {
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: 0;
+  }
+
+  // ---- "new messages" pill: a plum kraft tab floating over the bottom of the history -----------------------------------
+  .chat-pill {
+    @include texture-host("before", null);
+    @include texture-tone("kraft", "accent");
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    z-index: 1;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.95rem;
+    white-space: nowrap;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: var(--c-accent);
+    box-shadow: var(--shadow-lift);
+    color: var(--c-on-accent);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 620;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background-color 0.15s var(--ease-paper);
+
+    @include hover {
+      @include texture-tone("kraft", "accent-hover");
+      background: var(--c-accent-hover);
+    }
+    @include pressed {
+      @include texture-tone("kraft", "accent-active");
+      background: var(--c-accent-active);
+    }
+    @include focus {
+      @include focus-ring;
+    }
+  }
+
+  // ---- composer: a paper bar, the field is a plain paper input on it ---------------------------------------------------
+  .chat-composer {
+    @include texture-host;
+    @include texture-tone("paper", "surface-2");
+    --texture-strength: 0.5;
+    display: flex;
+    flex: none;
+    align-items: flex-end;
+    gap: 0.5rem;
+    padding: 0.65rem 0.75rem calc(0.65rem + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--c-line);
+    background: var(--c-surface-2);
+
+    // the error / counter line is part of the bar: it carries the safe-area padding instead
+    &:has(+ .chat-error, + .chat-counter) {
+      padding-bottom: 0.25rem;
+    }
+  }
+  // `textarea.input` (components/_form.scss) sets a 6.5rem min-height and vertical resize: same specificity here
+  textarea.chat-input {
+    flex: 1 1 0%;
+    min-height: 2.5rem;
+    max-height: 10rem;
+    resize: none;
+    line-height: 1.4;
+  }
+  .chat-send {
+    flex: none;
+    align-self: flex-end;
+    min-height: 2.5rem;
+    padding-inline: 1rem;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+  .chat-error,
+  .chat-counter {
+    flex: none;
+    margin: 0;
+    padding: 0 0.875rem calc(0.5rem + env(safe-area-inset-bottom));
+    background: var(--c-surface-2);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+  }
+  .chat-error {
+    color: var(--c-danger);
+  }
+  .chat-counter {
+    color: var(--c-muted);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+
+    &.is-over {
+      color: var(--c-danger);
+    }
+  }
+
+  @media (max-width: 640px) {
+    // 16px: iOS Safari zooms into smaller form fields.
+    textarea.chat-input {
+      font-size: 16px;
+    }
+    .chat-scroll {
+      padding-inline: 0.625rem;
+    }
+    .chat-body {
+      max-width: 88%;
+    }
+    .chat-bubble {
+      font-size: 1rem;
+    }
+  }
+}

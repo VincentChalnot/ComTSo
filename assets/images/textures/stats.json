@@ -1,0 +1,30 @@
+{
+  "paperMultiply": {
+    "mean": 0.9649,
+    "p05": 0.8558,
+    "p95": 1.0
+  },
+  "paperScreen": {
+    "mean": 0.1025,
+    "p05": 0.0091,
+    "p95": 0.2589
+  },
+  "kraftMultiply": {
+    "mean": 0.9603,
+    "p05": 0.8257,
+    "p95": 1.0
+  },
+  "kraftScreen": {
+    "mean": 0.0956,
+    "p05": 0.0064,
+    "p95": 0.2499
+  },
+  "canvasAlpha": {
+    "light": 0.22000000000000003,
+    "dark": 0.275
+  },
+  "cardAlpha": {
+    "light": 0.275,
+    "dark": 0.25
+  }
+}

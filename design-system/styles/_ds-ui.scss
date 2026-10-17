@@ -1,0 +1,321 @@
+// Showcase chrome only (ds-*): NOT part of the application stylesheet.
+@use "../../assets/styles/abstracts" as *;
+
+@layer components {
+  .ds-body {
+    min-height: 100vh;
+  }
+
+  .ds-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0.6rem clamp(1rem, 3vw, 2rem);
+    background: color-mix(in srgb, var(--c-page) 92%, transparent);
+    border-bottom: 3px double var(--c-rule);
+    backdrop-filter: blur(8px);
+  }
+  .ds-brand {
+    flex: none;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--c-fg);
+    text-decoration: none;
+
+    span {
+      @include eyebrow(0.6875rem, 0.16em);
+      margin-left: 0.4rem;
+      color: var(--c-kicker);
+    }
+  }
+  .ds-nav {
+    display: flex;
+    flex: 1;
+    gap: 0.15rem 0.9rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    a {
+      @include eyebrow(0.6875rem, 0.1em);
+      flex: none;
+      padding: 0.45rem 0;
+      color: var(--c-muted);
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+
+      &:hover {
+        color: var(--c-fg);
+        border-bottom-color: var(--c-highlight);
+      }
+    }
+  }
+  .ds-header-tools [data-when] {
+    display: none;
+  }
+  [data-theme="light"] .ds-header-tools [data-when="light"],
+  [data-theme="dark"] .ds-header-tools [data-when="dark"] {
+    display: inline;
+  }
+
+  .ds-main {
+    width: min(100% - 2rem, 78rem);
+    margin: 0 auto;
+    padding-bottom: 8rem;
+  }
+
+  .ds-section {
+    padding-top: clamp(3rem, 7vw, 6rem);
+    scroll-margin-top: 3.5rem;
+  }
+  .ds-section-head {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--c-rule);
+  }
+  .ds-section-head h2 {
+    font-size: var(--text-4xl);
+  }
+
+  .ds-demo {
+    margin: 0 0 2.25rem;
+  }
+  .ds-demo-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+  .ds-demo-title {
+    @include eyebrow(0.6875rem, 0.14em);
+    color: var(--c-muted);
+  }
+  .ds-demo-tools {
+    display: flex;
+    gap: 0.25rem;
+  }
+  .ds-stage,
+  .ds-island {
+    @include texture-host;
+    @include texture-tone("paper", "page");
+    --texture-strength: var(--canvas-texture-strength, 0.4);
+    padding: clamp(1rem, 3vw, 2rem);
+    background-color: var(--c-page);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-md);
+    color: var(--c-fg);
+  }
+  .ds-stage.is-surface {
+    background-color: var(--c-surface);
+  }
+  .ds-pair {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  }
+  .ds-island-label {
+    @include eyebrow(0.625rem, 0.18em);
+    margin: 0 0 1rem;
+    color: var(--c-muted);
+  }
+  .ds-code {
+    margin: 0.5rem 0 0;
+    padding: 1rem;
+    overflow: auto;
+    max-height: 22rem;
+    border-radius: var(--radius-md);
+    background: var(--c-surface-3);
+    color: var(--c-fg);
+    font-size: 0.78rem;
+    line-height: 1.55;
+    tab-size: 2;
+  }
+
+  // Layout helpers for demos
+  .ds-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+  .ds-col {
+    display: grid;
+    gap: 1rem;
+  }
+  .ds-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  }
+  .ds-note {
+    max-width: 62ch;
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+    color: var(--c-muted);
+  }
+  .ds-label {
+    @include eyebrow(0.625rem, 0.14em);
+    display: block;
+    margin-bottom: 0.4rem;
+    color: var(--c-muted);
+  }
+  .ds-table-wrap {
+    overflow-x: auto;
+  }
+  .ds-swatch {
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+
+    &-chip {
+      @include texture-host;
+      height: 4.5rem;
+      border-radius: var(--radius-sm);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-shadow) 12%, transparent);
+    }
+    code {
+      font-size: 0.7rem;
+    }
+  }
+
+  // forced recipes for the "wrong mode vs right mode" demo
+  .ds-tx-multiply {
+    @include texture-vars("paper", "light");
+  }
+  .ds-tx-screen {
+    @include texture-vars("paper", "dark");
+  }
+
+  // ---- colour documentation -----------------------------------------------------------------------------------
+  .ds-brand-row {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  }
+  .ds-brand-chip {
+    display: grid;
+    align-content: end;
+    gap: 0.15rem;
+    min-height: 11rem;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sheet);
+
+    &.is-light {
+      color: #2b2118;
+    }
+    &.is-dark {
+      color: #fdfbf7;
+    }
+  }
+  .ds-brand-name {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 560;
+    line-height: 1.1;
+  }
+  .ds-brand-hex {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+  .ds-brand-role {
+    font-size: 0.75rem;
+    opacity: 0.9;
+  }
+  .ds-steps {
+    display: grid;
+    gap: 0.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(5.25rem, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ds-step {
+    display: grid;
+    align-content: end;
+    gap: 0.1rem;
+    min-height: 4.25rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 2px;
+    font-size: 0.6875rem;
+
+    b {
+      font-weight: 650;
+    }
+    span {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+    }
+    &.is-light {
+      color: #2b2118;
+    }
+    &.is-dark {
+      color: #fdfbf7;
+    }
+  }
+  .ds-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+
+    th,
+    td {
+      padding: 0.45rem 0.75rem;
+      text-align: left;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--c-line);
+    }
+    thead th {
+      @include eyebrow(0.6875rem, 0.1em);
+      color: var(--c-muted);
+      border-bottom: 1px solid var(--c-rule);
+    }
+    .ds-group th {
+      @include eyebrow(0.6875rem, 0.14em);
+      padding-top: 1.25rem;
+      color: var(--c-kicker);
+      border-bottom: 1px solid var(--c-rule);
+    }
+    code {
+      font-size: 0.75rem;
+    }
+    td code {
+      margin-left: 0.5rem;
+    }
+    .num {
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+    .is-fail td {
+      background: var(--c-danger-soft);
+    }
+  }
+  .ds-table-compact td,
+  .ds-table-compact th {
+    padding-block: 0.3rem;
+  }
+  .ds-role-chip {
+    display: inline-block;
+    width: 2.25rem;
+    height: 1.25rem;
+    vertical-align: middle;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-shadow) 22%, transparent);
+  }
+  .ds-sample {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 1.5rem;
+    border-radius: 2px;
+    font-weight: 650;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-shadow) 22%, transparent);
+  }
+}

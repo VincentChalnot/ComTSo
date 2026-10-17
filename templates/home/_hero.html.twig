@@ -1,0 +1,29 @@
+{# Home page hero: the picture of the week. Params: hero (App\Photo\FeaturedPhoto) #}
+{% set photo = hero.photo %}
+{% set title = hero.title ?: 'Photo sans titre' %}
+{% set size = hero.imageSize %}
+{% set shown = photo.takenAt ?: photo.createdAt %}
+<section class="hero" aria-labelledby="hero-title">
+    {# The picture opens the lightbox (no JavaScript: the photo page). The link is named by aria-label (it overrides the image alt), so the picture is not announced twice next to "Voir la photo". #}
+    <a class="hero-media" href="{{ path('photo_show', {id: photo.id}) }}" aria-label="Agrandir la photo : {{ title }}"
+       data-lightbox="hero"
+       data-src="{{ path('photo_variant', {id: photo.id, variant: 'hero'}) }}"
+       data-full="{{ path('photo_source', {id: photo.id}) }}"
+       data-download="{{ path('photo_source', {id: photo.id, download: 1}) }}"
+       data-page="{{ path('photo_show', {id: photo.id}) }}"
+       data-caption="{{ title }}">
+        <img class="hero-image" src="{{ path('photo_variant', {id: photo.id, variant: 'hero'}) }}" alt="{{ title }}"{% if size %} width="{{ size.width }}" height="{{ size.height }}"{% endif %} fetchpriority="high" decoding="async">
+    </a>
+    <div class="hero-body">
+        <p class="kicker">{{ hero.kicker }}</p>
+        <h2 class="hero-title" id="hero-title">{{ title }}</h2>
+        <p class="byline">
+            {% if photo.author %}Par <a href="{{ path('people_show', {username: photo.author.username}) }}">{{ photo.author.username }}</a> · {% endif %}
+            <time datetime="{{ shown|date('Y-m-d') }}">{{ shown|date('d/m/Y') }}</time>
+            {% if hero.topic %}
+                · dans <a href="{{ hero.comment ? path('comment_show', {id: hero.comment.id}) : path('topic_show', {forumId: hero.topic.forum.id, id: hero.topic.id}) }}">{{ hero.topic.title }}</a>
+            {% endif %}
+        </p>
+        <a class="btn btn-primary" href="{{ path('photo_show', {id: photo.id}) }}">Voir la photo</a>
+    </div>
+</section>

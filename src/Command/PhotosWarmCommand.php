@@ -22,7 +22,7 @@ class PhotosWarmCommand
 
     public function __invoke(
         SymfonyStyle $io,
-        #[Option(description: 'Variants to generate (comma separated)')] string $variants = 'avatar,thumb',
+        #[Option(description: 'Variants to generate (comma separated: avatar, thumb, medium, hero)')] string $variants = 'avatar,thumb',
         #[Option(description: 'Only generate the N most recent photos')] ?int $limit = null,
     ): int {
         $variants = array_filter(array_map('trim', explode(',', $variants)));

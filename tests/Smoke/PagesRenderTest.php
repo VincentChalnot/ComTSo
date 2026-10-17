@@ -26,7 +26,7 @@ class PagesRenderTest extends AppWebTestCase
         $this->loginAs($alice);
         $urls = [
             '/', '/?since=2000-01-01', '/forums/', '/forums/general', '/forums/general/nouveau',
-            "/forum/general/{$topic->getId()}", "/forum/general/{$topic->getId()}/edit", "/forum/general/{$topic->getId()}/photos",
+            "/forum/general/{$topic->getId()}", "/forum/general/{$topic->getId()}/edit", "/forum/general/{$topic->getId()}/photos", "/forum/general/{$topic->getId()}/preview",
             "/comment/{$comment->getId()}", "/comment/{$comment->getId()}/edit",
             '/gens', '/gens/bob', '/gens/alice', '/gens/alice/edit', '/gens/alice/config',
             '/photos', "/photos/{$photo->getId()}", "/photos/{$photo->getId()}/edit",

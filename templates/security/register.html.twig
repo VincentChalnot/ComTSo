@@ -1,16 +1,26 @@
 {% extends 'base.html.twig' %}
+{% import '_ui/icons.html.twig' as ui %}
 
 {% block title %}Inscription · ComTSo{% endblock %}
 
+{% block masthead %}
+    <button type="button" class="btn-icon theme-toggle theme-toggle-floating" data-theme-toggle aria-label="Changer de thème">
+        <span data-when="light">{{ ui.icon('moon', 'size-5') }}</span><span data-when="dark">{{ ui.icon('sun', 'size-5') }}</span>
+    </button>
+{% endblock %}
+{% block footer %}{% endblock %}
+
 {% block content_layout %}
-<main class="mx-auto mt-10 max-w-sm">
-    <div class="card p-6">
-        <h1 class="mb-5 text-2xl font-bold tracking-tight">Inscription</h1>
-        {{ form_start(registrationForm) }}
+<main id="main" class="auth" tabindex="-1">
+    <div class="auth-card">
+        <header class="auth-brand"><span class="auth-wordmark">ComTSo</span><span class="rule-double is-flush"></span></header>
+        <h1 class="auth-title">Inscription</h1>
+        <p class="auth-lead">Créez votre compte pour rejoindre le cercle.</p>
+        {{ form_start(registrationForm, {attr: {class: 'auth-form'}}) }}
             {{ form_widget(registrationForm) }}
-            <button type="submit" class="btn btn-primary w-full">Créer mon compte</button>
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Créer mon compte</button>
         {{ form_end(registrationForm) }}
-        <p class="mt-4 text-center text-sm text-muted">Déjà inscrit ? <a href="{{ path('app_login') }}">Se connecter</a></p>
+        <p class="auth-footer">Déjà inscrit ? <a href="{{ path('app_login') }}">Se connecter</a></p>
     </div>
 </main>
 {% endblock %}
