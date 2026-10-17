@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+{% import '_ui/icons.html.twig' as ui %}
+{% import '_ui/avatar.html.twig' as av %}
+
+{% block title %}{{ person.username }} · ComTSo{% endblock %}
+
+{% block body %}
+<section class="card p-6">
+    <div class="flex flex-col items-center gap-3 text-center">
+        {{ av.avatar(person, 'size-28') }}
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight">{{ person.name }} {{ person.surname }} {% if person.name or person.surname %}<span class="text-base font-normal text-muted">({{ person.username }})</span>{% else %}{{ person.username }}{% endif %}</h1>
+        </div>
+        {% if person.signature %}<div class="post-body max-w-xl text-sm italic text-muted">{{ person.signature|rich_text }}</div>{% endif %}
+    </div>
+
+    <dl class="mx-auto mt-5 grid max-w-xl grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
+        {% if person.email %}<dt class="text-right font-medium text-muted">Email</dt><dd><a href="mailto:{{ person.email }}">{{ person.email }}</a></dd>{% endif %}
+        {% if person.website %}<dt class="text-right font-medium text-muted">Site web</dt><dd><a href="{{ person.website }}" target="_blank" rel="noopener noreferrer">{{ person.website }}</a></dd>{% endif %}
+        {% if person.activities %}<dt class="text-right font-medium text-muted">Activités</dt><dd>{{ person.activities|e|nl2br }}</dd>{% endif %}
+        {% if person.birthday %}<dt class="text-right font-medium text-muted">Né(e) le</dt><dd>{{ person.birthday|date('d/m/Y') }} ({{ date().diff(person.birthday).y }} ans)</dd>{% endif %}
+        <dt class="text-right font-medium text-muted">Inscrit le</dt><dd>{{ person.registeredAt|date('d/m/Y') }}</dd>
+        {% if person.phone %}<dt class="text-right font-medium text-muted">Téléphone</dt><dd>{{ person.phone }}</dd>{% endif %}
+        {% if person.address %}<dt class="text-right font-medium text-muted">Adresse</dt><dd>{{ person.address|e|nl2br }}</dd>{% endif %}
+    </dl>
+
+    {% if isMe or is_granted('ROLE_ADMIN') %}
+        <div class="mt-5 flex justify-center gap-2">
+            <a href="{{ path('people_edit', {username: person.username}) }}" class="btn">{{ ui.icon('pencil', 'size-4') }} Modifier le profil</a>
+            <a href="{{ path('people_config', {username: person.username}) }}" class="btn">{{ ui.icon('settings', 'size-4') }} Configuration</a>
+        </div>
+    {% endif %}
+</section>
+
+<section class="mt-6" aria-labelledby="conversation">
+    <h2 id="conversation" class="mb-3 text-xl font-semibold">{{ isMe ? 'Mes mémos' : 'Messages privés' }}</h2>
+    <div class="card mb-3 p-4">
+        {{ form_start(form) }}
+            {{ form_row(form.content) }}
+            <button type="submit" class="btn btn-primary">{{ ui.icon('send', 'size-4') }} Envoyer</button>
+        {{ form_end(form) }}
+    </div>
+    <div class="card overflow-hidden">
+        {% for message in conversation %}
+            <article class="post" id="message-{{ message.id }}" data-post>
+                {% if message.author %}<span class="shrink-0 self-start">{{ av.avatar(message.author, 'size-10') }}</span>{% endif %}
+                <div class="min-w-0 flex-1">
+                    <div class="mb-0.5 text-xs font-semibold text-muted">{{ message.author ? message.author.username : 'Ancien membre' }}</div>
+                    <div class="post-body" data-collapsible>{{ message.content|rich_text }}</div>
+                    <div class="post-meta mt-1.5"><time>{{ message.createdAt|date('d/m/Y à H:i') }}</time></div>
+                </div>
+            </article>
+        {% else %}
+            <p class="p-6 text-center text-sm text-muted">{{ isMe ? 'Aucun mémo pour le moment.' : 'Aucun message privé échangé avec ' ~ person.username ~ '.' }}</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

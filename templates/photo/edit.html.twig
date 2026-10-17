@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier la photo · ComTSo{% endblock %}
+
+{% block body %}
+<h1 class="mb-4 text-2xl font-bold tracking-tight">Modifier la photo</h1>
+<div class="grid gap-4 md:grid-cols-[14rem_1fr]">
+    <img src="{{ path('photo_variant', {id: photo.id, variant: 'thumb'}) }}" alt="" class="w-full rounded-lg border border-line">
+    <div class="card p-5">
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="flex gap-2">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a href="{{ path('photo_show', {id: photo.id}) }}" class="btn">Annuler</a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

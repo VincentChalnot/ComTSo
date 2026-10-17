@@ -1,92 +1,58 @@
 {% extends 'base.html.twig' %}
+{% import '_ui/icons.html.twig' as ui %}
+{% import '_ui/photo.html.twig' as ph %}
 
-{% block title %}{{ topic.title }}{% endblock %}
+{% block title %}{{ topic.title }} · ComTSo{% endblock %}
 
 {% block body %}
-<nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li><a href="{{ path('app_home') }}">Home</a></li>
-        <li><a href="{{ path('forum_show', {'id': topic.forum.id}) }}">{{ topic.forum.title }}</a></li>
-        <li class="is-active"><a href="#" aria-current="page">{{ topic.title }}</a></li>
-    </ul>
-</nav>
+{% set canManage = topic.author == app.user or is_granted('ROLE_ADMIN') %}
+{% include 'forum/_tabs.html.twig' with {current: topic.forum.id} %}
 
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">{{ topic.title }}</h1>
+<header class="mb-4 flex flex-wrap items-start gap-x-3 gap-y-2">
+    {% include 'topic/_star.html.twig' %}
+    <div class="min-w-0 flex-1 basis-48">
+        <h1 class="text-2xl font-bold leading-tight tracking-tight">{{ topic.title }}</h1>
+        <p class="mt-0.5 text-xs text-muted">
+            <a href="{{ path('forum_show', {forumId: topic.forum.id}) }}" class="text-muted">{{ topic.forum.title }}</a>
+            · créé {% if topic.author %}par <a href="{{ path('people_show', {username: topic.author.username}) }}" class="text-muted">{{ topic.author.username }}</a>{% endif %} le {{ topic.createdAt|date('d/m/Y à H:i') }}
+            · {{ topic.commentCount }} message{{ topic.commentCount > 1 ? 's' : '' }} · {{ topic.views }} vue{{ topic.views > 1 ? 's' : '' }}
+        </p>
+    </div>
+    {% if canManage %}
+        <div class="flex shrink-0 gap-1 max-sm:basis-full max-sm:pl-10">
+            <a href="{{ path('topic_edit', {forumId: topic.forum.id, id: topic.id}) }}" class="btn btn-sm">{{ ui.icon('pencil', 'size-3.5') }} Modifier</a>
+            <a href="{{ path('topic_photos', {forumId: topic.forum.id, id: topic.id}) }}" class="btn btn-sm">{{ ui.icon('image', 'size-3.5') }} Photos</a>
         </div>
-    </div>
-    <div class="level-right">
-        <div class="level-item">
-            <span class="tag">{{ topic.views }} views</span>
-            <span class="tag ml-2">{{ topic.commentCount }} comments</span>
-        </div>
-    </div>
-</div>
+    {% endif %}
+</header>
 
-<div class="box">
-    <div class="media">
-        <div class="media-content">
-            <div class="content">
-                {% if topic.content %}
-                    <p>{{ topic.content|nl2br }}</p>
-                {% endif %}
-            </div>
-            <p class="is-size-7">
-                Posted by {{ topic.author.username }} on {{ topic.createdAt|date('Y-m-d H:i') }}
-                {% if topic.author == app.user or is_granted('ROLE_ADMIN') %}
-                    • <a href="{{ path('topic_edit', {'forumId': topic.forum.id, 'id': topic.id}) }}">Edit</a>
-                {% endif %}
-            </p>
-        </div>
-    </div>
-</div>
+{% if topic.content %}
+    <div class="card mb-4 px-4 py-3"><div class="post-body" data-collapsible>{{ topic.content|rich_text }}</div></div>
+{% endif %}
 
-<h2 class="subtitle mt-5">Comments</h2>
-
-{% for comment in comments %}
-    <div class="box comment-item">
-        <div class="media">
-            <div class="media-content">
-                <div class="content">
-                    <p>{{ comment.content|nl2br }}</p>
-                </div>
-                <p class="is-size-7">
-                    by {{ comment.author.username }} on {{ comment.createdAt|date('Y-m-d H:i') }}
-                    {% if comment.author == app.user or is_granted('ROLE_ADMIN') %}
-                        • <a href="{{ path('comment_edit', {'id': comment.id}) }}">Edit</a>
-                        • <form method="post" action="{{ path('comment_delete', {'id': comment.id}) }}" style="display: inline;">
-                            <button type="submit" class="button is-small is-danger is-light" onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
-                    {% endif %}
-                </p>
-            </div>
-        </div>
-    </div>
-{% else %}
-    <p>No comments yet. Be the first to comment!</p>
-{% endfor %}
-
-{% if app.user %}
-    <div class="box mt-5">
-        <h3 class="title is-5">Add a Comment</h3>
-        <form method="post" action="{{ path('comment_create', {'forumId': topic.forum.id, 'topicId': topic.id}) }}">
-            <div class="field">
-                <div class="control">
-                    <textarea name="comment[content]" class="textarea" rows="5" required></textarea>
-                </div>
-            </div>
-            <div class="field">
-                <div class="control">
-                    <button type="submit" class="button is-primary">Post Comment</button>
-                </div>
-            </div>
-        </form>
-    </div>
-{% else %}
-    <div class="notification is-info is-light mt-5">
-        Please <a href="{{ path('app_login') }}">log in</a> to post a comment.
+{% if photos %}
+    <div class="mb-4 flex flex-wrap gap-2">
+        {% for link in photos %}{{ ph.thumb(link.photo, 'topic-' ~ topic.id, 'size-24 sm:size-32') }}{% endfor %}
     </div>
 {% endif %}
+
+{% include '_layout/pagination.html.twig' with {pager: pager, route: 'topic_show', params: {forumId: topic.forum.id, id: topic.id}} %}
+
+<div class="card overflow-hidden">
+    {% for comment in comments %}
+        {% include '_post/message.html.twig' %}
+    {% else %}
+        <p class="p-6 text-center text-muted">Aucun message pour le moment.</p>
+    {% endfor %}
+</div>
+
+{% include '_layout/pagination.html.twig' with {pager: pager, route: 'topic_show', params: {forumId: topic.forum.id, id: topic.id}} %}
+
+<section class="card mt-5 p-4" aria-labelledby="reply">
+    <h2 id="reply" class="card-title mb-2">Répondre</h2>
+    {{ form_start(commentForm) }}
+        {{ form_row(commentForm.content) }}
+        <button type="submit" class="btn btn-primary">{{ ui.icon('send', 'size-4') }} Envoyer</button>
+    {{ form_end(commentForm) }}
+</section>
 {% endblock %}

@@ -1,49 +1,29 @@
 {% extends 'base.html.twig' %}
+{% import '_ui/icons.html.twig' as ui %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Activités récentes · ComTSo{% endblock %}
 
 {% block body %}
-<h1 class="title">Welcome to ComTSo Forum</h1>
-
-<div class="columns">
-    <div class="column is-8">
-        <h2 class="subtitle">Recent Topics</h2>
-        <div class="box">
-            {% if recent_topics is empty %}
-                <p>No topics yet. Be the first to create one!</p>
-            {% else %}
-                {% for topic in recent_topics %}
-                    <div class="topic-item">
-                        <p class="title is-5">
-                            <a href="{{ path('topic_show', {'forumId': topic.forum.id, 'id': topic.id}) }}">
-                                {{ topic.title }}
-                            </a>
-                        </p>
-                        <p class="subtitle is-7">
-                            by {{ topic.author.username }} in {{ topic.forum.title }}
-                            • {{ topic.views }} views • {{ topic.commentCount }} comments
-                            • {{ topic.createdAt|date('Y-m-d H:i') }}
-                        </p>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="column is-4">
-        <h2 class="subtitle">Forums</h2>
-        <div class="box">
-            {% for forum in forums %}
-                <div class="mb-3">
-                    <a href="{{ path('forum_show', {'id': forum.id}) }}" class="has-text-weight-bold">
-                        {{ forum.title }}
-                    </a>
-                    {% if forum.content %}
-                        <p class="is-size-7">{{ forum.content|slice(0, 100) }}</p>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        </div>
-    </div>
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+    <h1 class="text-2xl font-bold tracking-tight">Activités récentes</h1>
+    <form method="get" action="{{ path('app_home') }}" class="flex items-center gap-2 text-sm">
+        <label for="since" class="text-muted">Nouveautés depuis le</label>
+        <input id="since" type="date" name="since" value="{{ since|date('Y-m-d') }}" max="{{ 'now'|date('Y-m-d') }}" class="input !w-auto !py-1.5" data-autosubmit>
+        <button type="submit" class="btn btn-sm">OK</button>
+    </form>
 </div>
+
+{% if cards is empty %}
+    <div class="card p-8 text-center text-muted">
+        <p class="text-lg">Aucun nouveau message depuis le {{ since|date('d/m/Y') }}.</p>
+        <p class="mt-2 text-sm">Choisissez une date plus ancienne ci-dessus, ou parcourez <a href="{{ path('forum_index') }}">les forums</a>.</p>
+    </div>
+{% else %}
+    <div class="space-y-5">
+        {% for card in cards %}
+            {% include '_digest/topic_card.html.twig' with card only %}
+        {% endfor %}
+    </div>
+    {% include '_layout/pagination.html.twig' with {pager: pager, route: 'app_home', params: {}} %}
+{% endif %}
 {% endblock %}

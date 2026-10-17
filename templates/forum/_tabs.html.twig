@@ -1,0 +1,6 @@
+{# Forum tabs. Param: current (forum id or null) #}
+<nav class="mb-4 flex flex-wrap gap-1 border-b border-line pb-2" aria-label="Forums">
+    {% for f in nav_forums() %}
+        <a href="{{ path('forum_show', {forumId: f.id}) }}" class="rounded-lg px-3 py-1.5 text-sm font-medium no-underline transition {{ f.id == current ? 'bg-accent-soft text-accent-strong' : 'text-muted hover:bg-surface-2 hover:text-fg' }}">{{ f.title }}</a>
+    {% endfor %}
+</nav>

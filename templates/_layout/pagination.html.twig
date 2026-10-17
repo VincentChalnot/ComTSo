@@ -1,0 +1,29 @@
+{# Usage: {% include '_layout/pagination.html.twig' with {pager: pager, route: 'topic_show', params: {...}} %}
+   `pager` is an App\Pagination\Pager. Links keep the other query parameters. #}
+{% import '_ui/icons.html.twig' as ui %}
+{% if pager.pageCount > 1 %}
+    {% set query = app.request.query.all %}
+    <nav class="pager my-3" aria-label="Pagination">
+        {% if pager.hasPrevious %}
+            <a href="{{ path(route, params|merge(query)|merge({page: pager.page - 1})) }}" rel="prev" aria-label="Page précédente">{{ ui.icon('chevron-left', 'size-4') }}</a>
+        {% else %}
+            <span class="is-disabled">{{ ui.icon('chevron-left', 'size-4') }}</span>
+        {% endif %}
+
+        {% for item in pager.window %}
+            {% if item is null %}
+                <span class="border-transparent bg-transparent">…</span>
+            {% elseif item == pager.page %}
+                <span class="is-current" aria-current="page">{{ item }}</span>
+            {% else %}
+                <a href="{{ path(route, params|merge(query)|merge({page: item})) }}">{{ item }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if pager.hasNext %}
+            <a href="{{ path(route, params|merge(query)|merge({page: pager.page + 1})) }}" rel="next" aria-label="Page suivante">{{ ui.icon('chevron-right', 'size-4') }}</a>
+        {% else %}
+            <span class="is-disabled">{{ ui.icon('chevron-right', 'size-4') }}</span>
+        {% endif %}
+    </nav>
+{% endif %}

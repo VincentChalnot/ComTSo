@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+{% import '_ui/icons.html.twig' as ui %}
+
+{% block title %}Message #{{ comment.id }} · {{ comment.topic.title }}{% endblock %}
+
+{% block body %}
+{% set topic = comment.topic %}
+{% include 'forum/_tabs.html.twig' with {current: topic.forum.id} %}
+<div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">Message #{{ comment.id }}</h1>
+        <p class="text-xs text-muted">Dans <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}">{{ topic.title }}</a> · {{ topic.forum.title }}</p>
+    </div>
+    <a href="{{ topicUrl }}" class="btn">{{ ui.icon('arrow-left', 'size-4') }} Voir dans le sujet</a>
+</div>
+<div class="card overflow-hidden">
+    {% include '_post/message.html.twig' %}
+</div>
+{% endblock %}

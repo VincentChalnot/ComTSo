@@ -1,0 +1,10 @@
+{# Favourite toggle (progressively enhanced by ui.js). Params: topic, starred #}
+{% import '_ui/icons.html.twig' as ui %}
+<form method="post" action="{{ path(starred ? 'topic_unstar' : 'topic_star', {forumId: topic.forum.id, id: topic.id}) }}"
+      data-star-form data-star-url="{{ path('topic_star', {forumId: topic.forum.id, id: topic.id}) }}" data-unstar-url="{{ path('topic_unstar', {forumId: topic.forum.id, id: topic.id}) }}" class="shrink-0">
+    <input type="hidden" name="_token" value="{{ csrf_token('star-' ~ topic.id) }}">
+    <button type="submit" class="btn-icon group" aria-pressed="{{ starred ? 'true' : 'false' }}" title="{{ starred ? 'Retirer des favoris' : 'Ajouter aux favoris' }}" aria-label="Favori">
+        <span class="group-aria-pressed:hidden">{{ ui.icon('star', 'size-5') }}</span>
+        <span class="hidden text-star group-aria-pressed:block">{{ ui.icon('star', 'size-5', true) }}</span>
+    </button>
+</form>

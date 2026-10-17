@@ -1,51 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription · ComTSo{% endblock %}
 
-{% block body %}
-<div class="columns is-centered">
-    <div class="column is-4">
-        <div class="card">
-            <div class="card-content">
-                <h1 class="title">Register</h1>
-
-                {{ form_start(registrationForm) }}
-                    <div class="field">
-                        {{ form_label(registrationForm.username, null, {'label_attr': {'class': 'label'}}) }}
-                        <div class="control">
-                            {{ form_widget(registrationForm.username, {'attr': {'class': 'input'}}) }}
-                        </div>
-                        {{ form_errors(registrationForm.username) }}
-                    </div>
-
-                    <div class="field">
-                        {{ form_label(registrationForm.email, null, {'label_attr': {'class': 'label'}}) }}
-                        <div class="control">
-                            {{ form_widget(registrationForm.email, {'attr': {'class': 'input'}}) }}
-                        </div>
-                        {{ form_errors(registrationForm.email) }}
-                    </div>
-
-                    <div class="field">
-                        {{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'label'}}) }}
-                        <div class="control">
-                            {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'input'}}) }}
-                        </div>
-                        {{ form_errors(registrationForm.plainPassword) }}
-                    </div>
-
-                    <div class="field">
-                        <div class="control">
-                            <button type="submit" class="button is-primary is-fullwidth">Register</button>
-                        </div>
-                    </div>
-                {{ form_end(registrationForm) }}
-
-                <div class="has-text-centered mt-4">
-                    <p>Already have an account? <a href="{{ path('app_login') }}">Log in</a></p>
-                </div>
-            </div>
-        </div>
+{% block content_layout %}
+<main class="mx-auto mt-10 max-w-sm">
+    <div class="card p-6">
+        <h1 class="mb-5 text-2xl font-bold tracking-tight">Inscription</h1>
+        {{ form_start(registrationForm) }}
+            {{ form_widget(registrationForm) }}
+            <button type="submit" class="btn btn-primary w-full">Créer mon compte</button>
+        {{ form_end(registrationForm) }}
+        <p class="mt-4 text-center text-sm text-muted">Déjà inscrit ? <a href="{{ path('app_login') }}">Se connecter</a></p>
     </div>
-</div>
+</main>
 {% endblock %}

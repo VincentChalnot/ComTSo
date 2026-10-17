@@ -1,49 +1,33 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in{% endblock %}
+{% block title %}Connexion · ComTSo{% endblock %}
 
-{% block body %}
-<div class="columns is-centered">
-    <div class="column is-4">
-        <div class="card">
-            <div class="card-content">
-                <h1 class="title">Log in</h1>
+{% block content_layout %}
+<main class="mx-auto mt-10 max-w-sm">
+    <div class="card p-6">
+        <h1 class="mb-1 text-2xl font-bold tracking-tight">Connexion</h1>
+        <p class="mb-5 text-sm text-muted">Ce forum est privé : identifiez-vous pour continuer.</p>
 
-                {% if error %}
-                    <div class="notification is-danger is-light">
-                        {{ error.messageKey|trans(error.messageData, 'security') }}
-                    </div>
-                {% endif %}
+        {% if error %}
+            <div class="mb-4 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
 
-                <form method="post">
-                    <div class="field">
-                        <label class="label" for="username">Username</label>
-                        <div class="control">
-                            <input type="text" class="input" id="username" name="_username" value="{{ last_username }}" required autofocus>
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label class="label" for="password">Password</label>
-                        <div class="control">
-                            <input type="password" class="input" id="password" name="_password" required>
-                        </div>
-                    </div>
-
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-                    <div class="field">
-                        <div class="control">
-                            <button type="submit" class="button is-primary is-fullwidth">Log in</button>
-                        </div>
-                    </div>
-                </form>
-
-                <div class="has-text-centered mt-4">
-                    <p>Don't have an account? <a href="{{ path('app_register') }}">Register</a></p>
-                </div>
+        <form method="post">
+            <div class="mb-4">
+                <label for="username" class="label">Pseudo</label>
+                <input type="text" id="username" name="_username" value="{{ last_username }}" class="input" required autofocus autocomplete="username">
             </div>
-        </div>
+            <div class="mb-4">
+                <label for="password" class="label">Mot de passe</label>
+                <input type="password" id="password" name="_password" class="input" required autocomplete="current-password">
+            </div>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            <button type="submit" class="btn btn-primary w-full">Se connecter</button>
+        </form>
+
+        {% if registration_enabled %}
+            <p class="mt-4 text-center text-sm text-muted">Pas encore de compte ? <a href="{{ path('app_register') }}">S'inscrire</a></p>
+        {% endif %}
     </div>
-</div>
+</main>
 {% endblock %}

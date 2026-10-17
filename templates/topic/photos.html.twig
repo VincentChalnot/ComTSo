@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% import '_ui/icons.html.twig' as ui %}
+
+{% block title %}Photos de « {{ topic.title }} » · ComTSo{% endblock %}
+
+{% block body %}
+<h1 class="mb-1 text-2xl font-bold tracking-tight">Gestion des photos</h1>
+<p class="mb-4 text-sm text-muted">Sujet : <a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}">{{ topic.title }}</a></p>
+
+<div data-vue-component="PhotoManager" data-props="{{ {
+    uploadUrl: path('topic_photos_upload', {forumId: topic.forum.id, id: topic.id}),
+    orderUrl: path('topic_photos_order', {forumId: topic.forum.id, id: topic.id}),
+    removeUrl: path('topic_photo_remove', {forumId: topic.forum.id, id: topic.id, linkId: 0}),
+    token: csrf_token('photos-' ~ topic.id),
+    photos: photos|map(link => {link: link.id, id: link.photo.id, title: link.photo.title ?: link.photo.originalFilename, thumb: path('photo_variant', {id: link.photo.id, variant: 'thumb'}), page: path('photo_show', {id: link.photo.id})}),
+    backUrl: path('topic_show', {forumId: topic.forum.id, id: topic.id}),
+}|json_encode|e('html_attr') }}"></div>
+{% endblock %}

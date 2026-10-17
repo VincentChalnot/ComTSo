@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -14,12 +15,30 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: 'fos_user')]
 #[ORM\UniqueConstraint(name: 'UNIQ_username', columns: ['username'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_email', columns: ['email'])]
-class User implements UserInterface, PasswordAuthenticatedUserInterface, \JsonSerializable
+class User implements UserInterface, PasswordAuthenticatedUserInterface, LegacyPasswordAuthenticatedUserInterface, \JsonSerializable
 {
+    use LegacyRefTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
+
+    /** Highest chat message id the user has seen, used to compute the unread badge. */
+    #[ORM\Column(name: 'chat_last_read_id', type: Types::INTEGER, options: ['default' => 0])]
+    private int $chatLastReadId = 0;
+
+    public function getChatLastReadId(): int
+    {
+        return $this->chatLastReadId;
+    }
+
+    public function setChatLastReadId(int $chatLastReadId): static
+    {
+        $this->chatLastReadId = $chatLastReadId;
+
+        return $this;
+    }
 
     #[ORM\Column(type: Types::STRING, length: 180)]
     private ?string $username = null;
@@ -32,6 +51,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \JsonSe
 
     #[ORM\Column(type: Types::STRING)]
     private ?string $password = null;
+
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $salt = null;
+
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+    private bool $enabled = true;
 
     #[ORM\Column(type: Types::STRING, length: 32, nullable: true)]
     private ?string $name = null;
@@ -73,7 +98,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \JsonSe
     #[ORM\JoinColumn(nullable: true)]
     private ?Photo $avatar = null;
 
-    #[ORM\ManyToMany(targetEntity: Topic::class)]
+    #[ORM\ManyToMany(targetEntity: Topic::class, inversedBy: 'starredBy')]
     #[ORM\JoinTable(name: 'ctso_starred_topic')]
     private Collection $starredTopics;
 
@@ -146,6 +171,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \JsonSe
 
     public function eraseCredentials(): void
     {
+    }
+
+    /**
+     * Salt of the legacy FOSUser sha512 hash. Cleared once the password has been
+     * transparently re-hashed with the modern algorithm at first login.
+     */
+    public function getSalt(): ?string
+    {
+        return $this->salt;
+    }
+
+    public function setSalt(?string $salt): self
+    {
+        $this->salt = $salt;
+        return $this;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled): self
+    {
+        $this->enabled = $enabled;
+        return $this;
     }
 
     public function getName(): ?string
@@ -324,15 +375,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \JsonSe
         return $this;
     }
 
+    /** Bootswatch themes of the legacy forum that were dark: users who picked one keep a dark interface. */
+    private const LEGACY_DARK_THEMES = ['slate', 'darkly', 'cyborg', 'superhero'];
+
     public function getTheme(): string
     {
-        return $this->config['theme'] ?? 'light';
+        $theme = $this->config['theme'] ?? null;
+        if (\in_array($theme, ['light', 'dark'], true)) {
+            return $theme;
+        }
+
+        return \in_array($this->config['bootstrap_theme'] ?? null, self::LEGACY_DARK_THEMES, true) ? 'dark' : 'light';
     }
 
     public function setTheme(string $theme): self
     {
         $config = $this->config ?? [];
         $config['theme'] = $theme;
+        $this->config = $config;
+        return $this;
+    }
+
+    /** "asc": oldest message first (newest last), "desc": newest first. Legacy configs stored "ASC"/"DESC". */
+    public function getMessageOrder(): string
+    {
+        return 'desc' === strtolower((string) ($this->config['message_order'] ?? 'asc')) ? 'desc' : 'asc';
+    }
+
+    public function setMessageOrder(string $order): self
+    {
+        $config = $this->config ?? [];
+        $config['message_order'] = 'desc' === strtolower($order) ? 'desc' : 'asc';
         $this->config = $config;
         return $this;
     }

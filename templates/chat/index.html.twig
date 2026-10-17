@@ -1,18 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Chat{% endblock %}
+{% block title %}Chat · ComTSo{% endblock %}
 
-{% block body %}
-<h1 class="title">Global Chat</h1>
+{# The chat takes the whole viewport under the navbar: see the "CHAT" block of assets/styles/app.css. #}
+{% block body_class %}chat-page{% endblock %}
 
-<div class="box" style="height: 600px;">
-    <div data-vue>
-        <chat-widget 
-            :initial-messages='{{ messages|json_encode|raw }}'
-            api-messages-url="{{ path('chat_api_messages') }}"
-            api-send-url="{{ path('chat_api_send') }}"
-            mercure-url="{{ mercure_public_url }}"
-        ></chat-widget>
+{% block content_layout %}
+    <div class="chat-mount" data-vue-component="ChatRoom" data-props="{{ props|json_encode|e('html_attr') }}">
+        <div class="card flex flex-1 items-center justify-center text-sm text-muted">
+            <noscript>Le chat nécessite JavaScript.</noscript>
+            <span>Chargement du chat…</span>
+        </div>
     </div>
-</div>
 {% endblock %}

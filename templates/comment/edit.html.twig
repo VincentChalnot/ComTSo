@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le message #{{ comment.id }}{% endblock %}
+
+{% block body %}
+<h1 class="mb-1 text-2xl font-bold tracking-tight">Modifier le message</h1>
+<p class="mb-4 text-xs text-muted">Dans <a href="{{ path('topic_show', {forumId: comment.topic.forum.id, id: comment.topic.id}) }}">{{ comment.topic.title }}</a></p>
+<div class="card p-5">
+    {{ form_start(form) }}
+        {{ form_row(form.content) }}
+        <div class="flex gap-2">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a href="{{ path('comment_show', {id: comment.id}) }}" class="btn">Annuler</a>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

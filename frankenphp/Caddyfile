@@ -10,7 +10,7 @@
 
 {$CADDY_EXTRA_CONFIG}
 
-{$SERVER_NAME:localhost} {
+{$CADDY_SITE_ADDRESS:localhost} {
 	log {
 		{$CADDY_SERVER_LOG_OPTIONS}
 		# Redact the authorization query parameter that can be set by Mercure
@@ -25,14 +25,17 @@
 	encode zstd br gzip
 
 	mercure {
+		# Required by recent Mercure versions to keep using publisher_jwt/subscriber_jwt
+		# Both listeners (localhost + php:80) share one hub: equal names share a transport
+		name comtso
+		protocol_version_compatibility 8
 		# Publisher JWT key
 		publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
 		# Subscriber JWT key
 		subscriber_jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} {env.MERCURE_SUBSCRIBER_JWT_ALG}
-		# Allow anonymous subscribers (double-check that it's what you want)
-		anonymous
-		# Enable the subscription API (double-check that it's what you want)
-		subscriptions
+		# The forum is private: NO anonymous subscribers. Every update is published as private and subscribers
+		# authenticate with the subscriber JWT cookie issued by Symfony to logged-in members (ChatController::state()).
+		# The subscriptions API is not enabled either.
 		# Extra directives
 		{$MERCURE_EXTRA_DIRECTIVES}
 	}

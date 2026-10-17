@@ -1,0 +1,14 @@
+{# Thumbnail that opens in the lightbox (falls back to the photo page without JavaScript).
+   {% import '_ui/photo.html.twig' as ph %}{{ ph.thumb(photo, 'topic-12', 'size-28') }} #}
+{% macro thumb(photo, group, size = 'size-28') %}
+<a href="{{ path('photo_show', {id: photo.id}) }}"
+   class="group/photo relative block {{ size }} shrink-0 overflow-hidden rounded-lg border border-line bg-surface-2"
+   data-lightbox="{{ group }}"
+   data-src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}"
+   data-full="{{ path('photo_source', {id: photo.id}) }}"
+   data-download="{{ path('photo_source', {id: photo.id, download: 1}) }}"
+   data-page="{{ path('photo_show', {id: photo.id}) }}"
+   data-caption="{{ photo.title ?: photo.originalFilename }}">
+    <img src="{{ path('photo_variant', {id: photo.id, variant: 'thumb'}) }}" alt="{{ photo.title ?: photo.originalFilename }}" loading="lazy" class="size-full object-cover transition duration-200 group-hover/photo:scale-105">
+</a>
+{% endmacro %}

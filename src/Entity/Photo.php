@@ -13,6 +13,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Table(name: 'ctso_photo')]
 class Photo implements \JsonSerializable
 {
+    use LegacyRefTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]

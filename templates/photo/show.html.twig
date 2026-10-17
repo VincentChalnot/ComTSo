@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+{% import '_ui/icons.html.twig' as ui %}
+
+{% block title %}{{ photo.title ?: photo.originalFilename }} · ComTSo{% endblock %}
+
+{% block body %}
+<header class="mb-4 flex flex-wrap items-start justify-between gap-3">
+    <div class="min-w-0">
+        <h1 class="text-2xl font-bold leading-tight tracking-tight">{{ photo.title ?: photo.originalFilename }}</h1>
+        <p class="mt-0.5 text-xs text-muted">
+            {% if photo.author %}Ajoutée par <a href="{{ path('people_show', {username: photo.author.username}) }}" class="text-muted">{{ photo.author.username }}</a> le {% else %}Ajoutée le {% endif %}
+            {{ photo.createdAt|date('d/m/Y à H:i') }}{% if photo.updatedAt and photo.updatedAt.timestamp - photo.createdAt.timestamp > 120 %} · modifiée le {{ photo.updatedAt|date('d/m/Y à H:i') }}{% endif %}
+        </p>
+    </div>
+    {% if app.user and (photo.author == app.user or is_granted('ROLE_ADMIN')) %}
+        <a href="{{ path('photo_edit', {id: photo.id}) }}" class="btn btn-sm">{{ ui.icon('pencil', 'size-3.5') }} Modifier</a>
+    {% endif %}
+</header>
+
+<figure class="card overflow-hidden">
+    <a href="{{ path('photo_show', {id: photo.id}) }}" class="block bg-surface-2 text-center"
+       data-lightbox="photo-{{ photo.id }}" data-src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}" data-full="{{ path('photo_source', {id: photo.id}) }}"
+       data-download="{{ path('photo_source', {id: photo.id, download: 1}) }}" data-caption="{{ photo.title ?: photo.originalFilename }}">
+        <img src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}" alt="{{ photo.title ?: photo.originalFilename }}" class="mx-auto max-h-[75vh] w-auto max-w-full">
+    </a>
+    <figcaption class="flex justify-center border-t border-line p-3">
+        <a href="{{ path('photo_source', {id: photo.id, download: 1}) }}" class="btn">{{ ui.icon('download', 'size-4') }} Télécharger ({{ (photo.fileSize / 1024)|round(1) }} Ko)</a>
+    </figcaption>
+</figure>
+
+{% if photo.content %}<p class="mt-4">{{ photo.content|e|nl2br }}</p>{% endif %}
+
+<dl class="mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+    {% if photo.takenAt %}<dt class="font-medium text-muted">Date de prise</dt><dd>{{ photo.takenAt|date('d/m/Y à H:i') }}</dd>{% endif %}
+    <dt class="font-medium text-muted">Taille</dt><dd>{{ (photo.fileSize / 1024)|round(1) }} Ko{% if photo.width and photo.height %} · {{ photo.width }}×{{ photo.height }}{% endif %}</dd>
+    {% if photo.exif.Make is defined %}<dt class="font-medium text-muted">Appareil</dt><dd>{{ photo.exif.Make }} {{ photo.exif.Model|default('') }}</dd>{% endif %}
+    {% if photo.exif.ExposureTime is defined %}<dt class="font-medium text-muted">Exposition</dt><dd>{{ photo.exif.ExposureTime }}</dd>{% endif %}
+    {% if photo.exif.FNumber is defined %}<dt class="font-medium text-muted">Ouverture</dt><dd>f/{{ photo.exif.FNumber }}</dd>{% endif %}
+    {% if photo.exif.ISOSpeedRatings is defined %}<dt class="font-medium text-muted">ISO</dt><dd>{{ photo.exif.ISOSpeedRatings }}</dd>{% endif %}
+    {% if photo.exif.FocalLength is defined %}<dt class="font-medium text-muted">Focale</dt><dd>{{ photo.exif.FocalLength }} mm</dd>{% endif %}
+</dl>
+
+{% if photo.topics|length %}
+    <h2 class="card-title mb-2 mt-6">Cette photo apparaît dans</h2>
+    <ul class="space-y-1 text-sm">
+        {% for link in photo.topics %}
+            <li><a href="{{ path('topic_show', {forumId: link.topic.forum.id, id: link.topic.id}) }}">{{ link.topic.title }}</a> <span class="text-muted">· {{ link.topic.forum.title }}</span></li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}

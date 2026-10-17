@@ -1,0 +1,31 @@
+{# One message: avatar on the left, body (long ones are collapsed by ui.js), details and actions on hover / tap.
+   Params: comment, hide_actions (optional) #}
+{% import '_ui/icons.html.twig' as ui %}
+{% import '_ui/avatar.html.twig' as av %}
+{% set author = comment.author %}
+{% set canManage = not hide_actions|default(false) and app.user and (author == app.user or is_granted('ROLE_ADMIN')) %}
+<article class="post" id="post-{{ comment.id }}" data-post>
+    {% if author %}
+        <a href="{{ path('people_show', {username: author.username}) }}" class="shrink-0 self-start" title="{{ author.username }}">{{ av.avatar(author, 'size-10') }}</a>
+    {% else %}
+        <span class="shrink-0 self-start">{{ av.avatar(null, 'size-10') }}</span>
+    {% endif %}
+    <div class="min-w-0 flex-1">
+        <div class="mb-0.5 text-xs font-semibold text-muted">{{ author ? author.username : 'Ancien membre' }}</div>
+        <div class="post-body" data-collapsible>{{ comment.content|rich_text }}</div>
+        <div class="post-meta mt-1.5">
+            <time datetime="{{ comment.createdAt|date('c') }}">Posté le {{ comment.createdAt|date('d/m/Y à H:i') }}</time>
+            {% if comment.updatedAt and comment.updatedAt.timestamp - comment.createdAt.timestamp > 120 %}
+                <span>· modifié le {{ comment.updatedAt|date('d/m/Y à H:i') }}</span>
+            {% endif %}
+            <a href="{{ path('comment_show', {id: comment.id}) }}" class="inline-flex items-center gap-1 text-muted no-underline hover:text-fg" title="Lien vers ce message">{{ ui.icon('link', 'size-3.5') }} Lien</a>
+            {% if canManage %}
+                <a href="{{ path('comment_edit', {id: comment.id}) }}" class="inline-flex items-center gap-1 text-muted no-underline hover:text-fg">{{ ui.icon('pencil', 'size-3.5') }} Modifier</a>
+                <form method="post" action="{{ path('comment_delete', {id: comment.id}) }}" data-confirm="Supprimer définitivement ce message ?" class="inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete-comment-' ~ comment.id) }}">
+                    <button type="submit" class="inline-flex cursor-pointer items-center gap-1 text-danger hover:underline">{{ ui.icon('trash', 'size-3.5') }} Supprimer</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</article>

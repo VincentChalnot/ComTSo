@@ -1,54 +1,55 @@
 {% extends 'base.html.twig' %}
+{% import '_ui/icons.html.twig' as ui %}
+{% import '_ui/photo.html.twig' as ph %}
 
-{% block title %}{{ forum.title }}{% endblock %}
+{% block title %}{{ forum.title }} · ComTSo{% endblock %}
 
 {% block body %}
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">{{ forum.title }}</h1>
-        </div>
+{% include 'forum/_tabs.html.twig' with {current: forum.id} %}
+
+<div class="mb-4 flex flex-wrap items-start justify-between gap-3">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight">{{ forum.title }}</h1>
+        {% if forum.content %}<div class="post-body mt-1 text-sm text-muted">{{ forum.content|rich_text }}</div>{% endif %}
     </div>
-    <div class="level-right">
-        <div class="level-item">
-            {% if app.user %}
-                <a href="{{ path('forum_new_topic', {'id': forum.id}) }}" class="button is-primary">
-                    New Topic
-                </a>
-            {% endif %}
-        </div>
-    </div>
+    <a href="{{ path('forum_new_topic', {forumId: forum.id}) }}" class="btn btn-primary">{{ ui.icon('plus', 'size-4') }} Nouveau sujet</a>
 </div>
 
-{% if forum.content %}
-    <div class="content">
-        <p>{{ forum.content }}</p>
-    </div>
-{% endif %}
+{% include '_layout/pagination.html.twig' with {pager: pager, route: 'forum_show', params: {forumId: forum.id}} %}
 
-<hr>
-
-{% if topics is empty %}
-    <p>No topics in this forum yet.</p>
-{% else %}
-    {% for topic in topics %}
-        <div class="box">
-            <div class="media">
-                <div class="media-content">
-                    <p class="title is-5">
-                        <a href="{{ path('topic_show', {'forumId': forum.id, 'id': topic.id}) }}">
-                            {{ topic.title }}
-                        </a>
-                    </p>
-                    <p class="subtitle is-7">
-                        by {{ topic.author.username }}
-                        • {{ topic.views }} views
-                        • {{ topic.commentCount }} comments
-                        • {{ topic.createdAt|date('Y-m-d H:i') }}
+<div class="space-y-3">
+    {% for card in cards %}
+        {% set topic = card.topic %}
+        {% set starred = app.user.starredTopics.contains(topic) %}
+        <section class="card overflow-hidden">
+            <header class="flex items-start gap-2 px-4 pt-3">
+                {% include 'topic/_star.html.twig' %}
+                <div class="min-w-0 flex-1">
+                    <h2 class="truncate text-lg font-semibold leading-snug"><a href="{{ path('topic_show', {forumId: forum.id, id: topic.id}) }}" class="text-fg no-underline hover:underline">{{ topic.title }}</a></h2>
+                    <p class="text-xs text-muted">
+                        par {{ topic.author ? topic.author.username : 'un ancien membre' }} · créé le {{ topic.createdAt|date('d/m/Y') }}
+                        · {{ topic.commentCount }} message{{ topic.commentCount > 1 ? 's' : '' }} · {{ topic.views }} vue{{ topic.views > 1 ? 's' : '' }}
+                        · dernière activité le {{ topic.lastActivityAt|date('d/m/Y à H:i') }}
                     </p>
                 </div>
+            </header>
+            {% if topic.content %}<div class="post-body px-4 pt-2 text-sm" data-collapsible>{{ topic.content|rich_text }}</div>{% endif %}
+            {% if card.photos %}
+                <div class="flex flex-wrap gap-2 px-4 pt-3">
+                    {% for link in card.photos|slice(0, 6) %}{{ ph.thumb(link.photo, 'forum-' ~ topic.id, 'size-20') }}{% endfor %}
+                    {% if card.photos|length > 6 %}<a href="{{ path('topic_show', {forumId: forum.id, id: topic.id}) }}" class="flex size-20 items-center justify-center rounded-lg border border-line bg-surface-2 text-sm text-muted no-underline">+{{ card.photos|length - 6 }}</a>{% endif %}
+                </div>
+            {% endif %}
+            <div class="mt-2">
+                {% for comment in card.latest|reverse %}
+                    {% include '_post/message.html.twig' with {comment: comment, hide_actions: true} %}
+                {% endfor %}
             </div>
-        </div>
+        </section>
+    {% else %}
+        <p class="card p-6 text-center text-muted">Aucun sujet dans ce forum pour le moment.</p>
     {% endfor %}
-{% endif %}
+</div>
+
+{% include '_layout/pagination.html.twig' with {pager: pager, route: 'forum_show', params: {forumId: forum.id}} %}
 {% endblock %}

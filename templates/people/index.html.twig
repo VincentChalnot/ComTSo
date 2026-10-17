@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+{% import '_ui/avatar.html.twig' as av %}
+
+{% block title %}Les gens · ComTSo{% endblock %}
+
+{% block body %}
+<h1 class="mb-4 text-2xl font-bold tracking-tight">Les gens</h1>
+<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+    {% for person in people %}
+        <a href="{{ path('people_show', {username: person.username}) }}" class="card flex flex-col items-center gap-2 p-4 text-center text-fg no-underline transition hover:border-accent">
+            <span class="relative">
+                {{ av.avatar(person, 'size-20') }}
+                {% if unread_messages()[person.id] is defined %}
+                    <span class="absolute -right-1 -top-1 inline-flex min-w-6 items-center justify-center rounded-full bg-accent px-1.5 text-xs font-semibold leading-6 text-on-accent" title="Messages privés non lus">{{ unread_messages()[person.id] }}</span>
+                {% endif %}
+            </span>
+            <span class="font-semibold">{{ person.username }}</span>
+            {% if person.name or person.surname %}<span class="-mt-1 text-xs text-muted">{{ person.name }} {{ person.surname }}</span>{% endif %}
+        </a>
+    {% endfor %}
+</div>
+{% endblock %}

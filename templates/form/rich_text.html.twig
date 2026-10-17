@@ -1,0 +1,25 @@
+{#
+    Form theme block of RichTextType. The plain textarea is the no-JavaScript fallback: the Vue RichEditor
+    (assets/vue/components/RichEditor.vue) replaces it when the mount point is initialised and keeps submitting the
+    same field name. Several editors per page are fine (each carries its own id/name).
+    Options: `compact`, `min_height`; placeholder / aria-label through `attr`.
+#}
+{% block rich_text_widget -%}
+    {%- if disabled -%}
+        {{- block('textarea_widget') -}}
+    {%- else -%}
+        {%- set editor_props = {
+            name: full_name,
+            id: id,
+            value: value is same as(null) ? '' : value,
+            placeholder: attr.placeholder|default(''),
+            ariaLabel: attr['aria-label']|default(''),
+            compact: compact|default(false),
+            minHeight: min_height|default(null),
+            required: required,
+        } -%}
+        <div data-vue-component="RichEditor" data-props="{{ editor_props|json_encode|e('html_attr') }}" class="rich-text-field">
+            {{- block('textarea_widget') -}}
+        </div>
+    {%- endif -%}
+{%- endblock rich_text_widget %}

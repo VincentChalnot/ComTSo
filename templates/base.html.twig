@@ -1,98 +1,87 @@
+{% import '_ui/icons.html.twig' as ui %}
+{% import '_ui/avatar.html.twig' as av %}
+{% set route = app.current_route ?? '' %}
 <!DOCTYPE html>
-<html lang="en" data-theme="{{ app.user ? app.user.theme : 'light' }}">
+<html lang="fr" data-theme="{{ app.user ? app.user.theme : 'light' }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ComTSo Forum{% endblock %}</title>
-
-    {% block stylesheets %}
-        <link rel="stylesheet" href="/assets/main.css">
-    {% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{% block title %}ComTSo{% endblock %}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    {% if not app.user %}
+        <script>if (matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.dataset.theme = 'dark';</script>
+    {% endif %}
+    {% block stylesheets %}<link rel="stylesheet" href="/assets/main.css">{% endblock %}
 </head>
-<body>
-    <nav class="navbar" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-            <a class="navbar-item" href="{{ path('app_home') }}">
-                <strong>ComTSo Forum</strong>
-            </a>
+<body class="min-h-screen bg-page text-fg {% block body_class %}{% endblock %}">
+    <header class="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
+        <nav class="mx-auto flex max-w-6xl items-center gap-1 px-3 py-2 sm:px-4" aria-label="Navigation principale">
+            <a href="{{ path('app_home') }}" class="mr-2 text-lg font-bold tracking-tight text-fg no-underline">ComTSo</a>
 
-            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMain">
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-            </a>
-        </div>
+            {% if app.user %}
+                <button type="button" class="btn-icon ml-auto lg:hidden" data-nav-toggle aria-label="Menu" aria-expanded="false">{{ ui.icon('menu', 'size-5') }}</button>
 
-        <div id="navbarMain" class="navbar-menu">
-            <div class="navbar-start">
-                <a class="navbar-item" href="{{ path('app_home') }}">Home</a>
-                <a class="navbar-item" href="{{ path('forum_index') }}">Forums</a>
-                <a class="navbar-item" href="{{ path('photo_index') }}">Photos</a>
-                {% if app.user %}
-                    <a class="navbar-item" href="{{ path('chat_index') }}">Chat</a>
-                    <a class="navbar-item" href="{{ path('message_index') }}">Messages</a>
-                {% endif %}
-            </div>
+                <div id="nav-menu" class="hidden w-full flex-col gap-2 pb-2 lg:flex lg:w-auto lg:flex-1 lg:flex-row lg:items-center lg:pb-0" data-nav-menu>
+                    <div class="flex flex-col gap-1 lg:flex-row">
+                        {% set links = [
+                            {route: 'app_home', label: 'Accueil', match: ['app_home']},
+                            {route: 'forum_index', label: 'Forums', match: ['forum_index', 'forum_show', 'topic_show', 'topic_edit', 'topic_photos', 'comment_show', 'comment_edit', 'forum_new_topic']},
+                            {route: 'people_index', label: 'Les gens', match: ['people_index', 'people_show', 'people_edit']},
+                            {route: 'photo_index', label: 'Photos', match: ['photo_index', 'photo_show', 'photo_edit']},
+                        ] %}
+                        {% for link in links %}
+                            <a href="{{ path(link.route) }}" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium no-underline transition {{ route in link.match ? 'bg-accent-soft text-accent-strong' : 'text-muted hover:bg-surface-2 hover:text-fg' }}">
+                                {{ link.label }}
+                                {% if link.route == 'people_index' and unread_messages() %}
+                                    <span class="inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[0.7rem] font-semibold leading-5 text-on-accent" title="Messages privés non lus">{{ unread_messages()|reduce((carry, n) => carry + n, 0) }}</span>
+                                {% endif %}
+                            </a>
+                        {% endfor %}
+                        <a href="{{ path('chat_index') }}" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium no-underline transition {{ route == 'chat_index' ? 'bg-accent-soft text-accent-strong' : 'text-muted hover:bg-surface-2 hover:text-fg' }}">
+                            Chat
+                            <span data-chat-badge data-count="{{ chat_unread_count() }}" class="{{ chat_unread_count() > 0 ? '' : 'hidden ' }}inline-flex min-w-5 items-center justify-center rounded-full bg-danger px-1.5 text-[0.7rem] font-semibold leading-5 text-white">{{ chat_unread_count() > 99 ? '99+' : chat_unread_count() }}</span>
+                        </a>
+                    </div>
 
-            <div class="navbar-end">
-                <div class="navbar-item">
-                    {% if app.user %}
-                        <div class="buttons">
-                            <div data-vue>
-                                <theme-toggle></theme-toggle>
-                            </div>
-                            <a class="button is-light" href="{{ path('user_profile', {'username': app.user.username}) }}">
-                                {{ app.user.username }}
-                            </a>
-                            <a class="button is-light" href="{{ path('app_logout') }}">
-                                Logout
-                            </a>
-                        </div>
-                    {% else %}
-                        <div class="buttons">
-                            <a class="button is-primary" href="{{ path('app_register') }}">
-                                <strong>Sign up</strong>
-                            </a>
-                            <a class="button is-light" href="{{ path('app_login') }}">
-                                Log in
-                            </a>
-                        </div>
-                    {% endif %}
+                    <form action="{{ path('search') }}" method="get" role="search" class="relative lg:ml-3 lg:w-56">
+                        <input type="search" name="q" value="{{ app.request.query.get('q') }}" placeholder="Rechercher…" aria-label="Rechercher" class="input !py-1.5 pl-9">
+                        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">{{ ui.icon('search', 'size-4') }}</span>
+                    </form>
+
+                    <div class="flex items-center gap-1 lg:ml-auto">
+                        <div data-vue-component="ThemeToggle" data-props="{{ {url: path('user_theme')}|json_encode|e('html_attr') }}"></div>
+                        <a href="{{ path('people_config', {username: app.user.username}) }}" class="btn-icon" title="Configuration">{{ ui.icon('settings', 'size-5') }}</a>
+                        <a href="{{ path('people_show', {username: app.user.username}) }}" class="flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium text-fg no-underline hover:bg-surface-2">
+                            {{ av.avatar(app.user, 'size-7') }}<span>{{ app.user.username }}</span>
+                        </a>
+                        <a href="{{ path('app_logout') }}" class="btn-icon" title="Déconnexion">{{ ui.icon('log-out', 'size-5') }}</a>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </nav>
+            {% endif %}
+        </nav>
+    </header>
 
-    <section class="section">
-        <div class="container">
-            {% for message in app.flashes('success') %}
-                <div class="notification is-success is-light">
-                    <button class="delete"></button>
-                    {{ message }}
+    <div class="mx-auto max-w-6xl px-3 py-5 sm:px-4">
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="mb-4 flex items-start justify-between gap-3 rounded-lg border px-4 py-3 text-sm {{ type == 'error' ? 'border-danger/40 bg-danger/10 text-danger' : 'border-ok/40 bg-ok/10 text-ok' }}" role="status">
+                    <span>{{ message }}</span>
+                    <button type="button" class="cursor-pointer opacity-60 hover:opacity-100" data-dismiss aria-label="Fermer">{{ ui.icon('x', 'size-4') }}</button>
                 </div>
             {% endfor %}
+        {% endfor %}
 
-            {% for message in app.flashes('error') %}
-                <div class="notification is-danger is-light">
-                    <button class="delete"></button>
-                    {{ message }}
-                </div>
-            {% endfor %}
+        {% block content_layout %}
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
+                <main class="min-w-0">{% block body %}{% endblock %}</main>
+                <aside class="space-y-5 lg:sticky lg:top-20 lg:self-start">
+                    {% include '_layout/aside.html.twig' %}
+                </aside>
+            </div>
+        {% endblock %}
+    </div>
 
-            {% block body %}{% endblock %}
-        </div>
-    </section>
-
-    <footer class="footer">
-        <div class="content has-text-centered">
-            <p>
-                <strong>ComTSo Forum</strong> - Powered by Symfony 8 & Vue 3
-            </p>
-        </div>
-    </footer>
-
-    {% block javascripts %}
-        <script type="module" src="/assets/main.js"></script>
-    {% endblock %}
+    {% block javascripts %}<script type="module" src="/assets/main.js"></script>{% endblock %}
 </body>
 </html>

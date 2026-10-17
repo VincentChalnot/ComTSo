@@ -1,18 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Forums{% endblock %}
+{% block title %}Les forums · ComTSo{% endblock %}
 
 {% block body %}
-<h1 class="title">Forums</h1>
-
-{% for forum in forums %}
-    <div class="box">
-        <h2 class="title is-4">
-            <a href="{{ path('forum_show', {'id': forum.id}) }}">{{ forum.title }}</a>
-        </h2>
-        {% if forum.content %}
-            <p>{{ forum.content }}</p>
-        {% endif %}
-    </div>
-{% endfor %}
+<h1 class="mb-4 text-2xl font-bold tracking-tight">Les forums</h1>
+<div class="grid gap-3 sm:grid-cols-2">
+    {% for forum in nav_forums() %}
+        <a href="{{ path('forum_show', {forumId: forum.id}) }}" class="card block p-4 text-fg no-underline transition hover:border-accent">
+            <h2 class="text-lg font-semibold">{{ forum.title }}</h2>
+            {% if forum.content %}<div class="post-body mt-1 text-sm text-muted">{{ forum.content|rich_text }}</div>{% endif %}
+            <p class="mt-2 text-xs text-muted">{{ stats[forum.id] }} sujet{{ stats[forum.id] > 1 ? 's' : '' }} · dernière modification le {{ forum.updatedAt|date('d/m/Y') }}</p>
+        </a>
+    {% endfor %}
+</div>
 {% endblock %}

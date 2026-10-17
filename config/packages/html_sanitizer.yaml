@@ -1,0 +1,110 @@
+framework:
+    html_sanitizer:
+        sanitizers:
+            # Allow-list of what the rich editor (Tiptap) emits plus what the imported legacy posts contain.
+            # Unknown elements are dropped with their content (script, style, svg, form controls...), except the
+            # harmless wrappers listed in block_elements whose text is kept. Inline CSS only survives through
+            # App\Content\AttributeSanitizer\StyleSanitizer (validated text-align/text-decoration), and the
+            # only iframe allowed is a YouTube embed (YouTubeEmbedSanitizer + source-less iframe removal in
+            # App\Content\ContentSanitizer).
+            app.rich_text:
+                # Legacy posts reach 85 KB: the default (20 KB) would truncate them in the middle of a tag.
+                max_input_length: 1000000
+                allow_elements:
+                    p: [style, align]
+                    div: [class, style, align]
+                    span: [style]
+                    br: []
+                    hr: []
+                    strong: []
+                    b: []
+                    em: []
+                    i: []
+                    u: []
+                    s: []
+                    strike: []
+                    del: []
+                    sub: []
+                    sup: []
+                    cite: []
+                    code: []
+                    pre: []
+                    blockquote: [style]
+                    h1: [style, align]
+                    h2: [style, align]
+                    h3: [style, align]
+                    h4: [style, align]
+                    ul: []
+                    ol: []
+                    li: [style]
+                    a: [href, title]
+                    img: [src, alt, title]
+                    iframe: [src]
+                    table: []
+                    caption: []
+                    thead: []
+                    tbody: []
+                    tfoot: []
+                    tr: []
+                    th: [style, align, valign, colspan, rowspan]
+                    td: [style, align, valign, colspan, rowspan]
+                block_elements:
+                    - font
+                    - center
+                    - small
+                    - big
+                    - tt
+                    - mark
+                    - ins
+                    - abbr
+                    - acronym
+                    - address
+                    - article
+                    - aside
+                    - section
+                    - header
+                    - footer
+                    - nav
+                    - main
+                    - figure
+                    - figcaption
+                    - details
+                    - summary
+                    - dl
+                    - dt
+                    - dd
+                    - label
+                    - form
+                    - fieldset
+                    - legend
+                    - q
+                    - time
+                    - var
+                    - samp
+                    - kbd
+                    - nobr
+                    - wbr
+                    - h5
+                    - h6
+                    - hgroup
+                allowed_link_schemes: [http, https, mailto]
+                allow_relative_links: true
+                allowed_media_schemes: [http, https]
+                allow_relative_medias: true
+                force_attributes:
+                    a:
+                        rel: noopener noreferrer
+                        target: _blank
+                    iframe:
+                        title: Vidéo YouTube
+                        loading: lazy
+                        allowfullscreen: ''
+                        allow: 'encrypted-media; picture-in-picture'
+                        referrerpolicy: strict-origin-when-cross-origin
+                # Order matters: they run before Symfony's own URL sanitizer, per element+attribute.
+                with_attribute_sanitizers:
+                    - App\Content\AttributeSanitizer\YouTubeEmbedSanitizer
+                    - App\Content\AttributeSanitizer\ImageSourceSanitizer
+                    - App\Content\AttributeSanitizer\ClassSanitizer
+                    - App\Content\AttributeSanitizer\StyleSanitizer
+                    - App\Content\AttributeSanitizer\EnumeratedAttributeSanitizer

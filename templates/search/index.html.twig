@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+{% import '_ui/avatar.html.twig' as av %}
+
+{% block title %}Recherche{% if term %} « {{ term }} »{% endif %} · ComTSo{% endblock %}
+
+{% block body %}
+<h1 class="mb-4 text-2xl font-bold tracking-tight">{% if term %}Résultats pour « {{ term }} »{% else %}Recherche{% endif %}</h1>
+
+{% if results is null %}
+    <p class="card p-6 text-center text-muted">Saisissez au moins deux caractères dans la barre de recherche.</p>
+{% else %}
+    {% set sections = [
+        {key: 'comments', label: 'Messages'}, {key: 'topics', label: 'Sujets'}, {key: 'photos', label: 'Photos'},
+        {key: 'chat', label: 'Chat'}, {key: 'people', label: 'Membres'}, {key: 'quotes', label: 'Citations'},
+    ] %}
+    <nav class="mb-4 flex flex-wrap gap-2 text-sm" aria-label="Accès rapide aux résultats">
+        {% for section in sections %}
+            <a href="#r-{{ section.key }}" class="rounded-full border border-line bg-surface px-3 py-1 text-fg no-underline hover:bg-surface-2">{{ section.label }} <span class="text-muted">{{ results[section.key]|length }}{{ results[section.key]|length >= limit ? '+' : '' }}</span></a>
+        {% endfor %}
+    </nav>
+
+    <section id="r-comments" class="mb-6"><h2 class="card-title mb-2">Messages</h2>
+        <div class="card overflow-hidden">
+            {% for comment in results.comments %}
+                <article class="post">
+                    <span class="shrink-0 self-start">{{ av.avatar(comment.author, 'size-10') }}</span>
+                    <div class="min-w-0 flex-1 text-sm">
+                        <p>{{ comment.content|excerpt(term) }}</p>
+                        <p class="mt-1 text-xs text-muted">{{ comment.author ? comment.author.username : 'Ancien membre' }} · {{ comment.createdAt|date('d/m/Y à H:i') }} dans
+                            <a href="{{ path('topic_show', {forumId: comment.topic.forum.id, id: comment.topic.id}) }}">{{ comment.topic.title }}</a>
+                            · <a href="{{ path('comment_show', {id: comment.id}) }}">voir le message</a></p>
+                    </div>
+                </article>
+            {% else %}<p class="p-4 text-sm text-muted">Aucun message.</p>{% endfor %}
+        </div>
+    </section>
+
+    <section id="r-topics" class="mb-6"><h2 class="card-title mb-2">Sujets</h2>
+        <ul class="card divide-y divide-line text-sm">
+            {% for topic in results.topics %}
+                <li class="px-4 py-2"><a href="{{ path('topic_show', {forumId: topic.forum.id, id: topic.id}) }}" class="font-medium">{{ topic.title }}</a> <span class="text-muted">· {{ topic.forum.title }} · {{ topic.createdAt|date('d/m/Y') }}</span></li>
+            {% else %}<li class="px-4 py-3 text-muted">Aucun sujet.</li>{% endfor %}
+        </ul>
+    </section>
+
+    <section id="r-photos" class="mb-6"><h2 class="card-title mb-2">Photos</h2>
+        {% import '_ui/photo.html.twig' as ph %}
+        <div class="flex flex-wrap gap-2">
+            {% for photo in results.photos %}{{ ph.thumb(photo, 'search', 'size-24') }}{% else %}<p class="text-sm text-muted">Aucune photo.</p>{% endfor %}
+        </div>
+    </section>
+
+    <section id="r-chat" class="mb-6"><h2 class="card-title mb-2">Chat</h2>
+        <ul class="card divide-y divide-line text-sm">
+            {% for message in results.chat %}
+                <li class="px-4 py-2"><span class="font-medium">{{ message.author ? message.author.username : 'Ancien membre' }}</span> <span class="text-xs text-muted">{{ message.createdAt|date('d/m/Y à H:i') }}</span><br>{{ message.content|excerpt(term, 200) }}</li>
+            {% else %}<li class="px-4 py-3 text-muted">Aucun message de chat.</li>{% endfor %}
+        </ul>
+    </section>
+
+    <section id="r-people" class="mb-6"><h2 class="card-title mb-2">Membres</h2>
+        <ul class="card divide-y divide-line text-sm">
+            {% for person in results.people %}
+                <li class="flex items-center gap-3 px-4 py-2">{{ av.avatar(person, 'size-8') }}<a href="{{ path('people_show', {username: person.username}) }}" class="font-medium">{{ person.username }}</a><span class="text-muted">{{ person.name }} {{ person.surname }}</span></li>
+            {% else %}<li class="px-4 py-3 text-muted">Aucun membre.</li>{% endfor %}
+        </ul>
+    </section>
+
+    <section id="r-quotes" class="mb-6"><h2 class="card-title mb-2">Citations</h2>
+        <ul class="card divide-y divide-line text-sm">
+            {% for quote in results.quotes %}
+                <li class="px-4 py-2"><span class="italic">{{ quote.content|excerpt(term, 300) }}</span>{% if quote.originalAuthor %} <span class="text-muted">— {{ quote.originalAuthor }}</span>{% endif %}</li>
+            {% else %}<li class="px-4 py-3 text-muted">Aucune citation.</li>{% endfor %}
+        </ul>
+    </section>
+{% endif %}
+{% endblock %}

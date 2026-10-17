@@ -1,32 +1,17 @@
 {% extends 'base.html.twig' %}
+{% import '_ui/photo.html.twig' as ph %}
 
-{% block title %}Photos{% endblock %}
+{% block title %}Photos · ComTSo{% endblock %}
 
 {% block body %}
-<div class="level">
-    <div class="level-left">
-        <div class="level-item">
-            <h1 class="title">Photos</h1>
-        </div>
-    </div>
-    <div class="level-right">
-        <div class="level-item">
-            {% if app.user %}
-                <a href="{{ path('photo_upload') }}" class="button is-primary">Upload Photos</a>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-<div class="photo-grid">
+<h1 class="mb-4 text-2xl font-bold tracking-tight">Photos</h1>
+{% include '_layout/pagination.html.twig' with {pager: pager, route: 'photo_index', params: {}} %}
+<div class="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
     {% for photo in photos %}
-        <div class="photo-item">
-            <a href="{{ path('photo_show', {'id': photo.id}) }}">
-                <img src="/uploads/photos/{{ photo.filename }}" alt="{{ photo.title ?? photo.originalFilename }}">
-            </a>
-        </div>
+        {{ ph.thumb(photo, 'all', 'aspect-square w-full') }}
     {% else %}
-        <p>No photos yet.</p>
+        <p class="col-span-full card p-6 text-center text-muted">Aucune photo.</p>
     {% endfor %}
 </div>
+{% include '_layout/pagination.html.twig' with {pager: pager, route: 'photo_index', params: {}} %}
 {% endblock %}

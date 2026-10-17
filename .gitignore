@@ -1,4 +1,3 @@
-
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -18,11 +17,6 @@
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
-
-###> symfony/asset-mapper ###
-/public/assets/
-###< symfony/asset-mapper ###
-
 # Node
 /node_modules/
 /assets/dist/
@@ -44,3 +38,12 @@
 # OS
 .DS_Store
 Thumbs.db
+
+# Generated thumbnails
+/public/media/
+
+# Vite build output
+/public/assets/
+
+# Playwright MCP scratch
+/.playwright-mcp/

@@ -3,6 +3,10 @@ framework:
     secret: '%env(APP_SECRET)%'
     #csrf_protection: true
     http_method_override: false
+    # Behind Traefik: trust X-Forwarded-* so URLs/cookies are https (see TRUSTED_PROXIES in compose.yaml).
+    trusted_proxies: '%env(default::TRUSTED_PROXIES)%'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
+    default_locale: fr
     handle_all_throwables: true
 
     # Enables session support. Note that the session will ONLY be started if you read or write from it.

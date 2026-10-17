@@ -1,0 +1,34 @@
+mercure:
+    hubs:
+        default:
+            url: '%env(MERCURE_URL)%'
+            public_url: '%env(default::MERCURE_PUBLIC_URL)%'
+            # The Caddy hub runs with `protocol_version_compatibility 8` (see frankenphp/Caddyfile).
+            protocol_version: '0.x'
+            jwt:
+                secret: '%env(MERCURE_JWT_SECRET)%'
+                publish: '*'
+
+services:
+    # The forum is private: chat updates are private and members subscribe with a subscriber JWT cookie
+    # (ChatController::state()). The bundle's default for that cookie is SameSite=Strict; use Lax.
+    # Positional arguments on purpose: the bundle's compiler pass reads argument #1 (cookie lifetime).
+    Symfony\Component\Mercure\Authorization:
+        arguments:
+            - '@Symfony\Component\Mercure\HubRegistry'
+            - null
+            - 'lax'
+
+when@test:
+    mercure:
+        hubs:
+            default:
+                # Host of the test client (the cookie domain must match the request host).
+                public_url: 'https://localhost/.well-known/mercure'
+
+    services:
+        # Never publish to the real hub from tests: record the updates instead (see tests/Chat).
+        App\Tests\Chat\RecordingHub:
+            decorates: mercure.hub.default
+            arguments: ['@.inner']
+            public: true

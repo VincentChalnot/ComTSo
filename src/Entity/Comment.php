@@ -9,8 +9,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 #[ORM\Table(name: 'ctso_comment')]
+#[ORM\Index(name: 'idx_comment_topic_created', columns: ['topic_id', 'created_at'])]
+#[ORM\Index(name: 'idx_comment_created', columns: ['created_at'])]
 class Comment
 {
+    use LegacyRefTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]

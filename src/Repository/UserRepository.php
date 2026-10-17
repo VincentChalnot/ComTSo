@@ -23,7 +23,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         }
 
         $user->setPassword($newHashedPassword);
+        $user->setSalt(null);
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
+    }
+
+    /** @return list<User> enabled members whose pseudo, name or activities match */
+    public function search(string $term, int $limit = 30): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.enabled = true')
+            ->andWhere('u.username LIKE :q OR u.name LIKE :q OR u.surname LIKE :q OR u.activities LIKE :q')
+            ->setParameter('q', '%'.addcslashes($term, '%_\\').'%')
+            ->orderBy('u.username')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 }

@@ -11,6 +11,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Table(name: 'ctso_quote')]
 class Quote
 {
+    use LegacyRefTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]

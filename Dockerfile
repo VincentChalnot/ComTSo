@@ -27,7 +27,10 @@ RUN <<-EOF
 		apcu \
 		intl \
 		opcache \
-		zip
+		zip \
+		exif \
+		gd \
+		pdo_mysql
 	rm -rf /var/lib/apt/lists/*
 EOF
 
@@ -37,6 +40,9 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 
 ###> recipes ###
+###> doctrine/doctrine-bundle ###
+RUN install-php-extensions pdo_pgsql
+###< doctrine/doctrine-bundle ###
 ###< recipes ###
 
 COPY --link frankenphp/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
@@ -82,6 +88,16 @@ COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
 
 # Builder for the prod FrankenPHP image
+# Front-end build: Vite bundles assets/ and Tailwind scans templates/ for the classes in use
+FROM node:22-alpine AS frontend_builder
+WORKDIR /app
+COPY --link package.json package-lock.json ./
+RUN npm ci
+COPY --link vite.config.js ./
+COPY --link assets ./assets
+COPY --link templates ./templates
+RUN npm run build
+
 FROM frankenphp_base AS frankenphp_prod_builder
 
 ENV APP_ENV=prod
@@ -102,13 +118,13 @@ RUN <<-EOF
 	composer dump-autoload --classmap-authoritative --no-dev
 	composer dump-env prod
 	composer run-script --no-dev post-install-cmd
-	if [ -f importmap.php ]; then
-		php bin/console asset-map:compile
-	fi
 	chmod +x bin/console
 	chmod -R g=u var
 	sync
 EOF
+
+# Compiled front-end (Vite + Tailwind): public/assets/main.{js,css}
+COPY --link --from=frontend_builder /app/public/assets ./public/assets
 
 # Collect shared libraries needed by FrankenPHP and PHP extensions
 # hadolint ignore=DL3008,SC3054,DL4006

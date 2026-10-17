@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le profil · ComTSo{% endblock %}
+
+{% block body %}
+<h1 class="mb-4 text-2xl font-bold tracking-tight">Modifier le profil de {{ person.username }}</h1>
+<div class="card p-5">
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <div class="flex gap-2">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a href="{{ path('people_show', {username: person.username}) }}" class="btn">Annuler</a>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

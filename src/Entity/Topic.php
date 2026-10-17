@@ -11,12 +11,38 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: TopicRepository::class)]
 #[ORM\Table(name: 'ctso_topic')]
+#[ORM\Index(name: 'idx_topic_last_activity', columns: ['last_activity_at'])]
+#[ORM\HasLifecycleCallbacks]
 class Topic
 {
+    use LegacyRefTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
+
+    /** Last time a message was posted (or the topic created): drives the ordering of forum feeds. */
+    #[ORM\Column(name: 'last_activity_at', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $lastActivityAt = null;
+
+    #[ORM\PrePersist]
+    public function initializeLastActivity(): void
+    {
+        $this->lastActivityAt ??= new \DateTime();
+    }
+
+    public function getLastActivityAt(): ?\DateTimeInterface
+    {
+        return $this->lastActivityAt;
+    }
+
+    public function setLastActivityAt(\DateTimeInterface $lastActivityAt): static
+    {
+        $this->lastActivityAt = $lastActivityAt;
+
+        return $this;
+    }
 
     #[ORM\Column(type: Types::STRING, length: 128)]
     private ?string $title = '';
@@ -54,10 +80,15 @@ class Topic
     #[ORM\Column(name: 'comment_count', type: Types::INTEGER)]
     private int $commentCount = 0;
 
+    /** Inverse side of User::$starredTopics (favourites). Read-only: modify the owning side. */
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'starredTopics')]
+    private Collection $starredBy;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
         $this->photos = new ArrayCollection();
+        $this->starredBy = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -211,6 +242,21 @@ class Topic
     {
         $this->commentCount = $commentCount;
         return $this;
+    }
+
+    /** Bookkeeping when a message is posted: bumps the counter and moves the topic up in the feeds. */
+    public function registerNewComment(\DateTimeInterface $at): static
+    {
+        ++$this->commentCount;
+        $this->lastActivityAt = $at;
+
+        return $this;
+    }
+
+    /** @return Collection<int, User> members who marked this topic as a favourite */
+    public function getStarredBy(): Collection
+    {
+        return $this->starredBy;
     }
 
     public function __toString(): string

@@ -19,30 +19,22 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('username', TextType::class, [
-                'constraints' => [
-                    new NotBlank(),
-                    new Length(['min' => 3, 'max' => 180]),
-                ],
+                'label' => 'Pseudo',
+                'constraints' => [new NotBlank(), new Length(min: 3, max: 180)],
             ])
             ->add('email', EmailType::class, [
-                'constraints' => [
-                    new NotBlank(),
-                    new Email(),
-                ],
+                'label' => 'Email',
+                'constraints' => [new NotBlank(), new Email()],
             ])
             ->add('plainPassword', PasswordType::class, [
+                'label' => 'Mot de passe',
                 'mapped' => false,
-                'constraints' => [
-                    new NotBlank(),
-                    new Length(['min' => 6]),
-                ],
+                'constraints' => [new NotBlank(), new Length(min: 8)],
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => User::class,
-        ]);
+        $resolver->setDefaults(['data_class' => User::class]);
     }
 }

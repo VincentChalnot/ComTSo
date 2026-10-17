@@ -11,6 +11,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Table(name: 'ctso_message')]
 class Message
 {
+    use LegacyRefTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]

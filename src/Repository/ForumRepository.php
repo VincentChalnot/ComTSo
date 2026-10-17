@@ -12,4 +12,10 @@ class ForumRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Forum::class);
     }
+
+    /** @return list<Forum> */
+    public function findAllOrdered(): array
+    {
+        return $this->findBy([], ['order' => 'ASC', 'title' => 'ASC']);
+    }
 }

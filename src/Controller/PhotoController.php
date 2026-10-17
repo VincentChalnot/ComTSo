@@ -3,134 +3,98 @@
 namespace App\Controller;
 
 use App\Entity\Photo;
+use App\Form\PhotoType;
+use App\Pagination\Pager;
 use App\Repository\PhotoRepository;
 use App\Service\ImageProcessingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
-#[Route('/photo')]
+/** Photos are private: files live outside the web root and are only ever served here, to logged-in members. */
 class PhotoController extends AbstractController
 {
-    #[Route('/', name: 'photo_index')]
-    public function index(PhotoRepository $photoRepository): Response
+    public const PHOTOS_PER_PAGE = 60;
+
+    #[Route('/photos', name: 'photo_index')]
+    public function index(Request $request, PhotoRepository $photos): Response
     {
-        $photos = $photoRepository->findBy([], ['createdAt' => 'DESC'], 50);
+        $pager = new Pager($photos->count([]), self::PHOTOS_PER_PAGE, $request->query->getInt('page', 1));
 
         return $this->render('photo/index.html.twig', [
-            'photos' => $photos,
+            'photos' => $photos->findBy([], ['createdAt' => 'DESC', 'id' => 'DESC'], $pager->perPage, $pager->offset()),
+            'pager' => $pager,
         ]);
     }
 
-    #[Route('/upload', name: 'photo_upload')]
-    #[IsGranted('ROLE_USER')]
-    public function upload(): Response
+    #[Route('/photos/source/{id}', name: 'photo_source', requirements: ['id' => '\d+'])]
+    public function source(Request $request, Photo $photo, ImageProcessingService $images): Response
     {
-        return $this->render('photo/upload.html.twig');
+        $path = $images->originalPath($photo->getFilename());
+        if (!is_file($path)) {
+            throw $this->createNotFoundException();
+        }
+
+        $response = new BinaryFileResponse($path);
+        $response->headers->set('Content-Type', $photo->getFileType() ?: 'application/octet-stream');
+        $response->setContentDisposition(
+            $request->query->getBoolean('download') ? ResponseHeaderBag::DISPOSITION_ATTACHMENT : ResponseHeaderBag::DISPOSITION_INLINE,
+            $photo->getOriginalFilename() ?: $photo->getFilename(),
+            // ASCII fallback for exotic file names
+            preg_replace('/[^A-Za-z0-9._-]/', '_', $photo->getFilename()),
+        );
+
+        return $this->cacheable($response);
     }
 
-    #[Route('/api/upload', name: 'photo_api_upload', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function apiUpload(
-        Request $request,
-        SluggerInterface $slugger,
-        EntityManagerInterface $entityManager,
-        ImageProcessingService $imageService
-    ): JsonResponse {
-        /** @var UploadedFile $file */
-        $file = $request->files->get('file');
-
-        if (!$file) {
-            return new JsonResponse(['error' => 'No file uploaded'], 400);
+    #[Route('/photos/{id}/{variant}', name: 'photo_variant', requirements: ['id' => '\d+', 'variant' => 'avatar|thumb|medium'])]
+    public function variant(Photo $photo, string $variant, ImageProcessingService $images): Response
+    {
+        $path = $images->thumbnailPath($photo->getFilename(), $variant);
+        if (null === $path) {
+            throw $this->createNotFoundException();
         }
 
-        // Validate image
-        if (!$imageService->validateImage($file)) {
-            return new JsonResponse(['error' => 'Invalid image file'], 400);
-        }
-
-        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = $slugger->slug($originalFilename);
-        $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
-
-        try {
-            $file->move(
-                $this->getParameter('photos_directory'),
-                $newFilename
-            );
-        } catch (FileException $e) {
-            return new JsonResponse(['error' => 'Upload failed'], 500);
-        }
-
-        $filepath = $this->getParameter('photos_directory') . '/' . $newFilename;
-
-        $photo = new Photo();
-        $photo->setFilename($newFilename);
-        $photo->setOriginalFilename($file->getClientOriginalName());
-        $photo->setFileSize($file->getSize());
-        $photo->setFileType($file->getMimeType());
-        $photo->setAuthor($this->getUser());
-
-        // Extract image dimensions
-        $dimensions = $imageService->getImageDimensions($filepath);
-        if ($dimensions) {
-            $photo->setWidth($dimensions['width']);
-            $photo->setHeight($dimensions['height']);
-        }
-
-        // Extract EXIF data
-        $exif = $imageService->extractExif($filepath);
-        if ($exif) {
-            $photo->setExif($exif);
-            $takenDate = $imageService->extractTakenDate($exif);
-            if ($takenDate) {
-                $photo->setTakenAt($takenDate);
-            }
-        }
-
-        $entityManager->persist($photo);
-        $entityManager->flush();
-
-        return new JsonResponse($photo);
+        return $this->cacheable(new BinaryFileResponse($path));
     }
 
-    #[Route('/{id}', name: 'photo_show')]
+    #[Route('/photos/{id}', name: 'photo_show', requirements: ['id' => '\d+'])]
     public function show(Photo $photo): Response
     {
-        return $this->render('photo/show.html.twig', [
-            'photo' => $photo,
-        ]);
+        return $this->render('photo/show.html.twig', ['photo' => $photo]);
     }
 
-    #[Route('/{id}/edit', name: 'photo_edit')]
-    #[IsGranted('ROLE_USER')]
-    public function edit(Photo $photo, Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/photos/{id}/edit', name: 'photo_edit', requirements: ['id' => '\d+'])]
+    public function edit(Request $request, Photo $photo, EntityManagerInterface $em): Response
     {
         if ($photo->getAuthor() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException();
         }
 
-        $form = $this->createForm(\App\Form\PhotoType::class, $photo);
+        $form = $this->createForm(PhotoType::class, $photo);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Photo updated successfully!');
+            $em->flush();
+            $this->addFlash('success', 'La photo a été modifiée.');
 
             return $this->redirectToRoute('photo_show', ['id' => $photo->getId()]);
         }
 
-        return $this->render('photo/edit.html.twig', [
-            'photo' => $photo,
-            'form' => $form,
-        ]);
+        return $this->render('photo/edit.html.twig', ['photo' => $photo, 'form' => $form]);
+    }
+
+    /** Image content never changes for a given id: let the browser keep it (privately) for a year. */
+    private function cacheable(BinaryFileResponse $response): BinaryFileResponse
+    {
+        $response->setPrivate();
+        $response->setMaxAge(31536000);
+        $response->headers->addCacheControlDirective('immutable');
+        $response->setAutoEtag();
+
+        return $response;
     }
 }
