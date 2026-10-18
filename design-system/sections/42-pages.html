@@ -8,7 +8,7 @@
   <div class="ds-demo" data-title="Connexion : le bouton de thème flottant est placé en haut à droite de la fenêtre dans la vraie page">
     <div class="ds-stage">
     <div class="relative">
-      <button type="button" class="btn-icon theme-toggle theme-toggle-floating" style="position: absolute" data-theme-toggle aria-label="Changer de thème"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" data-when="light" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" data-when="dark" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button type="button" class="btn-icon theme-toggle theme-toggle-floating" style="position: absolute" data-theme-toggle aria-label="Changer de thème"><span data-when="light"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span><span data-when="dark"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span></button>
       <main class="auth">
         <div class="auth-card">
           <header class="auth-brand"><span class="auth-wordmark">ComTSo</span><span class="rule-double is-flush"></span></header>
@@ -17,10 +17,12 @@
           <form class="auth-form" method="post" onsubmit="return false">
           <div class="field"><label class="label" for="l-user-a">Pseudo</label><input class="input" id="l-user-a" type="text" value="vincent" autocomplete="username" required></div>
           <div class="field"><label class="label" for="l-pw-a">Mot de passe</label><input class="input" id="l-pw-a" type="password" autocomplete="current-password" required></div>
-          <div class="auth-remember"><label class="check"><input type="checkbox" checked><span>Rester connecté</span></label><a href="#">Mot de passe oublié ?</a></div>
           <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
           </form>
-          <p class="auth-footer">Pas encore de compte ? <a href="#">S’inscrire</a></p>
+          <p class="auth-footer">
+            <a href="#">Mot de passe oublié ?</a>
+            <br>Pas encore de compte ? <a href="#">S'inscrire</a>
+          </p>
         </div>
       </main>
     </div>
@@ -30,7 +32,7 @@
   <div class="ds-demo" data-title="Connexion : identifiants invalides">
     <div class="ds-stage">
     <div class="relative">
-      <button type="button" class="btn-icon theme-toggle theme-toggle-floating" style="position: absolute" data-theme-toggle aria-label="Changer de thème"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" data-when="light" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" data-when="dark" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button type="button" class="btn-icon theme-toggle theme-toggle-floating" style="position: absolute" data-theme-toggle aria-label="Changer de thème"><span data-when="light"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span><span data-when="dark"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span></button>
       <main class="auth">
         <div class="auth-card">
           <header class="auth-brand"><span class="auth-wordmark">ComTSo</span><span class="rule-double is-flush"></span></header>
@@ -40,10 +42,12 @@
           <form class="auth-form" method="post" onsubmit="return false">
           <div class="field"><label class="label" for="l-user-b">Pseudo</label><input class="input" id="l-user-b" type="text" value="vincent" autocomplete="username" required></div>
           <div class="field"><label class="label" for="l-pw-b">Mot de passe</label><input class="input" id="l-pw-b" type="password" autocomplete="current-password" required></div>
-          <div class="auth-remember"><label class="check"><input type="checkbox" checked><span>Rester connecté</span></label><a href="#">Mot de passe oublié ?</a></div>
-          <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+                    <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
           </form>
-          <p class="auth-footer">Pas encore de compte ? <a href="#">S’inscrire</a></p>
+          <p class="auth-footer">
+            <a href="#">Mot de passe oublié ?</a>
+            <br>Pas encore de compte ? <a href="#">S'inscrire</a>
+          </p>
         </div>
       </main>
     </div>
@@ -53,7 +57,7 @@
   <div class="ds-demo" data-title="Inscription">
     <div class="ds-stage">
     <div class="relative">
-      <button type="button" class="btn-icon theme-toggle theme-toggle-floating" style="position: absolute" data-theme-toggle aria-label="Changer de thème"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" data-when="light" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" data-when="dark" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+      <button type="button" class="btn-icon theme-toggle theme-toggle-floating" style="position: absolute" data-theme-toggle aria-label="Changer de thème"><span data-when="light"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span><span data-when="dark"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span></button>
       <main class="auth">
         <div class="auth-card">
           <header class="auth-brand"><span class="auth-wordmark">ComTSo</span><span class="rule-double is-flush"></span></header>
@@ -66,6 +70,46 @@
           <button type="submit" class="btn btn-primary btn-block">Créer mon compte</button>
           </form>
           <p class="auth-footer">Déjà inscrit ? <a href="#">Se connecter</a></p>
+        </div>
+      </main>
+    </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Mot de passe oublié (security/forgot_password)">
+    <div class="ds-stage">
+    <div class="relative">
+      <button type="button" class="btn-icon theme-toggle theme-toggle-floating" style="position: absolute" data-theme-toggle aria-label="Changer de thème"><span data-when="light"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span><span data-when="dark"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span></button>
+      <main class="auth">
+        <div class="auth-card">
+          <header class="auth-brand"><span class="auth-wordmark">ComTSo</span><span class="rule-double is-flush"></span></header>
+          <h1 class="auth-title">Mot de passe oublié</h1>
+          <p class="auth-lead">Indiquez votre pseudo ou votre adresse e-mail : si un compte correspond, un lien pour choisir un nouveau mot de passe lui sera envoyé.</p>
+          <form class="auth-form" method="post" onsubmit="return false">
+            <div class="field"><label class="label" for="f-id">Pseudo ou e-mail</label><input class="input" id="f-id" type="text" required></div>
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Envoyer le lien</button>
+          </form>
+          <p class="auth-footer"><a href="#">Retour à la connexion</a></p>
+        </div>
+      </main>
+    </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Nouveau mot de passe (security/reset_password)">
+    <div class="ds-stage">
+    <div class="relative">
+      <button type="button" class="btn-icon theme-toggle theme-toggle-floating" style="position: absolute" data-theme-toggle aria-label="Changer de thème"><span data-when="light"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span><span data-when="dark"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span></button>
+      <main class="auth">
+        <div class="auth-card">
+          <header class="auth-brand"><span class="auth-wordmark">ComTSo</span><span class="rule-double is-flush"></span></header>
+          <h1 class="auth-title">Nouveau mot de passe</h1>
+          <p class="auth-lead">camille, choisissez votre nouveau mot de passe.</p>
+          <form class="auth-form" method="post" onsubmit="return false">
+            <div class="field"><label class="label" for="n-pw">Nouveau mot de passe</label><input class="input" id="n-pw" type="password" autocomplete="new-password" required><p class="field-help">Au moins 8 caractères.</p></div>
+            <div class="field"><label class="label" for="n-pw2">Confirmation</label><input class="input" id="n-pw2" type="password" autocomplete="new-password" required></div>
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Enregistrer le mot de passe</button>
+          </form>
         </div>
       </main>
     </div>
@@ -98,88 +142,6 @@
     </div>
   </div>
 
-  <div class="ds-demo" data-title="Annuaire des membres (pastille de messages non lus, point en ligne, noms longs)">
-    <div class="ds-stage">
-    <div class="people-grid">
-      <a class="card card-hover person-card" href="#">
-        <span class="person-card-avatar"><span class="avatar-wrap"><span class="avatar avatar-initial avatar-xl" style="--avatar-hue: 200">C</span><span class="avatar-status is-online"></span></span><span class="badge badge-accent badge-count person-card-count" title="Messages privés non lus">3</span></span>
-        <span class="person-card-name">Camille</span>
-        <span class="person-card-meta">Camille Martin</span>
-      </a>
-      <a class="card card-hover person-card" href="#">
-        <span class="person-card-avatar"><span class="avatar-wrap"><span class="avatar avatar-initial avatar-xl" style="--avatar-hue: 35">J</span><span class="avatar-status is-online"></span></span></span>
-        <span class="person-card-name">Julien</span>
-        <span class="person-card-meta">Julien Bernard</span>
-      </a>
-      <a class="card card-hover person-card" href="#">
-        <span class="person-card-avatar"><span class="avatar-wrap"><span class="avatar avatar-initial avatar-xl" style="--avatar-hue: 320">M</span></span></span>
-        <span class="person-card-name">Marion</span>
-      </a>
-      <a class="card card-hover person-card" href="#">
-        <span class="person-card-avatar"><span class="avatar-wrap"><span class="avatar avatar-initial avatar-xl" style="--avatar-hue: 95">T</span></span><span class="badge badge-accent badge-count person-card-count" title="Messages privés non lus">12</span></span>
-        <span class="person-card-name">Théo</span>
-        <span class="person-card-meta">Théo Lambert</span>
-      </a>
-      <a class="card card-hover person-card" href="#">
-        <span class="person-card-avatar"><span class="avatar-wrap"><span class="avatar avatar-initial avatar-xl" style="--avatar-hue: 150">S</span><span class="avatar-status is-online"></span></span></span>
-        <span class="person-card-name">Sophie</span>
-        <span class="person-card-meta">Sophie Roux</span>
-      </a>
-      <a class="card card-hover person-card" href="#">
-        <span class="person-card-avatar"><span class="avatar-wrap"><span class="avatar avatar-initial avatar-xl" style="--avatar-hue: 265">V</span><span class="avatar-status is-online"></span></span></span>
-        <span class="person-card-name">Vincent</span>
-        <span class="person-card-meta">Vincent Dupont</span>
-      </a>
-      <a class="card card-hover person-card" href="#">
-        <span class="person-card-avatar"><span class="avatar-wrap"><span class="avatar avatar-initial avatar-xl" style="--avatar-hue: 20">N</span></span><span class="badge badge-accent badge-count person-card-count" title="Messages privés non lus">1</span></span>
-        <span class="person-card-name">Nico</span>
-        <span class="person-card-meta">N. Girard</span>
-      </a>
-      <a class="card card-hover person-card" href="#">
-        <span class="person-card-avatar"><span class="avatar-wrap"><span class="avatar avatar-initial avatar-xl" style="--avatar-hue: 300">L</span></span></span>
-        <span class="person-card-name">Léa-Rose</span>
-        <span class="person-card-meta">Léa-Rose de la Fontaine-Beauchamp</span>
-      </a>
-    </div>
-    </div>
-  </div>
-
-  <div class="ds-demo" data-title="Profil d’un membre">
-    <div class="ds-stage">
-    <section class="profile card">
-      <header class="profile-header">
-        <span class="avatar-wrap"><span class="avatar avatar-initial avatar-xl profile-avatar" style="--avatar-hue: 265">VD</span><span class="avatar-status is-online"></span></span>
-        <div class="profile-identity">
-          <p class="kicker">Membre du cercle</p>
-          <h1 class="profile-name">Vincent Dupont</h1>
-          <p class="profile-username">vincent · en ligne</p>
-        </div>
-        <div class="profile-signature post-body"><p>Toujours partant pour une balade, surtout quand il y a des sandwichs.</p></div>
-      </header>
-
-      <dl class="profile-stats">
-        <div><dt>Messages</dt><dd>1 482</dd></div>
-        <div><dt>Sujets</dt><dd>37</dd></div>
-        <div><dt>Photos</dt><dd>214</dd></div>
-        <div><dt>Depuis</dt><dd>2004</dd></div>
-      </dl>
-
-      <dl class="dl profile-details">
-        <dt>Email</dt><dd><a href="#">vincent@exemple.fr</a></dd>
-        <dt>Site web</dt><dd><a href="#">https://vincent.exemple.fr</a></dd>
-        <dt>Activités</dt><dd>Randonnée, photographie, jeux de société</dd>
-        <dt>Né(e) le</dt><dd>12/03/1982 (44 ans)</dd>
-        <dt>Inscrit le</dt><dd>14/09/2004</dd>
-      </dl>
-
-      <div class="profile-actions">
-        <a class="btn" href="#"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> Modifier le profil</a>
-        <a class="btn" href="#">Configuration</a>
-      </div>
-    </section>
-    </div>
-  </div>
-
   <div class="ds-demo" data-title="Page de configuration / modification du profil">
     <div class="ds-stage">
     <div class="settings">
@@ -193,6 +155,32 @@
           <div class="form-actions"><a class="btn" href="#">Annuler</a><button type="submit" class="btn btn-primary">Sauvegarder</button></div>
         </form>
       </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Configuration : carte « Mot de passe » (people/config)">
+    <div class="ds-stage">
+    <div class="settings">
+      <div class="card settings-card" id="mot-de-passe">
+        <h2 class="section-title">Mot de passe</h2>
+        <p class="settings-hint">Après le changement, les autres appareils devront se reconnecter.</p>
+        <form method="post" onsubmit="return false">
+          <div class="field"><label class="label" for="c-old">Mot de passe actuel</label><input class="input" id="c-old" type="password" autocomplete="current-password"></div>
+          <div class="field"><label class="label" for="c-new">Nouveau mot de passe</label><input class="input" id="c-new" type="password" autocomplete="new-password"></div>
+          <div class="form-actions"><button type="submit" class="btn btn-primary">Changer le mot de passe</button></div>
+        </form>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="En-tête de sujet : bouton admin « Supprimer le sujet »">
+    <div class="ds-stage">
+    <div class="page-actions">
+      <a href="#" class="btn btn-sm"><svg viewBox="0 0 24 24" class="size-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> Modifier</a>
+      <a href="#" class="btn btn-sm"><svg viewBox="0 0 24 24" class="size-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg> Photos</a>
+      <form method="post" action="#" onsubmit="return false" data-confirm="Supprimer définitivement ce sujet ?"><button type="submit" class="btn btn-sm btn-danger"><svg viewBox="0 0 24 24" class="size-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Supprimer le sujet</button></form>
     </div>
     </div>
   </div>

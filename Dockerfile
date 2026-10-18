@@ -100,7 +100,10 @@ RUN npm run build
 
 FROM frankenphp_base AS frankenphp_prod_builder
 
+# Configuration comes from real environment variables only (compose / orchestrator): no .env file exists in the image
+# and symfony/dotenv is not installed.
 ENV APP_ENV=prod
+ENV APP_DEBUG=0
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
@@ -114,9 +117,13 @@ RUN composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scri
 COPY --link --exclude=frankenphp/ . ./
 
 RUN <<-EOF
-	mkdir -p var/cache var/log var/share
+	# var/photos: mount point of the persistent photo library (must exist in the image to inherit the www-data ownership)
+	mkdir -p var/cache var/log var/share var/photos/originals var/photos/cache
 	composer dump-autoload --classmap-authoritative --no-dev
-	composer dump-env prod
+	# The cache warmup instantiates services, which resolves these two variables (nothing connects). Build-time placeholders for
+	# THIS RUN ONLY: they are not stored in the image, the real values come from the environment at runtime.
+	export DATABASE_URL='mysql://build:build@127.0.0.1:3306/build?serverVersion=mariadb-11.4.0&charset=utf8mb4'
+	export MERCURE_URL='http://localhost/.well-known/mercure'
 	composer run-script --no-dev post-install-cmd
 	chmod +x bin/console
 	chmod -R g=u var
@@ -148,6 +155,7 @@ FROM debian:13-slim AS frankenphp_prod
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 
 ENV APP_ENV=prod
+ENV APP_DEBUG=0
 ENV PHP_INI_SCAN_DIR=":/usr/local/etc/php/app.conf.d"
 
 COPY --from=frankenphp_prod_builder /usr/local/bin/frankenphp /usr/local/bin/frankenphp

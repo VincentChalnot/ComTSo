@@ -11,6 +11,7 @@ const ICON = {
   right: '<svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>',
   close: '<svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
   download: '<svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
   page: '<svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
 };
 
@@ -137,6 +138,29 @@ function initForms() {
 }
 
 /* ------------------------------------------------------------------ lightbox */
+// Like state of the photos seen in the lightbox: photo id -> { liked, count, token } (token = CSRF token of the toggle).
+const likeStates = new Map();
+
+async function loadLikeState(photoId) {
+  if (!likeStates.has(photoId)) {
+    const response = await fetch(`/photos/${photoId}/like`, { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' });
+    if (!response.ok || response.redirected) throw new Error(String(response.status));
+    likeStates.set(photoId, await response.json());
+  }
+  return likeStates.get(photoId);
+}
+
+async function toggleLike(photoId) {
+  const state = await loadLikeState(photoId);
+  const body = new FormData();
+  body.append('_token', state.token);
+  const response = await fetch(`/photos/${photoId}/like`, { method: 'POST', body, headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' });
+  if (!response.ok || response.redirected) throw new Error(String(response.status));
+  const result = await response.json();
+  Object.assign(state, result);
+  return state;
+}
+
 class Lightbox {
   constructor(items, index) {
     this.items = items;
@@ -159,6 +183,7 @@ class Lightbox {
       <div class="lightbox-bar">
         <span data-lb-counter class="lightbox-counter"></span>
         <div class="lightbox-actions">
+          <button type="button" data-lb-like class="lightbox-btn lightbox-like" aria-pressed="false" aria-label="J\u2019aime" title="J\u2019aime" hidden>${ICON.heart}<span data-lb-like-count class="lightbox-like-count"></span></button>
           <a data-lb-page class="lightbox-btn" title="Page de la photo" aria-label="Page de la photo">${ICON.page}</a>
           <a data-lb-download class="lightbox-btn" title="Télécharger" aria-label="Télécharger" download>${ICON.download}</a>
           <button type="button" data-lb-close class="lightbox-btn" title="Fermer (Échap)" aria-label="Fermer">${ICON.close}</button>
@@ -177,6 +202,7 @@ class Lightbox {
     this.spinner = root.querySelector('[data-lb-spinner]');
 
     root.querySelector('[data-lb-close]').addEventListener('click', () => this.close());
+    root.querySelector('[data-lb-like]').addEventListener('click', () => this.like());
     root.querySelector('[data-lb-prev]').addEventListener('click', () => this.go(-1));
     root.querySelector('[data-lb-next]').addEventListener('click', () => this.go(1));
     // Clicking the dark backdrop (not the image or a button) closes the viewer.
@@ -236,12 +262,52 @@ class Lightbox {
     const download = this.root.querySelector('[data-lb-download]');
     download.href = item.download || item.full;
     this.root.querySelectorAll('[data-lb-prev], [data-lb-next]').forEach((b) => { b.hidden = this.items.length < 2; });
+    this.showLike(item);
 
     // Preload neighbours for instant navigation.
     [index - 1, index + 1].forEach((i) => {
       const neighbour = this.items[(i + this.items.length) % this.items.length];
       if (neighbour && neighbour !== item) new Image().src = neighbour.src;
     });
+  }
+
+  /** The heart: hidden for photos without id, filled from the server state (fetched once per photo). */
+  showLike(item) {
+    const button = this.root.querySelector('[data-lb-like]');
+    button.hidden = true;
+    if (!item.photoId) return;
+    loadLikeState(item.photoId)
+      .then((state) => {
+        if (this.items[this.index] !== item || !this.root.isConnected) return;
+        this.renderLike(button, state);
+        button.hidden = false;
+      })
+      .catch(() => {});
+  }
+
+  renderLike(button, state) {
+    button.classList.toggle('is-liked', state.liked);
+    button.setAttribute('aria-pressed', String(state.liked));
+    const label = state.liked ? 'Je n\u2019aime plus' : 'J\u2019aime';
+    button.setAttribute('aria-label', label);
+    button.title = label;
+    button.querySelector('[data-lb-like-count]').textContent = state.count > 0 ? String(state.count) : '';
+  }
+
+  async like() {
+    const item = this.items[this.index];
+    const button = this.root.querySelector('[data-lb-like]');
+    if (!item.photoId || button.disabled) return;
+    button.disabled = true;
+    try {
+      const state = await toggleLike(item.photoId);
+      if (this.root.isConnected && this.items[this.index] === item) this.renderLike(button, state);
+    } catch {
+      // Token expired or network error: forget the cached state so the next try starts from the server.
+      likeStates.delete(item.photoId);
+    } finally {
+      button.disabled = false;
+    }
   }
 
   close() {
@@ -265,6 +331,7 @@ function initLightbox() {
       download: a.dataset.download,
       page: a.dataset.page || a.href,
       caption: a.dataset.caption || '',
+      photoId: a.dataset.photoId ? Number(a.dataset.photoId) : null,
     }));
     new Lightbox(items, Math.max(0, group.indexOf(link)));
   });

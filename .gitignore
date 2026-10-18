@@ -1,7 +1,10 @@
+# Compose-only secrets (copy .env.example / deploy/.env.example): never committed, never read by PHP
+/.env
+/deploy/.env
+/secrets/
+/deploy/secrets/
+
 ###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
@@ -47,3 +50,7 @@ Thumbs.db
 
 # Playwright MCP scratch
 /.playwright-mcp/
+/backups/
+/deploy/backups/
+/design-system/dist/
+/.phpunit.cache/

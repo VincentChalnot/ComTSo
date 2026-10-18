@@ -6,7 +6,7 @@ mercure:
             # The Caddy hub runs with `protocol_version_compatibility 8` (see frankenphp/Caddyfile).
             protocol_version: '0.x'
             jwt:
-                secret: '%env(MERCURE_JWT_SECRET)%'
+                secret: '%env(trim:file:MERCURE_JWT_SECRET_FILE)%'
                 publish: '*'
 
 services:

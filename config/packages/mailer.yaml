@@ -1,3 +1,9 @@
 framework:
     mailer:
-        dsn: '%env(MAILER_DSN)%'
+        dsn: '%env(trim:file:MAILER_DSN_FILE)%'
+
+when@test:
+    framework:
+        mailer:
+            # Tests assert on the messages (assertEmailCount) and never reach the dev mail catcher.
+            dsn: 'null://null'

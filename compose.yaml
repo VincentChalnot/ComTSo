@@ -1,22 +1,60 @@
+# ComTSo — DEVELOPMENT stack (the only compose file of the repository; production lives in deploy/compose.yaml).
+#
+#   cp .env.example .env     # first time only: the dev secrets (see "Secrets" below)
+#   docker compose up -d
+#
+# Configuration: every NON-secret setting is in the `environment:` blocks below (override any `${VAR:-default}` from the shell
+# or from .env, e.g. `SERVER_NAME=foo.local.sidus.fr docker compose up -d`). PHP never parses a .env file (symfony/dotenv is not
+# installed): it only sees real environment variables.
+#
+# Secrets: .env (git-ignored, compose-only) -> top-level `secrets:` -> files under /run/secrets/<name> in the containers.
+# Symfony reads them through `%env(trim:file:APP_SECRET_FILE)%`-style processors (config/packages/*.yaml), Caddy through
+# `{file./run/secrets/mercure_jwt_secret}` (frankenphp/Caddyfile), MariaDB through its native `*_FILE` variables.
+name: comtso
+
 services:
   php:
+    image: comtso-php-dev
     build:
       context: .
       target: frankenphp_dev
     restart: unless-stopped
+    tty: true
     environment:
+      APP_ENV: "${APP_ENV:-dev}"
       # Port-only site address: Traefik terminates TLS and routes by Host() from the outside, while
       # internal callers (e.g. the Mercure publisher at http://php/.well-known/mercure) arrive with `Host: php`.
       CADDY_SITE_ADDRESS: ":80"
       DEFAULT_URI: https://${SERVER_NAME:-comtso.local.sidus.fr}
       # Symfony trusts X-Forwarded-* coming from Traefik (any private-range proxy, i.e. the Docker `proxy` network).
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-private_ranges}
-      MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
-      MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
-      DATABASE_URL: mysql://${MYSQL_USER:-comtso}:${MYSQL_PASSWORD:-comtso}@database:3306/${MYSQL_DATABASE:-comtso}?serverVersion=mariadb-11.4.0&charset=utf8mb4
-      MERCURE_URL: ${CADDY_MERCURE_URL:-http://php/.well-known/mercure}
-      MERCURE_PUBLIC_URL: ${CADDY_MERCURE_PUBLIC_URL:-https://${SERVER_NAME:-comtso.local.sidus.fr}/.well-known/mercure}
-      MERCURE_JWT_SECRET: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
+      # The forum is private: set to true to let anybody create an account at /register.
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}
+      # The password is read from the secret file at runtime (Doctrine `resolve:` processor); never put it here.
+      DATABASE_URL: mysql://comtso:%env(trim:file:DATABASE_PASSWORD_FILE)%@database:3306/comtso?serverVersion=mariadb-11.4.0&charset=utf8mb4
+      MERCURE_URL: http://php/.well-known/mercure
+      MERCURE_PUBLIC_URL: https://${SERVER_NAME:-comtso.local.sidus.fr}/.well-known/mercure
+      # Secrets: paths of the files mounted by `secrets:` below.
+      APP_SECRET_FILE: /run/secrets/app_secret
+      DATABASE_PASSWORD_FILE: /run/secrets/database_password
+      MERCURE_JWT_SECRET_FILE: /run/secrets/mercure_jwt_secret
+      MAILER_DSN_FILE: /run/secrets/mailer_dsn
+      # Sender of the e-mails (password reset), "Name <address>".
+      MAILER_FROM: ${MAILER_FROM:-ComTSo <no-reply@localhost>}
+      # Throwaway databases of the one-shot legacy reimport (profile `legacy`, see docs/legacy-import.md); read by app:legacy:reimport.
+      LEGACY_OLDPHP_URL: mysql://root:${LEGACY_MYSQL_ROOT_PASSWORD:-root}@legacy-mysql:3306/${LEGACY_MYSQL_DATABASE:-comtso_oldphp}?serverVersion=mariadb-11.4.0&charset=utf8mb4
+      LEGACY_PHPBB3_URL: pgsql://${LEGACY_PG_USER:-postgres}:${LEGACY_PG_PASSWORD:-legacy}@legacy-postgres:5432/${LEGACY_PG_DATABASE:-comtso2}?charset=utf8
+      FRANKENPHP_WORKER_CONFIG: watch
+      FRANKENPHP_SITE_CONFIG: hot_reload
+      # Applied by the entrypoint at every start (dev only: the production stack has a dedicated one-shot `migrate` service).
+      MIGRATE_ON_START: "1"
+      # See https://xdebug.org/docs/all_settings#mode
+      XDEBUG_MODE: "${XDEBUG_MODE:-develop}"
+    secrets:
+      - app_secret
+      - database_password
+      - mercure_jwt_secret
+      - mailer_dsn
     volumes:
       - caddy_data:/data
       - caddy_config:/config
@@ -24,13 +62,22 @@ services:
       - ./frankenphp/Caddyfile:/etc/frankenphp/Caddyfile:ro
       - ./frankenphp/conf.d/10-app.ini:/usr/local/etc/php/app.conf.d/10-app.ini:ro
       - ./frankenphp/conf.d/20-app.dev.ini:/usr/local/etc/php/app.conf.d/20-app.dev.ini:ro
+      # Keep var/ off the bind-mount for faster I/O; anything written there that is not bind-mounted below is lost on `down`.
+      - /app/var
+      # Photo originals (private) and the legacy dumps used by app:legacy:import
+      - ./var/photos:/app/var/photos
+    extra_hosts:
+      # Ensure that host.docker.internal is correctly defined on Linux
+      - host.docker.internal:host-gateway
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     networks:
       - default
       - proxy
     labels:
-      traefik.enable: "true"
+      # TRAEFIK_ENABLE=false lets a second copy of the stack (CI, throwaway runs) coexist without hijacking the router.
+      traefik.enable: "${TRAEFIK_ENABLE:-true}"
       traefik.docker.network: "${TRAEFIK_NETWORK:-proxy}"
       traefik.http.routers.comtso.rule: "Host(`${SERVER_NAME:-comtso.local.sidus.fr}`)"
       traefik.http.routers.comtso.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
@@ -43,15 +90,61 @@ services:
     image: mariadb:11.4
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-comtso}
-      MYSQL_USER: ${MYSQL_USER:-comtso}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-comtso}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MARIADB_DATABASE: comtso
+      MARIADB_USER: comtso
+      MARIADB_PASSWORD_FILE: /run/secrets/database_password
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/database_root_password
+    secrets:
+      - database_password
+      - database_root_password
     volumes:
       - database_data:/var/lib/mysql
+      # Runs once, when the volume is first created: creates `comtso_test` (PHPUnit) and grants `comtso%.*` to the app user.
       - ./docker/database/10-test-db.sql:/docker-entrypoint-initdb.d/10-test-db.sql:ro
     ports:
       - "${DATABASE_PORT:-3307}:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  # Vite build in watch mode: assets are rebuilt into public/assets (git-ignored) on every change.
+  node:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sh -c "npm install && npm run build -- --watch"
+    depends_on:
+      - php
+
+  # Design-system showcase: Vite dev server compiling the same Sass/Tailwind sources as the application
+  # (docs/design-system.md). http://localhost:${DESIGN_SYSTEM_PORT:-5174}/ (plain HTTP, published on the host). Dev only.
+  design-system:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    # `node` runs `npm install`; wait for it instead of racing it on the shared bind mount
+    command: sh -c "until [ -x node_modules/.bin/vite ] && [ -d node_modules/sass ]; do sleep 2; done; npm run design-system"
+    environment:
+      DESIGN_SYSTEM_INTERNAL_PORT: "5174"
+    ports:
+      - "${DESIGN_SYSTEM_PORT:-5174}:5174"
+    depends_on:
+      - node
+
+  # Local SMTP sink + web UI (random host ports: `docker compose port mailer 8025`).
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - "1025"
+      - "8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
   # --- Temporary services for the one-shot legacy reimport (see docs/legacy-import.md). Not started by default:
   #     docker compose --profile legacy up -d legacy-mysql legacy-postgres
@@ -90,29 +183,26 @@ services:
       retries: 60
       start_period: 20s
 
-  node:
-    image: node:20-alpine
-    working_dir: /app
-    volumes:
-      - ./:/app
-    command: sh -c "npm install && npm run build -- --watch"
-    depends_on:
-      - php
-
-# Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
-###> symfony/mercure-bundle ###
-###< symfony/mercure-bundle ###
-
+# Dev values live in .env (copy .env.example). Nothing else secret is read by the stack.
+secrets:
+  app_secret:
+    environment: APP_SECRET
+  database_password:
+    environment: DATABASE_PASSWORD
+  database_root_password:
+    environment: DATABASE_ROOT_PASSWORD
+  mercure_jwt_secret:
+    environment: MERCURE_JWT_SECRET
+  mailer_dsn:
+    environment: MAILER_DSN
 
 networks:
   proxy:
     external: true
     name: ${TRAEFIK_NETWORK:-proxy}
 
+# Same names as before the single-file cutover (project `comtso`): the dev database survives.
 volumes:
   caddy_data:
   caddy_config:
   database_data:
-###> symfony/mercure-bundle ###
-###< symfony/mercure-bundle ###
-

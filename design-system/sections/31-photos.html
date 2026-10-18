@@ -265,188 +265,129 @@
     </div>
   </div>
 
-  <div class="ds-demo" data-title="Page d'une photo (<code>.photo-figure</code>)">
-    <p class="ds-note">Image sur un carton de montage, titre/légende et lien de téléchargement sous un filet.</p>
-    <div class="ds-stage">
-<figure class="photo-figure">
-      <a href="#" class="block bg-surface-2 text-center" data-lightbox="photo-1" data-src="/photos/demo-6.svg" data-caption="Coucher de soleil sur la lande"><img src="/photos/demo-6.svg" alt="Coucher de soleil sur la lande" class="mx-auto max-h-[75vh] w-auto max-w-full"></a>
-      <figcaption><span>Coucher de soleil sur la lande</span><a href="#" class="btn"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg> Télécharger (842,5 Ko)</a></figcaption>
-    </figure>
-    <h2 class="card-title mb-2 mt-6">Cette photo apparaît dans</h2>
-    <ul class="space-y-1 text-sm">
-      <li><a href="#">Week-end en Bretagne</a> <span class="text-muted">· sujet · Sorties</span></li>
-      <li><a href="#">Message de Claire</a> <span class="text-muted">du 12/03/2026 · dans <a href="#" class="text-muted">Week-end en Bretagne</a> · Sorties</span></li>
-    </ul>
-    </div>
-  </div>
-
-  <div class="ds-demo" data-title="Gestion des photos du sujet : DOM actuel de PhotoManager">
-    <p class="ds-note">Les utilitaires Tailwind du composant Vue (<code>card</code>, <code>border-dashed</code>, <code>opacity-40</code>…) restent valides ; 2e tuile = glissée (<code>opacity-40</code>).</p>
-    <div class="ds-stage">
-<div>
-      <p class="mb-3 text-sm text-muted">Glissez-déposez les photos pour les réordonner. Les nouvelles photos sont ajoutées à la fin.</p>
-      <ul class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-      <li class="card group relative overflow-hidden" draggable="true">
-        <a href="#" class="block aspect-square bg-surface-2"><img src="/photos/demo-1.svg" alt="pointe-du-raz.jpg" class="size-full object-cover" draggable="false"></a>
-        <p class="truncate px-2 pt-1 text-xs text-muted" title="pointe-du-raz.jpg">pointe-du-raz.jpg</p>
-        <div class="flex gap-1 p-2"><button type="button" class="btn btn-sm flex-1">Retirer</button><button type="button" class="btn btn-sm btn-danger" title="Supprimer définitivement la photo">Supprimer</button></div>
-      </li>
-      <li class="card group relative overflow-hidden opacity-40" draggable="true">
-        <a href="#" class="block aspect-square bg-surface-2"><img src="/photos/demo-2.svg" alt="marche.jpg" class="size-full object-cover" draggable="false"></a>
-        <p class="truncate px-2 pt-1 text-xs text-muted" title="marche.jpg">marche.jpg</p>
-        <div class="flex gap-1 p-2"><button type="button" class="btn btn-sm flex-1">Retirer</button><button type="button" class="btn btn-sm btn-danger" title="Supprimer définitivement la photo">Supprimer</button></div>
-      </li>
-      <li class="card group relative overflow-hidden" draggable="true">
-        <a href="#" class="block aspect-square bg-surface-2"><img src="/photos/demo-3.svg" alt="port.jpg" class="size-full object-cover" draggable="false"></a>
-        <p class="truncate px-2 pt-1 text-xs text-muted" title="port.jpg">port.jpg</p>
-        <div class="flex gap-1 p-2"><button type="button" class="btn btn-sm flex-1">Retirer</button><button type="button" class="btn btn-sm btn-danger" title="Supprimer définitivement la photo">Supprimer</button></div>
-      </li>
-      <li class="card group relative overflow-hidden" draggable="true">
-        <a href="#" class="block aspect-square bg-surface-2"><img src="/photos/demo-4.svg" alt="cartes.jpg" class="size-full object-cover" draggable="false"></a>
-        <p class="truncate px-2 pt-1 text-xs text-muted" title="cartes.jpg">cartes.jpg</p>
-        <div class="flex gap-1 p-2"><button type="button" class="btn btn-sm flex-1">Retirer</button><button type="button" class="btn btn-sm btn-danger" title="Supprimer définitivement la photo">Supprimer</button></div>
-      </li>
-      </ul>
-      <section class="card border-2 border-dashed p-6 text-center transition border-line">
-        <h2 class="mb-2 font-semibold">Ajouter des photos</h2>
-        <label class="btn btn-primary">Choisir des fichiers…<input type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple class="hidden"></label>
-        <p class="mt-2 text-xs text-muted">ou déposez-les ici — JPEG, PNG, GIF, WebP, 25 Mo maximum chacune.</p>
-        <ul class="mx-auto mt-4 max-w-md space-y-1 text-left text-sm">
-          <li class="flex items-center justify-between gap-3"><span class="truncate">brume.jpg</span><span class="text-ok">OK</span></li>
-          <li class="flex items-center justify-between gap-3"><span class="truncate">grosse-photo.tiff</span><span class="text-danger">Fichier non accepté</span></li>
-          <li class="flex items-center justify-between gap-3"><span class="truncate">lande.jpg</span><span class="text-muted">Envoi…</span></li>
-        </ul>
-      </section>
-      <p class="mt-6"><a href="#" class="btn">Retour au sujet</a></p>
-    </div>
-    </div>
-  </div>
-
-  <div class="ds-demo" data-title="Gestion des photos : classes sémantiques">
-    <p class="ds-note"><code>.photo-manager</code>, <code>.photo-tile</code> (+ <code>.is-dragging</code>), <code>.photo-tile-tools</code> (rotation / suppression au survol), <code>.photo-dropzone</code> (+ <code>.is-dragover</code>).</p>
+  <div class="ds-demo" data-title="Gestion des photos du sujet (<code>PhotoManager</code>) : tuile glissée, téléversements">
+    <p class="ds-note">Réplique du DOM de <code>PhotoManager.vue</code> ; 2e tuile = glissée (<code>.is-dragging</code>).</p>
     <div class="ds-stage">
 <div class="photo-manager">
-      <p class="mb-3 text-sm text-muted">Glissez-déposez les photos pour les réordonner.</p>
-      <ul class="photo-manager-grid">
+      <p class="photo-manager-hint">Glissez-déposez les photos pour les réordonner. Les nouvelles photos sont ajoutées à la fin.</p>
+      <ul class="photo-manager-grid" aria-label="Photos du sujet">
         <li class="photo-tile" draggable="true">
           <a href="#"><img src="/photos/demo-1.svg" alt="pointe-du-raz.jpg" draggable="false"></a>
-          <div class="photo-tile-tools">
-            <button type="button" class="photo-tile-tool" title="Pivoter" aria-label="Pivoter"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
-            <button type="button" class="photo-tile-tool is-danger" title="Supprimer" aria-label="Supprimer"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          <p class="photo-tile-name" title="pointe-du-raz.jpg">pointe-du-raz.jpg</p>
+          <div class="photo-tile-actions">
+            <button type="button" class="btn btn-sm">Retirer</button>
+            <button type="button" class="btn btn-sm btn-danger" title="Supprimer définitivement la photo">Supprimer</button>
           </div>
-          <p class="photo-tile-name">pointe-du-raz.jpg</p>
-          <div class="photo-tile-actions"><button type="button" class="btn btn-sm">Retirer</button><button type="button" class="btn btn-sm btn-danger">Supprimer</button></div>
         </li>
         <li class="photo-tile is-dragging" draggable="true">
           <a href="#"><img src="/photos/demo-2.svg" alt="marche.jpg" draggable="false"></a>
-          <div class="photo-tile-tools">
-            <button type="button" class="photo-tile-tool" title="Pivoter" aria-label="Pivoter"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
-            <button type="button" class="photo-tile-tool is-danger" title="Supprimer" aria-label="Supprimer"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          <p class="photo-tile-name" title="marche.jpg">marche.jpg</p>
+          <div class="photo-tile-actions">
+            <button type="button" class="btn btn-sm">Retirer</button>
+            <button type="button" class="btn btn-sm btn-danger" title="Supprimer définitivement la photo">Supprimer</button>
           </div>
-          <p class="photo-tile-name">marche.jpg</p>
-          <div class="photo-tile-actions"><button type="button" class="btn btn-sm">Retirer</button><button type="button" class="btn btn-sm btn-danger">Supprimer</button></div>
         </li>
-        <li class="photo-tile is-hover" draggable="true">
+        <li class="photo-tile" draggable="true">
           <a href="#"><img src="/photos/demo-3.svg" alt="port.jpg" draggable="false"></a>
-          <div class="photo-tile-tools">
-            <button type="button" class="photo-tile-tool" title="Pivoter" aria-label="Pivoter"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
-            <button type="button" class="photo-tile-tool is-danger" title="Supprimer" aria-label="Supprimer"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          <p class="photo-tile-name" title="port.jpg">port.jpg</p>
+          <div class="photo-tile-actions">
+            <button type="button" class="btn btn-sm">Retirer</button>
+            <button type="button" class="btn btn-sm btn-danger" title="Supprimer définitivement la photo">Supprimer</button>
           </div>
-          <p class="photo-tile-name">port.jpg</p>
-          <div class="photo-tile-actions"><button type="button" class="btn btn-sm">Retirer</button><button type="button" class="btn btn-sm btn-danger">Supprimer</button></div>
         </li>
         <li class="photo-tile" draggable="true">
           <a href="#"><img src="/photos/demo-4.svg" alt="cartes.jpg" draggable="false"></a>
-          <div class="photo-tile-tools">
-            <button type="button" class="photo-tile-tool" title="Pivoter" aria-label="Pivoter"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
-            <button type="button" class="photo-tile-tool is-danger" title="Supprimer" aria-label="Supprimer"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          <p class="photo-tile-name" title="cartes.jpg">cartes.jpg</p>
+          <div class="photo-tile-actions">
+            <button type="button" class="btn btn-sm">Retirer</button>
+            <button type="button" class="btn btn-sm btn-danger" title="Supprimer définitivement la photo">Supprimer</button>
           </div>
-          <p class="photo-tile-name">cartes.jpg</p>
-          <div class="photo-tile-actions"><button type="button" class="btn btn-sm">Retirer</button><button type="button" class="btn btn-sm btn-danger">Supprimer</button></div>
         </li>
       </ul>
-      <section class="photo-dropzone">
-        <h2>Ajouter des photos</h2>
-        <label class="btn btn-primary">Choisir des fichiers…<input type="file" multiple class="hidden"></label>
-        <p class="mt-2 text-xs text-fg-soft">ou déposez-les ici — JPEG, PNG, GIF, WebP, 25 Mo maximum chacune.</p>
+      <section class="photo-dropzone" aria-labelledby="photo-dropzone-title">
+        <h2 id="photo-dropzone-title">Ajouter des photos</h2>
+        <label class="btn btn-primary">Choisir des fichiers…<input type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple class="sr-only"></label>
+        <p class="field-help">ou déposez-les ici — JPEG, PNG, GIF, WebP, 25 Mo maximum chacune.</p>
+        <ul class="photo-uploads" aria-live="polite">
+          <li><span class="photo-upload-name">brume.jpg</span><span class="photo-upload-state is-done">OK</span></li>
+          <li><span class="photo-upload-name">grosse-photo.tiff</span><span class="photo-upload-state is-error">Fichier non accepté</span></li>
+          <li><span class="photo-upload-name">lande.jpg</span><span class="photo-upload-state">Envoi…</span></li>
+        </ul>
       </section>
-      <section class="photo-dropzone is-dragover mt-3">
-        <h2>Déposez pour envoyer</h2>
-        <p class="text-sm">3 fichiers prêts.</p>
-      </section>
+      <section class="photo-dropzone is-dragover mt-3"><h2>Déposez pour envoyer</h2><p class="field-help">3 fichiers prêts.</p></section>
+      <p class="mt-8"><a href="#" class="btn btn-ghost">Retour au sujet</a></p>
     </div>
     </div>
   </div>
-
   <div class="ds-demo" data-title="Visionneuse (<code>.lightbox</code>)">
-    <p class="ds-note">Réplique statique du DOM construit par <code>ui.js</code> : fond sombre quelle que soit le thème, boutons ronds papier. Bouton télécharger = survol forcé, fermer = focus clavier.</p>
+    <p class="ds-note">Réplique statique du DOM construit par <code>ui.js</code> : fond sombre quelle que soit le thème, boutons ronds papier. Télécharger = survol forcé, fermer = focus clavier.</p>
     <div class="ds-stage">
 <div style="position:relative;height:30rem;overflow:hidden;border-radius:4px">
     <div class="lightbox" tabindex="-1" role="dialog" aria-modal="true" aria-label="Visionneuse de photos">
-      <div class="flex items-center justify-between gap-3 p-3 text-sm">
-        <span data-lb-counter class="tabular-nums opacity-80">2 / 5</span>
-        <div class="flex items-center gap-2">
+      <div class="lightbox-bar">
+        <span data-lb-counter class="lightbox-counter">2 / 5</span>
+        <div class="lightbox-actions">
+          <button type="button" data-lb-like class="lightbox-btn lightbox-like is-liked" aria-pressed="true" aria-label="J’aime" title="J’aime"><svg viewBox="0 0 24 24" class="size-5" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span data-lb-like-count class="lightbox-like-count">3</span></button>
           <a data-lb-page class="lightbox-btn" href="#" title="Page de la photo" aria-label="Page de la photo"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></a>
           <a data-lb-download class="lightbox-btn is-hover" href="#" title="Télécharger" aria-label="Télécharger" download><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></a>
           <button type="button" data-lb-close class="lightbox-btn is-focus" title="Fermer (Échap)" aria-label="Fermer"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
         </div>
       </div>
-      <div data-lb-backdrop class="relative flex min-h-0 flex-1 items-center justify-center px-2 sm:px-14">
-        <button type="button" data-lb-prev class="lightbox-btn absolute left-2 top-1/2 -translate-y-1/2" title="Précédente (←)" aria-label="Photo précédente"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
-        <img data-lb-image src="/photos/demo-2.svg" alt="Marché du dimanche" draggable="false">
-        <div data-lb-spinner class="absolute size-8 animate-spin rounded-full border-2 border-white/30 border-t-white hidden"></div>
-        <button type="button" data-lb-next class="lightbox-btn absolute right-2 top-1/2 -translate-y-1/2" title="Suivante (→)" aria-label="Photo suivante"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+      <div data-lb-backdrop class="lightbox-stage">
+        <button type="button" data-lb-prev class="lightbox-btn lightbox-nav is-prev" title="Précédente (←)" aria-label="Photo précédente"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+        <img data-lb-image class="lightbox-image" src="/photos/demo-2.svg" alt="" draggable="false">
+        <div data-lb-spinner class="lightbox-spinner" role="status" aria-label="Chargement" hidden></div>
+        <button type="button" data-lb-next class="lightbox-btn lightbox-nav is-next" title="Suivante (→)" aria-label="Photo suivante"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
       </div>
-      <p data-lb-caption class="min-h-12 p-3 text-center text-sm">Marché du dimanche</p>
+      <p data-lb-caption class="lightbox-caption">Marché du dimanche</p>
     </div>
 </div>
     </div>
   </div>
-
   <div class="ds-demo" data-title="Visionneuse : chargement">
-    <p class="ds-note">Image à <code>opacity-0</code> + <code>[data-lb-spinner]</code> pendant le chargement.</p>
+    <p class="ds-note"><code>.lightbox.is-loading</code> + <code>[data-lb-spinner]</code> visible pendant le chargement.</p>
     <div class="ds-stage">
 <div style="position:relative;height:30rem;overflow:hidden;border-radius:4px">
-    <div class="lightbox" tabindex="-1" role="dialog" aria-modal="true" aria-label="Visionneuse de photos">
-      <div class="flex items-center justify-between gap-3 p-3 text-sm">
-        <span data-lb-counter class="tabular-nums opacity-80">3 / 5</span>
-        <div class="flex items-center gap-2">
+    <div class="lightbox is-loading" tabindex="-1" role="dialog" aria-modal="true" aria-label="Visionneuse de photos">
+      <div class="lightbox-bar">
+        <span data-lb-counter class="lightbox-counter">3 / 5</span>
+        <div class="lightbox-actions">
+          <button type="button" data-lb-like class="lightbox-btn lightbox-like" aria-pressed="false" aria-label="J’aime" title="J’aime"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span data-lb-like-count class="lightbox-like-count"></span></button>
           <a data-lb-page class="lightbox-btn" href="#" title="Page de la photo" aria-label="Page de la photo"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></a>
           <a data-lb-download class="lightbox-btn is-hover" href="#" title="Télécharger" aria-label="Télécharger" download><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></a>
           <button type="button" data-lb-close class="lightbox-btn is-focus" title="Fermer (Échap)" aria-label="Fermer"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
         </div>
       </div>
-      <div data-lb-backdrop class="relative flex min-h-0 flex-1 items-center justify-center px-2 sm:px-14">
-        <button type="button" data-lb-prev class="lightbox-btn absolute left-2 top-1/2 -translate-y-1/2" title="Précédente (←)" aria-label="Photo précédente"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
-        <img data-lb-image src="/photos/demo-3.svg" alt="Le port, vu de la jetée" class="opacity-0" draggable="false">
-        <div data-lb-spinner class="absolute size-8 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
-        <button type="button" data-lb-next class="lightbox-btn absolute right-2 top-1/2 -translate-y-1/2" title="Suivante (→)" aria-label="Photo suivante"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+      <div data-lb-backdrop class="lightbox-stage">
+        <button type="button" data-lb-prev class="lightbox-btn lightbox-nav is-prev" title="Précédente (←)" aria-label="Photo précédente"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+        <img data-lb-image class="lightbox-image" src="/photos/demo-3.svg" alt="" draggable="false">
+        <div data-lb-spinner class="lightbox-spinner" role="status" aria-label="Chargement"></div>
+        <button type="button" data-lb-next class="lightbox-btn lightbox-nav is-next" title="Suivante (→)" aria-label="Photo suivante"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
       </div>
-      <p data-lb-caption class="min-h-12 p-3 text-center text-sm">Le port, vu de la jetée</p>
+      <p data-lb-caption class="lightbox-caption">Le port, vu de la jetée</p>
     </div>
 </div>
     </div>
   </div>
-
   <div class="ds-demo" data-title="Visionneuse : mobile (390 px)">
     <div class="ds-stage">
 <div style="position:relative;height:34rem;width:390px;max-width:100%;margin-inline:auto;overflow:hidden;border-radius:4px">
     <div class="lightbox" tabindex="-1" role="dialog" aria-modal="true" aria-label="Visionneuse de photos">
-      <div class="flex items-center justify-between gap-3 p-3 text-sm">
-        <span data-lb-counter class="tabular-nums opacity-80">1 / 3</span>
-        <div class="flex items-center gap-2">
+      <div class="lightbox-bar">
+        <span data-lb-counter class="lightbox-counter">1 / 3</span>
+        <div class="lightbox-actions">
           <a data-lb-page class="lightbox-btn" href="#" title="Page de la photo" aria-label="Page de la photo"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></a>
           <a data-lb-download class="lightbox-btn is-hover" href="#" title="Télécharger" aria-label="Télécharger" download><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg></a>
           <button type="button" data-lb-close class="lightbox-btn is-focus" title="Fermer (Échap)" aria-label="Fermer"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
         </div>
       </div>
-      <div data-lb-backdrop class="relative flex min-h-0 flex-1 items-center justify-center px-2 sm:px-14">
-        <button type="button" data-lb-prev class="lightbox-btn absolute left-2 top-1/2 -translate-y-1/2" title="Précédente (←)" aria-label="Photo précédente"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
-        <img data-lb-image src="/photos/demo-1.svg" alt="Pointe du Raz au crépuscule" draggable="false">
-        <div data-lb-spinner class="absolute size-8 animate-spin rounded-full border-2 border-white/30 border-t-white hidden"></div>
-        <button type="button" data-lb-next class="lightbox-btn absolute right-2 top-1/2 -translate-y-1/2" title="Suivante (→)" aria-label="Photo suivante"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+      <div data-lb-backdrop class="lightbox-stage">
+        <button type="button" data-lb-prev class="lightbox-btn lightbox-nav is-prev" title="Précédente (←)" aria-label="Photo précédente"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+        <img data-lb-image class="lightbox-image" src="/photos/demo-1.svg" alt="" draggable="false">
+        <div data-lb-spinner class="lightbox-spinner" role="status" aria-label="Chargement" hidden></div>
+        <button type="button" data-lb-next class="lightbox-btn lightbox-nav is-next" title="Suivante (→)" aria-label="Photo suivante"><svg viewBox="0 0 24 24" class="size-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
       </div>
-      <p data-lb-caption class="min-h-12 p-3 text-center text-sm">Pointe du Raz au crépuscule</p>
+      <p data-lb-caption class="lightbox-caption">Pointe du Raz au crépuscule</p>
     </div>
 </div>
     </div>

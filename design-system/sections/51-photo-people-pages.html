@@ -1,0 +1,146 @@
+<section class="ds-section" id="pages-photos-gens" data-title="Pages photos et membres">
+  <header class="ds-section-head">
+    <p class="kicker">Pages</p>
+    <h2>Photothèque, membres, recherche</h2>
+    <p class="standfirst">Répliques statiques du balisage rendu par <code>photo/index</code>, <code>photo/show</code>, <code>people/index</code>, <code>people/show</code> et <code>search/index</code>.</p>
+  </header>
+
+  <div class="ds-demo" data-title="Galerie (<code>photo/index</code>)">
+    <div class="ds-stage">
+<header class="page-header">
+      <p class="kicker">Photothèque</p>
+      <h1 class="page-title">Photos</h1>
+      <p class="standfirst">1 284 photos partagées par le cercle, page 1 sur 54, des plus récentes aux plus anciennes.</p>
+    </header>
+    <div class="photo-grid">
+      <a href="#" class="photo-thumb shrink-0 aspect-square w-full" data-lightbox="all" data-src="/photos/demo-1.svg" data-full="/photos/demo-1.svg" data-download="/photos/demo-1.svg" data-page="#" data-caption="Pointe du Raz"><img src="/photos/demo-1.svg" alt="Pointe du Raz" loading="lazy"></a>
+      <a href="#" class="photo-thumb shrink-0 aspect-square w-full" data-lightbox="all" data-src="/photos/demo-2.svg" data-full="/photos/demo-2.svg" data-download="/photos/demo-2.svg" data-page="#" data-caption="Marché"><img src="/photos/demo-2.svg" alt="Marché" loading="lazy"></a>
+      <a href="#" class="photo-thumb shrink-0 aspect-square w-full" data-lightbox="all" data-src="/photos/demo-3.svg" data-full="/photos/demo-3.svg" data-download="/photos/demo-3.svg" data-page="#" data-caption="Le port"><img src="/photos/demo-3.svg" alt="Le port" loading="lazy"></a>
+      <a href="#" class="photo-thumb shrink-0 aspect-square w-full" data-lightbox="all" data-src="/photos/demo-4.svg" data-full="/photos/demo-4.svg" data-download="/photos/demo-4.svg" data-page="#" data-caption="Cartes"><img src="/photos/demo-4.svg" alt="Cartes" loading="lazy"></a>
+      <a href="#" class="photo-thumb shrink-0 aspect-square w-full" data-lightbox="all" data-src="/photos/demo-5.svg" data-full="/photos/demo-5.svg" data-download="/photos/demo-5.svg" data-page="#" data-caption="Dunes"><img src="/photos/demo-5.svg" alt="Dunes" loading="lazy"></a>
+      <a href="#" class="photo-thumb shrink-0 aspect-square w-full" data-lightbox="all" data-src="/photos/demo-6.svg" data-full="/photos/demo-6.svg" data-download="/photos/demo-6.svg" data-page="#" data-caption="Brume"><img src="/photos/demo-6.svg" alt="Brume" loading="lazy"></a>
+      <a href="#" class="photo-thumb shrink-0 aspect-square w-full" data-lightbox="all" data-src="/photos/demo-7.svg" data-full="/photos/demo-7.svg" data-download="/photos/demo-7.svg" data-page="#" data-caption="Lande"><img src="/photos/demo-7.svg" alt="Lande" loading="lazy"></a>
+      <a href="#" class="photo-thumb shrink-0 aspect-square w-full" data-lightbox="all" data-src="/photos/demo-8.svg" data-full="/photos/demo-8.svg" data-download="/photos/demo-8.svg" data-page="#" data-caption="Falaises"><img src="/photos/demo-8.svg" alt="Falaises" loading="lazy"></a>
+    </div>
+    </div>
+  </div>
+  <div class="ds-demo" data-title="Page d’une photo (<code>photo/show</code>) : figure, détails, usages">
+    <div class="ds-stage">
+<header class="page-header">
+      <p class="kicker"><a href="#">Photothèque</a></p>
+      <h1 class="page-title">Coucher de soleil sur la lande</h1>
+      <div class="page-actions">
+        <a href="#" class="btn"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg> Télécharger (842,3 Ko)</a>
+        <a href="#" class="btn btn-ghost"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> Modifier</a>
+        <form method="post" action="#" class="inline" data-confirm="Supprimer définitivement cette photo ?" onsubmit="return false">
+          <button type="submit" class="btn btn-danger"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Supprimer</button>
+        </form>
+      </div>
+    </header>
+    <figure class="photo-figure">
+      <a href="#" data-lightbox="photo-6" data-photo-id="6" data-src="/photos/demo-6.svg" data-full="/photos/demo-6.svg" data-download="/photos/demo-6.svg" data-caption="Coucher de soleil sur la lande">
+        <img src="/photos/demo-6.svg" alt="Coucher de soleil sur la lande">
+      </a>
+      <figcaption>
+        <form method="post" action="#" class="like" id="likes" onsubmit="return false">
+          <button type="submit" class="btn like-button is-liked" aria-pressed="true">
+            <svg viewBox="0 0 24 24" class="size-4" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <span>Je n'aime plus</span>
+            <span class="like-count" aria-label="3 mentions J'aime">3</span>
+          </button>
+        </form>
+        <p class="like-likers">Aimé par <a href="#">camille</a>, <a href="#">claire</a> et 1 autre</p>
+        <p>Dernière lumière avant la pluie, à deux pas du refuge.</p>
+        <p class="byline"><span>Ajoutée par <a href="#">camille</a> le <time datetime="2026-03-12T18:40:00+01:00">12/03/2026 à 18:40</time></span></p>
+      </figcaption>
+    </figure>
+    <div class="section grid gap-x-16 gap-y-12 md:grid-cols-2">
+      <section aria-labelledby="photo-details">
+        <h2 class="section-title" id="photo-details">Détails</h2>
+        <dl class="dl">
+          
+          <dt>Date de prise</dt><dd>12/03/2026 à 18:12</dd>
+          <dt>Taille</dt><dd>842,3 Ko · 1600×1000</dd>
+          <dt>Appareil</dt><dd>Fujifilm X-T4</dd>
+          <dt>Exposition</dt><dd>1/250</dd>
+          <dt>Ouverture</dt><dd>f/5.6</dd>
+          <dt>ISO</dt><dd>200</dd>
+          <dt>Focale</dt><dd>35 mm</dd>
+          <dt>Position GPS</dt><dd><a href="#" rel="noopener noreferrer" target="_blank">48.0833, -4.6667</a></dd>
+        </dl>
+      </section>
+      <section aria-labelledby="photo-usages">
+        <h2 class="section-title" id="photo-usages">Cette photo apparaît dans</h2>
+        <ul class="photo-usages">
+          <li><p class="photo-usage-title"><a href="#">Week-end en Bretagne</a></p><p class="photo-usage-meta">Sujet · Sorties</p></li>
+          <li><p class="photo-usage-title"><a href="#">Message de claire</a></p><p class="photo-usage-meta">du 12/03/2026 · dans <a href="#">Week-end en Bretagne</a> · Sorties</p></li>
+        </ul>
+      </section>
+    </div>
+    </div>
+  </div>
+  <div class="ds-demo" data-title="Annuaire des membres (<code>people/index</code>)">
+    <div class="ds-stage">
+<header class="page-header">
+      <p class="kicker">Le cercle</p>
+      <h1 class="page-title">Les gens</h1>
+      <p class="standfirst">3 membres du cercle, depuis 2004.</p>
+    </header>
+    <div class="people-grid">
+      <a href="#" class="card card-hover person-card"><span class="person-card-avatar"><span class="avatar avatar-xl avatar-initial" style="--avatar-hue: 200">C</span><span class="badge badge-accent badge-count person-card-count" title="Messages privés non lus">2<span class="sr-only"> messages privés non lus</span></span></span><span class="person-card-name">camille</span><span class="person-card-meta">Camille Martin</span></a>
+      <a href="#" class="card card-hover person-card"><span class="person-card-avatar"><span class="avatar avatar-xl avatar-initial" style="--avatar-hue: 35">J</span></span><span class="person-card-name">jonas</span></a>
+      <a href="#" class="card card-hover person-card"><span class="person-card-avatar"><span class="avatar avatar-xl avatar-initial" style="--avatar-hue: 300">M</span></span><span class="person-card-name">marie-hélène</span><span class="person-card-meta">Marie-Hélène de la Tour</span></a>
+    </div>
+    </div>
+  </div>
+  <div class="ds-demo" data-title="Profil et messages privés (<code>people/show</code>)">
+    <div class="ds-stage">
+<section class="profile card" aria-labelledby="profile-name">
+      <header class="profile-header">
+        <span class="avatar profile-avatar avatar-xl avatar-initial" style="--avatar-hue: 200">C</span>
+        <div class="profile-identity">
+          <p class="kicker">Membre du cercle</p>
+          <h1 class="profile-name" id="profile-name">Camille Martin</h1>
+          <p class="profile-username">camille</p>
+        </div>
+        <div class="profile-signature post-body"><p>« Le plus court chemin d’un point à un autre est toujours la ligne droite. »</p></div>
+      </header>
+      <dl class="dl profile-details">
+        <dt>Email</dt><dd><a href="#">camille@example.test</a></dd>
+        <dt>Activités</dt><dd>Randonnée, photo, jardinage</dd>
+        <dt>Inscrit le</dt><dd>12/03/2004</dd>
+      </dl>
+      <div class="profile-actions">
+        <a href="#" class="btn"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> Modifier le profil</a>
+        <a href="#" class="btn"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg> Configuration</a>
+      </div>
+    </section>
+    <section class="section" aria-labelledby="conversation">
+      <h2 id="conversation" class="section-title">Messages privés</h2>
+      <div class="reply">
+        <span class="reply-avatar"><span class="avatar avatar-initial" style="--avatar-hue: 150">V</span></span>
+        <div class="reply-body">
+          <p class="card-title mb-2">Écrire à camille</p>
+          <div class="field"><textarea class="input" rows="3" aria-label="Message"></textarea></div>
+        </div>
+        <div class="reply-actions"><button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Envoyer</button></div>
+      </div>
+    </section>
+    </div>
+  </div>
+  <div class="ds-demo" data-title="Résultat de recherche (<code>search/index</code>, terme dans <code>mark.search-hit</code>)">
+    <div class="ds-stage">
+<ol class="result-list">
+      <li class="result has-avatar">
+        <span class="result-aside"><span class="avatar avatar-initial" style="--avatar-hue: 20">G</span></span>
+        <div class="result-body">
+          <p class="kicker is-plain">Le Bac à Sable</p>
+          <h3 class="result-title"><a href="#">Anniversaire !</a></h3>
+          <p class="result-excerpt">… on s’est retrouvés à la <mark class="search-hit">chapelle</mark> pour fêter les 40 ans de PB, il y avait du monde …</p>
+          <p class="byline"><span>gigi</span><time datetime="2008-02-20T16:55:00+01:00">20/02/2008 à 16:55</time><a href="#">Voir le message</a></p>
+        </div>
+      </li>
+    </ol>
+    </div>
+  </div>
+</section>

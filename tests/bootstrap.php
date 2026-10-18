@@ -1,13 +1,8 @@
 <?php
 
-use Symfony\Component\Dotenv\Dotenv;
-
+// No .env parsing: configuration comes from real environment variables (docker compose) and phpunit.dist.xml.
 require dirname(__DIR__).'/vendor/autoload.php';
 
-if (method_exists(Dotenv::class, 'bootEnv')) {
-    (new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
-}
-
-if ($_SERVER['APP_DEBUG']) {
+if ($_SERVER['APP_DEBUG'] ?? true) {
     umask(0000);
 }

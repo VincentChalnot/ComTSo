@@ -28,10 +28,12 @@ tests/
 var/
 vendor/
 .editorconfig
-.env.*.local
-.env.local
-.env.local.php
-.env.test
+.env
+.env.*
+deploy/
+secrets/
 node_modules/
 public/assets/
 .playwright-mcp/
+backups/
+design-system/

@@ -278,4 +278,16 @@
       border-left: 0;
     }
   }
+
+  // Search hit (src/Twig/SearchExtension.php wraps the matched term): sand marker + a thin underline so it also reads without colour.
+  // Same pair as the base `mark` (fg on highlight-soft, checked by `npm run contrast`).
+  .search-hit {
+    background: var(--c-highlight-soft);
+    color: var(--c-fg);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--c-highlight);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.15em;
+  }
 }

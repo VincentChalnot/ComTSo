@@ -1,0 +1,155 @@
+name: CI
+
+# Tests on every push to the default branch and on pull requests; the production image is built on the same events
+# and pushed to ghcr.io only for the default branch and `v*` tags (never for pull requests).
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  # A newer push to a pull request supersedes the older run; never cancel a run that may be publishing an image.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Second copy of the dev stack on a CI runner: no Traefik router for it.
+      TRAEFIK_ENABLE: 'false'
+    steps:
+      - uses: actions/checkout@v4
+
+      # The dev compose file reads its (throwaway) secrets from .env and joins the external Traefik network.
+      - name: Prepare the dev stack inputs
+        run: |
+          cp .env.example .env
+          docker network create proxy
+
+      - name: Validate the compose files
+        run: |
+          docker compose config -q
+          docker compose -f deploy/compose.yaml --env-file deploy/.env.example config -q
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Same image as `docker compose up` (target frankenphp_dev), loaded into the local Docker daemon under the name compose.yaml expects.
+      - name: Build the dev image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: frankenphp_dev
+          load: true
+          tags: comtso-php-dev
+          cache-from: type=gha,scope=dev
+          cache-to: type=gha,scope=dev,mode=max
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+
+      # Scripts are skipped: cache:clear/assets:install need the runtime environment of the stack, they run lazily there.
+      - name: Install PHP dependencies
+        run: >
+          docker run --rm -e COMPOSER_AUTH -v "$PWD:/app" -w /app comtso-php-dev
+          composer install --no-progress --no-interaction --prefer-dist --no-scripts
+        env:
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
+
+      # Advisory for now (continue-on-error): flip to blocking once the dependency tree is clean.
+      - name: Composer audit (non-blocking)
+        continue-on-error: true
+        run: docker run --rm -v "$PWD:/app" -w /app comtso-php-dev composer audit --locked
+
+      # `database` is healthy first (compose `depends_on`); the php entrypoint then migrates the dev database.
+      - name: Start the stack
+        run: docker compose up -d --wait --wait-timeout 300 php
+
+      - name: Migrate the test database
+        run: docker compose exec -T -e APP_ENV=test php bin/console doctrine:migrations:migrate --no-interaction
+
+      - name: Validate the Doctrine schema
+        run: docker compose exec -T -e APP_ENV=test php bin/console doctrine:schema:validate
+
+      - name: Lint Twig, YAML and the service container
+        run: |
+          docker compose exec -T php bin/console lint:twig templates
+          docker compose exec -T php bin/console lint:yaml config translations
+          docker compose exec -T php bin/console lint:container
+
+      - name: PHPUnit
+        run: docker compose exec -T php vendor/bin/phpunit
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build the front-end
+        run: |
+          npm ci
+          npm run build
+
+      - name: npm audit (non-blocking)
+        continue-on-error: true
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: WCAG AA contrast check
+        run: npm run contrast
+
+      - name: Stack logs
+        if: failure()
+        run: docker compose logs --no-color --tail=200
+
+  image:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to ghcr.io
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # latest = default branch; sha-<short> = every pushed build; 1.2.3 / 1.2 = git tag v1.2.3
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          flavor: latest=false
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=short
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build (and push, except for pull requests)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: frankenphp_prod
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
+          cache-from: type=gha,scope=prod
+          cache-to: type=gha,scope=prod,mode=max

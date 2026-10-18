@@ -29,8 +29,8 @@ docker compose exec node npm run contrast        # WCAG AA check of every text/b
 python3 design-system/scripts/make-textures.py   # regenerate the texture tiles (host: python3 + numpy + Pillow)
 ```
 
-Never run npm/node on the host (see AGENTS.md). The `design-system` service lives in `compose.override.yaml` only: it is
-neither in `compose.yaml` nor in the production image.
+Never run npm/node on the host (see AGENTS.md). The `design-system` service lives in the dev `compose.yaml` only: it is
+not part of the production stack (`deploy/compose.yaml`) nor of the production image.
 
 ## The SCSS + Tailwind 4 pipeline
 
@@ -300,7 +300,7 @@ and forced classes (`is-hover`, `is-pressed`, `is-focus`, `is-disabled`) through
 | `_form` | `.input` (+`-sm`/`-lg`, `.is-invalid`, readonly) `.label` `.field` `.field-help` `.field-error` `.form-grid` `.form-actions` checkbox/radio (global) `.check` `.switch` `.input-group` `.input-addon` `.input-wrap` `.input-icon` |
 | `_alert` | `.alert` `-danger` `-ok`/`-success` `-info` `-warning` `-neutral` `-sm` `.alert-icon` `.alert-body` `.alert-title` |
 | `_badge` | `.badge` `-muted` `-accent` `-secondary` `-highlight` `-danger` `-ok` `-solid` `-lg` `-dot` `-count` |
-| `_avatar` | `.avatar` `-xs/-sm/-lg/-xl` `-initial` (`--avatar-hue`) `-framed` `.avatar-wrap` `.avatar-status` `.avatar-stack` (`li` carries the overlap; legacy Tailwind avatars work) `.avatar-stack-more` |
+| `_avatar` | `.avatar` `-xs/-sm/-lg/-xl` `-initial` (`--avatar-hue`) `-framed` `.avatar-wrap` `.avatar-status` `.avatar-stack` (`li` carries the overlap) `.avatar-stack-more` |
 | `_tabs` | `.tabs` `.tab-pills` `.nav-pills` |
 | `_dropdown` | `.dropdown` `.dropdown-menu` `.dropdown-item` `.dropdown-divider` `.dropdown-label` `.popover` `.tooltip` `[data-tooltip]` `.menu` `.menu-item` `.menu-title` |
 | `_pager` | `.pager` (`a`, `span`, `.is-current`, `.is-disabled`) |
@@ -316,7 +316,7 @@ and forced classes (`is-hover`, `is-pressed`, `is-focus`, `is-disabled`) through
 | `_thread-preview` | `.thread-preview` (`.is-new`; `.has-cover` is a marker, the layout follows the presence of `.thread-preview-cover`) `.thread-preview-cover` `-body` `-title` `-excerpt` `-last` `-last-author` `-meta` `-stat` `-toggle` `-more` |
 | `_chat` | every `.chat-*` class of the original chat (page layout is unlayered on purpose) |
 | `_rich-editor` | every `.rich-editor*` class, ProseMirror content typeset like `.post-body` |
-| `_people` | `.people-grid` `.person-card*` `.profile*` `.settings*` |
+| `_people` | `.people-grid` `.person-card*` `.profile*` `.settings*` `.result-list` `.result*` `.search-hit` (search highlight, `mark`) |
 | `_auth` | `.auth` `.auth-card` `.auth-brand` `.auth-wordmark` `.auth-title` `.auth-lead` `.auth-form` `.auth-remember` `.auth-footer` |
 | `_error` | `.error-page` `.error-code` `.error-title` `.error-text` `.error-actions` |
 | `_theme-toggle` | `.theme-toggle` `.theme-toggle-floating` |
@@ -351,6 +351,7 @@ Audit of `assets/styles/app.css` (removed by the cutover), `templates/**`, `asse
 | Search result highlights | `mark` (base) |
 | Scrollbars, selection, focus ring | `base/_base` |
 | New: hero, thread preview, post photos, attach widget, reply block | `_hero`, `_thread-preview`, `_post-photos`, `_attach`, `_reply` |
+| Likes on photos (photo-page heart, lightbox heart) | `_like` |
 
 Templates and Vue components use the semantic classes above (masthead, `.page` / `.layout`, `.page-header`, `.section`, `.alert`, `.badge`,
 `.avatar`, `.post`, `.photo-*`, `.chat-*`, `.auth`, `.error-page`, `.people-grid`, `.profile`, `.settings`...); Tailwind utilities remain only as

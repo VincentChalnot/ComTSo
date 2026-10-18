@@ -26,13 +26,14 @@
 
 	mercure {
 		# Required by recent Mercure versions to keep using publisher_jwt/subscriber_jwt
-		# Both listeners (localhost + php:80) share one hub: equal names share a transport
+		# All listeners (the public site address and, in production, the internal `http://app:8080` one used by the Mercure
+		# publisher) share one hub: equal names share a transport
 		name comtso
 		protocol_version_compatibility 8
-		# Publisher JWT key
-		publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
-		# Subscriber JWT key
-		subscriber_jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} {env.MERCURE_SUBSCRIBER_JWT_ALG}
+		# Publisher and subscriber JWT key: the secret file shared with Symfony (compose `secrets:`, never an env var value).
+		# `{$VAR:default}` is resolved at startup to a path, then Caddy's `{file.*}` placeholder reads the file (trailing newline trimmed).
+		publisher_jwt {file.{$MERCURE_JWT_SECRET_FILE:/run/secrets/mercure_jwt_secret}} {env.MERCURE_PUBLISHER_JWT_ALG}
+		subscriber_jwt {file.{$MERCURE_JWT_SECRET_FILE:/run/secrets/mercure_jwt_secret}} {env.MERCURE_SUBSCRIBER_JWT_ALG}
 		# The forum is private: NO anonymous subscribers. Every update is published as private and subscribers
 		# authenticate with the subscriber JWT cookie issued by Symfony to logged-in members (ChatController::state()).
 		# The subscriptions API is not enabled either.
@@ -44,11 +45,32 @@
 
 	{$CADDY_SERVER_EXTRA_DIRECTIVES}
 
-	# Disable Topics tracking if not enabled explicitly: https://github.com/jkarlin/topics
-	header ?Permissions-Policy "browsing-topics=()"
+	# Security headers. The CSP allows the one inline script of templates/base.html.twig (theme bootstrap) by hash:
+	# tests/Security/CaddyCspTest.php fails when the hash no longer matches the template (regenerate: see the test message).
+	# style-src keeps 'unsafe-inline' for Vue/Tiptap inline styles; connect-src 'self' covers the (same-origin) Mercure hub.
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		X-Frame-Options "SAMEORIGIN"
+		X-Robots-Tag "noindex, nofollow, noarchive"
+		Permissions-Policy "browsing-topics=(), camera=(), microphone=(), geolocation=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-iM4Iipwxj/xPAAgO2D2q4MoLfHYSU7sRlVfL/+2vSn0='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://www.youtube-nocookie.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
+	}
+	# HSTS only when HSTS_ENABLED=true (production compose); dev sits behind Traefik, which has its own policy.
+	@hsts expression `{env.HSTS_ENABLED} == "true"`
+	header @hsts Strict-Transport-Security "max-age=31536000"
+
+	# Crawlers: served by Caddy so it works without login (the forum is private, see config/packages/security.yaml).
+	respond /robots.txt 200 {
+		body <<TXT
+			User-agent: *
+			Disallow: /
+			TXT
+	}
 
 	@phpRoute {
 		not path /.well-known/mercure*
+		not path /robots.txt
 		not file {path}
 	}
 	rewrite @phpRoute index.php

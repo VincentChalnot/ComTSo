@@ -2,41 +2,16 @@
 set -e
 
 if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
-	###> dunglas/symfony-docker ###
-	# Install the project the first time PHP is started
-	# This block will remove itself after the installation
-	if [ "$(cat composer.json)" = '{}' ]; then
-		rm -Rf tmp/
-		composer create-project "symfony/skeleton $SYMFONY_VERSION" tmp --stability="$STABILITY" --prefer-dist --no-progress --no-interaction --no-install
-
-		cd tmp
-		cp -Rp . ..
-		cd -
-		rm -Rf tmp/
-
-		composer require "php:>=$PHP_VERSION"
-		composer config --json extra.symfony.docker 'true'
-
-		# Remove the project install block from this script and the compose.yaml
-		sed -i '/^\t###> dunglas\/symfony-docker ###/,/^\t###< dunglas\/symfony-docker ###/d' frankenphp/docker-entrypoint.sh
-		sed -i '/###> dunglas\/symfony-docker ###/,/###< dunglas\/symfony-docker ###/d' compose.yaml
-
-		if grep -q ^DATABASE_URL= .env; then
-			echo 'To finish the installation please press Ctrl+C to stop Docker Compose and run: docker compose up --build --wait'
-			sleep infinity
-		fi
-	fi
-	###< dunglas/symfony-docker ###
-
+	# Dev only: vendor/ is bind-mounted and empty on a fresh checkout (the production image ships it).
 	if [ -z "$(ls -A 'vendor/' 2>/dev/null)" ]; then
 		composer install --prefer-dist --no-progress --no-interaction
 	fi
 
 	# Display information about the current project
-	# Or about an error in project initialization
+	# Or about an error in the configuration (every setting comes from real environment variables / secret files)
 	php bin/console -V
 
-	if grep -q ^DATABASE_URL= .env; then
+	if [ -n "${DATABASE_URL:-}" ]; then
 		echo 'Waiting for database to be ready...'
 		ATTEMPTS_LEFT_TO_REACH_DATABASE=60
 		until [ $ATTEMPTS_LEFT_TO_REACH_DATABASE -eq 0 ] || DATABASE_ERROR=$(php bin/console dbal:run-sql -q "SELECT 1" 2>&1); do
@@ -58,7 +33,8 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 			echo 'The database is now ready and reachable'
 		fi
 
-		if [ "$(find ./migrations -iname '*.php' -print -quit)" ]; then
+		# Opt-in (MIGRATE_ON_START=1, dev compose): production applies migrations in a dedicated one-shot service instead.
+		if [ "${MIGRATE_ON_START:-0}" = '1' ] && [ "$(find ./migrations -iname '*.php' -print -quit)" ]; then
 			php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing
 		fi
 	fi

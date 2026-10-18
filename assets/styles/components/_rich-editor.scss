@@ -48,7 +48,7 @@
   .rich-editor-toolbar {
     display: flex;
     align-items: center;
-    gap: 0.125rem;
+    justify-content: space-between;
     padding: 0.25rem;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;

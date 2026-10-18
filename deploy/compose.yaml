@@ -1,0 +1,146 @@
+# ComTSo — PRODUCTION stack, from the pre-built image published by CI (.github/workflows/ci.yml).
+#
+#   cp .env.example .env      # then edit: SERVER_NAME + the 5 secrets (see deploy/README.md)
+#   docker compose up -d
+#
+# Image:   ghcr.io/vincentchalnot/comtso:${COMTSO_IMAGE_TAG:-latest}   (tags: latest, sha-<short>, <semver>)
+# Config:  every non-secret setting is an `environment:` entry below (defaults inline, overridable from .env or the shell).
+#          PHP only sees real environment variables: there is no .env file in the image and symfony/dotenv is not installed.
+# Secrets: .env (git-ignored, read by Compose only) -> top-level `secrets:` -> /run/secrets/<name> inside the containers.
+#          Symfony reads them with `%env(trim:file:APP_SECRET_FILE)%`-style processors, Caddy with `{file.*}`, MariaDB with `*_FILE`.
+# Single replica: do NOT scale `app` (the Mercure hub is embedded in Caddy and keeps its state in the container;
+#          migrations run once, in `migrate`, before `app` starts).
+name: comtso
+
+x-app: &app
+  image: ghcr.io/vincentchalnot/comtso:${COMTSO_IMAGE_TAG:-latest}
+  environment: &app-environment
+    APP_ENV: prod
+    APP_DEBUG: "0"
+    # Public host name: Caddy automatic HTTPS certificate (direct mode), absolute URLs, Mercure public URL.
+    DEFAULT_URI: https://${SERVER_NAME:?Set SERVER_NAME in .env (public host name, e.g. forum.example.com)}
+    # Empty = trust no proxy (direct mode). Behind a reverse proxy set e.g. `private_ranges` or the proxy IP/CIDR.
+    TRUSTED_PROXIES: ${TRUSTED_PROXIES:-}
+    # Strict-Transport-Security header (Caddyfile). Turn off only if the site is reachable over plain HTTP on purpose.
+    HSTS_ENABLED: ${HSTS_ENABLED:-true}
+    # The forum is private: set to true to let anybody create an account at /register.
+    REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}
+    # The password is read from the secret file at runtime (Doctrine `resolve:` processor); never put it here.
+    DATABASE_URL: mysql://comtso:%env(trim:file:DATABASE_PASSWORD_FILE)%@database:3306/comtso?serverVersion=mariadb-11.4.0&charset=utf8mb4
+    # The Symfony app publishes to the embedded hub over the internal listener (`http://app:8080`, see CADDY_SITE_ADDRESS);
+    # browsers subscribe through the public URL.
+    MERCURE_URL: http://app:8080/.well-known/mercure
+    MERCURE_PUBLIC_URL: https://${SERVER_NAME}/.well-known/mercure
+    # Secrets: paths of the files mounted by `secrets:`.
+    APP_SECRET_FILE: /run/secrets/app_secret
+    DATABASE_PASSWORD_FILE: /run/secrets/database_password
+    MERCURE_JWT_SECRET_FILE: /run/secrets/mercure_jwt_secret
+    MAILER_DSN_FILE: /run/secrets/mailer_dsn
+    # Sender of the e-mails (password reset), "Name <address>".
+    MAILER_FROM: ${MAILER_FROM:-ComTSo <no-reply@localhost>}
+  secrets:
+    - app_secret
+    - database_password
+    - mercure_jwt_secret
+    - mailer_dsn
+
+services:
+  app:
+    <<: *app
+    restart: unless-stopped
+    environment:
+      <<: *app-environment
+      # Caddy site addresses, comma separated:
+      #  - the public one: SERVER_NAME => automatic HTTPS (Let's Encrypt, ports 80/443 must reach this host);
+      #    `:80` => plain HTTP for any host, when an external reverse proxy terminates TLS;
+      #  - `http://app:8080`: internal-only plain listener (not published) for the Mercure publisher of the Symfony app.
+      # They share one Mercure hub thanks to `name comtso` in the Caddyfile.
+      CADDY_SITE_ADDRESS: ${CADDY_SITE_ADDRESS:-${SERVER_NAME}}, http://app:8080
+    depends_on:
+      database:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    # The image carries its own HEALTHCHECK (Caddy admin API); `docker compose ps` shows `healthy` once Caddy + PHP are up.
+    volumes:
+      - photos:/app/var/photos
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      # Direct mode (default): Caddy on the host's 80/443 (+443/udp for HTTP/3), certificates in the `caddy_data` volume.
+      # Behind a proxy on the same host set HTTP_BIND=127.0.0.1:8080 HTTPS_BIND=127.0.0.1:8443 (or reach `app:80` through a shared network).
+      - "${HTTP_BIND:-0.0.0.0:80}:80"
+      - "${HTTPS_BIND:-0.0.0.0:443}:443"
+      - "${HTTPS_BIND:-0.0.0.0:443}:443/udp"
+    # --- Traefik instead of published ports: uncomment this block, the `proxy` network at the bottom, and set
+    #     CADDY_SITE_ADDRESS=:80  TRUSTED_PROXIES=private_ranges  HTTP_BIND=127.0.0.1:8080  HTTPS_BIND=127.0.0.1:8443
+    # networks:
+    #   - default
+    #   - proxy
+    # labels:
+    #   traefik.enable: "true"
+    #   traefik.docker.network: "proxy"
+    #   traefik.http.routers.comtso.rule: "Host(`${SERVER_NAME}`)"
+    #   traefik.http.routers.comtso.entrypoints: "websecure"
+    #   traefik.http.routers.comtso.tls: "true"
+    #   traefik.http.routers.comtso.tls.certresolver: "letsencrypt"   # your resolver name
+    #   traefik.http.services.comtso.loadbalancer.server.port: "80"
+
+  # One-shot: applies the Doctrine migrations, then exits (re-run, as a no-op when up to date, by every `docker compose up -d`).
+  # `app` only starts once it has succeeded, so a failing migration never serves a half-migrated schema.
+  migrate:
+    <<: *app
+    restart: "no"
+    command: ["php", "bin/console", "doctrine:migrations:migrate", "--no-interaction", "--allow-no-migration"]
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: comtso
+      MARIADB_USER: comtso
+      MARIADB_PASSWORD_FILE: /run/secrets/database_password
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/database_root_password
+      # Lets the image upgrade the system tables when `mariadb:11.4` moves to a newer patch release.
+      MARIADB_AUTO_UPGRADE: "1"
+    secrets:
+      - database_password
+      - database_root_password
+    volumes:
+      - database_data:/var/lib/mysql
+    # No published port: only `app` and `migrate` reach it, on the private compose network.
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+secrets:
+  app_secret:
+    environment: APP_SECRET
+  database_password:
+    environment: DATABASE_PASSWORD
+  database_root_password:
+    environment: DATABASE_ROOT_PASSWORD
+  mercure_jwt_secret:
+    environment: MERCURE_JWT_SECRET
+  mailer_dsn:
+    environment: MAILER_DSN
+
+volumes:
+  # Private photo library (var/photos: originals + generated thumbnails). Back it up with the database.
+  photos:
+  # Caddy certificates/ACME account (direct mode) and autosaved config.
+  caddy_data:
+  caddy_config:
+  database_data:
+
+# Traefik mode only (see `app` above):
+# networks:
+#   proxy:
+#     external: true
+#     name: proxy
