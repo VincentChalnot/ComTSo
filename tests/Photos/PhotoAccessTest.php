@@ -35,6 +35,14 @@ class PhotoAccessTest extends AppWebTestCase
         imagejpeg($image, $path);
     }
 
+    /** CSRF token of the photo manager page (the Vue widget sends it with every upload). */
+    private function managerToken(int $topicId): string
+    {
+        $crawler = $this->client->request('GET', "/forum/general/$topicId/photos");
+
+        return json_decode($crawler->filter('[data-vue-component=PhotoManager]')->attr('data-props'), true)['token'];
+    }
+
     private function storedPhoto(string $filename = 'abc123.jpeg'): Photo
     {
         $this->jpeg($this->dir.'/'.$filename);
@@ -63,15 +71,18 @@ class PhotoAccessTest extends AppWebTestCase
         $this->client->request('GET', "/photos/source/{$photo->getId()}");
         self::assertResponseIsSuccessful();
         self::assertSame('image/jpeg', $this->client->getResponse()->headers->get('Content-Type'));
+        self::assertSame('nosniff', $this->client->getResponse()->headers->get('X-Content-Type-Options'));
         self::assertStringContainsString('private', $this->client->getResponse()->headers->get('Cache-Control'));
 
         $this->client->request('GET', "/photos/{$photo->getId()}/thumb");
         self::assertResponseIsSuccessful();
-        [$width, $height] = getimagesize(static::getContainer()->getParameter('photos_cache_directory').'/thumb/abc123.jpeg');
+        self::assertSame('image/webp', $this->client->getResponse()->headers->get('Content-Type'));
+        self::assertSame('nosniff', $this->client->getResponse()->headers->get('X-Content-Type-Options'));
+        [$width, $height] = getimagesize(static::getContainer()->getParameter('photos_cache_directory').'/thumb/abc123.webp');
         self::assertSame([320, 320], [$width, $height], 'Thumbnails are cropped to a square.');
 
         $this->client->request('GET', "/photos/{$photo->getId()}/medium");
-        [$width] = getimagesize(static::getContainer()->getParameter('photos_cache_directory').'/medium/abc123.jpeg');
+        [$width] = getimagesize(static::getContainer()->getParameter('photos_cache_directory').'/medium/abc123.webp');
         self::assertSame(600, $width, 'Medium never upscales a small photo.');
     }
 
@@ -114,7 +125,7 @@ class PhotoAccessTest extends AppWebTestCase
         $upload = sys_get_temp_dir().'/upload-test.jpg';
         $this->jpeg($upload, 800, 600);
 
-        $this->client->request('POST', "/forum/general/{$topic->getId()}/photos/upload", files: ['file' => new UploadedFile($upload, 'beach.jpg', 'image/jpeg', null, true)]);
+        $this->client->request('POST', "/forum/general/{$topic->getId()}/photos/upload", ['_token' => $this->managerToken($topic->getId())], ['file' => new UploadedFile($upload, 'beach.jpg', 'image/jpeg', null, true)]);
 
         self::assertResponseStatusCodeSame(201);
         $this->em()->clear();
@@ -123,6 +134,7 @@ class PhotoAccessTest extends AppWebTestCase
         $photo = $links[0]->getPhoto();
         self::assertSame('beach.jpg', $photo->getOriginalFilename());
         self::assertSame([800, 600], [$photo->getWidth(), $photo->getHeight()]);
+        self::assertSame('image/webp', $photo->getFileType(), 'Stored through the pipeline.');
         self::assertFileExists($this->dir.'/'.$photo->getFilename());
         self::assertGreaterThan(new \DateTime('-1 minute'), $this->em()->find($topic::class, $topic->getId())->getLastActivityAt(), 'New photos move the topic up in the feeds.');
     }
@@ -135,12 +147,13 @@ class PhotoAccessTest extends AppWebTestCase
         file_put_contents($text, '<?php echo "pwned";');
 
         $this->loginAs($alice);
-        $this->client->request('POST', "/forum/general/{$topic->getId()}/photos/upload", files: ['file' => new UploadedFile($text, 'evil.jpg', 'image/jpeg', null, true)]);
+        $token = $this->managerToken($topic->getId());
+        $this->client->request('POST', "/forum/general/{$topic->getId()}/photos/upload", ['_token' => $token], ['file' => new UploadedFile($text, 'evil.jpg', 'image/jpeg', null, true)]);
         self::assertResponseStatusCodeSame(422);
 
         $this->loginAs($this->createUser('mallory'));
         $this->jpeg($ok = sys_get_temp_dir().'/ok.jpg');
-        $this->client->request('POST', "/forum/general/{$topic->getId()}/photos/upload", files: ['file' => new UploadedFile($ok, 'ok.jpg', 'image/jpeg', null, true)]);
+        $this->client->request('POST', "/forum/general/{$topic->getId()}/photos/upload", ['_token' => $token], ['file' => new UploadedFile($ok, 'ok.jpg', 'image/jpeg', null, true)]);
         self::assertResponseStatusCodeSame(403);
 
         self::assertSame([], glob($this->dir.'/*') ?: []);

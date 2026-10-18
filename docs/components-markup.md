@@ -5,25 +5,26 @@ Skeletons exactly as rendered by the templates (Twig/Vue sources in brackets). C
 `.avatar-stack`, `.btn*`) are styled by the design system; section "Classes outside the contract" lists the extra hooks.
 No component carries inline styles; the few Tailwind utilities left in templates are layout glue and can be replaced.
 
-## Hero — picture of the week (`templates/home/_hero.html.twig`, top of the home page)
+## Hero — coup de cœur des membres (random photo among the 10 most recently liked) (`templates/home/_hero.html.twig`, top of the home page)
 
 ```html
 <section class="hero" aria-labelledby="hero-title">
-  <a class="hero-media" href="/photos/{id}" aria-label="Agrandir la photo : {title}" data-lightbox="hero" data-src="/photos/{id}/hero"
+  <a class="hero-media" href="/photos/{id}" aria-label="Agrandir la photo : {title}" data-lightbox="hero" data-photo-id="{id}" data-src="/photos/{id}/hero"
      data-full="…" data-download="…" data-page="/photos/{id}" data-caption="{title}"> <!-- opens the lightbox; page link without JS -->
     <img class="hero-image" src="/photos/{id}/hero" alt="{title}" width="…" height="…" fetchpriority="high" decoding="async">
   </a>
   <div class="hero-body">
-    <p class="kicker">Photo de la semaine | Photo du mois | Photo à redécouvrir</p>
+    <p class="kicker">Coup de cœur des membres</p>
     <h2 class="hero-title" id="hero-title">{title or 'Photo sans titre'}</h2>
     <p class="byline">
       Par <a href="/gens/{user}">{author}</a> · <time datetime="Y-m-d">d/m/Y</time> · dans <a href="/comment/{id} or /forum/{f}/{t}">{topic title}</a>
+      · <span class="hero-likes">3 j'aime</span>
     </p>
     <a class="btn btn-primary" href="/photos/{id}">Voir la photo</a>
   </div>
 </section>
 ```
-`width`/`height` are the dimensions of the 1600 px `hero` variant (aspect ratio known up front). Author and "dans …" parts are optional.
+`width`/`height` are the dimensions of the 1600 px `hero` variant (aspect ratio known up front). Author and "dans …" parts are optional. No liked photo: the whole `<section>` is absent. The photo changes on every page load. `.hero-likes` is a plain inline span (no style needed). The image opens the lightbox, whose heart (see below) works on it.
 
 ## Thread preview (`templates/forum/_thread_preview.html.twig`, list wrapper `<div class="space-y-6">` in `forum/show.html.twig`)
 
@@ -109,10 +110,10 @@ Used by the reply form, the message edit page (`comment[photos][]`) and the new-
 Server-rendered (no JavaScript — a working native multiple file input):
 
 ```html
-<div class="attach" data-vue-component="AttachPhotos" data-props='{"name":"comment[photos][]","id":"comment_photos","maxFiles":10,"maxSize":26214400,"accept":"image/jpeg,image/png,image/gif,image/webp","existing":0}'>
+<div class="attach" data-vue-component="AttachPhotos" data-props='{"name":"comment[photos][]","id":"comment_photos","maxFiles":10,"maxSize":10485760,"accept":"image/jpeg,image/png,image/gif,image/webp","existing":0}'>
   <div class="attach-zone">
     <input type="file" id="comment_photos" name="comment[photos][]" multiple class="attach-input" accept="image/jpeg,image/png,image/gif,image/webp">
-    <p class="attach-hint">Jusqu'à 10 photos (JPEG, PNG, GIF ou WebP, 25 Mo maximum chacune).</p>
+    <p class="attach-hint">Jusqu'à 10 photos (JPEG, PNG, GIF ou WebP, 10 Mo maximum chacune).</p>
   </div>
 </div>
 ```
@@ -158,21 +159,73 @@ Server-side field errors (too many / too heavy / not an image) render through th
 ```
 Here `.attach-item-remove` wraps a *checkbox + label* (a native "remove" toggle) rather than the button of the Vue tray.
 
-## Photo page: where the photo is used (`templates/photo/show.html.twig`)
+## Photo page (`templates/photo/show.html.twig`)
 
 ```html
-<h2 class="card-title mb-2 mt-6">Cette photo apparaît dans</h2>
-<ul class="space-y-1 text-sm">
-  <li><a href="/forum/{f}/{t}">{topic}</a> <span class="text-muted">· sujet · {forum}</span></li>
-  <li><a href="/comment/{id}">Message de {author}</a> <span class="text-muted">du d/m/Y · dans <a href="/forum/{f}/{t}" class="text-muted">{topic}</a> · {forum}</span></li>
-</ul>
+<header class="page-header">
+  <p class="kicker"><a href="/photos">Photothèque</a></p>
+  <h1 class="page-title">{title or file name}</h1>
+  <div class="page-actions">
+    <a href="/photos/source/{id}?download=1" class="btn">{icon} Télécharger (266 Ko)</a>
+    <!-- owner / admin only -->
+    <a href="/photos/{id}/edit" class="btn btn-ghost">{icon} Modifier</a>
+    <form method="post" action="/photos/{id}/delete" class="inline" data-confirm="Supprimer définitivement cette photo ?">
+      <input type="hidden" name="_token" value="…"><button type="submit" class="btn btn-danger">{icon} Supprimer</button>
+    </form>
+  </div>
+</header>
+<figure class="photo-figure">
+  <a href="/photos/{id}" data-lightbox="photo-{id}" data-photo-id="{id}" data-src data-full data-download data-caption><img src="/photos/{id}/medium" alt></a>
+  <figcaption>
+    <form method="post" action="/photos/{id}/like" class="like" id="likes">                 <!-- no-JS toggle: POST + redirect to #likes -->
+      <input type="hidden" name="_token" value="…">
+      <button type="submit" class="btn like-button [is-liked]" aria-pressed="true|false">
+        <svg>{heart, filled when liked}</svg> <span>J'aime | Je n'aime plus</span> <span class="like-count" aria-label="3 mentions J'aime">3</span>
+      </button>
+    </form>
+    <p class="like-likers">Aimé par <a href="/gens/{user}">alice</a>, <a>bob</a> et 2 autres</p>   <!-- only with likes -->
+    <p>{description}</p> <p class="byline">…</p>
+  </figcaption>
+</figure>
+<div class="section grid …">
+  <section aria-labelledby="photo-details">
+    <h2 class="section-title" id="photo-details">Détails</h2>
+    <dl class="dl">                                                                   <!-- only rows that exist -->
+      <dt>Date de prise</dt><dd>20/10/2018 à 13:22</dd> <dt>Taille</dt><dd>266 Ko</dd> <dt>Dimensions</dt><dd>1600 × 1200 px</dd>
+      <dt>Appareil</dt><dd>samsung SM-A310F</dd> <dt>Objectif</dt> <dt>Exposition</dt><dd>1/33 s</dd> <dt>Ouverture</dt><dd>f/1.9</dd> <dt>ISO</dt> <dt>Focale</dt><dd>3.7 mm (équivalent 35 mm : 27 mm)</dd>
+      <dt>Flash</dt> <dt>Balance des blancs</dt> …
+      <!-- owner / admin only --> <dt>Position GPS</dt><dd><a href="https://www.openstreetmap.org/…" rel="noopener noreferrer" target="_blank">48.85661, 2.35222</a></dd> <dt>Altitude</dt>
+    </dl>
+  </section>
+  <section aria-labelledby="photo-usages">                                             <!-- only when used somewhere -->
+    <h2 class="section-title" id="photo-usages">Cette photo apparaît dans</h2>
+    <ul class="photo-usages">
+      <li><p class="photo-usage-title"><a href="/forum/{f}/{t}">{topic}</a></p><p class="photo-usage-meta">Sujet · {forum}</p></li>
+      <li><p class="photo-usage-title"><a href="/comment/{id}">Message de {author}</a></p>
+          <p class="photo-usage-meta">du d/m/Y · dans <a href="/forum/{f}/{t}">{topic}</a> · {forum}</p></li>
+    </ul>
+  </section>
+</div>
 ```
+
+## Lightbox heart (generated by `assets/scripts/ui.js`, styled by `components/_like.scss`)
+
+```html
+<div class="lightbox-actions">
+  <button type="button" class="lightbox-btn lightbox-like [is-liked]" data-lb-like aria-pressed="false" aria-label="J’aime" title="J’aime" hidden>
+    <svg>{heart}</svg><span class="lightbox-like-count" data-lb-like-count>3</span>
+  </button>
+  <a data-lb-page …> <a data-lb-download …> <button data-lb-close …>
+</div>
+```
+Shown (hidden removed) once `GET /photos/{id}/like` answered; hidden for links without `data-photo-id`. Click: `POST /photos/{id}/like` (token from the state), updates `is-liked`, `aria-pressed`, label ("J’aime" / "Je n’aime plus") and count without closing the viewer; `disabled` while the request runs.
 
 ## Classes outside the contract
 
 New hooks (need styling):
 - `.avatar-stack-more` — the "+N" `<li>` at the end of `.avatar-stack`.
 - `.attach-item-name`, `.attach-item-size` — file name / size inside `.attach-item`.
+- `.like`, `.like-button` (+ `.is-liked`), `.like-count`, `.like-likers`, `.lightbox-like` (+ `.is-liked`), `.lightbox-like-count`, `.hero-likes` — see `assets/styles/components/_like.scss` (written with the feature).
 - State classes: `.has-cover`, `.is-new` (on `.thread-preview`), `.is-dragover` (on `.attach-zone`), all in the contract.
 - `[hidden]` is relied upon on `.thread-preview-toggle` and `.thread-preview-more`: make sure `display` rules do not override the `hidden` attribute.
 - `.attach-item-remove` is used on a `<button>` (Vue tray) and on a `<span>` holding a checkbox + label (edit page).

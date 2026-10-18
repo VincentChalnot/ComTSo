@@ -116,7 +116,7 @@ class PostPhotosTest extends AppWebTestCase
 
         $this->reply('<p>Piège</p>', [$this->jpegUpload(), $this->fakeImageUpload()]);
 
-        self::assertResponseRedirects();
+        self::assertResponseStatusCodeSame(422, 'The page is shown again, with the reason, instead of redirecting.');
         self::assertNull($this->lastComment(), 'The message is not posted when one file is refused.');
         self::assertSame([], $this->storedFiles());
         self::assertSame(0, $this->em()->getRepository(Photo::class)->count([]));
@@ -147,7 +147,7 @@ class PostPhotosTest extends AppWebTestCase
         $path = sys_get_temp_dir().'/huge-'.uniqid().'.jpg';
         $handle = fopen($path, 'w');
         fwrite($handle, "\xFF\xD8\xFF\xE0");
-        ftruncate($handle, 26 * 1024 * 1024);
+        ftruncate($handle, 11 * 1024 * 1024);
         fclose($handle);
 
         $this->reply('<p>Énorme</p>', [new UploadedFile($path, 'huge.jpg', 'image/jpeg', null, true)]);

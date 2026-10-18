@@ -38,7 +38,7 @@ class SearchExtension
         }
 
         // The excerpt is escaped before highlighting: search the escaped spelling of the term.
-        return preg_replace($this->pattern(htmlspecialchars($term, ENT_QUOTES, 'UTF-8')), '<mark class="rounded bg-accent-soft px-0.5 text-fg">$0</mark>', $escaped) ?? $escaped;
+        return preg_replace($this->pattern(htmlspecialchars($term, ENT_QUOTES, 'UTF-8')), '<mark class="search-hit">$0</mark>', $escaped) ?? $escaped;
     }
 
     private function pattern(string $term): string

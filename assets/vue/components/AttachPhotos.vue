@@ -60,7 +60,7 @@ const props = defineProps({
   name: { type: String, required: true },
   id: { type: String, required: true },
   maxFiles: { type: Number, default: 10 },
-  maxSize: { type: Number, default: 25 * 1024 * 1024 },
+  maxSize: { type: Number, default: 10 * 1024 * 1024 },
   accept: { type: String, default: 'image/jpeg,image/png,image/gif,image/webp' },
   existing: { type: Number, default: 0 },
 });

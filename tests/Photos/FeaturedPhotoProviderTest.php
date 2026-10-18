@@ -4,241 +4,180 @@ namespace App\Tests\Photos;
 
 use App\Entity\CommentPhoto;
 use App\Entity\Photo;
+use App\Entity\PhotoLike;
 use App\Entity\PhotoTopic;
+use App\Entity\User;
 use App\Photo\FeaturedPhoto;
 use App\Photo\FeaturedPhotoProvider;
-use App\Photo\FeaturedRule;
+use App\Repository\PhotoLikeRepository;
 use App\Tests\Support\AppWebTestCase;
+use Random\Engine\Xoshiro256StarStar;
+use Random\Randomizer;
 
-class FeaturedPhotoProviderTest extends AppWebTestCase
+/** The hero shows a random one of the 10 photos most recently liked by the members. */
+final class FeaturedPhotoProviderTest extends AppWebTestCase
 {
-    /** Wednesday of ISO week 2026-W42. */
-    private const NOW = '2026-10-14 12:00:00';
+    private int $counter = 0;
 
-    private int $sequence = 0;
-
-    private function provider(): FeaturedPhotoProvider
+    private function provider(string $seed = 'comtso'): FeaturedPhotoProvider
     {
-        return static::getContainer()->get(FeaturedPhotoProvider::class);
+        return new FeaturedPhotoProvider($this->em(), static::getContainer()->get(PhotoLikeRepository::class), new Randomizer(new Xoshiro256StarStar(hash('sha256', $seed, true))));
     }
 
-    private function now(string $modifier = ''): \DateTimeImmutable
+    private function photo(?string $title = null): Photo
     {
-        return (new \DateTimeImmutable(self::NOW))->modify($modifier ?: 'now');
-    }
-
-    private function photo(\DateTimeInterface $createdAt, ?int $width = 1600, ?int $height = 900, ?string $title = null): Photo
-    {
-        $name = 'featured-'.++$this->sequence.'.jpeg';
-        $photo = (new Photo())
-            ->setFilename($name)
-            ->setOriginalFilename($name)
-            ->setFileSize(1000)
-            ->setFileType('image/jpeg')
-            ->setWidth($width)
-            ->setHeight($height)
-            ->setTitle($title)
-            ->setCreatedAt($createdAt);
+        $name = 'liked-'.++$this->counter.'.webp';
+        $photo = (new Photo())->setFilename($name)->setOriginalFilename($name)->setFileSize(1000)->setFileType('image/webp')->setWidth(1600)->setHeight(900)->setTitle($title);
         $this->em()->persist($photo);
         $this->em()->flush();
 
         return $photo;
     }
 
-    private function ago(string $interval): \DateTime
+    /** @param list<User> $likers */
+    private function like(Photo $photo, array $likers, string $at): void
     {
-        return \DateTime::createFromImmutable($this->now('-'.$interval));
+        foreach ($likers as $user) {
+            $this->em()->persist(new PhotoLike($photo, $user, new \DateTime($at)));
+        }
+        $this->em()->flush();
     }
 
-    public function testNoPhotoMeansNoHero(): void
+    /** @return array<int, int> photo id => times picked */
+    private function picks(FeaturedPhotoProvider $provider, int $draws): array
     {
-        self::assertNull($this->provider()->select($this->now()));
+        $picked = [];
+        for ($i = 0; $i < $draws; ++$i) {
+            $id = $provider->select()?->photo->getId();
+            $picked[$id] = ($picked[$id] ?? 0) + 1;
+        }
+
+        return $picked;
     }
 
-    public function testPhotoUploadedThisWeekIsThePhotoOfTheWeek(): void
+    public function testNoLikedPhotoMeansNoHero(): void
     {
-        $recent = $this->photo($this->ago('2 days'));
-        $this->photo($this->ago('20 days'));
-        $this->photo($this->ago('200 days'));
+        $this->photo('Never liked');
 
-        $featured = $this->provider()->select($this->now());
-
-        self::assertInstanceOf(FeaturedPhoto::class, $featured);
-        self::assertSame($recent->getId(), $featured->photo->getId());
-        self::assertSame(FeaturedRule::Week, $featured->rule);
-        self::assertSame('Photo de la semaine', $featured->kicker());
+        self::assertNull($this->provider()->select());
     }
 
-    public function testFallsBackToThePhotoOfTheMonth(): void
-    {
-        $month = $this->photo($this->ago('20 days'));
-        $this->photo($this->ago('200 days'));
-
-        $featured = $this->provider()->select($this->now());
-
-        self::assertSame($month->getId(), $featured->photo->getId());
-        self::assertSame(FeaturedRule::Month, $featured->rule);
-        self::assertSame('Photo du mois', $featured->kicker());
-    }
-
-    public function testFallsBackToTheLibrary(): void
-    {
-        $old = $this->photo($this->ago('200 days'));
-
-        $featured = $this->provider()->select($this->now());
-
-        self::assertSame($old->getId(), $featured->photo->getId());
-        self::assertSame(FeaturedRule::Library, $featured->rule);
-        self::assertSame('Photo à redécouvrir', $featured->kicker());
-    }
-
-    public function testPhotosFromTheFutureOfTheGivenInstantAreIgnored(): void
-    {
-        $this->photo(\DateTime::createFromImmutable($this->now('+2 days')));
-
-        self::assertSame(FeaturedRule::Library, $this->provider()->select($this->now())?->rule);
-    }
-
-    public function testAvatarsAreNeverFeatured(): void
+    public function testPicksAmongTheLastTenDistinctLikedPhotosAndNeverTheEleventhOldest(): void
     {
         $alice = $this->createUser('alice');
-        $alice->setAvatar($this->photo($this->ago('1 day'), 1600, 900));
+        $photos = [];
+        for ($i = 1; $i <= 11; ++$i) {
+            $photos[$i] = $this->photo("Photo $i");
+            $this->like($photos[$i], [$alice], sprintf('2026-01-%02d 10:00:00', $i)); // 1 is the oldest like
+        }
+
+        $picked = $this->picks($this->provider(), 400);
+
+        self::assertArrayNotHasKey($photos[1]->getId(), $picked, 'The 11th most recent liked photo is out of the pool.');
+        self::assertCount(10, $picked, 'Every photo of the pool comes up sometime: the pick is random on each call.');
+    }
+
+    public function testAPhotoLikedByThreeMembersCountsOnce(): void
+    {
+        $members = [$this->createUser('alice'), $this->createUser('bob'), $this->createUser('carol')];
+        $popular = $this->photo('Popular');
+        $this->like($popular, $members, '2026-02-01 10:00:00');
+        for ($i = 1; $i <= 9; ++$i) {
+            $this->like($this->photo("Single $i"), [$members[0]], sprintf('2026-01-%02d 10:00:00', $i));
+        }
+        // 10 distinct photos exist: with 3 likes the popular one would push another one out if likes were counted.
+        $picked = $this->picks($this->provider(), 400);
+
+        self::assertCount(10, $picked);
+        self::assertSame(3, $this->providerPick($popular)?->likeCount, 'It is one photo of the pool, shown with its 3 likes.');
+    }
+
+    private function providerPick(Photo $wanted): ?FeaturedPhoto
+    {
+        $provider = $this->provider('find');
+        for ($i = 0; $i < 200; ++$i) {
+            $featured = $provider->select();
+            if ($featured?->photo->getId() === $wanted->getId()) {
+                return $featured;
+            }
+        }
+
+        return null;
+    }
+
+    public function testRecentLikeRefreshesAnOlderPhotoIntoThePool(): void
+    {
+        $alice = $this->createUser('alice');
+        $old = $this->photo('Old favourite');
+        $this->like($old, [$alice], '2025-01-01 10:00:00');
+        for ($i = 1; $i <= 10; ++$i) {
+            $this->like($this->photo("Newer $i"), [$alice], sprintf('2026-01-%02d 10:00:00', $i));
+        }
+        self::assertArrayNotHasKey($old->getId(), $this->picks($this->provider(), 300));
+
+        $this->like($old, [$this->createUser('bob')], '2026-03-01 10:00:00');
+
+        self::assertArrayHasKey($old->getId(), $this->picks($this->provider(), 300), 'A fresh like puts the photo back in the pool.');
+    }
+
+    public function testAvatarsAreNeverPicked(): void
+    {
+        $alice = $this->createUser('alice');
+        $avatar = $this->photo('Avatar');
+        $alice->setAvatar($avatar);
         $this->em()->flush();
+        $this->like($avatar, [$alice], '2026-03-01 10:00:00');
 
-        self::assertNull($this->provider()->select($this->now()));
+        self::assertNull($this->provider()->select());
 
-        $other = $this->photo($this->ago('1 day'), 600, 800);
-        self::assertSame($other->getId(), $this->provider()->select($this->now())->photo->getId());
+        $real = $this->photo('Real');
+        $this->like($real, [$alice], '2026-03-02 10:00:00');
+        self::assertSame([$real->getId()], array_keys($this->picks($this->provider(), 30)));
     }
 
-    public function testThePickIsStableForTheWholeIsoWeekAndAcrossCalls(): void
+    public function testTheRandomSourceIsInjected(): void
     {
-        // Uploaded Monday morning of W42: inside the 7-day window at every instant of the week.
-        $created = new \DateTime('2026-10-12 08:00:00');
-        for ($i = 0; $i < 6; ++$i) {
-            $this->photo($created);
+        $alice = $this->createUser('alice');
+        for ($i = 1; $i <= 10; ++$i) {
+            $this->like($this->photo("Photo $i"), [$alice], sprintf('2026-01-%02d 10:00:00', $i));
         }
 
-        $instants = ['2026-10-12 09:00:00', '2026-10-13 23:59:59', '2026-10-14 12:00:00', '2026-10-17 06:30:00', '2026-10-18 07:59:00'];
-        $picks = [];
-        foreach ($instants as $instant) {
-            $picks[] = $this->provider()->select(new \DateTimeImmutable($instant))->photo->getId();
-            $picks[] = $this->provider()->select(new \DateTimeImmutable($instant))->photo->getId();
-        }
+        $sequence = static fn (FeaturedPhotoProvider $provider): array => array_map(static fn () => $provider->select()->photo->getId(), range(1, 20));
 
-        self::assertCount(1, array_unique($picks));
+        self::assertSame($sequence($this->provider('seed A')), $sequence($this->provider('seed A')));
+        self::assertNotSame($sequence($this->provider('seed A')), $sequence($this->provider('seed B')));
+        $one = $this->provider('seed A');
+        self::assertGreaterThan(1, \count(array_unique($sequence($one))), 'Consecutive calls of one provider do not repeat the same photo.');
     }
 
-    public function testThePickChangesFromWeekToWeek(): void
-    {
-        $created = new \DateTime('2020-01-01');
-        for ($i = 0; $i < 8; ++$i) {
-            $this->photo($created);
-        }
-
-        $picks = [];
-        for ($week = 0; $week < 10; ++$week) {
-            $featured = $this->provider()->select($this->now('+'.$week.' weeks'));
-            self::assertSame(FeaturedRule::Library, $featured->rule);
-            $picks[$featured->photo->getId()] = true;
-        }
-
-        self::assertGreaterThanOrEqual(2, \count($picks), 'Different weeks do not always feature the same photo.');
-    }
-
-    public function testAnUnrelatedNewUploadDoesNotReshuffleTheChoice(): void
-    {
-        for ($i = 0; $i < 6; ++$i) {
-            $this->photo($this->ago('1 day'));
-        }
-        $before = $this->provider()->select($this->now())->photo->getId();
-
-        // The newcomer is a portrait: it can never outrank the landscape candidates.
-        $this->photo($this->ago('1 hour'), 800, 1200);
-
-        self::assertSame($before, $this->provider()->select($this->now())->photo->getId());
-    }
-
-    public function testHighResolutionLandscapeIsPreferredInTheWindow(): void
-    {
-        for ($week = 0; $week < 6; ++$week) {
-            $now = $this->now('+'.$week.' weeks');
-            $created = \DateTime::createFromImmutable($now->modify('-1 day'));
-            $this->photo($created, 900, 1400); // portrait
-            $this->photo($created, 800, 600); // landscape but too small
-            $this->photo($created, null, null); // legacy import, unknown size
-            $this->photo($created, FeaturedPhotoProvider::MIN_LANDSCAPE_WIDTH - 1, 400); // just under the bar
-            $best = $this->photo($created, FeaturedPhotoProvider::MIN_LANDSCAPE_WIDTH, 800);
-
-            self::assertSame($best->getId(), $this->provider()->select($now)->photo->getId(), "Week +$week");
-        }
-    }
-
-    public function testAnyLandscapeBeatsPortraitAndUnknownSizeWhenNothingIsHighResolution(): void
-    {
-        for ($week = 0; $week < 6; ++$week) {
-            $now = $this->now('+'.$week.' weeks');
-            $created = \DateTime::createFromImmutable($now->modify('-1 day'));
-            $this->photo($created, 900, 1400);
-            $this->photo($created, null, null);
-            $this->photo($created, 500, 500); // square is not landscape
-            $landscape = $this->photo($created, 640, 480);
-
-            self::assertSame($landscape->getId(), $this->provider()->select($now)->photo->getId(), "Week +$week");
-        }
-    }
-
-    public function testPhotosWithoutDimensionsStillQualifyWhenNothingElseDoes(): void
-    {
-        $unknown = $this->photo($this->ago('1 day'), null, null);
-
-        $featured = $this->provider()->select($this->now());
-
-        self::assertSame($unknown->getId(), $featured->photo->getId());
-        self::assertSame(FeaturedRule::Week, $featured->rule);
-    }
-
-    public function testLibraryAlsoPrefersLandscapeAndNeverTreatsUnknownSizeAsLandscape(): void
-    {
-        $old = new \DateTime('2020-01-01');
-        for ($i = 0; $i < 5; ++$i) {
-            $this->photo($old, null, null);
-            $this->photo($old, 700, 1000);
-        }
-        $landscape = $this->photo($old, 800, 600);
-
-        for ($week = 0; $week < 6; ++$week) {
-            self::assertSame($landscape->getId(), $this->provider()->select($this->now('+'.$week.' weeks'))->photo->getId(), "Week +$week");
-        }
-    }
-
-    public function testTitleAndLocationComeFromTheNewestAppearance(): void
+    public function testTitleAndTopicComeFromTheNewestAppearance(): void
     {
         $alice = $this->createUser('alice');
         $forum = $this->createForum();
-        $album = $this->createTopic($forum, $alice, 'Album de vacances');
-        $discussion = $this->createTopic($forum, $alice, 'Sortie du dimanche');
-        $comment = $this->createComment($discussion, $alice);
-        $photo = $this->photo($this->ago('1 day'));
-
-        self::assertNull($this->provider()->select($this->now())->topic, 'Not attached anywhere yet.');
-        self::assertNull($this->provider()->select($this->now())->title());
-
-        $this->em()->persist((new PhotoTopic())->setPhoto($photo)->setTopic($album)->setCreatedAt(new \DateTime('2026-10-10'))->setUpdatedAt(new \DateTime('2026-10-10')));
+        $older = $this->createTopic($forum, $alice, 'Older topic');
+        $newer = $this->createTopic($forum, $alice, 'Newer topic');
+        $comment = $this->createComment($newer, $alice);
+        $photo = $this->photo();
+        $this->em()->persist((new PhotoTopic())->setTopic($older)->setPhoto($photo)->setCreatedAt(new \DateTime('2026-01-01')));
+        $this->em()->persist((new CommentPhoto())->setComment($comment)->setPhoto($photo)->setCreatedAt(new \DateTime('2026-02-01')));
+        $this->like($photo, [$alice], '2026-03-01 10:00:00');
         $this->em()->flush();
-        $featured = $this->provider()->select($this->now());
-        self::assertSame($album->getId(), $featured->topic->getId());
-        self::assertNull($featured->comment);
-        self::assertSame('Album de vacances', $featured->title());
 
-        $this->em()->persist((new CommentPhoto())->setPhoto($photo)->setComment($comment)->setCreatedAt(new \DateTime('2026-10-13')));
-        $this->em()->flush();
-        $featured = $this->provider()->select($this->now());
-        self::assertSame($discussion->getId(), $featured->topic->getId());
+        $featured = $this->provider()->select();
+
+        self::assertSame('Newer topic', $featured->topic->getTitle());
         self::assertSame($comment->getId(), $featured->comment->getId());
+        self::assertSame('Newer topic', $featured->title(), 'No photo title: the topic title is used.');
+        self::assertSame(1, $featured->likeCount);
+    }
 
-        $photo->setTitle('Coucher de soleil');
-        $this->em()->flush();
-        self::assertSame('Coucher de soleil', $this->provider()->select($this->now())->title(), 'The photo title wins over the topic title.');
+    public function testImageSizeIsTheHeroVariantSize(): void
+    {
+        $wide = new FeaturedPhoto((new Photo())->setWidth(3200)->setHeight(1800), 1);
+        $small = new FeaturedPhoto((new Photo())->setWidth(640)->setHeight(480), 1);
+
+        self::assertSame(['width' => 1600, 'height' => 900], $wide->imageSize());
+        self::assertSame(['width' => 640, 'height' => 480], $small->imageSize(), 'Never upscaled.');
+        self::assertNull((new FeaturedPhoto(new Photo(), 1))->imageSize());
     }
 }

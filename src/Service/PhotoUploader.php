@@ -4,18 +4,20 @@ namespace App\Service;
 
 use App\Entity\Photo;
 use App\Entity\User;
+use App\Photo\PhotoMetadata;
+use App\Photo\PhotoPipeline;
+use App\Photo\ProcessedPhoto;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-/** Validates an uploaded image, stores it in the private photo directory and builds the Photo entity. */
+/** Validates an uploaded image, runs it through the photo pipeline (EXIF, orientation, 10 MP WebP) and builds the Photo entity. */
 class PhotoUploader
 {
-    public const MAX_SIZE = 25 * 1024 * 1024;
-
-    private const EXTENSIONS = ['image/jpeg' => 'jpeg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
+    /** Largest file a member may send (the pixel limits are in {@see PhotoPipeline}). */
+    public const MAX_SIZE = 10 * 1024 * 1024;
 
     public function __construct(
+        private readonly PhotoPipeline $pipeline,
         private readonly ImageProcessingService $images,
         #[Autowire('%photos_directory%')]
         private readonly string $photosDirectory,
@@ -29,59 +31,54 @@ class PhotoUploader
             throw new \InvalidArgumentException('Le fichier n\'a pas pu être envoyé.');
         }
         if ($file->getSize() > self::MAX_SIZE) {
-            throw new \InvalidArgumentException('La photo dépasse 25 Mo.');
+            throw new \InvalidArgumentException('La photo dépasse 10 Mo.');
         }
 
-        $mimeType = $file->getMimeType();
-        $extension = self::EXTENSIONS[$mimeType] ?? null;
-        if (null === $extension) {
-            throw new \InvalidArgumentException('Seules les images JPEG, PNG, GIF et WebP sont acceptées.');
-        }
+        $processed = $this->pipeline->ingest($file->getPathname(), $this->photosDirectory);
 
-        // Read everything we need before moving: the temporary file disappears afterwards.
-        $size = $file->getSize();
-        $originalName = mb_substr($file->getClientOriginalName(), 0, 128);
-        $filename = uniqid().'.'.$extension;
-
-        if (!is_dir($this->photosDirectory)) {
-            mkdir($this->photosDirectory, 0775, true);
-        }
-        try {
-            $file->move($this->photosDirectory, $filename);
-        } catch (FileException $e) {
-            throw new \InvalidArgumentException('La photo n\'a pas pu être enregistrée.', 0, $e);
-        }
-        $path = $this->images->originalPath($filename);
-
-        $photo = (new Photo())
-            ->setFilename($filename)
-            ->setOriginalFilename($originalName)
-            ->setFileSize($size)
-            ->setFileType($mimeType)
+        return self::build($processed, mb_substr($file->getClientOriginalName(), 0, 128))
             ->setFileModifiedAt(new \DateTime())
             ->setAuthor($author);
+    }
 
-        if ($dimensions = $this->images->getImageDimensions($path)) {
-            $photo->setWidth($dimensions['width'])->setHeight($dimensions['height']);
-        }
-        if ($exif = $this->images->extractExif($path)) {
-            $photo->setExif($exif);
-            if ($taken = $this->images->extractTakenDate($exif)) {
-                $photo->setTakenAt($taken);
-            }
-        }
+    /** A new Photo for a file the pipeline just stored (the display name is the name the member knows the file by). */
+    public static function build(ProcessedPhoto $processed, string $originalFilename): Photo
+    {
+        $photo = (new Photo())
+            ->setFilename($processed->filename)
+            ->setOriginalFilename($originalFilename)
+            ->setFileSize($processed->fileSize)
+            ->setFileType($processed->mimeType)
+            ->setWidth($processed->width)
+            ->setHeight($processed->height);
+        self::applyMetadata($photo, $processed->metadata);
 
         return $photo;
     }
 
+    public static function applyMetadata(Photo $photo, PhotoMetadata $metadata): void
+    {
+        $photo->setTakenAt($metadata->takenAt ? \DateTime::createFromImmutable($metadata->takenAt) : null)
+            ->setGpsLatitude($metadata->latitude)
+            ->setGpsLongitude($metadata->longitude)
+            ->setGpsAltitude($metadata->altitude)
+            ->setExif($metadata->exif ?: null);
+    }
+
     public function delete(Photo $photo): void
     {
-        $path = $this->images->originalPath($photo->getFilename());
-        if (is_file($path)) {
+        $this->deleteFiles((string) $photo->getFilename());
+    }
+
+    /** Removes the stored file and every cached thumbnail of a stored photo. */
+    public function deleteFiles(string $filename): void
+    {
+        $path = $this->images->originalPath($filename);
+        if ('' !== $filename && is_file($path)) {
             unlink($path);
         }
         foreach (array_keys(ImageProcessingService::VARIANTS) as $variant) {
-            foreach (glob($this->images->cacheDirectory().'/'.$variant.'/'.pathinfo($photo->getFilename(), PATHINFO_FILENAME).'.*') ?: [] as $cached) {
+            foreach (glob($this->images->cacheDirectory().'/'.$variant.'/'.pathinfo($filename, PATHINFO_FILENAME).'.*') ?: [] as $cached) {
                 unlink($cached);
             }
         }

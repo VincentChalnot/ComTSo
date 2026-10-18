@@ -39,7 +39,7 @@
         Choisir des fichiers…
         <input ref="file" type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple class="sr-only" @change="onPick" />
       </label>
-      <p class="field-help">ou déposez-les ici — JPEG, PNG, GIF, WebP, 25 Mo maximum chacune.</p>
+      <p class="field-help">ou déposez-les ici — JPEG, PNG, GIF, WebP, 10 Mo maximum chacune.</p>
 
       <ul v-if="uploads.length" class="photo-uploads" aria-live="polite">
         <li v-for="(u, i) in uploads" :key="i">
@@ -54,6 +54,9 @@
 </template>
 
 <script>
+// Keep in sync with App\Service\PhotoUploader::MAX_SIZE
+const MAX_SIZE = 10 * 1024 * 1024;
+
 export default {
   name: 'PhotoManager',
   props: {
@@ -103,8 +106,13 @@ export default {
       for (const file of files) {
         const entry = { name: file.name, state: 'sending', message: 'Envoi…' };
         this.uploads.push(entry);
+        if (file.size > MAX_SIZE) {
+          Object.assign(entry, { state: 'error', message: 'Trop lourde : 10 Mo au maximum.' });
+          continue;
+        }
         const body = new FormData();
         body.append('file', file);
+        body.append('_token', this.token);
         try {
           const response = await fetch(this.uploadUrl, { method: 'POST', body, headers: { 'X-Requested-With': 'XMLHttpRequest' } });
           const data = await response.json();

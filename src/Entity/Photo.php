@@ -11,6 +11,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: PhotoRepository::class)]
 #[ORM\Table(name: 'ctso_photo')]
+#[ORM\Index(name: 'idx_photo_taken_at', columns: ['taken_at'])]
+#[ORM\Index(name: 'idx_photo_gps', columns: ['gps_latitude', 'gps_longitude'])]
 class Photo implements \JsonSerializable
 {
     use LegacyRefTrait;
@@ -37,6 +39,17 @@ class Photo implements \JsonSerializable
 
     #[ORM\Column(name: 'taken_at', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $takenAt = null;
+
+    /** Decimal degrees, negative south. Only shown to the photo's owner and administrators (home locations leak). */
+    #[ORM\Column(name: 'gps_latitude', type: Types::DECIMAL, precision: 9, scale: 6, nullable: true)]
+    private ?string $gpsLatitude = null;
+
+    #[ORM\Column(name: 'gps_longitude', type: Types::DECIMAL, precision: 10, scale: 6, nullable: true)]
+    private ?string $gpsLongitude = null;
+
+    /** Metres above sea level. */
+    #[ORM\Column(name: 'gps_altitude', type: Types::DECIMAL, precision: 8, scale: 2, nullable: true)]
+    private ?string $gpsAltitude = null;
 
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $width = null;
@@ -143,6 +156,44 @@ class Photo implements \JsonSerializable
     {
         $this->takenAt = $takenAt;
         return $this;
+    }
+
+    public function getGpsLatitude(): ?float
+    {
+        return null === $this->gpsLatitude ? null : (float) $this->gpsLatitude;
+    }
+
+    public function setGpsLatitude(?float $gpsLatitude): self
+    {
+        $this->gpsLatitude = null === $gpsLatitude ? null : number_format($gpsLatitude, 6, '.', '');
+        return $this;
+    }
+
+    public function getGpsLongitude(): ?float
+    {
+        return null === $this->gpsLongitude ? null : (float) $this->gpsLongitude;
+    }
+
+    public function setGpsLongitude(?float $gpsLongitude): self
+    {
+        $this->gpsLongitude = null === $gpsLongitude ? null : number_format($gpsLongitude, 6, '.', '');
+        return $this;
+    }
+
+    public function getGpsAltitude(): ?float
+    {
+        return null === $this->gpsAltitude ? null : (float) $this->gpsAltitude;
+    }
+
+    public function setGpsAltitude(?float $gpsAltitude): self
+    {
+        $this->gpsAltitude = null === $gpsAltitude ? null : number_format($gpsAltitude, 2, '.', '');
+        return $this;
+    }
+
+    public function hasGps(): bool
+    {
+        return null !== $this->gpsLatitude && null !== $this->gpsLongitude;
     }
 
     public function getWidth(): ?int

@@ -29,8 +29,8 @@ class HeroVariantTest extends AppWebTestCase
     {
         $image = imagecreatetruecolor($width, $height);
         imagefill($image, 0, 0, imagecolorallocate($image, 40, 120, 200));
-        imagejpeg($image, $this->dir.'/'.$filename);
-        $photo = (new Photo())->setFilename($filename)->setOriginalFilename($filename)->setFileSize(filesize($this->dir.'/'.$filename))->setFileType('image/jpeg')->setWidth($width)->setHeight($height);
+        imagewebp($image, $this->dir.'/'.$filename);
+        $photo = (new Photo())->setFilename($filename)->setOriginalFilename($filename)->setFileSize(filesize($this->dir.'/'.$filename))->setFileType('image/webp')->setWidth($width)->setHeight($height);
         $this->em()->persist($photo);
         $this->em()->flush();
 
@@ -39,7 +39,7 @@ class HeroVariantTest extends AppWebTestCase
 
     public function testHeroVariantRequiresALogin(): void
     {
-        $photo = $this->storedPhoto('wide.jpeg', 800, 600);
+        $photo = $this->storedPhoto('wide.webp', 800, 600);
 
         $this->client->request('GET', "/photos/{$photo->getId()}/hero");
 
@@ -48,25 +48,26 @@ class HeroVariantTest extends AppWebTestCase
 
     public function testHeroVariantIsScaledDownToAtMost1600PixelsWide(): void
     {
-        $photo = $this->storedPhoto('wide.jpeg', 3200, 1800);
+        $photo = $this->storedPhoto('wide.webp', 3200, 1800);
         $this->loginAs($this->createUser('alice'));
 
         $this->client->request('GET', "/photos/{$photo->getId()}/hero");
 
         self::assertResponseIsSuccessful();
-        self::assertSame('image/jpeg', $this->client->getResponse()->headers->get('Content-Type'));
+        self::assertSame('image/webp', $this->client->getResponse()->headers->get('Content-Type'));
+        self::assertSame('nosniff', $this->client->getResponse()->headers->get('X-Content-Type-Options'));
         self::assertStringContainsString('private', $this->client->getResponse()->headers->get('Cache-Control'));
-        self::assertSame([1600, 900], \array_slice(getimagesize(static::getContainer()->getParameter('photos_cache_directory').'/hero/wide.jpeg'), 0, 2));
+        self::assertSame([1600, 900], \array_slice(getimagesize(static::getContainer()->getParameter('photos_cache_directory').'/hero/wide.webp'), 0, 2));
     }
 
     public function testHeroVariantNeverUpscalesASmallPhoto(): void
     {
-        $photo = $this->storedPhoto('small.jpeg', 640, 480);
+        $photo = $this->storedPhoto('small.webp', 640, 480);
         $this->loginAs($this->createUser('alice'));
 
         $this->client->request('GET', "/photos/{$photo->getId()}/hero");
 
         self::assertResponseIsSuccessful();
-        self::assertSame([640, 480], \array_slice(getimagesize(static::getContainer()->getParameter('photos_cache_directory').'/hero/small.jpeg'), 0, 2));
+        self::assertSame([640, 480], \array_slice(getimagesize(static::getContainer()->getParameter('photos_cache_directory').'/hero/small.webp'), 0, 2));
     }
 }

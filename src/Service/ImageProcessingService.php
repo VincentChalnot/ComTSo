@@ -6,72 +6,10 @@ use Imagine\Filter\Basic\Autorotate;
 use Imagine\Gd\Imagine as GdImagine;
 use Imagine\Image\Box;
 use Imagine\Image\ImageInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/** Lazily generated, cached thumbnails (always WebP) of the stored photos. Stored photos themselves are produced by App\Photo\PhotoPipeline. */
 class ImageProcessingService
 {
-    public function __construct(
-        private readonly string $photosDirectory,
-        private readonly string $cacheDirectory,
-    ) {
-    }
-
-    /**
-     * Extract EXIF data from an image file
-     */
-    public function extractExif(string $filepath): ?array
-    {
-        if (!function_exists('exif_read_data')) {
-            return null;
-        }
-
-        $exif = @exif_read_data($filepath, null, true);
-        if (!$exif) {
-            return null;
-        }
-
-        // Clean and normalize EXIF data
-        $cleanExif = [];
-
-        if (isset($exif['IFD0'])) {
-            $cleanExif['Make'] = $exif['IFD0']['Make'] ?? null;
-            $cleanExif['Model'] = $exif['IFD0']['Model'] ?? null;
-            $cleanExif['DateTime'] = $exif['IFD0']['DateTime'] ?? null;
-        }
-
-        if (isset($exif['EXIF'])) {
-            $cleanExif['ExposureTime'] = $this->formatExposureTime($exif['EXIF']['ExposureTime'] ?? null);
-            $cleanExif['FNumber'] = $this->formatFNumber($exif['EXIF']['FNumber'] ?? null);
-            $cleanExif['ISOSpeedRatings'] = $exif['EXIF']['ISOSpeedRatings'] ?? null;
-            $cleanExif['FocalLength'] = $this->formatFocalLength($exif['EXIF']['FocalLength'] ?? null);
-            $cleanExif['DateTimeOriginal'] = $exif['EXIF']['DateTimeOriginal'] ?? null;
-        }
-
-        if (isset($exif['GPS'])) {
-            $cleanExif['GPS'] = $this->extractGPSCoordinates($exif['GPS']);
-        }
-
-        return array_filter($cleanExif);
-    }
-
-    /**
-     * Extract the date when photo was taken from EXIF
-     */
-    public function extractTakenDate(array $exif): ?\DateTimeInterface
-    {
-        $dateString = $exif['DateTimeOriginal'] ?? $exif['DateTime'] ?? null;
-
-        if (!$dateString) {
-            return null;
-        }
-
-        try {
-            return new \DateTime($dateString);
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
     /** Thumbnail variants: name => [width, height, mode]. "cover" crops to fill, "inset" fits inside the box. */
     public const VARIANTS = [
         'thumb' => [320, 320, 'cover'],
@@ -80,8 +18,17 @@ class ImageProcessingService
         'avatar' => [96, 96, 'cover'],
     ];
 
+    public const VARIANT_EXTENSION = 'webp';
+    public const VARIANT_MIME_TYPE = 'image/webp';
+
+    public function __construct(
+        private readonly string $photosDirectory,
+        private readonly string $cacheDirectory,
+    ) {
+    }
+
     /**
-     * Returns the path of the (lazily generated, cached) thumbnail of a stored photo, or null when the
+     * Returns the path of the (lazily generated, cached) WebP thumbnail of a stored photo, or null when the
      * variant is unknown or the original is missing/unreadable.
      */
     public function thumbnailPath(string $filename, string $variant): ?string
@@ -95,7 +42,7 @@ class ImageProcessingService
             return null;
         }
 
-        $target = $this->cacheDirectory.'/'.$variant.'/'.pathinfo($filename, PATHINFO_FILENAME).'.'.self::thumbnailExtension($filename);
+        $target = $this->cacheDirectory.'/'.$variant.'/'.pathinfo($filename, PATHINFO_FILENAME).'.'.self::VARIANT_EXTENSION;
         if (is_file($target) && filemtime($target) >= filemtime($source)) {
             return $target;
         }
@@ -103,7 +50,10 @@ class ImageProcessingService
         [$width, $height, $mode] = self::VARIANTS[$variant];
         try {
             $image = (new GdImagine())->open($source);
-            (new Autorotate())->apply($image);
+            // Photos stored by the pipeline are already upright; legacy JPEGs not yet reprocessed may still carry an orientation.
+            if (\in_array(strtolower(pathinfo($filename, PATHINFO_EXTENSION)), ['jpg', 'jpeg'], true)) {
+                (new Autorotate())->apply($image);
+            }
             $size = $image->getSize();
             if ('inset' === $mode && $size->getWidth() <= $width && $size->getHeight() <= $height) {
                 // Never upscale: serve a re-encoded copy at the original size.
@@ -114,7 +64,7 @@ class ImageProcessingService
             if (!is_dir(\dirname($target))) {
                 mkdir(\dirname($target), 0775, true);
             }
-            $out->save($target, ['jpeg_quality' => 82, 'png_compression_level' => 7, 'webp_quality' => 82]);
+            $out->save($target, ['format' => 'webp', 'webp_quality' => 82]);
         } catch (\Throwable) {
             return null;
         }
@@ -130,161 +80,5 @@ class ImageProcessingService
     public function originalPath(string $filename): string
     {
         return $this->photosDirectory.'/'.$filename;
-    }
-
-    private static function thumbnailExtension(string $filename): string
-    {
-        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-        return 'jpg' === $extension ? 'jpeg' : $extension;
-    }
-
-    /**
-     * Validate that uploaded file is an image
-     */
-    public function validateImage(UploadedFile $file): bool
-    {
-        $mimeType = $file->getMimeType();
-        $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-
-        return in_array($mimeType, $allowedMimes);
-    }
-
-    /**
-     * Get image dimensions
-     */
-    public function getImageDimensions(string $filepath): ?array
-    {
-        $imageInfo = @getimagesize($filepath);
-        if (!$imageInfo) {
-            return null;
-        }
-
-        return [
-            'width' => $imageInfo[0],
-            'height' => $imageInfo[1],
-            'type' => $imageInfo[2],
-            'mime' => $imageInfo['mime']
-        ];
-    }
-
-    /**
-     * Format exposure time to readable fraction
-     */
-    private function formatExposureTime(?string $exposureTime): ?string
-    {
-        if (!$exposureTime) {
-            return null;
-        }
-
-        if (str_contains($exposureTime, '/')) {
-            $parts = explode('/', $exposureTime);
-            if (count($parts) === 2 && is_numeric($parts[0]) && is_numeric($parts[1])) {
-                $value = (float)$parts[0] / (float)$parts[1];
-                if ($value < 1) {
-                    return "1/" . round(1 / $value);
-                }
-                return round($value, 1) . "s";
-            }
-        }
-
-        return $exposureTime;
-    }
-
-    /**
-     * Format F-number to readable aperture value
-     */
-    private function formatFNumber(?string $fNumber): ?string
-    {
-        if (!$fNumber) {
-            return null;
-        }
-
-        if (str_contains($fNumber, '/')) {
-            $parts = explode('/', $fNumber);
-            if (count($parts) === 2 && is_numeric($parts[0]) && is_numeric($parts[1])) {
-                return round((float)$parts[0] / (float)$parts[1], 1);
-            }
-        }
-
-        return $fNumber;
-    }
-
-    /**
-     * Format focal length to mm
-     */
-    private function formatFocalLength(?string $focalLength): ?string
-    {
-        if (!$focalLength) {
-            return null;
-        }
-
-        if (str_contains($focalLength, '/')) {
-            $parts = explode('/', $focalLength);
-            if (count($parts) === 2 && is_numeric($parts[0]) && is_numeric($parts[1])) {
-                return round((float)$parts[0] / (float)$parts[1]);
-            }
-        }
-
-        return $focalLength;
-    }
-
-    /**
-     * Extract GPS coordinates from EXIF GPS data
-     */
-    private function extractGPSCoordinates(array $gps): ?array
-    {
-        if (!isset($gps['GPSLatitude']) || !isset($gps['GPSLongitude'])) {
-            return null;
-        }
-
-        $lat = $this->convertGPSCoordinate($gps['GPSLatitude'], $gps['GPSLatitudeRef']);
-        $lon = $this->convertGPSCoordinate($gps['GPSLongitude'], $gps['GPSLongitudeRef']);
-
-        if ($lat === null || $lon === null) {
-            return null;
-        }
-
-        return [
-            'latitude' => $lat,
-            'longitude' => $lon
-        ];
-    }
-
-    /**
-     * Convert GPS coordinate to decimal degrees
-     */
-    private function convertGPSCoordinate(array $coordinate, string $ref): ?float
-    {
-        if (count($coordinate) !== 3) {
-            return null;
-        }
-
-        $degrees = $this->gpsToDecimal($coordinate[0]);
-        $minutes = $this->gpsToDecimal($coordinate[1]);
-        $seconds = $this->gpsToDecimal($coordinate[2]);
-
-        $decimal = $degrees + ($minutes / 60) + ($seconds / 3600);
-
-        if ($ref === 'S' || $ref === 'W') {
-            $decimal *= -1;
-        }
-
-        return $decimal;
-    }
-
-    /**
-     * Convert GPS fraction to decimal
-     */
-    private function gpsToDecimal(string $value): float
-    {
-        if (str_contains($value, '/')) {
-            $parts = explode('/', $value);
-            if (count($parts) === 2 && is_numeric($parts[0]) && is_numeric($parts[1]) && $parts[1] != 0) {
-                return (float)$parts[0] / (float)$parts[1];
-            }
-        }
-
-        return (float)$value;
     }
 }

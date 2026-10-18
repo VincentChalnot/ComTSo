@@ -5,12 +5,14 @@ namespace App\Legacy\Import;
 use App\Legacy\LegacyDate;
 use App\Legacy\Model\LegacyPhoto;
 use App\Legacy\Source\OldPhpSource;
+use App\Photo\PhotoPipeline;
 use Doctrine\DBAL\Connection;
 
 /**
  * Photos of the old PHP forum (`photos` rows + `photos/{id}.jpg` files). Photos the live site already has
- * (matched by original file name, or by identical file content) are left alone; a missing photo is imported only
- * if its file really exists in the old code tree, otherwise it is reported as lost.
+ * (matched by original file name) are left alone; a missing photo is imported only if its file really exists in the
+ * old code tree, otherwise it is reported as lost. Imported files go through the photo pipeline like any upload
+ * (EXIF read, orientation applied, at most 10 MP, stored as WebP): the stored copy is not byte-identical to the old file.
  */
 final class PhotoImporter
 {
@@ -25,6 +27,7 @@ final class PhotoImporter
         private readonly ImportReport $report,
         private readonly ReimportOptions $options,
         private readonly PhotoLinks $photoLinks,
+        private readonly PhotoPipeline $pipeline,
     ) {
     }
 
@@ -34,7 +37,6 @@ final class PhotoImporter
         $photos = $this->oldPhp->photos();
         $liveNames = array_flip($this->live->fetchFirstColumn('SELECT original_filename FROM ctso_photo'));
         $liveRefs = array_flip($this->live->fetchFirstColumn('SELECT legacy_ref FROM ctso_photo WHERE legacy_ref IS NOT NULL'));
-        $hashes = null;
 
         foreach ($photos as $photo) {
             $r->total(self::SOURCE, 'photos');
@@ -55,39 +57,19 @@ final class PhotoImporter
                 $r->detail('oldphp photos not imported', $describe.' — file missing');
                 continue;
             }
-            $hashes ??= $this->liveFileHashes();
-            if (isset($hashes[md5_file($file)])) {
-                $r->present(self::SOURCE, 'photos');
-                $r->detail('oldphp photos already stored under another name', $describe);
-                continue;
-            }
-
             $this->importFile($photo, $file, $describe);
         }
     }
 
-    /** @return array<string, true> md5 of every original already stored */
-    private function liveFileHashes(): array
-    {
-        $hashes = [];
-        foreach (glob($this->options->photosDirectory.'/*') ?: [] as $path) {
-            if (is_file($path)) {
-                $hashes[md5_file($path)] = true;
-            }
-        }
-
-        return $hashes;
-    }
-
     private function importFile(LegacyPhoto $photo, string $file, string $describe): void
     {
-        $size = @getimagesize($file);
-        if (false === $size) {
-            $this->report->skipped(self::SOURCE, 'photos', 'not a readable image');
+        try {
+            $this->pipeline->inspect($file);
+        } catch (\InvalidArgumentException $e) {
+            $this->report->skipped(self::SOURCE, 'photos', 'not an acceptable image: '.$e->getMessage());
 
             return;
         }
-        $extension = 'image/png' === $size['mime'] ? 'png' : ('image/gif' === $size['mime'] ? 'gif' : 'jpeg');
         $authorId = $this->users->resolve(self::SOURCE, $photo->authorId);
         $title = mb_substr($photo->title, 0, 128);
         $created = LegacyDate::sql($photo->createdAt);
@@ -102,29 +84,28 @@ final class PhotoImporter
             return;
         }
 
-        do {
-            $filename = uniqid().'.'.$extension;
-        } while (is_file($this->options->photosDirectory.'/'.$filename));
-        if (!is_dir($this->options->photosDirectory)) {
-            mkdir($this->options->photosDirectory, 0775, true);
+        try {
+            $stored = $this->pipeline->ingest($file, $this->options->photosDirectory);
+        } catch (\InvalidArgumentException $e) {
+            $this->report->skipped(self::SOURCE, 'photos', 'rejected by the photo pipeline: '.$e->getMessage());
+
+            return;
         }
-        copy($file, $this->options->photosDirectory.'/'.$filename);
 
         $this->live->insert('ctso_photo', [
-            'filename' => $filename,
+            'filename' => $stored->filename,
             'original_filename' => $photo->legacyFilename(),
-            'file_size' => filesize($file),
-            'file_type' => $size['mime'],
+            'file_size' => $stored->fileSize,
+            'file_type' => $stored->mimeType,
             'file_modified_at' => $modified,
-            'taken_at' => $modified,
-            'width' => $size[0],
-            'height' => $size[1],
+            'width' => $stored->width,
+            'height' => $stored->height,
             'title' => '' !== $title ? $title : null,
             'created_at' => $created,
             'updated_at' => $created,
             'author_id' => $authorId,
             'legacy_ref' => $photo->ref(),
-        ]);
+        ] + $stored->metadata->toColumns());
         $photoId = (int) $this->live->lastInsertId();
         $this->photoLinks->register($photo->id, $photoId);
         if (null !== $topicId) {
@@ -135,7 +116,7 @@ final class PhotoImporter
             ]);
         }
         $this->report->imported(self::SOURCE, 'photos');
-        $this->report->detail('oldphp photos imported', $describe.($topicId ? " → album topic #$topicId" : ' (no album topic found: photo stored without album)').' as '.$filename);
+        $this->report->detail('oldphp photos imported', $describe.($topicId ? " → album topic #$topicId" : ' (no album topic found: photo stored without album)').' as '.$stored->filename);
     }
 
     /** Live album topic of a photo: the topic its album siblings are attached to. */

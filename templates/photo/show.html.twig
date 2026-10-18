@@ -10,19 +10,39 @@
     <h1 class="page-title">{{ caption }}</h1>
     <div class="page-actions">
         <a href="{{ path('photo_source', {id: photo.id, download: 1}) }}" class="btn">{{ ui.icon('download', 'size-4') }} Télécharger ({{ (photo.fileSize / 1024)|round(1) }} Ko)</a>
-        {% if app.user and (photo.author == app.user or is_granted('ROLE_ADMIN')) %}
+        {% set canManage = app.user and (photo.author == app.user or is_granted('ROLE_ADMIN')) %}
+        {% if canManage %}
             <a href="{{ path('photo_edit', {id: photo.id}) }}" class="btn btn-ghost">{{ ui.icon('pencil', 'size-4') }} Modifier</a>
+            <form method="post" action="{{ path('photo_delete', {id: photo.id}) }}" class="inline"
+                  data-confirm="{% if is_granted('ROLE_ADMIN') and (photo.topics|length or messageUsages) %}Supprimer définitivement cette photo ? Elle disparaîtra aussi des sujets et des messages où elle apparaît.{% else %}Supprimer définitivement cette photo ?{% endif %}">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete-photo-' ~ photo.id) }}">
+                <button type="submit" class="btn btn-danger">{{ ui.icon('trash', 'size-4') }} Supprimer</button>
+            </form>
         {% endif %}
     </div>
 </header>
 
 <figure class="photo-figure">
     <a href="{{ path('photo_show', {id: photo.id}) }}"
-       data-lightbox="photo-{{ photo.id }}" data-src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}" data-full="{{ path('photo_source', {id: photo.id}) }}"
+       data-lightbox="photo-{{ photo.id }}" data-photo-id="{{ photo.id }}" data-src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}" data-full="{{ path('photo_source', {id: photo.id}) }}"
        data-download="{{ path('photo_source', {id: photo.id, download: 1}) }}" data-caption="{{ caption }}">
         <img src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}" alt="{{ caption }}">
     </a>
     <figcaption>
+        <form method="post" action="{{ path('photo_like', {id: photo.id}) }}" class="like" id="likes">
+            <input type="hidden" name="_token" value="{{ csrf_token('like-photo-' ~ photo.id) }}">
+            <button type="submit" class="btn like-button{{ liked ? ' is-liked' : '' }}" aria-pressed="{{ liked ? 'true' : 'false' }}">
+                {{ ui.icon('heart', 'size-4', liked) }}
+                <span>{{ liked ? 'Je n\'aime plus' : 'J\'aime' }}</span>
+                <span class="like-count" aria-label="{{ likeCount }} {{ likeCount > 1 ? 'mentions J\'aime' : 'mention J\'aime' }}">{{ likeCount }}</span>
+            </button>
+        </form>
+        {% if likers %}
+            <p class="like-likers">
+                Aimé par
+                {% for person in likers %}<a href="{{ path('people_show', {username: person.username}) }}">{{ person.username }}</a>{{ loop.last ? '' : ', ' }}{% endfor %}{% if likeCount > likers|length %} et {{ likeCount - likers|length }} autre{{ likeCount - likers|length > 1 ? 's' : '' }}{% endif %}
+            </p>
+        {% endif %}
         {% if photo.content %}<p>{{ photo.content|e|nl2br }}</p>{% endif %}
         <p class="byline">
             <span>{% if photo.author %}Ajoutée par <a href="{{ path('people_show', {username: photo.author.username}) }}">{{ photo.author.username }}</a> le {% else %}Ajoutée le {% endif %}<time datetime="{{ photo.createdAt|date('c') }}">{{ photo.createdAt|date('d/m/Y à H:i') }}</time></span>
@@ -35,13 +55,9 @@
     <section aria-labelledby="photo-details">
         <h2 class="section-title" id="photo-details">Détails</h2>
         <dl class="dl">
-            {% if photo.takenAt %}<dt>Date de prise</dt><dd>{{ photo.takenAt|date('d/m/Y à H:i') }}</dd>{% endif %}
-            <dt>Taille</dt><dd>{{ (photo.fileSize / 1024)|round(1) }} Ko{% if photo.width and photo.height %} · {{ photo.width }}×{{ photo.height }}{% endif %}</dd>
-            {% if photo.exif.Make is defined %}<dt>Appareil</dt><dd>{{ photo.exif.Make }} {{ photo.exif.Model|default('') }}</dd>{% endif %}
-            {% if photo.exif.ExposureTime is defined %}<dt>Exposition</dt><dd>{{ photo.exif.ExposureTime }}</dd>{% endif %}
-            {% if photo.exif.FNumber is defined %}<dt>Ouverture</dt><dd>f/{{ photo.exif.FNumber }}</dd>{% endif %}
-            {% if photo.exif.ISOSpeedRatings is defined %}<dt>ISO</dt><dd>{{ photo.exif.ISOSpeedRatings }}</dd>{% endif %}
-            {% if photo.exif.FocalLength is defined %}<dt>Focale</dt><dd>{{ photo.exif.FocalLength }} mm</dd>{% endif %}
+            {% for row in photo_details(photo, canSeeGps) %}
+                <dt>{{ row.label }}</dt><dd>{% if row.url is defined %}<a href="{{ row.url }}" rel="noopener noreferrer" target="_blank">{{ row.value }}</a>{% else %}{{ row.value }}{% endif %}</dd>
+            {% endfor %}
         </dl>
     </section>
 

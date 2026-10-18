@@ -2,6 +2,7 @@
 
 namespace App\Form\Type;
 
+use App\Photo\PhotoPipeline;
 use App\Photo\PostPhotos;
 use App\Service\PhotoUploader;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -51,11 +52,19 @@ class PhotoUploadType extends FileType
                 new All([new Image(
                     maxSize: $options['max_size'],
                     mimeTypes: self::MIME_TYPES,
-                    maxSizeMessage: 'La photo {{ name }} est trop lourde ({{ size }} {{ suffix }}) : {{ limit }} {{ suffix }} au maximum.',
+                    // Decompression bombs are refused from the header, before anything decodes the pixels.
+                    maxPixels: PhotoPipeline::MAX_SOURCE_PIXELS,
+                    maxWidth: PhotoPipeline::MAX_SIDE,
+                    maxHeight: PhotoPipeline::MAX_SIDE,
+                    maxSizeMessage: 'La photo {{ name }} est trop lourde ({{ size }} {{ suffix }}) : '.intdiv($options['max_size'], 1048576).' Mo au maximum.',
                     mimeTypesMessage: '{{ name }} n\'est pas une image acceptée : seules les images JPEG, PNG, GIF et WebP sont acceptées.',
+                    maxPixelsMessage: '{{ name }} est trop grande ({{ width }} × {{ height }} pixels) : '.(PhotoPipeline::MAX_SOURCE_PIXELS / 1_000_000).' mégapixels au maximum.',
+                    maxWidthMessage: '{{ name }} est trop large ({{ width }} pixels) : '.PhotoPipeline::MAX_SIDE.' pixels au maximum.',
+                    maxHeightMessage: '{{ name }} est trop haute ({{ height }} pixels) : '.PhotoPipeline::MAX_SIDE.' pixels au maximum.',
                     notFoundMessage: 'Le fichier n\'a pas pu être envoyé.',
                     notReadableMessage: 'Le fichier n\'a pas pu être lu.',
-                    uploadIniSizeErrorMessage: 'Une photo dépasse la taille maximale autorisée ({{ limit }} {{ suffix }}).',
+                    // PHP refuses the file itself when it exceeds upload_max_filesize (10M): same sentence as the size constraint.
+                    uploadIniSizeErrorMessage: 'Une photo est trop lourde : '.intdiv($options['max_size'], 1048576).' Mo au maximum.',
                     uploadFormSizeErrorMessage: 'Une photo dépasse la taille maximale autorisée.',
                     uploadErrorMessage: 'Le fichier n\'a pas pu être envoyé.',
                     sizeNotDetectedMessage: '{{ name }} n\'est pas une image valide.',

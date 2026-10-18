@@ -5,6 +5,7 @@
 <a href="{{ path('photo_show', {id: photo.id}) }}"
    class="photo-thumb shrink-0 {{ size }}"
    data-lightbox="{{ group }}"
+   data-photo-id="{{ photo.id }}"
    data-src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}"
    data-full="{{ path('photo_source', {id: photo.id}) }}"
    data-download="{{ path('photo_source', {id: photo.id, download: 1}) }}"

@@ -11,6 +11,7 @@ use App\Legacy\Source\OldPhpSource;
 use App\Legacy\Source\Phpbb2Source;
 use App\Legacy\Source\Phpbb3Source;
 use App\Legacy\Text\TextNormalizer;
+use App\Photo\PhotoPipeline;
 use Doctrine\DBAL\Connection;
 
 /**
@@ -47,6 +48,7 @@ final class Reimporter
         private readonly Phpbb2Source $phpbb2,
         private readonly Phpbb3Source $phpbb3,
         private readonly OldPhpSource $oldPhp,
+        private readonly PhotoPipeline $photoPipeline,
     ) {
     }
 
@@ -186,7 +188,7 @@ final class Reimporter
     private function importOldPhp(): void
     {
         // Photos first: the posts embed them and their links are rewritten to the live photo ids.
-        (new PhotoImporter($this->live, $this->oldPhp, $this->users, $this->report, $this->options, $this->photoLinks))->import();
+        (new PhotoImporter($this->live, $this->oldPhp, $this->users, $this->report, $this->options, $this->photoLinks, $this->photoPipeline))->import();
         $this->importPlatform('oldphp', $this->oldPhp->topics(), [], $this->oldPhp->messages());
         $this->importQuotes();
     }

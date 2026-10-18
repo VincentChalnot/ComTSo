@@ -7,22 +7,19 @@ use App\Entity\Photo;
 use App\Entity\Topic;
 use App\Service\ImageProcessingService;
 
-/** The photo featured in the home page hero, with the rule that selected it and where it appears on the forum. */
+/** The photo featured in the home page hero (one of the latest photos liked by the members) and where it appears on the forum. */
 final readonly class FeaturedPhoto
 {
+    public const KICKER = 'Coup de cœur des membres';
+
     public function __construct(
         public Photo $photo,
-        public FeaturedRule $rule,
+        public int $likeCount,
         /** Topic where the photo was most recently shown (attached to the topic, or to one of its messages). */
         public ?Topic $topic = null,
         /** Set when the most recent appearance is a message (null when attached to the topic itself). */
         public ?Comment $comment = null,
     ) {
-    }
-
-    public function kicker(): string
-    {
-        return $this->rule->kicker();
     }
 
     /** The photo's own title, else the title of the topic it appears in, else null. */
