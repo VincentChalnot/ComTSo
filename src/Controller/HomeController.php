@@ -49,12 +49,18 @@ class HomeController extends AbstractController
         }
         $commentPhotos->preload(array_merge(...array_column($cards, 'comments')));
 
-        return $this->render('home/index.html.twig', [
+        $response = $this->render('home/index.html.twig', [
             'since' => $since,
             'cards' => $cards,
             'pager' => $pager,
             'hero' => $featuredPhoto->select(),
         ]);
+
+        // The hero is picked at random on every visit: nothing may keep a copy of the page.
+        $response->setPrivate();
+        $response->headers->addCacheControlDirective('no-store');
+
+        return $response;
     }
 
     private function resolveSince(Request $request, User $user): \DateTimeImmutable

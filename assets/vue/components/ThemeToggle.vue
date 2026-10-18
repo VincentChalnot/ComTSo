@@ -24,7 +24,7 @@ export default {
       await fetch(this.url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-        body: JSON.stringify({ theme: this.theme }),
+        body: JSON.stringify({ theme: this.theme, _token: this.csrf }),
       });
     },
   },

@@ -41,12 +41,12 @@
 
             {% if app.user %}
                 <div class="masthead-tools">
-                    <div data-vue-component="ThemeToggle" data-props="{{ {url: path('user_theme')}|json_encode|e('html_attr') }}"></div>
+                    <div data-vue-component="ThemeToggle" data-props="{{ {url: path('user_theme'), csrf: csrf_token('theme')}|json_encode|e('html_attr') }}"></div>
                     <a href="{{ path('people_config', {username: app.user.username}) }}" class="btn-icon masthead-settings" title="Configuration" aria-label="Configuration">{{ ui.icon('settings', 'size-5') }}</a>
                     <a href="{{ path('people_show', {username: app.user.username}) }}" class="masthead-user" title="Mon profil">
                         {{ av.avatar(app.user, 'sm') }}<span class="masthead-user-name">{{ app.user.username }}</span>
                     </a>
-                    <a href="{{ path('app_logout') }}" class="btn-icon masthead-logout" title="Déconnexion" aria-label="Déconnexion">{{ ui.icon('log-out', 'size-5') }}</a>
+                    <a href="{{ logout_path() }}" class="btn-icon masthead-logout" title="Déconnexion" aria-label="Déconnexion">{{ ui.icon('log-out', 'size-5') }}</a>
                 </div>
             {% endif %}
         </div>
@@ -85,7 +85,7 @@
                         <a href="{{ path('people_config', {username: app.user.username}) }}" class="masthead-link">Configuration</a>
                     </li>
                     <li class="masthead-menu-account">
-                        <a href="{{ path('app_logout') }}" class="masthead-link">Déconnexion</a>
+                        <a href="{{ logout_path() }}" class="masthead-link">Déconnexion</a>
                     </li>
                 </ul>
             </nav>

@@ -7,6 +7,9 @@
 
 {% block body %}
 {% set canManage = topic.author == app.user or is_granted('ROLE_ADMIN') %}
+{% if commentForm.vars.submitted and not commentForm.vars.valid %}
+    <div class="alert alert-danger" role="alert"><div class="alert-body"><p>Votre message n'a pas été envoyé. <a href="#reply">Voir pourquoi et le corriger</a> : ce que vous aviez écrit est conservé.</p></div></div>
+{% endif %}
 {% include 'forum/_tabs.html.twig' with {current: topic.forum.id} %}
 
 <header class="page-header">
@@ -23,6 +26,12 @@
         {% if canManage %}
             <a href="{{ path('topic_edit', {forumId: topic.forum.id, id: topic.id}) }}" class="btn btn-sm">{{ ui.icon('pencil', 'size-3.5') }} Modifier</a>
             <a href="{{ path('topic_photos', {forumId: topic.forum.id, id: topic.id}) }}" class="btn btn-sm">{{ ui.icon('image', 'size-3.5') }} Photos</a>
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+            <form method="post" action="{{ path('topic_delete', {forumId: topic.forum.id, id: topic.id}) }}" data-confirm="Supprimer définitivement ce sujet, ses {{ topic.commentCount }} message{{ topic.commentCount > 1 ? 's' : '' }} et toutes les photos qui n'existent que là ? Cette action est irréversible.">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete-topic-' ~ topic.id) }}">
+                <button type="submit" class="btn btn-sm btn-danger">{{ ui.icon('trash', 'size-3.5') }} Supprimer le sujet</button>
+            </form>
         {% endif %}
     </div>
 </header>
@@ -57,6 +66,7 @@
         <span class="reply-avatar">{{ av.avatar(app.user, 'md') }}</span>
         <div class="reply-body">
             <h2 id="reply" class="card-title mb-2">Répondre</h2>
+            {{ form_errors(commentForm) }}
             {{ form_row(commentForm.content) }}
             {{ form_row(commentForm.photos) }}
         </div>

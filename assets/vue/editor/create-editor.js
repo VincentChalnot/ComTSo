@@ -3,8 +3,6 @@
 import { Editor } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
-import Subscript from '@tiptap/extension-subscript';
-import Superscript from '@tiptap/extension-superscript';
 import TextAlign from '@tiptap/extension-text-align';
 import { Placeholder } from '@tiptap/extensions';
 import { YouTube } from './youtube-node.js';
@@ -88,8 +86,6 @@ export function createEditor({ element, content, placeholder, ariaLabel, id, onS
       }),
       // Inline: smilies live inside paragraphs.
       Image.configure({ inline: true, allowBase64: false }),
-      Subscript,
-      Superscript,
       TextAlign.configure({ types: ['heading', 'paragraph'], alignments: ['left', 'center', 'right', 'justify'] }),
       YouTube,
       Placeholder.configure({ placeholder }),

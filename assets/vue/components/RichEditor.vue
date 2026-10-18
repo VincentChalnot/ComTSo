@@ -174,8 +174,6 @@ const definitions = [
     markTool('italic', 'italic', 'Italique', 'Ctrl+I', (c) => c.toggleItalic()),
     markTool('underline', 'underline', 'Souligné', 'Ctrl+U', (c) => c.toggleUnderline()),
     markTool('strike', 'strike', 'Barré', 'Ctrl+Maj+S', (c) => c.toggleStrike()),
-    { ...markTool('subscript', 'subscript', 'Indice', 'Ctrl+,', (c) => c.toggleSubscript()), full: true },
-    { ...markTool('superscript', 'superscript', 'Exposant', 'Ctrl+.', (c) => c.toggleSuperscript()), full: true },
     tool('clear', 'clear', 'Effacer la mise en forme', () => chain().unsetAllMarks().clearNodes().unsetTextAlign().run(), { full: true }),
   ],
   [
