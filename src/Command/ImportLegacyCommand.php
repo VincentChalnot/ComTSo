@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use App\Photo\PhotoReprocessor;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -39,6 +40,7 @@ class ImportLegacyCommand extends Command
     public function __construct(
         private readonly Connection $connection,
         private readonly Filesystem $filesystem,
+        private readonly PhotoReprocessor $photoReprocessor,
         #[Autowire('%photos_directory%')]
         private readonly string $photosDirectory,
         #[Autowire('%kernel.project_dir%/var/photos/originals')]
@@ -204,6 +206,10 @@ class ImportLegacyCommand extends Command
         $io->writeln(sprintf('  ctso_topic.comment_count: %d stale counter(s) recomputed', $fixed));
     }
 
+    /**
+     * The legacy files go through the photo pipeline (EXIF into the database, orientation, at most 10 MP, WebP): each row ends up
+     * pointing at the processed file. When the source is the photo directory itself the files are processed in place.
+     */
     private function relinkPhotoFiles(string $source, bool $copy, SymfonyStyle $io): void
     {
         if (!is_dir($source)) {
@@ -213,50 +219,35 @@ class ImportLegacyCommand extends Command
         }
 
         $this->filesystem->mkdir($this->photosDirectory);
-        $filenames = $this->connection->fetchFirstColumn('SELECT filename FROM ctso_photo');
-        $done = $already = 0;
+        $rows = $this->connection->fetchAllAssociative('SELECT id, filename, exif, taken_at FROM ctso_photo ORDER BY id');
+        $inPlace = realpath($source) === realpath($this->photosDirectory);
+        $counts = [PhotoReprocessor::UPDATED => 0, PhotoReprocessor::UP_TO_DATE => 0, PhotoReprocessor::MISSING => 0, PhotoReprocessor::REJECTED => 0];
         $missing = [];
 
-        foreach ($filenames as $filename) {
-            $from = $source.'/'.$filename;
-            $to = $this->photosDirectory.'/'.$filename;
-            if (is_file($to)) {
-                ++$already;
+        foreach ($rows as $row) {
+            if (!$inPlace && is_file($this->photosDirectory.'/'.$row['filename'])) {
+                ++$counts[PhotoReprocessor::UP_TO_DATE]; // already processed by a previous run (the row points at the new file)
                 continue;
             }
-            if (!is_file($from)) {
-                $missing[] = $filename;
-                continue;
+            $error = null;
+            $status = $this->photoReprocessor->reprocess($row, $source, $inPlace || !$copy, $error);
+            ++$counts[$status];
+            if (PhotoReprocessor::MISSING === $status) {
+                $missing[] = $row['filename'];
+            } elseif (PhotoReprocessor::REJECTED === $status) {
+                $io->warning(sprintf('Photo #%d (%s) kept as is: %s', $row['id'], $row['filename'], $error));
             }
-            $this->transfer($from, $to, $copy);
-            ++$done;
         }
 
-        $io->writeln(sprintf('  %d file(s) %s to %s, %d already in place', $done, $copy ? 'copied' : 'moved', $this->photosDirectory, $already));
+        $io->writeln(sprintf('  %d photo(s) processed into %s, %d already in place', $counts[PhotoReprocessor::UPDATED], $this->photosDirectory, $counts[PhotoReprocessor::UP_TO_DATE]));
         if ($missing) {
             $io->warning(sprintf('%d photo row(s) have no file: %s', count($missing), implode(', ', array_slice($missing, 0, 10))));
         }
 
-        $known = array_flip($filenames);
+        $known = array_flip($this->connection->fetchFirstColumn('SELECT filename FROM ctso_photo'));
         $orphans = array_filter(scandir($source), fn ($f) => is_file($source.'/'.$f) && !isset($known[$f]));
         if ($orphans) {
             $io->note(sprintf('%d file(s) in %s are not referenced by any photo row and were left untouched: %s', count($orphans), $source, implode(', ', $orphans)));
-        }
-    }
-
-    private function transfer(string $from, string $to, bool $copy): void
-    {
-        if ($copy) {
-            $this->filesystem->copy($from, $to);
-
-            return;
-        }
-        try {
-            $this->filesystem->rename($from, $to);
-        } catch (\Throwable) {
-            // Different filesystems/mounts: rename(2) is not possible.
-            $this->filesystem->copy($from, $to);
-            $this->filesystem->remove($from);
         }
     }
 

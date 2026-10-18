@@ -28,6 +28,12 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    /** A member by pseudo, else by e-mail address (both are unique). */
+    public function findOneByUsernameOrEmail(string $identifier): ?User
+    {
+        return $this->findOneBy(['username' => $identifier]) ?? $this->findOneBy(['email' => $identifier]);
+    }
+
     /** @return list<User> enabled members whose pseudo, name or activities match */
     public function search(string $term, int $limit = 30): array
     {

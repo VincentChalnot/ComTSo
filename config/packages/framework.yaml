@@ -1,9 +1,9 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
-    secret: '%env(APP_SECRET)%'
+    secret: '%env(trim:file:APP_SECRET_FILE)%'
     #csrf_protection: true
     http_method_override: false
-    # Behind Traefik: trust X-Forwarded-* so URLs/cookies are https (see TRUSTED_PROXIES in compose.yaml).
+    # Behind Traefik: trust X-Forwarded-* so URLs/cookies are https (TRUSTED_PROXIES, set in compose.yaml).
     trusted_proxies: '%env(default::TRUSTED_PROXIES)%'
     trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
     default_locale: fr
@@ -11,11 +11,32 @@ framework:
 
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
     # Remove or comment this section to explicitly disable session support.
+    # The remember-me cookie follows these cookie_* options (the security firewall does not override them).
     session:
         handler_id: null
         cookie_secure: auto
+        cookie_httponly: true
         cookie_samesite: lax
         storage_factory_id: session.storage.factory.native
+
+    cache:
+        pools:
+            # Counters of the login throttling (security.yaml) and of the password-reset limiters below.
+            limiter.cache:
+                adapter: cache.adapter.filesystem
+
+    rate_limiter:
+        # "Mot de passe oublié ?": per client address, and per requested account so that nobody can flood a mailbox.
+        password_reset_ip:
+            policy: sliding_window
+            limit: 10
+            interval: '1 hour'
+            cache_pool: limiter.cache
+        password_reset_account:
+            policy: sliding_window
+            limit: 3
+            interval: '1 hour'
+            cache_pool: limiter.cache
 
     #esi: true
     #fragments: true
@@ -27,3 +48,16 @@ when@test:
         test: true
         session:
             storage_factory_id: session.storage.factory.mock_file
+        rate_limiter:
+            # Counters live in memory (app.limiter.storage, config/services.yaml): a test that needs them to survive several
+            # requests calls $client->disableReboot(), every other test starts from zero (a cache pool would be reset or shared).
+            password_reset_ip:
+                storage_service: app.limiter.storage
+            password_reset_account:
+                storage_service: app.limiter.storage
+
+when@prod:
+    framework:
+        session:
+            # Production is served over HTTPS only (Traefik / Caddy): never send the session cookie in clear text.
+            cookie_secure: true

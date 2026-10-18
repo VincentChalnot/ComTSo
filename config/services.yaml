@@ -5,11 +5,16 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     # Photos are private: stored outside public/ and only served through authenticated controllers.
-    # In dev, ./var/photos is bind-mounted from the host (see compose.override.yaml).
+    # In dev, ./var/photos is bind-mounted from the host (see compose.yaml).
     photos_directory: '%kernel.project_dir%/var/photos/originals'
     photos_cache_directory: '%kernel.project_dir%/var/photos/cache'
     # Open registration feature flag (REGISTRATION_ENABLED=true|false, default false).
-    app.registration_enabled: '%env(bool:REGISTRATION_ENABLED)%'
+    app.registration_enabled: '%env(bool:default::REGISTRATION_ENABLED)%'
+    # Sender of the e-mails (password reset), "Name <address>"; the real value comes from MAILER_FROM (compose.yaml).
+    app.mailer_from_default: 'ComTSo <no-reply@localhost>'
+    app.mailer_from: '%env(default:app.mailer_from_default:MAILER_FROM)%'
+    # Public origin of the forum (https://forum.example.com): links in e-mails never take their host from the request.
+    app.public_url: '%env(default::DEFAULT_URI)%'
 
 services:
     # default configuration for services in *this* file
@@ -29,6 +34,9 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    # Random source of the home hero (replaced by a seeded one in tests).
+    Random\Randomizer: ~
+
     App\Service\ImageProcessingService:
         arguments:
             $photosDirectory: '%photos_directory%'
@@ -39,3 +47,7 @@ when@test:
         # Tests must never read or write the real photo library.
         photos_directory: '%kernel.project_dir%/var/test-photos/originals'
         photos_cache_directory: '%kernel.project_dir%/var/test-photos/cache'
+    services:
+        # Counters of the rate limiters (login throttling, password reset): in memory, per container.
+        app.limiter.storage:
+            class: Symfony\Component\RateLimiter\Storage\InMemoryStorage

@@ -74,7 +74,7 @@ class ChatMercureAuthorizationTest extends ChatTestCase
         $this->loginAs($this->createUser('alice'));
         $this->getJson('/chat/state');
 
-        $this->client->request('GET', '/logout');
+        $this->logOut();
 
         $cookie = $this->subscriberCookie();
         self::assertNotNull($cookie);

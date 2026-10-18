@@ -53,9 +53,13 @@ class UserPreferencesTest extends AppWebTestCase
         $alice = $this->createUser('alice');
         $this->loginAs($alice);
 
-        $this->client->jsonRequest('POST', '/preferences/theme', ['theme' => 'dark']);
+        // The toggle of the masthead is handed its URL and its CSRF token.
+        $crawler = $this->client->request('GET', '/gens/alice/config');
+        $toggle = json_decode($crawler->filter('[data-vue-component="ThemeToggle"]')->attr('data-props'), true, flags: \JSON_THROW_ON_ERROR);
+
+        $this->client->jsonRequest('POST', $toggle['url'], ['theme' => 'dark', '_token' => $toggle['csrf']]);
         self::assertResponseIsSuccessful();
-        $this->client->jsonRequest('POST', '/preferences/theme', ['theme' => 'neon']);
+        $this->client->jsonRequest('POST', $toggle['url'], ['theme' => 'neon', '_token' => $toggle['csrf']]);
         self::assertResponseStatusCodeSame(400);
 
         $this->em()->clear();

@@ -9,9 +9,8 @@ use App\Entity\Topic;
 use App\Entity\User;
 use App\Form\CommentType;
 use App\Form\TopicType;
-use App\Pagination\Pager;
-use App\Repository\CommentPhotoRepository;
-use App\Repository\CommentRepository;
+use App\Forum\TopicPageBuilder;
+use App\Forum\TopicRemover;
 use App\Repository\PhotoTopicRepository;
 use App\Service\PhotoUploader;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,19 +39,12 @@ class TopicController extends AbstractController
         string $forumId,
         #[MapEntity(id: 'id')] Topic $topic,
         #[CurrentUser] User $user,
-        CommentRepository $comments,
-        PhotoTopicRepository $photoTopics,
-        CommentPhotoRepository $commentPhotos,
+        TopicPageBuilder $page,
         EntityManagerInterface $em,
     ): Response {
         if ($redirect = $this->canonicalRedirect($topic, $forumId, $request)) {
             return $redirect;
         }
-
-        $order = $user->getMessageOrder();
-        $total = $comments->countInTopic($topic);
-        $requested = $request->query->has('page') ? $request->query->getInt('page', 1) : ('asc' === $order ? PHP_INT_MAX : 1);
-        $pager = new Pager($total, self::MESSAGES_PER_PAGE, $requested);
 
         // Plain UPDATE: counting a view must neither touch "updated at" nor load anything.
         $em->createQuery('UPDATE '.Topic::class.' t SET t.views = t.views + 1 WHERE t.id = :id')->setParameter('id', $topic->getId())->execute();
@@ -61,18 +53,7 @@ class TopicController extends AbstractController
             'action' => $this->generateUrl('comment_create', ['forumId' => $topic->getForum()->getId(), 'id' => $topic->getId()]),
         ]);
 
-        $pageComments = $comments->findPage($topic, $order, $pager->offset(), $pager->perPage);
-        $commentPhotos->preload($pageComments);
-
-        return $this->render('topic/show.html.twig', [
-            'topic' => $topic,
-            'comments' => $pageComments,
-            'photos' => $photoTopics->findForTopic($topic),
-            'pager' => $pager,
-            'order' => $order,
-            'commentForm' => $commentForm,
-            'starred' => $user->getStarredTopics()->contains($topic),
-        ]);
+        return $this->render('topic/show.html.twig', $page->build($request, $topic, $user) + ['commentForm' => $commentForm]);
     }
 
     #[Route('/edit', name: 'topic_edit')]
@@ -90,6 +71,23 @@ class TopicController extends AbstractController
         }
 
         return $this->render('topic/edit.html.twig', ['topic' => $topic, 'form' => $form]);
+    }
+
+    /** Moderation: administrators only. The author of a topic may edit it, but not erase the messages of the others. */
+    #[Route('/delete', name: 'topic_delete', methods: ['POST'])]
+    public function delete(Request $request, string $forumId, #[MapEntity(id: 'id')] Topic $topic, TopicRemover $remover): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        if (!$this->isCsrfTokenValid('delete-topic-'.$topic->getId(), $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        $forum = $topic->getForum();
+        $title = $topic->getTitle();
+        $remover->remove($topic);
+        $this->addFlash('success', sprintf('Le sujet « %s » a été supprimé.', $title));
+
+        return $this->redirectToRoute('forum_show', ['forumId' => $forum->getId()]);
     }
 
     #[Route('/star', name: 'topic_star', methods: ['POST'])]
@@ -139,6 +137,9 @@ class TopicController extends AbstractController
         EntityManagerInterface $em,
     ): JsonResponse {
         $this->denyUnlessCanManage($topic);
+        if (!$this->isCsrfTokenValid('photos-'.$topic->getId(), $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
 
         $file = $request->files->get('file');
         if (!$file instanceof UploadedFile) {

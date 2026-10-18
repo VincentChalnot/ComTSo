@@ -44,7 +44,7 @@ class LoginTest extends AppWebTestCase
         $this->logIn('vincent', 'Old-pass-1');
 
         self::assertResponseRedirects('/');
-        $this->client->request('GET', '/logout');
+        $this->logOut();
         $this->logIn('vincent', 'Old-pass-1');
         self::assertResponseRedirects('/');
     }
@@ -62,7 +62,7 @@ class LoginTest extends AppWebTestCase
         self::assertStringStartsWith('$', $reloaded->getPassword(), 'The legacy hash is replaced by a modern one.');
 
         // ...and the new hash keeps working
-        $this->client->request('GET', '/logout');
+        $this->logOut();
         $this->logIn('marie', 'Old-pass-1');
         self::assertResponseRedirects('/');
     }

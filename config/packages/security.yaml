@@ -31,14 +31,27 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+            # 5 failed attempts per username + IP address and per 15 minutes (25 per IP address in total): then even the
+            # right password is refused until the window slides. A success resets the counter of that username.
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
+                cache_pool: limiter.cache
             logout:
                 path: app_logout
                 target: app_home
+                # Stateless token (see csrf.yaml): use {{ logout_path() }}, a bare /logout link is refused.
+                enable_csrf: true
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
                 path: /
                 always_remember_me: true
+                # `secure` follows framework.session.cookie_secure (true in production).
+                httponly: true
+                samesite: lax
+                # Changing the password invalidates every remember-me cookie issued before.
+                signature_properties: [password]
 
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
@@ -48,6 +61,8 @@ security:
     # Note: Only the *first* access control that matches will be used.
     access_control:
         - { path: ^/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/mot-de-passe/(oublie|reinitialiser)$, roles: PUBLIC_ACCESS }
+        - { path: ^/health$, roles: PUBLIC_ACCESS }
         - { path: ^/register$, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: ROLE_USER }
 
@@ -60,3 +75,8 @@ when@test:
                 cost: 4
                 migrate_from:
                     - legacy_sha512
+        firewalls:
+            main:
+                login_throttling:
+                    # Same limits as production, counted in memory (see config/packages/framework.yaml).
+                    storage_service: app.limiter.storage

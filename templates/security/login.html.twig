@@ -35,9 +35,10 @@
             <button type="submit" class="btn btn-primary btn-lg btn-block">Se connecter</button>
         </form>
 
-        {% if registration_enabled %}
-            <p class="auth-footer">Pas encore de compte ? <a href="{{ path('app_register') }}">S'inscrire</a></p>
-        {% endif %}
+        <p class="auth-footer">
+            <a href="{{ path('app_forgot_password') }}">Mot de passe oublié ?</a>
+            {% if registration_enabled %}<br>Pas encore de compte ? <a href="{{ path('app_register') }}">S'inscrire</a>{% endif %}
+        </p>
     </div>
 </main>
 {% endblock %}

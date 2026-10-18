@@ -82,4 +82,11 @@ abstract class AppWebTestCase extends WebTestCase
     {
         $this->client->loginUser($user);
     }
+
+    /** Logs out the way a member does: through the masthead link, which carries the CSRF token of the logout. */
+    protected function logOut(): void
+    {
+        $this->client->request('GET', '/');
+        $this->client->click($this->client->getCrawler()->filter('.masthead-logout')->link());
+    }
 }

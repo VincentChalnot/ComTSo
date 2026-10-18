@@ -1,0 +1,20 @@
+{# Layout of the pages of a visitor who is not logged in (password reset): the card carries its own wordmark, no masthead, no colophon. #}
+{% extends 'base.html.twig' %}
+{% import '_ui/icons.html.twig' as ui %}
+
+{% block masthead %}
+    <button type="button" class="btn-icon theme-toggle theme-toggle-floating" data-theme-toggle aria-label="Changer de thème">
+        <span data-when="light">{{ ui.icon('moon', 'size-5') }}</span><span data-when="dark">{{ ui.icon('sun', 'size-5') }}</span>
+    </button>
+{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content_layout %}
+<main id="main" class="auth" tabindex="-1">
+    <div class="auth-card">
+        <header class="auth-brand"><span class="auth-wordmark">ComTSo</span><span class="rule-double is-flush"></span></header>
+        <h1 class="auth-title">{% block heading %}{% endblock %}</h1>
+        {% block card %}{% endblock %}
+    </div>
+</main>
+{% endblock %}

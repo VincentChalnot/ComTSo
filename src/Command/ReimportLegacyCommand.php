@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Content\ContentSanitizer;
+use App\Photo\PhotoPipeline;
 use App\Legacy\Import\ImportReport;
 use App\Legacy\Import\ReimportOptions;
 use App\Legacy\Import\Reimporter;
@@ -34,6 +35,7 @@ final class ReimportLegacyCommand extends Command
     public function __construct(
         private readonly Connection $connection,
         private readonly ContentSanitizer $sanitizer,
+        private readonly PhotoPipeline $photoPipeline,
         #[Autowire(env: 'default::LEGACY_OLDPHP_URL')]
         private readonly ?string $oldPhpUrl,
         #[Autowire(env: 'default::LEGACY_PHPBB3_URL')]
@@ -68,7 +70,7 @@ final class ReimportLegacyCommand extends Command
             return Command::INVALID;
         }
         if (!$this->oldPhpUrl || !$this->phpbb3Url) {
-            $io->error('LEGACY_OLDPHP_URL / LEGACY_PHPBB3_URL are not set (see .env).');
+            $io->error('LEGACY_OLDPHP_URL / LEGACY_PHPBB3_URL are not set (see compose.yaml).');
 
             return Command::FAILURE;
         }
@@ -96,7 +98,7 @@ final class ReimportLegacyCommand extends Command
             $phpbb3Dir ?? 'not mounted',
         ));
 
-        $reimporter = new Reimporter($this->connection, $this->sanitizer, new Phpbb2Source($oldPhpDb), new Phpbb3Source($phpbb3Db), new OldPhpSource($oldPhpDb));
+        $reimporter = new Reimporter($this->connection, $this->sanitizer, new Phpbb2Source($oldPhpDb), new Phpbb3Source($phpbb3Db), new OldPhpSource($oldPhpDb), $this->photoPipeline);
         $report = $reimporter->run(new ReimportOptions(
             $dryRun,
             array_values($sources),

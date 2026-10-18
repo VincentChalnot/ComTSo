@@ -6,6 +6,7 @@ use App\Entity\Comment;
 use App\Entity\Topic;
 use App\Entity\User;
 use App\Form\CommentType;
+use App\Forum\TopicPageBuilder;
 use App\Pagination\Pager;
 use App\Photo\PostPhotos;
 use App\Repository\CommentPhotoRepository;
@@ -33,7 +34,12 @@ class CommentController extends AbstractController
         ]);
     }
 
-    #[Route('/forum/{forumId}/{id}/comment', name: 'comment_create', requirements: ['forumId' => '[a-z0-9-]+', 'id' => '\d+'], methods: ['POST'])]
+    /**
+     * Posts a reply. A refused reply (empty, too many photos, a file that cannot be stored…) shows the topic page again with
+     * the bound form (HTTP 422): what the member typed is still in the editor, with the reason above it.
+     * A GET (refresh of that page) goes back to the topic.
+     */
+    #[Route('/forum/{forumId}/{id}/comment', name: 'comment_create', requirements: ['forumId' => '[a-z0-9-]+', 'id' => '\d+'], methods: ['GET', 'POST'])]
     public function create(
         Request $request,
         #[MapEntity(id: 'id')] Topic $topic,
@@ -41,23 +47,27 @@ class CommentController extends AbstractController
         EntityManagerInterface $em,
         CommentRepository $comments,
         PostPhotos $postPhotos,
+        TopicPageBuilder $page,
     ): Response {
+        if (!$request->isMethod('POST')) {
+            return $this->redirectToRoute('topic_show', ['forumId' => $topic->getForum()->getId(), 'id' => $topic->getId()]);
+        }
+
         $comment = (new Comment())->setTopic($topic)->setAuthor($user);
         $form = $this->createForm(CommentType::class, $comment);
         $form->handleRequest($request);
 
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            $this->addFlash('error', $form->getErrors(true)->count() ? $form->getErrors(true)->current()->getMessage() : 'Le message n\'a pas pu être envoyé.');
-
-            return $this->redirectToRoute('topic_show', ['forumId' => $topic->getForum()->getId(), 'id' => $topic->getId()]);
+        $photos = [];
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $photos = $postPhotos->store($form->get('photos')->getData() ?? [], $user);
+            } catch (\InvalidArgumentException $e) {
+                $form->get('photos')->addError(new FormError($e->getMessage()));
+            }
         }
 
-        try {
-            $photos = $postPhotos->store($form->get('photos')->getData() ?? [], $user);
-        } catch (\InvalidArgumentException $e) {
-            $this->addFlash('error', $e->getMessage());
-
-            return $this->redirectToRoute('topic_show', ['forumId' => $topic->getForum()->getId(), 'id' => $topic->getId()]);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return $this->render('topic/show.html.twig', $page->build($request, $topic, $user) + ['commentForm' => $form], new Response(status: Response::HTTP_UNPROCESSABLE_ENTITY));
         }
 
         $comment->setCreatedAt($now = new \DateTime())->setUpdatedAt($now);
