@@ -81,9 +81,10 @@ private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `t
 
 - **Production** = `deploy/compose.yaml` + `deploy/.env.example` (copied to `deploy/.env` on the server, never committed) running the **pre-built image** `ghcr.io/vincentchalnot/comtso:${COMTSO_IMAGE_TAG:-latest}`
   (`frankenphp_prod` target: assets built in `frontend_builder`, `composer --no-dev --classmap-authoritative`, `APP_ENV=prod`, `APP_DEBUG=0`, no `.env`/dotenv in the image). Services: `app` (Caddy + FrankenPHP + the embedded
-  Mercure hub, healthcheck from the image), `migrate` (one-shot `doctrine:migrations:migrate`, `app` waits for it: single replica only), `database` (MariaDB 11.4, healthcheck, no published port).
+  Mercure hub, healthcheck = public `GET /health` through loopback on the internal `http://app:8080` listener with `Host: app`: `healthy` = Caddy + PHP + MariaDB), `migrate` (one-shot `doctrine:migrations:migrate`, `app` waits for it: single replica only), `database` (MariaDB 11.4, healthcheck, no published port).
   Same secret mechanism as dev (see "Configuration and secrets"). Volumes: `photos` (`/app/var/photos`), `caddy_data`, `caddy_config`, `database_data`. Direct HTTPS by Caddy (`SERVER_NAME`) or behind a proxy
-  (`CADDY_SITE_ADDRESS=:80`, `TRUSTED_PROXIES`, commented Traefik labels). The Symfony app publishes to Mercure on an internal-only listener `http://app:8080`. Runbook (first deploy, admin, upgrade, rollback, backup, legacy import): `deploy/README.md`.
+  (`CADDY_SITE_ADDRESS=:80`, `TRUSTED_PROXIES`; shared Traefik = override file `deploy/compose.traefik.yaml` via `COMPOSE_FILE` in `deploy/.env`, router `comtso-forum`, knobs `CERT_RESOLVER`/`TRAEFIK_NETWORK`). The Symfony app publishes to Mercure on an internal-only listener `http://app:8080`.
+  Outgoing mail: `MAILER_DSN` is a Symfony Mailer DSN (`symfony/mailer`, `smtp://` needs no extra package); **Scaleway Transactional Email is the recommended provider**: `smtp://<SCW_PROJECT_ID>:<SCW_SECRET_KEY>@smtp.tem.scaleway.com:587` (sender domain validated in the TEM console, `MAILER_FROM` on it), see `deploy/.env.example`. Runbook (first deploy, admin, upgrade, rollback, backup, legacy import): `deploy/README.md`.
 - **CI** (`.github/workflows/ci.yml`, GitHub Actions): job `test` builds the dev image, starts `php` + `database` from the dev compose (`TRAEFIK_ENABLE=false`, `.env` copied from `.env.example`), then migrations on `comtso_test`,
   `doctrine:schema:validate`, `lint:twig`, `lint:yaml`, `lint:container`, PHPUnit, `npm ci && npm run build`, `npm run contrast`. Job `image` (needs `test`) builds `frankenphp_prod` with buildx + gha cache; it pushes to ghcr.io
   (`latest` on the default branch, `sha-<short>`, `X.Y.Z`/`X.Y` for `v*` tags) only on pushes, never on pull requests. A push to the default branch (`master`, listed in `on.push.branches`) publishes; keep CI green before tagging.
@@ -91,7 +92,8 @@ private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `t
 - **Security headers** are set in `frankenphp/Caddyfile` (CSP, nosniff, Referrer-Policy, X-Frame-Options, Permissions-Policy, X-Robots-Tag; HSTS only with `HSTS_ENABLED=true`, set in `deploy/compose.yaml`, absent in dev). The CSP allows the single inline
   theme script of `base.html.twig` by sha256: after editing that script, put the hash printed by `tests/Security/CaddyCspTest.php` into the Caddyfile. `/robots.txt` (`Disallow: /`) is a Caddy `respond`, reachable without login. In dev the shared Traefik
   (`security-headers@file`) replaces `Content-Security-Policy` and adds its own X-Robots-Tag, and the Symfony profiler toolbar uses inline scripts that the CSP blocks (dev only): to test the real CSP in a browser, override the response header in the test tool.
-- **Backups**: `deploy/backup.sh` (DB dump + photo originals, retention `BACKUP_KEEP_DAYS`, `BACKUP_DIR`) and `deploy/restore.sh --yes <db> [photos]`; cron line in `deploy/README.md`. The prod healthcheck is still Caddy's metrics endpoint (no `/health` route yet).
+- **Backups**: `deploy/backup.sh` (DB dump + photo originals, retention `BACKUP_KEEP_DAYS`, `BACKUP_DIR`) and `deploy/restore.sh --yes <db> [photos]`; cron line in `deploy/README.md`.
+- **Go-live**: the ordered plan for the sidus.fr server (recon facts, decisions, rehearsal, cutover, rollback, smoke tests) is `docs/deployment-checklist.md`. The prod compose project is named `comtso-forum` on purpose (the legacy Symfony 2 stack of that server is the project `comtso`).
 
 ## Architecture notes
 

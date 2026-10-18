@@ -5,11 +5,14 @@ Production runs from the **pre-built image** `ghcr.io/vincentchalnot/comtso` tha
 Nothing is built on the server: it only needs Docker with Compose v2 and the two files of this directory.
 
 ```
-deploy/compose.yaml     app (FrankenPHP + Caddy + embedded Mercure hub) · migrate (one-shot) · database (MariaDB 11.4)
-deploy/.env.example     the settings and the 5 secrets, to copy to deploy/.env
+deploy/compose.yaml          app (FrankenPHP + Caddy + embedded Mercure hub) · migrate (one-shot) · database (MariaDB 11.4)
+deploy/compose.traefik.yaml  optional override: shared Traefik instead of published ports (see "Reverse proxy options")
+deploy/.env.example          the settings and the 5 secrets, to copy to deploy/.env
 ```
 
-Run every command below **from `deploy/`** (on the server a directory holding just `compose.yaml` and `.env` is enough).
+The Compose project is named `comtso-forum` (volumes `comtso-forum_photos`, `comtso-forum_database_data`, ...), so it can live next to another stack called `comtso` on the same host. Use a directory of its own on the server.
+
+Run every command below **from `deploy/`** (on the server a directory holding `compose.yaml`, `.env`, the two scripts and, in Traefik mode, `compose.traefik.yaml` is enough).
 
 ## How configuration and secrets flow
 
@@ -68,7 +71,7 @@ the CSP with a weaker one. The CSP whitelists the one inline theme script of `te
 |---|---|---|
 | **Direct HTTPS** (default) | `SERVER_NAME=forum.example.com` | Caddy listens on 80/443 and gets the certificate itself. `TRUSTED_PROXIES` stays empty. |
 | **Behind your own proxy** (nginx, Caddy, HAProxy...) | `CADDY_SITE_ADDRESS=:80`, `TRUSTED_PROXIES=<proxy IP/CIDR or private_ranges>`, `HTTP_BIND=127.0.0.1:8080`, `HTTPS_BIND=127.0.0.1:8443` | The proxy terminates TLS and forwards to `127.0.0.1:8080`, keeping `Host` and sending `X-Forwarded-For/Proto/Host`. Mercure needs streaming: disable response buffering for `/.well-known/mercure` (nginx: `proxy_buffering off; proxy_read_timeout 1h;`). |
-| **Traefik** on a shared Docker network | as above with `CADDY_SITE_ADDRESS=:80`, `TRUSTED_PROXIES=private_ranges`, plus the commented `networks`/`labels` blocks of `compose.yaml` enabled (set your cert resolver name) | Traefik forwards to port 80 of the `app` container. |
+| **Traefik** on a shared Docker network | `COMPOSE_FILE=compose.yaml:compose.traefik.yaml`, `CADDY_SITE_ADDRESS=:80`, `TRUSTED_PROXIES=private_ranges`, `CERT_RESOLVER=<your resolver name>`, optional `TRAEFIK_NETWORK` | The override file drops the published ports, joins the external network (default `proxy`) and adds the labels (router `comtso-forum`, entrypoint `websecure`, Traefik forwards to port 80 of `app`). Traefik's own entrypoint middlewares (e.g. a global `headers` middleware) apply on top: check the final headers with `curl -I`, a global `Content-Security-Policy` there **replaces** the one of Caddy. |
 
 Whatever the mode, the Symfony app publishes chat updates to the embedded Mercure hub over an internal plain-HTTP listener
 (`http://app:8080`, not published); browsers subscribe through `https://$SERVER_NAME/.well-known/mercure` with a private,
@@ -153,4 +156,22 @@ docker compose exec -T -e XDEBUG_MODE=off app php bin/console app:cutover:prepar
 docker compose down                                          # stop (volumes are kept); NEVER add -v unless you want to destroy the data
 ```
 
-Password-reset e-mails go out through `MAILER_DSN` with the sender `MAILER_FROM` (e.g. `ComTSo <forum@example.com>`, default `ComTSo <no-reply@localhost>`: set a real address on the server, in `.env` or the shell) and link to `https://$SERVER_NAME`. `GET /health` answers `200 ok` while the database is reachable.
+Password-reset e-mails go out through `MAILER_DSN` with the sender `MAILER_FROM` (e.g. `"ComTSo <forum@example.com>"`, default `ComTSo <no-reply@localhost>`: set a real address on the server, in `.env` or the shell) and link to `https://$SERVER_NAME`.
+`GET /health` answers `200 ok` while the database is reachable; the `app` container's healthcheck (`docker compose ps`) calls it through loopback on the internal listener, so `healthy` means Caddy + PHP + MariaDB.
+
+### Outgoing mail: Scaleway Transactional Email (recommended)
+
+`symfony/mailer` (already required) handles `smtp://` natively, nothing to install. With Scaleway TEM:
+
+```bash
+MAILER_DSN=smtp://<SCW_PROJECT_ID>:<SCW_SECRET_KEY>@smtp.tem.scaleway.com:587   # STARTTLS; 465 = implicit TLS (smtps://)
+MAILER_FROM="ComTSo <no-reply@your-validated-domain>"
+```
+
+The username is the Scaleway project ID, the password an API secret key (both from the Scaleway console); the sender domain must be validated in the TEM console
+(SPF + DKIM records, MX + DMARC recommended) before the first mail. Apply with `docker compose up -d` (the secret is a file: containers using it are recreated), then request a reset from `/login`
+with one real address and check the headers (`spf=pass dkim=pass`).
+
+## Go-live checklist
+
+The ordered, step-by-step plan to take the redesigned forum to production on the sidus.fr server (decisions, secrets, rehearsal, cutover, rollback, smoke tests): [`docs/deployment-checklist.md`](../docs/deployment-checklist.md).

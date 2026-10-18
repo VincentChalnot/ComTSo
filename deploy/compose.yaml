@@ -10,7 +10,9 @@
 #          Symfony reads them with `%env(trim:file:APP_SECRET_FILE)%`-style processors, Caddy with `{file.*}`, MariaDB with `*_FILE`.
 # Single replica: do NOT scale `app` (the Mercure hub is embedded in Caddy and keeps its state in the container;
 #          migrations run once, in `migrate`, before `app` starts).
-name: comtso
+# Project name: deliberately NOT `comtso`, which is what the legacy Symfony 2 stack uses on the production server
+# (same project name = shared network, `--remove-orphans` would delete the old containers). Volumes: comtso-forum_<name>.
+name: comtso-forum
 
 x-app: &app
   image: ghcr.io/vincentchalnot/comtso:${COMTSO_IMAGE_TAG:-latest}
@@ -61,7 +63,16 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
-    # The image carries its own HEALTHCHECK (Caddy admin API); `docker compose ps` shows `healthy` once Caddy + PHP are up.
+    # Healthcheck: the public `GET /health` (200 `ok` while PHP and the database answer, 503 otherwise), asked on the internal
+    # plain listener `http://app:8080` through loopback with `Host: app` (works in every mode: direct HTTPS, behind a proxy; no
+    # TLS redirect, no published port). It overrides the image's own HEALTHCHECK (Caddy metrics: only proves Caddy is up).
+    # `docker compose ps` shows `healthy` once Caddy + PHP + MariaDB work together; Traefik drops an unhealthy container.
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit('ok' === @file_get_contents('http://127.0.0.1:8080/health', false, stream_context_create(['http' => ['timeout' => 5, 'header' => 'Host: app']])) ? 0 : 1);"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     volumes:
       - photos:/app/var/photos
       - caddy_data:/data
@@ -72,19 +83,7 @@ services:
       - "${HTTP_BIND:-0.0.0.0:80}:80"
       - "${HTTPS_BIND:-0.0.0.0:443}:443"
       - "${HTTPS_BIND:-0.0.0.0:443}:443/udp"
-    # --- Traefik instead of published ports: uncomment this block, the `proxy` network at the bottom, and set
-    #     CADDY_SITE_ADDRESS=:80  TRUSTED_PROXIES=private_ranges  HTTP_BIND=127.0.0.1:8080  HTTPS_BIND=127.0.0.1:8443
-    # networks:
-    #   - default
-    #   - proxy
-    # labels:
-    #   traefik.enable: "true"
-    #   traefik.docker.network: "proxy"
-    #   traefik.http.routers.comtso.rule: "Host(`${SERVER_NAME}`)"
-    #   traefik.http.routers.comtso.entrypoints: "websecure"
-    #   traefik.http.routers.comtso.tls: "true"
-    #   traefik.http.routers.comtso.tls.certresolver: "letsencrypt"   # your resolver name
-    #   traefik.http.services.comtso.loadbalancer.server.port: "80"
+    # Traefik / shared proxy on the same host: use the override `compose.traefik.yaml` (drops these ports, joins the proxy network, adds the labels).
 
   # One-shot: applies the Doctrine migrations, then exits (re-run, as a no-op when up to date, by every `docker compose up -d`).
   # `app` only starts once it has succeeded, so a failing migration never serves a half-migrated schema.
@@ -139,8 +138,4 @@ volumes:
   caddy_config:
   database_data:
 
-# Traefik mode only (see `app` above):
-# networks:
-#   proxy:
-#     external: true
-#     name: proxy
+# Traefik mode: `compose.traefik.yaml` (override file, see deploy/README.md "Reverse proxy options").

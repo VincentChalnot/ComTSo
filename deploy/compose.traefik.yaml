@@ -1,0 +1,30 @@
+# ComTSo production behind a shared Traefik (Docker provider) on the same host. Override of compose.yaml:
+#
+#   .env:  COMPOSE_FILE=compose.yaml:compose.traefik.yaml
+#          CADDY_SITE_ADDRESS=:80          # Traefik terminates TLS, Caddy serves plain HTTP on port 80 of the container
+#          TRUSTED_PROXIES=private_ranges  # Traefik reaches the app from a private Docker address
+#          CERT_RESOLVER=<your certificatesResolvers name>   (default `letsencrypt`)
+#          TRAEFIK_NETWORK=<shared network name>              (default `proxy`)
+#
+# With COMPOSE_FILE in .env a plain `docker compose ...` (and backup.sh / restore.sh) picks both files up.
+# Nothing is published on the host: Traefik reaches `app:80` over the shared network.
+# The router/service name is `comtso-forum` (not `comtso`, the name of the legacy stack on the production server).
+services:
+  app:
+    ports: !reset []
+    networks:
+      - default
+      - proxy
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK:-proxy}"
+      traefik.http.routers.comtso-forum.rule: "Host(`${SERVER_NAME}`)"
+      traefik.http.routers.comtso-forum.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
+      traefik.http.routers.comtso-forum.tls: "true"
+      traefik.http.routers.comtso-forum.tls.certresolver: "${CERT_RESOLVER:-letsencrypt}"
+      traefik.http.services.comtso-forum.loadbalancer.server.port: "80"
+
+networks:
+  proxy:
+    external: true
+    name: ${TRAEFIK_NETWORK:-proxy}
