@@ -40,7 +40,7 @@ The old PHP forum is the direct predecessor of the Symfony 2 site: its posts 1 �
 and the Symfony 2 migration imported almost all of it. phpBB 2 (2004-2007) was **never** migrated.
 There is no chat / shoutbox table in any dump (nothing to put in `ctso_chat_message`).
 
-## Services (`compose.yaml`, profile `legacy`, credentials in `.env`)
+## Services (dev `compose.yaml`, profile `legacy`)
 
 * `legacy-mysql` (MariaDB 11.4, db `comtso_oldphp`, root/root): loads `comtso.sql` through `/docker-entrypoint-initdb.d` (read-only mount).
   The MySQL 5.7 dump loads as is (MyISAM tables are fine, `sql_mode=NO_AUTO_VALUE_ON_ZERO` set like in the dump header).
@@ -50,7 +50,7 @@ There is no chat / shoutbox table in any dump (nothing to put in `ctso_chat_mess
   * its `CREATE OPERATOR` blocks for the `varchar_ci` domain use a syntax PostgreSQL rejects (`COMMUTATOR = <(varchar_ci,varchar_ci)`),
     and `\set ON_ERROR_STOP on` turns that into a failed init. `docker/legacy/10-load-phpbb3.sh` strips these (data-irrelevant)
     blocks with `sed` and pipes the rest to `psql`; the dump itself is mounted read-only at `/legacy/phpbb3.sql`.
-* The command reads both through `LEGACY_OLDPHP_URL` / `LEGACY_PHPBB3_URL` (`.env`); the connections are built with DBAL inside the command,
+* The command reads both through `LEGACY_OLDPHP_URL` / `LEGACY_PHPBB3_URL` (set in the `php` service of `compose.yaml`, no `.env` involved); the connections are built with DBAL inside the command,
   nothing was added to the application's Doctrine configuration.
 
 ## How "already present" is decided (never trust ids)
@@ -73,7 +73,7 @@ Existing rows have no `legacy_ref`, so a legacy message is looked up in the live
 * topics are matched through their posts (majority vote of the live topic of the matched posts), otherwise by title + date (±2 days; the
   previous migration renamed the album topics "Commentaires de l'album: X" → "X");
 * private messages by (live sender, live recipient, time, body — with or without the subject line); quotes by text;
-  photos by `original_filename` (`N.jpg`) then by file content;
+  photos by `original_filename` (`N.jpg`) (stored files are re-encoded by the photo pipeline, so a content hash can no longer match);
 * last guard: a row whose `legacy_ref` already exists is never inserted again.
 
 Verified: the real run imported the numbers below, the immediate re-run imported **0** rows in every table, and no imported comment shares
@@ -102,8 +102,8 @@ author + second with an existing comment (SQL check).
   Messages involving an account that exists in no dump (user 69) are skipped.
 * **Quotes** → `ctso_quote` by text (298 in the old forum, 297 already live, 1 is empty). No date exists in the dump: new rows would get the
   import time (none needed).
-* **Photos**: the old forum's `photos/N.jpg` exists in `comtso.old/photos`; a photo is imported (file copied to `var/photos/originals`, `uniqid().jpeg`
-  like the existing ones, row + `ctso_photo_topic` link to the album topic of its sibling photos) only when it is missing and the file really exists.
+* **Photos**: the old forum's `photos/N.jpg` exists in `comtso.old/photos`; a photo is imported (the file goes through the photo pipeline — EXIF read into `taken_at`/GPS/`exif`, orientation applied, ≤ 10 MP, stored as `uniqid().webp` in
+  `var/photos/originals`; see AGENTS.md —, row + `ctso_photo_topic` link to the album topic of its sibling photos) only when it is missing and the file really exists.
 * **Not representable**: the 32 calendar `events` (no table/feature in the new app), `status`, user profiles of the old platforms, phpBB polls (9 in
   phpBB 2, no polls in the new app) and phpBB 3 attachments (see below). They stay in the dumps.
 * Smilies: phpBB 2 text codes are mapped to the files `public/smilies` already serves (phpBB 3 `icon_e_*` variants, custom `:love: :siffle: …`).
@@ -171,8 +171,9 @@ phpbb3:1:2, phpbb2:26, oldphp:6) looked right.
   71 comments contain the literal `(Invalid img)` where a remote image used to be; `[url=…]label[/url]` lost its label (replaced by the address);
   12 comments still show raw `[attachment=0]file.jpg[/attachment]`: the 27 phpBB 3 attachments (images, files present in `comtso2.old/phpBB3/files/`) were
   never migrated.
-* **68 comments link to `/photos/preview/N.jpg` / `/photos/thumbnail/N.jpg`** (Symfony 2 routes that do not exist in this app: the routes are
-  `/photos/{id}` and `/photos/{id}/thumb`, N being the old forum's photo number = `ctso_photo.original_filename` `N.jpg`).
+* **68 comments link to `/photos/preview/N.jpg` / `/photos/thumbnail/N.jpg`** (Symfony 2 routes, N being the old forum's photo number = `ctso_photo.original_filename` `N.jpg`).
+  The links are left as written and kept alive by `LegacyRedirectController`: members get a 301 to `/photos/{id}/medium` / `/photos/{id}/thumb` of the oldest photo named `N.jpg`
+  (the imported one wins over a later upload with the same name; 67 distinct numbers in the dev data, all resolved); anonymous visitors go to the login first.
   Imported rows already use the new routes (`PhotoLinks`).
 * No month is empty between 2007-06 and 2026-10 except 2022-08, 2023-05 and 2023-06 (genuinely quiet, nothing in the sources covers them); yearly counts of the
   old PHP forum equal the live ones (2007: 1 371, 2009: 3 256, 2010: 4 682, 2011: 2 141) except the missing Frofro posts in 2008 (1 891 vs 1 880).
@@ -184,7 +185,7 @@ phpbb3:1:2, phpbb2:26, oldphp:6) looked right.
    everything in `archives`. Either is a one-line SQL move.
 2. Photos #40 "joli" (gigi) and #68 "été 2008" (nounou) belonged to **albums that had been deleted**: they were imported without album (visible in `/photos`);
    delete the rows `legacy_ref = 'oldphp:photo:40'` / `68` if the deletion was intentional.
-3. Repair the 28 garbled comments / 2 titles and the 68 `/photos/preview/…` links of existing rows? (Needs a go: the command never edits existing rows.)
+3. Repair the 28 garbled comments / 2 titles of existing rows? (Needs a go: the command never edits existing rows; the `/photos/preview/…` links no longer need a repair, they redirect.)
 4. phpBB 3 attachments (27) and the 32 calendar events: recover as photos / pinned topic, or leave in the dumps?
 5. Created disabled users keep fake `@legacy.invalid` addresses (the old addresses were not copied on purpose).
 
@@ -223,9 +224,20 @@ Once the result is accepted (it is single-use; `legacy_ref` columns and the impo
 docker compose --profile legacy down -v                     # stops and deletes the two legacy databases
 git rm -r src/Legacy src/Command/ReimportLegacyCommand.php tests/Legacy docker/legacy
 # compose.yaml: delete the `legacy-mysql` and `legacy-postgres` services (and the comment above them)
-# .env: delete the "legacy reimport" block (LEGACY_* variables)
+# compose.yaml: also delete the `LEGACY_*` entries of the `php` service environment
 # docs/: keep this file as the record; AGENTS.md "Legacy data" paragraph: drop the reimport sentence
 rm var/backup-before-reimport.sql var/reimport-*.log        # when the rollback copy is no longer needed
 ```
 
 `var/legacy/*.sql` (the dumps) are git-ignored with the whole `var/` directory; keep them somewhere safe.
+
+## Photos and the photo pipeline (EXIF)
+
+* The Symfony 2 forum **did** keep EXIF: `ctso_photo.jsonExif`/`exif` (ExifTool output). `app:legacy:import` normalised it into the `exif` JSON column (Make, Model, DateTime,
+  ExposureTime, FNumber, ISOSpeedRatings, FocalLength, DateTimeOriginal + the whole raw ExifTool dump) and copied `taken_at`; there were no GPS columns. 2 194 of the 2 396 photos carry EXIF.
+  The old PHP forum and the phpBB platforms stored none (their photo rows have no EXIF).
+* Every photo file that these importers copy now goes through `App\Photo\PhotoPipeline` (`app:legacy:import` through `PhotoReprocessor` when the photo source is another directory, in place when it is
+  the photo directory; `app:legacy:reimport` for the photos it recovers): EXIF is re-read from the original file into `taken_at`, `gps_*` and the curated `exif` map (what only the old map knew is kept, its raw
+  ExifTool dump with server paths is dropped), the picture is rotated, capped at 10 MP and stored as WebP.
+* A library that is already restored with raw JPEGs (e.g. a dump of the production database + `var/photos`) is migrated in place with `app:photos:reprocess` (`--dry-run`, `--limit`; idempotent; roughly one to two
+  seconds per 12-megapixel photo, so ~1 h for 2.4 k photos — run it once in a `tmux`, then `app:photos:warm`).

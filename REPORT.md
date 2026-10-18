@@ -5,7 +5,7 @@
 - **https://comtso.local.sidus.fr** (Traefik, valid Let's Encrypt certificate). The forum is private: everything redirects to `/login`.
 - Accounts are the migrated ones (legacy SHA-512 passwords still work and are rehashed on first login). The owner `Vincent` is now **administrator**
   (`app:user:promote`); nobody had a role in the legacy data. The throw-away `tester*` accounts I used are deleted.
-- Registration is off: `REGISTRATION_ENABLED=true` in `.env.local` opens `/register`. New accounts: `bin/console app:user:create <pseudo> <password> [--admin]`.
+- Registration is off: `REGISTRATION_ENABLED=true docker compose up -d` (a setting of the `php` service in `compose.yaml`, no `.env` is read by PHP anymore) opens `/register`. New accounts: `bin/console app:user:create <pseudo> <password> [--admin]`.
 - Tests: `docker compose exec php vendor/bin/phpunit` → **441 tests, 1105 assertions, green** (real MariaDB `comtso_test`, DAMA rollback). `composer audit` and `npm audit`: 0 advisories (`npm audit fix` applied).
   `doctrine:schema:validate`, `lint:twig`, `lint:container`, `lint:yaml`: green.
 
@@ -61,12 +61,12 @@ Weak spots / debt:
 - The chat badge script opens one Mercure `EventSource` per page load plus two small requests (`/chat/state`).
 - Editing forum descriptions/creating forums is not ported (admin edits the table); photo albums by member keep the legacy structure.
 - YouTube playback could not be verified in the Playwright Chromium (error 153 with no `Referer`); the iframe markup is the standard nocookie embed with a referrer policy — please test once in a normal browser.
-- Production image: the new `frontend_builder` stage builds (verified), but I did not build or deploy the full prod image; uploads need a persistent volume for `var/photos`, and `MERCURE_JWT_SECRET`/`APP_SECRET` must be real secrets (the dev values in `.env` are random but committed).
+- Production: the `frankenphp_prod` image is built by CI and run from `deploy/compose.yaml` (see `deploy/README.md`); it was smoke-tested locally (migrations, `/login`, Mercure publish/subscribe, photo volume writable). Configuration is environment-only (no `.env` in the image); `MERCURE_JWT_SECRET`/`APP_SECRET`/DB passwords must be real secrets in `deploy/.env` (the dev values in `.env.example` are throwaway).
 - `git`: nothing is committed; the work tree contains the whole migration. Review `git status`, then commit in logical slices (upgrade, security, importer, front-end, chat/editor).
 
 ## 6. Advice
 
-1. Commit now, in slices; put `REGISTRATION_ENABLED`, `MERCURE_JWT_SECRET`, `APP_SECRET`, `CERT_RESOLVER` in `.env.local`/secrets.
+1. Commit now, in slices; production secrets (`APP_SECRET`, `MERCURE_JWT_SECRET`, DB passwords, `MAILER_DSN`) go in `deploy/.env` on the server (see `deploy/README.md`), never in git (`/.env` is git-ignored: run `git rm --cached .env` once).
 2. Open the app as Vincent and skim: home digest, a 2005 thread, a thread with YouTube, a 2012 photo wall, `/gens`, PMs (unread badges from the legacy `state = NULL` rows).
 3. Decide on the forum names/ordering of the 7 recovered forums and the disabled placeholder users.
 4. Back up `var/photos/originals` (2.4 k files, outside git) — it is now the only copy besides the old servers.

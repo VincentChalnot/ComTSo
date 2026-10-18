@@ -15,16 +15,31 @@ Vite + Tailwind CSS 4 + Vue 3 (only for interactive widgets), Mercure for the ch
 
 ## Running the app
 
-Everything runs in Docker (`compose.yaml` + `compose.override.yaml`). Never run PHP/composer/npm on the host.
+Everything runs in Docker through the **single dev `compose.yaml`** (production is `deploy/compose.yaml`, see "Deploy" below). Never run PHP/composer/npm on the host.
 
 ```bash
+cp .env.example .env                       # first time only: dev secrets read by Compose (see "Configuration and secrets")
 docker compose up -d                       # php (FrankenPHP), database (MariaDB), node (vite build --watch), mailer
 docker compose exec php bin/console ...    # Symfony console
 docker compose exec php composer ...
 docker compose exec node npm ...           # assets are rebuilt automatically into public/assets (git-ignored)
-docker compose up -d design-system         # DEV ONLY showcase of the design system: http://localhost:5174/ (Vite dev server, compose.override.yaml only)
+docker compose up -d design-system         # started by `up -d` too; DEV ONLY showcase of the design system: http://localhost:5174/ (Vite dev server, compose.yaml only, not in the production image)
 docker compose exec node npm run contrast  # WCAG AA check of every text/background pair in both themes
 ```
+
+### Configuration and secrets
+
+PHP never parses a `.env` file: `symfony/dotenv` is not installed and `composer.json` has `extra.runtime.disable_dotenv`. **All configuration is real environment variables supplied by Docker Compose**
+(`bin/console` and `public/index.php` get `APP_ENV`/`APP_DEBUG` from the environment; `phpunit.dist.xml` forces `APP_ENV=test`, `APP_DEBUG=1` and `KERNEL_CLASS`).
+
+- **Non-secret settings** live in the `environment:` block of the `php` service in `compose.yaml`, each with an inline default, overridable from the shell (`REGISTRATION_ENABLED=true docker compose up -d`):
+  `APP_ENV`, `DEFAULT_URI`, `TRUSTED_PROXIES`, `REGISTRATION_ENABLED`, `MAILER_FROM` (sender of the e-mails, `Name <address>`), `DATABASE_URL`, `MERCURE_URL`, `MERCURE_PUBLIC_URL`, `LEGACY_*_URL`, `SERVER_NAME`, Traefik knobs. Adding a setting = add it there (and to `deploy/compose.yaml`).
+- **Secrets** (`APP_SECRET`, `DATABASE_PASSWORD`, `DATABASE_ROOT_PASSWORD`, `MERCURE_JWT_SECRET`, `MAILER_DSN`) live in the git-ignored root `.env`, which is **read by Compose only** (copy the committed `.env.example`).
+  Compose turns each into a file under `/run/secrets/<name>` (top-level `secrets:` with `environment:` source) and the containers receive only the *path*:
+  Symfony reads `%env(trim:file:APP_SECRET_FILE)%`, `%env(trim:file:MERCURE_JWT_SECRET_FILE)%`, `%env(trim:file:MAILER_DSN_FILE)%`; `DATABASE_URL` embeds `%env(trim:file:DATABASE_PASSWORD_FILE)%`
+  (Doctrine's `resolve:` processor expands it at runtime, so passwords must not contain URL-special characters: use hex); Caddy reads `{file.{$MERCURE_JWT_SECRET_FILE}}` in the Caddyfile;
+  MariaDB uses its native `MARIADB_*_FILE`. A new secret = `.env.example` + `secrets:` entries (top level and per service) + a `*_FILE` env var + a `trim:file:` reference.
+- The dev DB passwords only matter when the `database_data` volume is created; `comtso`/`comtso`, `root`/`root` are what the existing volume holds.
 
 ### Reverse proxy (Traefik) and TLS
 
@@ -37,11 +52,11 @@ The app is exposed **only** through the shared Traefik instance (`../traefik`, e
   internal calls such as the Mercure publish to `http://php/.well-known/mercure` also work). The original request asked for port `8843`;
   nothing listens on that port in this stack, so `80` is used.
 - Symfony trusts the proxy headers (`TRUSTED_PROXIES=private_ranges`, `framework.trusted_proxies`) so generated URLs and cookies are `https`.
-- No port is published on the host except MariaDB (`DATABASE_PORT`, default `3307`) and, in dev only (`compose.override.yaml`, never in the production image), the design-system showcase (`DESIGN_SYSTEM_PORT`, default `5174`, plain HTTP).
+- No port is published on the host except MariaDB (`DATABASE_PORT`, default `3307`) and the dev-only design-system showcase (`DESIGN_SYSTEM_PORT`, default `5174`, plain HTTP). `TRAEFIK_ENABLE=false` removes the Traefik router (second copy of the stack, CI).
 
 ### Database
 
-- `comtso` (app), `comtso_test` (PHPUnit). Credentials `comtso`/`comtso` (root `root`). `docker/database/10-test-db.sql` creates the test DB + grants on first volume init.
+- `comtso` (app), `comtso_test` (PHPUnit). Credentials `comtso`/`comtso` (root `root`), from `.env` secrets. `docker/database/10-test-db.sql` creates the test DB + grants on first volume init. The compose project is pinned to `comtso` (`name:`): volumes `comtso_database_data`, `comtso_caddy_data`, `comtso_caddy_config` hold the dev data: **never `docker compose down -v`**.
 - Schema is managed by Doctrine migrations only (`bin/console doctrine:migrations:diff` then `migrate`). `doctrine:schema:validate` must stay green.
 - The old Symfony 2 database (`var/2610110300.sql.gz`) was imported with `bin/console app:legacy:import` (see below).
 
@@ -54,31 +69,62 @@ docker compose exec php sh -c 'APP_ENV=test php bin/console doctrine:migrations:
 docker compose exec php vendor/bin/phpunit
 ```
 
+No `.env.test`: the environment of the `php` container (compose) plus `phpunit.dist.xml` (`APP_ENV=test`, `APP_DEBUG=1`, `KERNEL_CLASS`) is all the suite needs.
+
 Base class `tests/Support/AppWebTestCase.php` offers `createUser/createForum/createTopic/createComment/loginAs`. Start small, test behaviour
 (security, permissions, pagination, ordering, import idempotence), never wiring or markup trivia.
 
-Layout: `tests/Security` (privacy, login, registration flag, activity tracking), `tests/Forum` (pagination, permalinks, favourites, digest, permissions, preferences, search,
+Layout: `tests/Security` (privacy, login + throttling, password change/reset, CSRF, health, legacy photo URLs, prod config, activity tracking), `tests/Command` (cutover, reset-password), `tests/Forum` (pagination, permalinks, favourites, digest, permissions, preferences, search,
 private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `tests/Legacy` (importers, converters, idempotence), `tests/Smoke` (every page renders).
+
+## Deploy and CI
+
+- **Production** = `deploy/compose.yaml` + `deploy/.env.example` (copied to `deploy/.env` on the server, never committed) running the **pre-built image** `ghcr.io/vincentchalnot/comtso:${COMTSO_IMAGE_TAG:-latest}`
+  (`frankenphp_prod` target: assets built in `frontend_builder`, `composer --no-dev --classmap-authoritative`, `APP_ENV=prod`, `APP_DEBUG=0`, no `.env`/dotenv in the image). Services: `app` (Caddy + FrankenPHP + the embedded
+  Mercure hub, healthcheck from the image), `migrate` (one-shot `doctrine:migrations:migrate`, `app` waits for it: single replica only), `database` (MariaDB 11.4, healthcheck, no published port).
+  Same secret mechanism as dev (see "Configuration and secrets"). Volumes: `photos` (`/app/var/photos`), `caddy_data`, `caddy_config`, `database_data`. Direct HTTPS by Caddy (`SERVER_NAME`) or behind a proxy
+  (`CADDY_SITE_ADDRESS=:80`, `TRUSTED_PROXIES`, commented Traefik labels). The Symfony app publishes to Mercure on an internal-only listener `http://app:8080`. Runbook (first deploy, admin, upgrade, rollback, backup, legacy import): `deploy/README.md`.
+- **CI** (`.github/workflows/ci.yml`, GitHub Actions): job `test` builds the dev image, starts `php` + `database` from the dev compose (`TRAEFIK_ENABLE=false`, `.env` copied from `.env.example`), then migrations on `comtso_test`,
+  `doctrine:schema:validate`, `lint:twig`, `lint:yaml`, `lint:container`, PHPUnit, `npm ci && npm run build`, `npm run contrast`. Job `image` (needs `test`) builds `frankenphp_prod` with buildx + gha cache; it pushes to ghcr.io
+  (`latest` on the default branch, `sha-<short>`, `X.Y.Z`/`X.Y` for `v*` tags) only on pushes, never on pull requests. A push to the default branch (`master`, listed in `on.push.branches`) publishes; keep CI green before tagging.
+  `composer audit` and `npm audit --omit=dev --audit-level=high` run in `test` as **non-blocking** steps (`continue-on-error`) for now.
+- **Security headers** are set in `frankenphp/Caddyfile` (CSP, nosniff, Referrer-Policy, X-Frame-Options, Permissions-Policy, X-Robots-Tag; HSTS only with `HSTS_ENABLED=true`, set in `deploy/compose.yaml`, absent in dev). The CSP allows the single inline
+  theme script of `base.html.twig` by sha256: after editing that script, put the hash printed by `tests/Security/CaddyCspTest.php` into the Caddyfile. `/robots.txt` (`Disallow: /`) is a Caddy `respond`, reachable without login. In dev the shared Traefik
+  (`security-headers@file`) replaces `Content-Security-Policy` and adds its own X-Robots-Tag, and the Symfony profiler toolbar uses inline scripts that the CSP blocks (dev only): to test the real CSP in a browser, override the response header in the test tool.
+- **Backups**: `deploy/backup.sh` (DB dump + photo originals, retention `BACKUP_KEEP_DAYS`, `BACKUP_DIR`) and `deploy/restore.sh --yes <db> [photos]`; cron line in `deploy/README.md`. The prod healthcheck is still Caddy's metrics endpoint (no `/health` route yet).
 
 ## Architecture notes
 
-- **Photos are private**: originals in `var/photos/originals` (bind-mounted from the host in dev), thumbnails generated lazily in
-  `var/photos/cache/{thumb,medium,hero,avatar}` by `App\Service\ImageProcessingService` (imagine/imagine, GD). Served only by authenticated controllers (`photo_variant`).
-  `hero` (≤1600 px, inset, never upscaled) feeds the home hero; `app:photos:warm --variants=avatar,thumb,medium,hero` pre-generates them.
-- **Home hero** (`App\Photo\FeaturedPhotoProvider`, partial `templates/home/_hero.html.twig`): photos of the last 7 days, else 30 days, else the whole library; landscape ≥ 1200 px preferred;
-  weighted by a hash of the ISO week + photo id (stable for everybody during the week, avatars excluded); no photo = no hero. Kicker names the rule that matched.
+- **Photos are private**: files in `var/photos/originals` (bind-mounted from the host in dev), thumbnails generated lazily in
+  `var/photos/cache/{thumb,medium,hero,avatar}` by `App\Service\ImageProcessingService` (imagine/imagine, GD) and **always WebP** (`image/webp`). Served only by authenticated
+  controllers (`photo_source`, `photo_variant`), every response `X-Content-Type-Options: nosniff`. `hero` (≤1600 px, inset, never upscaled) feeds the home hero;
+  `app:photos:warm --variants=avatar,thumb,medium,hero` pre-generates them.
+- **Photo pipeline** (`App\Photo\PhotoPipeline`, the ONLY way an image enters the library: uploads via `PhotoUploader::store`, topic photo manager, `app:legacy:import` / `app:legacy:reimport`
+  via `PhotoReprocessor`, `app:photos:reprocess`): 1. header only (`getimagesize`, real type, never the client's): > 100 megapixels / > 30 000 px a side is refused BEFORE decoding, and an image that would
+  not fit in the remaining `memory_limit` (768M, `frankenphp/conf.d/10-app.ini`) is refused with a French message instead of a fatal error; 2. EXIF read from the untouched original
+  (`App\Photo\ExifReader`: curated flat UTF-8 map, rationals/GPS normalised); 3. orientation applied, downscaled to ≤ 10 MP / 8000 px (never upscaled), re-encoded as WebP q85 = the stored "original"
+  (drops polyglot payloads; `original_filename` is kept for display, downloads are named `<name>.webp`); 4. animated GIFs are kept byte for byte as GIF (≤ 10 MP, else refused). Upload limit **10 MB**
+  per file (`PhotoUploader::MAX_SIZE`, `upload_max_filesize=10M`, `post_max_size=128M`; restart `php` after changing the ini), 10 files per message.
+  Persisted on `Photo`: `taken_at` (indexed), `gps_latitude/longitude/altitude` (indexed together, for a future map; **shown only to the photo's owner and administrators**), `exif` JSON (Make, Model, Lens*,
+  ExposureTime + `ExposureTimeFraction`, FNumber, ISO, FocalLength(+35mm), Flash, GPS*, `Original{Width,Height,FileSize,MimeType}`…); the photo page lists them through `PhotoDetails` (twig `photo_details`).
+  `app:photos:reprocess [--dry-run] [--limit=N]` migrates a restored legacy library in place (idempotent: WebP within the caps and animated GIFs are skipped); run with `-e XDEBUG_MODE=off --no-debug`.
+  Photo deletion (`POST /photos/{id}/delete`, CSRF): the author only when nothing uses the photo, an administrator always (links, likes and avatar go with it, files removed).
+- **Likes and home hero**: members like/unlike photos (`PhotoLike`, `ctso_photo_like`, unique user+photo, ON DELETE CASCADE; `POST /photos/{id}/like` toggles with CSRF token `like-photo-{id}` and answers
+  `{liked, count}` to fetch / redirects without JS; `GET /photos/{id}/like` gives the state + token). The photo page has the heart + who liked; the lightbox heart (`ui.js`, `data-photo-id` on every
+  `data-lightbox` link) loads the state lazily. **Home hero** (`App\Photo\FeaturedPhotoProvider`, `templates/home/_hero.html.twig`): a RANDOM photo, drawn on every page load, among the 10 distinct photos most
+  recently liked (avatars excluded; `Random\Randomizer` injected, seeded in tests); nothing liked = no hero. The home response is `private, no-store`.
 - **Photos on messages**: `App\Entity\CommentPhoto` (`ctso_comment_photo`, unique comment+photo, ON DELETE CASCADE) links photos to a message; `PhotoTopic` still links them to a topic
-  (the new-topic form attaches uploads to the topic). The unmapped `PhotoUploadType` field (`comment[photos][]`, max `PostPhotos::MAX_PER_POST` = 10 files of `PhotoUploader::MAX_SIZE` = 25 MB, real
-  content type checked by `Image` + `PhotoUploader::store`) is enhanced by `assets/vue/components/AttachPhotos.vue` (drag & drop, paste, thumbnails, keeps the input's `FileList` in sync, so a plain
+  (the new-topic form attaches uploads to the topic). The unmapped `PhotoUploadType` field (`comment[photos][]`, max `PostPhotos::MAX_PER_POST` = 10 files of `PhotoUploader::MAX_SIZE` = 10 MB, real
+  content type checked by `Image` + the pipeline) is enhanced by `assets/vue/components/AttachPhotos.vue` (drag & drop, paste, thumbnails, keeps the input's `FileList` in sync, so a plain
   submit works). `App\Photo\PostPhotos` stores all-or-nothing, links, detaches and `releaseOrphans()` (file + row deleted only when no topic, message or avatar still uses the photo): used by
-  create/edit/delete of a comment (only author/admin; the edit page lists attached photos with a remove checkbox). PHP limits live in `frankenphp/conf.d/10-app.ini`
-  (`upload_max_filesize=25M`, `post_max_size=256M`; restart `php` after changing). Pages rendering many messages call `CommentPhotoRepository::preload($comments)` (one query) before
+  create/edit/delete of a comment (only author/admin; the edit page lists attached photos with a remove checkbox). Pages rendering many messages call `CommentPhotoRepository::preload($comments)` (one query) before
   rendering `_post/message.html.twig`: do the same in any new listing. In tests, `em()->clear()` before a request that must lazy-load collections created in the same test.
 - **Thread previews** (forum page): `App\Forum\ThreadPreviewBuilder` builds the read model of a whole page of topics with batch queries (query count asserted in `ForumPageTest`);
   excerpts are plain text from `App\Content\TextExcerpt` (twig `excerpt_text`, auto-escaped), relative dates come from the `ago` filter. The inline "Aperçu" fetches
   `GET /forum/{forumId}/{id}/preview` (`TopicPreviewController`, HTML fragment of the last 5 messages, private/no-store) through `initThreadPreviews()` in `assets/scripts/ui.js`.
   Markup of the new components is documented in `docs/components-markup.md`.
-- **Legacy-compatible URLs** (old links were shared in messages): `/forums/`, `/forums/{forum}`, `/forum/{forum}/{topic}`, `/comment/{id}`, `/gens/{username}`, `/photos/{id}`.
+- **Legacy-compatible URLs** (old links were shared in messages): `/forums/`, `/forums/{forum}`, `/forum/{forum}/{topic}`, `/comment/{id}`, `/gens/{username}`, `/photos/{id}`, `/topic.php?id=`, and the Symfony 2 photo links `/photos/preview/N.jpg` / `/photos/thumbnail/N.jpg` (68 imported messages use them): `LegacyRedirectController` answers
+  301 (members only, like everything) to `photo_variant` `medium` / `thumb` of the oldest photo whose `original_filename` is `N.jpg` (never a file path).
 - Entities keep the legacy table names (`fos_user`, `ctso_*`). Imported rows carry `legacy_ref` (unique) so imports are idempotent.
 - User preferences live in `fos_user.config` (JSON): `theme` (`light|dark`), `message_order` (`asc|desc`).
 - `previous_login`/`last_activity` on users drive "what's new since your last visit" on the home page.
@@ -99,6 +145,21 @@ private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `t
   becomes the player. Adding a smiley = drop the gif in `public/smilies/` **and** list it in `assets/vue/editor/smilies.js` (a test enforces it).
   After changing the allow-list run `bin/console app:content:sanitize --dry-run` then without `--dry-run` (idempotent, batched, plain SQL, leaves `updated_at` alone).
 
+- **Authentication hardening** (`config/packages/security.yaml`, `framework.yaml`): `login_throttling` = 5 attempts / 15 min per username + IP (25 per IP), counters in the filesystem pool `limiter.cache`
+  (`app.limiter.storage` in memory under `when@test`: a test that needs counts across requests calls `$client->disableReboot()`). Logout needs its stateless CSRF token: use `{{ logout_path() }}`, tests use `$this->logOut()`.
+  Session and remember-me cookies are `HttpOnly`, `SameSite=Lax`, `Secure` in prod (`when@prod`); `kernel.debug`, profiler and toolbar exist only in dev/test (`tests/Security/ProductionConfigTest.php` boots the prod kernel).
+  Every POST/DELETE route checks a token or is a Symfony form: `tests/Security/CsrfTest.php` lists them and fails when a new one is not classified.
+- **Passwords**: members change theirs on `/gens/{pseudo}/config` (current password, min 10 characters, native hasher, signed in again on a fresh session; old remember-me cookies and sessions die with the old hash).
+  "Mot de passe oublié ?" (`PasswordResetController`, `App\Security\PasswordReset`) mails a link signed with `UriSigner` (1 h) bound to the member's current password hash + e-mail, so it is single use without any table;
+  the answer is always neutral (no enumeration; mail is sent in `kernel.terminate`), 10 requests/h per IP and 3/h per account (`rate_limiter` in `framework.yaml`), never to disabled accounts or `*.invalid` placeholder addresses.
+  Links are built on `DEFAULT_URI`, sender is `MAILER_FROM`. Fallback for the owner: `bin/console app:user:reset-password <pseudo> [--password=…]`.
+- **Health**: `GET /health` is public, `200 ok` (`SELECT 1`) or `503 unavailable`, `Cache-Control: no-store`, nothing else leaks.
+- **Moderation**: administrators delete a whole topic from its page (`topic_delete`, confirm + CSRF; `App\Forum\TopicRemover`: bulk delete of messages, photo links, favourites, then `PostPhotos::releaseOrphans`).
+  Deleting a whole forum is deliberately not offered (SQL only).
+- **Cutover** (`app:cutover:prepare [--dry-run] [--delete-user=<pseudo>]…`, run once between the final import and opening the doors, with `-e XDEBUG_MODE=off --no-debug`): every member's `previous_login` = now and
+  `chat_last_read_id` = latest chat message (never backwards), optional deletion of test accounts with what they wrote (`App\Forum\UserRemover`), then lists ROLE_ADMIN, disabled and mail-less accounts.
+- A refused reply (`CommentController::create`) re-renders the topic page with the bound form and HTTP 422 (typed text is kept); the other forms already re-render in place.
+
 ## Legacy data
 
 `docs/legacy/` holds screenshots of the Symfony 2 production site (reference for features/UX) and `docs/LEGACY_FEATURES.md` lists every feature seen there.
@@ -109,6 +170,8 @@ Older platforms (old PHP forum MySQL dump, two phpBB installs) live in `var/lega
 ```bash
 docker compose exec php bin/console app:user:create <pseudo> <password> [--admin]   # accounts are created by the owner (registration is off)
 docker compose exec php bin/console app:user:promote <pseudo> [--revoke]            # grant/remove ROLE_ADMIN (moderate everything)
+docker compose exec php bin/console app:user:reset-password <pseudo> [--password=…]  # lost password, no usable e-mail: prints a one-time random password
+docker compose exec -T -e XDEBUG_MODE=off php php bin/console app:cutover:prepare --no-debug --dry-run  # before go-live; then without --dry-run (see Architecture notes)
 docker compose exec -T -e XDEBUG_MODE=off php php bin/console app:photos:warm       # pre-generate thumbnails (lazy otherwise); --variants=avatar,thumb,medium,hero
 docker compose --profile legacy up -d legacy-mysql legacy-postgres                  # old dumps loaded from var/legacy/ (not started by default)
 docker compose exec -T php php bin/console app:content:sanitize --dry-run --no-debug
@@ -122,7 +185,7 @@ Styling pipeline in one line: `assets/scripts/main.js` imports `assets/styles/ap
 ## Gotchas
 
 - Legacy passwords: the Symfony 2 forum stored `sha512 x5000 base64` of `password{salt}`, **or** of `sha1(sha1(password)){salt}` for members older than FOSUserBundle (its custom auth provider tried both). `App\Security\LegacyPasswordHasher` accepts both and `migrate_from` upgrades to bcrypt at first login. In `password_hashers`, Symfony takes the **first entry matching the user**, and `migrate_from` is ignored with `algorithm: auto`: keep `App\Entity\User` first with `algorithm: native`, and repeat the full entry in `when@test`.
-- `compose.override.yaml` mounts an anonymous volume on `/app/var`: anything written to `var/` that is not bind-mounted (`var/photos`) is lost on `docker compose down`.
+- `compose.yaml` mounts an anonymous volume on `/app/var`: anything written to `var/` that is not bind-mounted (`var/photos`) is lost on `docker compose down`.
 - Mercure hub runs in compatibility mode (`protocol_version_compatibility 8` in the Caddyfile / `protocol_version: '0.x'` in `config/packages/mercure.yaml`).
 - Playwright MCP calls time out after 30 s: keep scripted crawls short (a few pages per call).
 - Run whole-database console commands (`app:content:sanitize`, `app:legacy:reimport`, `app:photos:warm`) with `-e XDEBUG_MODE=off` and `--no-debug`: Xdebug and the dev
