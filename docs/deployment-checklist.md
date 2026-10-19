@@ -24,7 +24,7 @@ Dev-machine commands run from `/home/vincent/www/comtso` through `docker compose
 | Docker | Engine 29.8.2, Compose **v5.6.0**. Seven compose projects run: `traefik`, `comtso` (old forum), `keres`, `meuj`, `sidus`, `baby-names`, `admin-demo`. |
 | **Old forum** | `/root/www/comtso`: **Symfony 2 on PHP 5.6.40, Docker**: services `php-fpm` (built from `./current/.docker/php-fpm`), `nginx:alpine`, `mysql` = **mariadb:10.3** (volume `comtso_volume_mysql`, 169 MB; its image has `mysqldump`, no `mariadb` binary). Deployed by a Makefile from `github.com/VincentChalnot/ComTSo` (`repository/` -> `current` symlink). `.env` holds only the keys `REPOSITORY_ADDRESS`, `MYSQL_PASSWORD`, `DOMAIN_NAME` (=`comtso.fr`). The **compose project is named `comtso`**. |
 | Reverse proxy | **Traefik** (container `traefik`, `/root/www/traefik`), owns host ports **80, 443/tcp, 443/udp**; Docker provider on network **`proxy`** (exists, external name `proxy`), `exposedByDefault: false`. Entrypoints `web` (redirects to `websecure`) and `websecure`. Cert resolvers `gandi` and `keres`: **both use the HTTP-01 challenge** on `web` (the resolver named `gandi` stores in `letsencrypt/gandi.json`; its DNS-challenge lines are commented out). **Cert resolver to use: `gandi`**. The old forum's labels: router `comtso`, `Host(\`comtso.fr\`)`, `tls.certresolver=gandi`, no entrypoint label. |
-| **Global headers middleware** | `entryPoints.websecure.http.middlewares: security-headers@file` applies to **every router**: HSTS (1 y, subdomains, preload), `X-Frame-Options: SAMEORIGIN`, and **`Content-Security-Policy: frame-ancestors 'self' https://*.sidus.fr`**. `curl -I https://comtso.fr` shows it today. It will **replace the app's own CSP** (see mismatch M3). |
+| **Global headers middleware** | `entryPoints.websecure.http.middlewares: security-headers@file` applies to **every router**: HSTS (1 y, subdomains, preload), `X-Frame-Options: SAMEORIGIN`. It **used to add** `Content-Security-Policy: frame-ancestors 'self' https://*.sidus.fr` (removed 2026-10-19, section 11). |
 | fail2ban | Active, jails `sshd` and **`traefik-404`**: 20 responses with status 404 in 60 s from one IP (read from Traefik's JSON access log) = **1 h ban**. 204 bans so far, no `ignoreip`. |
 | Firewall | iptables `INPUT ACCEPT`, `FORWARD DROP` + Docker/ufw/tailscale chains. Listening on the host: 80, 443 (docker-proxy = Traefik), ssh on the Tailscale address, DNS stub. Nothing on 8080/8443 (free for a loopback bind). Outbound to `smtp.tem.scaleway.com:587` and `ghcr.io:443` works (TCP connect tested from the server). |
 | DNS | `comtso.fr` and `www.comtso.fr` -> `217.154.10.101` = this server (as does `sidus.fr`); NS at **Gandi**. `comtso.fr` already has `MX 10 blackhole.tem.scaleway.com`, `TXT "v=spf1 include:_spf.tem.scaleway.com -all"`, `_dmarc "v=DMARC1; p=none"`: **the domain already looks configured for Scaleway TEM**. The DKIM record (selector unknown, TEM names it after the project id) was not found by guessing: verify in the TEM console. No CAA record. `www.comtso.fr` has no Traefik router (old forum only answers `comtso.fr`). |
@@ -39,7 +39,7 @@ Dev-machine commands run from `/home/vincent/www/comtso` through `docker compose
 |---|---|---|---|
 | M1 | Project `name: comtso` | The old forum **is** the project `comtso` (same network `comtso_default`, containers `comtso-*`; `--remove-orphans` would delete the old containers) | **Fixed in the repo**: prod project is now `comtso-forum`; use its own directory `ST`. |
 | M2 | Directory with `compose.yaml` + `.env` | `/root/www/comtso` already holds the old `compose.yaml`/`.env`/`Makefile` | New directory `ST=/root/www/comtso-forum`. |
-| M3 | App CSP reaches the browser | Traefik's global `security-headers@file` **overwrites `Content-Security-Policy`** with `frame-ancestors ...` only: no `script-src`/`default-src` any more (the app keeps working, defence in depth against XSS is lost; content is sanitized anyway) | Decision D6. Check with step 7.9. |
+| M3 | App CSP reaches the browser | Traefik's global `security-headers@file` overwrote the CSP of every site | **Fixed 2026-10-19**: the global CSP line was removed (backup `traefik.yaml.bak-2026-10-19`); the app's own CSP now reaches the browser. Check with step 7.5/7.9. |
 | M4 | Published ports 80/443 (direct mode) | Held by Traefik; the other 6 sites live behind it | Traefik mode only: `compose.traefik.yaml` publishes nothing. |
 | M5 | Commented labels used resolver `letsencrypt`, router `comtso` | Resolver is **`gandi`**; router name `comtso` **is taken** by the old forum (same name + different rule = conflicting Docker-provider config) | **Fixed**: override file uses router/service `comtso-forum`, `CERT_RESOLVER=gandi` in `.env`. |
 | M6 | Healthcheck from the image = Caddy metrics | n/a | **Fixed**: `app` healthcheck is now `GET /health` (verified locally healthy / unhealthy with the DB down). Traefik drops a container that is `unhealthy`. |
@@ -54,20 +54,15 @@ Dev-machine commands run from `/home/vincent/www/comtso` through `docker compose
 
 ## 1. Decisions needed from the owner
 
-- [ ] **[YOU]** D1 Profile visibility: what members see of each other on `/gens/{pseudo}` (e-mail, last login, signature...). Today every member sees every profile; GPS EXIF is already owner/admin only. Say "keep" or what to hide.
-- [ ] **[YOU]** D2 Registration password length: the registration form requires **8** characters, the change-password form **10** (registration is OFF unless `REGISTRATION_ENABLED=true`). Recommended: 10 everywhere (a [ME] code change with a test once you say go).
-- [ ] **[YOU]** D3 Login throttling behind NAT: 5 failed attempts / 15 min per username + IP and **25 / 15 min per IP** (`config/packages/security.yaml`). Friends sharing one box/CGNAT can lock each other out. Keep, or raise (e.g. 10 / 50)? Real client IPs come from Traefik's `X-Forwarded-For` (`TRUSTED_PROXIES=private_ranges`).
-- [ ] **[YOU]** D4 Domain: final `SERVER_NAME=comtso.fr`; rehearsal host name (proposal `next.comtso.fr`, needs a DNS record, step 2.7). `www.comtso.fr`: ignore, or redirect to `comtso.fr` (needs an extra Traefik router, not covered here).
-- [ ] **[YOU]** D5 Rehearsal strategy: recommended = **old forum keeps serving `comtso.fr` untouched while the new stack runs on `next.comtso.fr`** with a copy of the data; cutover = stop old nginx, load final data, change `SERVER_NAME` to `comtso.fr`. (Alternative: no rehearsal host, rehearse only on the dev machine.)
-- [ ] **[YOU]** D6 TLS/proxy mode: only **Traefik** is possible here (it owns 80/443 for 7 sites); direct Caddy TLS would need a different server or moving Traefik. And the CSP question (M3): (a) accept Traefik's replacement CSP, (b) remove `contentSecurityPolicy` from the global `security-headers` middleware in `/root/www/traefik/traefik.yaml` (affects all sites there; Traefik hot-reloads the file provider; `keres`, `meuj`... would then need their own CSP), or (c) move that middleware from the entrypoint to per-router labels (touches all other projects). Recommended: (a) for go-live, (b) later.
-- [ ] **[YOU]** D7 `design-tester` (and any other dev/test) account: delete it with `app:cutover:prepare --delete-user=design-tester` (recommended). It disappears anyway if the final dataset is built from a fresh `app:legacy:import --force`.
-- [ ] **[YOU]** D8 Is `comtso.fr` embedded/linked from another site of this server (CSP `frame-ancestors *.sidus.fr`, nginx alias `comtso.fr` on network `proxy`)? If yes it must be adapted.
-- [ ] **[YOU]** D9 fail2ban: add your own IP(s) (and the friends' NAT if known) to `ignoreip` of `traefik-404` (`/etc/fail2ban/jail.d/`), or leave as is?
-- [ ] **[YOU]** D10 Mail sender: address/domain for `MAILER_FROM` (proposal `"ComTSo <no-reply@comtso.fr>"`; `comtso.fr` already has SPF/MX/DMARC records for TEM). Which mailbox receives replies (none = `no-reply`)?
-- [ ] **[YOU]** D11 Backups: who writes the weekly `…0300.sql.gz` dumps of the old forum (not found on the host)? Where should off-site copies of the new backups go (Scaleway Object Storage, rsync to home, ...)? Nothing leaves this disk today.
-- [ ] **[YOU]** D12 Where the heavy import runs: recommended = **dev machine** (needs the `legacy` profile databases for `app:legacy:reimport`, has RAM, ~1 h of photo processing), then ship `db` + `photos` archives and `restore.sh` them (the documented way, `deploy/README.md` "Legacy import"). Running it on the server is NOT recommended (RAM, and `app:legacy:reimport` does not exist there).
-- [ ] **[YOU]** D13 Open questions already listed in `docs/legacy-import.md` "Needs the owner's decision" (layout of 2004-2007 forums, 2 album-less photos, 28 garbled comments, phpBB attachments/events, `@legacy.invalid` users).
-- [ ] **[YOU]** D14 Freeze window: how long can the old forum be read-only/off (estimate 1.5-3 h, measured in the rehearsal) and who announces it (the assistant never posts on the real forum).
+Answers received 2026-10-19 (all decided):
+
+- [x] **[YOU]** D1 profile visibility, D13 legacy-import open questions: decided by the owner (no change requested to the code/dataset in this task).
+- [x] **[YOU]** D2 password length 10 everywhere (commit `87519eb`, local, to push). **D3** login throttling: owner decided (no change recorded here).
+- [x] **[YOU]** D4 rehearsal host `next.comtso.fr` (wildcard DNS, nothing to create); `www.comtso.fr` -> `comtso.fr` permanent redirect wanted: `deploy/compose.www-redirect.yaml` (enabled at cutover, 8.1.2).
+- [x] **[YOU]** D5 plan: final local rehearsal and dataset (`backups/rehearsal/`, another worker), deploy to `next.comtso.fr` with that local data, owner checks, then switch `comtso.fr`.
+- [x] **[YOU]** D6 every project owns its CSP: `contentSecurityPolicy` removed from the global `security-headers@file` (applied 2026-10-19, see section 11); keres sends its own (diff in section 11, owner commits/deploys); other sidus apps left without CSP (unimportant).
+- [x] **[YOU]** D7 dataset from a fresh dump (no `design-tester`); **D8** no embedding; **D9** fail2ban unchanged; **D10** `MAILER_FROM="ComTSo <no-reply@comtso.fr>"`, owner types the Scaleway DSN himself (leave `null://null` until step 6.1); **D14** the old forum keeps serving during the whole rehearsal (the short freeze of 5.3.2 is still needed at the final cutover only).
+- [x] **[YOU]** D11 the weekly dumps are written by the NAS script `/home/vincent/nas/home/Backups/comtso/backup.sh` (cron on the NAS side, not on the server); it now also backs up the new stack once it runs (section 11). **D12** import on the dev machine.
 
 ---
 
@@ -75,17 +70,17 @@ Dev-machine commands run from `/home/vincent/www/comtso` through `docker compose
 
 ### GitHub
 
-- [ ] **[YOU]** 2.1 Make sure `master` is pushed and the **Actions run is green** for the commit to deploy. Recon: the image tag `sha-9148a6d` already exists on ghcr and equals the local `master` HEAD before the commits of this task; the later local commits (docs + `deploy/` files) are not published until you push. They do not change the image (`deploy/` is not part of it), so a push is only needed to get CI to validate them, not to deploy.
+- [x] **[YOU]** 2.1 `master` pushed (origin/master = `02d8848`, includes the deploy commits of the first task).
 - [x] **[ME]** 2.2 ghcr package visibility: `ghcr.io/vincentchalnot/comtso` is **public** (anonymous `GET /v2/vincentchalnot/comtso/tags/list` returns `latest`, `sha-9148a6d`). Nothing to do; a PAT is only needed if you make it private later.
-- [ ] **[YOU]** 2.3 (After pushing) GitHub > Actions: `test` and `image` jobs green; Packages > `comtso` shows the new `sha-<short>`. Decide the tag to run: pin `COMTSO_IMAGE_TAG=sha-<short>` for go-live (recommended, reproducible rollback) rather than `latest`.
+- [x] **[ME]** 2.3 CI green for `origin/master` = `02d8848` (run 39150865228: `test` + `image` success); ghcr has `sha-02d8848`. **Pinned: `COMTSO_IMAGE_TAG=sha-02d8848`.** The local commit `87519eb` (10-character password at registration, D2) is NOT in that image: after you push it, bump the tag before the cutover.
 - [ ] **[ME]** 2.4 Verify locally before any deploy: `docker compose -f deploy/compose.yaml --env-file deploy/.env.example config -q && docker compose -f deploy/compose.yaml -f deploy/compose.traefik.yaml --env-file deploy/.env.example config -q` (both silent = OK; CI runs both).
 
 ### Server (all read-only checks, already done in recon: re-run them right before go-live)
 
 - [x] **[ME]** 2.5 Docker 29.8.2 + Compose v5.6.0 present (supports `secrets: environment:` and `!reset`); `proxy` network exists; ports 80/443 owned by Traefik; ghcr.io reachable; 48 GB free; amd64.
 - [ ] **[ME]** 2.6 Right before the rehearsal re-check capacity (read-only): `ssh sidus.fr 'free -h; df -h /; docker stats --no-stream --format "{{.Name}} {{.MemUsage}}" | sort -k2 -h | tail -5'` — expect >= 500 MiB available; otherwise postpone or free memory.
-- [ ] **[YOU]** 2.7 DNS (Gandi): create `A next.comtso.fr -> 217.154.10.101` (TTL 300) for the rehearsal host (D4). `comtso.fr` itself needs **no DNS change** at cutover: it already points here, only the Traefik router that claims it changes.
-- [ ] **[ME]** 2.8 `dig +short A next.comtso.fr` returns `217.154.10.101` (propagation check, read-only).
+- [x] **[YOU]** 2.7 DNS: nothing to create (wildcard `*.comtso.fr`). Caveat: the wildcard does NOT cover `www.next.comtso.fr` (two levels), hence `compose.www-redirect.yaml` is only used for the apex.
+- [x] **[ME]** 2.8 `*.comtso.fr` is a wildcard that already resolves to the server (owner, 2026-10-19): `next.comtso.fr` needs no DNS work.
 
 ---
 
@@ -93,7 +88,7 @@ Dev-machine commands run from `/home/vincent/www/comtso` through `docker compose
 
 - [ ] **[YOU]** 3.1 Scaleway TEM console: validate the sender domain (`comtso.fr`): SPF `v=spf1 include:_spf.tem.scaleway.com -all` (already published), **DKIM TXT record** shown in the console (add it at Gandi if missing), MX `blackhole.tem.scaleway.com` (present), DMARC (present, `p=none`; tighten later). Wait for the domain to show **Checked/Validated**.
 - [ ] **[YOU]** 3.2 Scaleway IAM: create an API key (project scope, permission to send transactional e-mail). Keep the **project ID** and the **secret key**. Never paste them in chat or commit them; type them into `.env` yourself (3.6).
-- [ ] **[ME]** **[RISKY — WAIT FOR GO]** 3.3 Create the directory and copy the deploy files (from the dev machine; creates files on the server):
+- [x] **[ME]** 3.3 Create the directory and copy the deploy files — **done 2026-10-19** (`/root/www/comtso-forum`: `compose.yaml`, `compose.traefik.yaml`, `compose.www-redirect.yaml`, `.env.example`, `backup.sh`, `restore.sh`, `README.md`; re-`rsync` them after any change in `deploy/`). Command used:
   ```bash
   ssh sidus.fr 'mkdir -p /root/www/comtso-forum'
   cd /home/vincent/www/comtso/deploy
@@ -101,7 +96,7 @@ Dev-machine commands run from `/home/vincent/www/comtso` through `docker compose
   ssh sidus.fr 'chmod 755 /root/www/comtso-forum/*.sh'
   ```
   Expected: the six files listed, no `.env` (never copied from dev).
-- [ ] **[ME]** **[RISKY — WAIT FOR GO]** 3.4 Generate the four random secrets **on the server** (values never leave it, never printed):
+- [x] **[ME]** 3.4 Generate the four random secrets **on the server** (values never printed) — **done 2026-10-19**: `.env` mode 600 root, keys listed only, each secret 64 hex chars. Command used:
   ```bash
   ssh sidus.fr 'cd /root/www/comtso-forum && cp .env.example .env && chmod 600 .env &&
     for k in APP_SECRET DATABASE_PASSWORD DATABASE_ROOT_PASSWORD MERCURE_JWT_SECRET; do
@@ -109,7 +104,7 @@ Dev-machine commands run from `/home/vincent/www/comtso` through `docker compose
     cut -d= -f1 .env | grep -v "^#" | grep -v "^$"'
   ```
   Expected: only key names printed (`COMTSO_IMAGE_TAG`, `SERVER_NAME`, `APP_SECRET`, ..., `MAILER_DSN`). `openssl rand -hex 32` = 64 hex chars: Mercure JWT >= 32 chars OK, hex only is safe inside the database URL.
-- [ ] **[YOU]** **[RISKY — WAIT FOR GO]** 3.5 Edit the non-secret settings in `ST/.env` (`ssh sidus.fr`, `$EDITOR /root/www/comtso-forum/.env`) for the **rehearsal**:
+- [x] **[ME]** 3.5 `ST/.env` settings for the **rehearsal** — **done 2026-10-19** (`COMTSO_IMAGE_TAG=sha-02d8848`, `SERVER_NAME=next.comtso.fr`, `COMPOSE_FILE=compose.yaml:compose.traefik.yaml`, `CADDY_SITE_ADDRESS=:80`, `TRUSTED_PROXIES=private_ranges`, `CERT_RESOLVER=gandi`, `TRAEFIK_NETWORK=proxy`, `MAILER_FROM="ComTSo <no-reply@comtso.fr>"`, **`MAILER_DSN=null://null`**). Reference block, for the cutover edits:
   ```dotenv
   COMTSO_IMAGE_TAG=sha-<short>              # the green build from 2.3
   SERVER_NAME=next.comtso.fr                # comtso.fr at cutover (step 5.9)
@@ -123,7 +118,7 @@ Dev-machine commands run from `/home/vincent/www/comtso` through `docker compose
   #MAILER_FROM="ComTSo <no-reply@comtso.fr>"  # set with the D10 answer
   ```
 - [ ] **[YOU]** **[RISKY — WAIT FOR GO]** 3.6 Real mail (only at step 6, not before): set `MAILER_DSN=smtp://<SCW_PROJECT_ID>:<SCW_SECRET_KEY>@smtp.tem.scaleway.com:587` and `MAILER_FROM="ComTSo <no-reply@comtso.fr>"`. Verified against what I know of TEM: host `smtp.tem.scaleway.com`; ports 25 / **587 (STARTTLS)** / 2587, and 465 / 2465 for implicit TLS (then use `smtps://`); user = project ID, password = secret key (a UUID: no URL-special characters). **Re-check these against the current Scaleway TEM documentation before use**: I could not browse it. `symfony/mailer` 8.1 is in `composer.json`; `smtp://` and `smtps://` are built in (no extra package).
-- [ ] **[ME]** 3.7 On the server, validate the file without printing values: `cd /root/www/comtso-forum && docker compose config -q && echo CONFIG_OK` (fails with a clear message if `SERVER_NAME` or a secret is missing). Read-only.
+- [x] **[ME]** 3.7 On the server, validate the file without printing values: `cd /root/www/comtso-forum && docker compose config -q && echo CONFIG_OK` — **done 2026-10-19: CONFIG_OK**, `docker compose ps -a` empty (stack NOT started).
 
 ---
 
@@ -263,9 +258,9 @@ Replace `H`. `curl` checks are `[ME]` (read-only); browser checks are `[YOU]` (o
 ### 8.1 Switch (no DNS change: `comtso.fr` already resolves to the server)
 
 - [ ] **[ME]** **[RISKY — WAIT FOR GO]** 8.1.1 Precondition: old nginx stopped (5.3.2), final data restored (5.3.5), `cutover:prepare` done (5.3.6), 7.1-7.5 green on `next.comtso.fr`.
-- [ ] **[ME]** **[RISKY — WAIT FOR GO]** 8.1.2 Point the stack at the real name and recreate `app` (Traefik reads the new `Host(\`comtso.fr\`)` label; the `comtso.fr` certificate already exists in `gandi.json`):
+- [ ] **[ME]** **[RISKY — WAIT FOR GO]** 8.1.2 Point the stack at the real name and recreate `app` (Traefik reads the new `Host(\`comtso.fr\`)` label; the `comtso.fr` certificate already exists in `gandi.json`). Also enable the permanent `www.comtso.fr -> comtso.fr` redirect by adding `compose.www-redirect.yaml` to `COMPOSE_FILE` (`compose.yaml:compose.traefik.yaml:compose.www-redirect.yaml`; only valid for the apex `SERVER_NAME`; Traefik requests a certificate for `www.comtso.fr` by HTTP-01, DNS already points here). Test afterwards: `curl -sI 'https://www.comtso.fr/login?x=1' | grep -iE "^(HTTP|location)"` -> `301` + `location: https://comtso.fr/login?x=1`:
   ```bash
-  ssh sidus.fr 'cd /root/www/comtso-forum && sed -i "s|^SERVER_NAME=.*|SERVER_NAME=comtso.fr|" .env && docker compose up -d && sleep 30 && docker compose ps && curl -s https://comtso.fr/health'
+  ssh sidus.fr 'cd /root/www/comtso-forum && sed -i "s|^SERVER_NAME=.*|SERVER_NAME=comtso.fr|; s|^COMPOSE_FILE=.*|COMPOSE_FILE=compose.yaml:compose.traefik.yaml:compose.www-redirect.yaml|" .env && docker compose up -d && sleep 30 && docker compose ps && curl -s https://comtso.fr/health'
   ```
   Expected: `app` recreated and `healthy`, `curl` prints `ok`. `curl -sI https://comtso.fr/login | head -1` -> `HTTP/2 200`. Redirects (`/login`) and the chat now use `https://comtso.fr` (`DEFAULT_URI`, `MERCURE_PUBLIC_URL` are derived from `SERVER_NAME`).
 - [ ] **[YOU]** 8.1.3 Run section 7 on `comtso.fr`, announce the reopening yourself, tell members to log in again (all sessions are new) and that the "Mot de passe oublié ?" link works.
@@ -323,3 +318,47 @@ The old stack is **never deleted or modified** before the whole go-live is accep
 * **`PhotoImporter` / `ImportLegacyCommand` have no unit tests** (their idempotence was verified by hand on the dev data; `tests/Legacy` covers converters and the reimport matcher). The **old-style password hashes** (pre-FOSUserBundle double-sha1) are covered by tests but only the `vincent` account was verified end to end; the final import must be spot-checked with other members.
 * **First full run of the procedure on the server**: timings of restore/warm under 740 MiB of free RAM; swap use during `app:photos:warm`.
 * The unknown writer of the weekly old dumps (D11): the freeze/final dump of 5.3.3 does not depend on it.
+
+---
+
+## 11. Done on 2026-10-19: CSP per project, NAS backup, server prepared
+
+### 11.1 Traefik: global CSP removed (APPLIED on the server)
+
+`/root/www/traefik/traefik.yaml` (backup `traefik.yaml.bak-2026-10-19`, same directory): the single line
+`contentSecurityPolicy: "frame-ancestors 'self' https://*.sidus.fr"` was removed from `http.middlewares.security-headers.headers`; HSTS, `X-Frame-Options`, nosniff, `sslRedirect`, `browserXssFilter` stay. The file was edited **in place** (same inode: it is a single-file bind mount, `sed -i` would have detached it) and Traefik hot-reloaded it (no restart). Rollback: `cp -p traefik.yaml.bak-2026-10-19 traefik.yaml` is NOT enough (new inode): use `cat traefik.yaml.bak-2026-10-19 > traefik.yaml`.
+
+Before/after `curl -sI https://<host>/` (status unchanged everywhere, the CSP header vanished, HSTS and `X-Frame-Options` still present):
+
+| Host | before | after | `Content-Security-Policy` after | HSTS / XFO after |
+|---|---|---|---|---|
+| app.playkeres.com | 200 | 200 | none (**keres must ship its own: 11.2**) | yes / yes |
+| admin-demo.sidus.fr | 200 | 200 | none | yes / yes |
+| meuj.sidus.fr | 302 | 302 | none | yes / yes |
+| sidus.fr | 200 | 200 | none | yes / yes |
+| comtso.fr (old forum) | 302 | 302 | none | yes / yes |
+| baby-names.sidus.fr | 302 | 302 | none | yes / yes |
+
+The old `frame-ancestors 'self' https://*.sidus.fr` is gone for sidus/meuj/baby-names/admin-demo/old comtso (they keep `X-Frame-Options: SAMEORIGIN`; the owner said they are unimportant, no edit made to their compose files). The new forum sends `frame-ancestors 'self'` itself.
+
+### 11.2 Keres: own CSP (PREPARED in `/home/vincent/www/keres-platform/deploy/compose.yaml`, NOT committed, NOT deployed)
+
+Keres sets no CSP of its own (its `frankenphp/Caddyfile` only adds a Permissions-Policy), so until this is deployed `app.playkeres.com` has none. Inspection: 2 inline `<script>` blocks (`templates/actions/new_local_game.html.twig`, `_choice_cards.html.twig`), ~58 inline `style=` attributes, Mercure through `EventSource` on the same origin, no web workers, WebAssembly, iframes or third-party scripts/fonts; hence `'unsafe-inline'` for script/style. Diff, labels of `php` (apply on the server by `docker compose up -d` after committing, Traefik picks the middleware up from the labels):
+
+```diff
+       traefik.http.routers.keres-https.service: "keres-https-svc"
++
++      # Content-Security-Policy of this app (the shared Traefik no longer sets one globally) ...
++      traefik.http.routers.keres-https.middlewares: "keres-csp"
++      traefik.http.middlewares.keres-csp.headers.contentsecuritypolicy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self' https://*.sidus.fr"
+```
+
+Validated with `docker compose config` (temporary env, removed). After deploying, check with the browser console on the lobby, a game and settings (CSP violations), and that live updates still arrive (Mercure). If something breaks, relax only the directive named in the console message. A stricter policy (nonces for the two inline scripts) is a later step. `OIDC` login redirects are top-level navigations and are not restricted (no `form-action`).
+
+### 11.3 NAS backup script (ADAPTED)
+
+`/home/vincent/nas/home/Backups/comtso/backup.sh` (original kept as `backup.sh.orig-2026-10-19` next to it) is the job that writes the weekly `…0300.sql.gz` of the OLD forum (ssh to `root@100.93.187.57`, `mysqldump` through the `mysql` container, then `rsync` of `shared/app/data` into `data/`). The old part is unchanged. New: when `/root/www/comtso-forum/.env` exists and the `app` service of the new stack is running, it runs `deploy/backup.sh` on the server (`BACKUP_DIR=/var/backups/comtso`, 7 days kept on the server) and mirrors `/var/backups/comtso/` into `new-forum/` next to the script (no `--delete`; prune by hand). Exit status is non-zero if either part failed. Until the stack is started the new part is silently skipped, so nothing changes today. No secret appears in the script (the DB root password is read inside the container by `backup.sh`). Note: this makes step 9.1 (server-side cron) optional; keep one of the two, not both, or the 850 MB photo tar is made twice a day.
+
+### 11.4 Server: `/root/www/comtso-forum` prepared (stack NOT started, no data)
+
+Files copied, `.env` generated (mode 600, four 64-hex secrets generated on the server and never displayed), rehearsal settings in place (3.3-3.5), `docker compose config -q` OK, `docker compose ps -a` empty. **Waiting for the dataset** (`backups/rehearsal/`, 5.1.7), then 4.1 (start), 5.2 (restore). `MAILER_DSN` is still `null://null`: **set the Scaleway DSN yourself in `/root/www/comtso-forum/.env` at step 6.1 (after the rehearsal data is loaded and checked), then `docker compose up -d`.**

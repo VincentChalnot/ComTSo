@@ -1,0 +1,19 @@
+# Optional second override: permanent redirect https://www.<SERVER_NAME>/... -> https://<SERVER_NAME>/... (path and query kept).
+# Use it ONLY when SERVER_NAME is the apex domain (comtso.fr): for next.comtso.fr Traefik would try to obtain a certificate
+# for www.next.comtso.fr (not covered by DNS) and log ACME errors.
+#
+#   .env:  COMPOSE_FILE=compose.yaml:compose.traefik.yaml:compose.www-redirect.yaml
+#
+# Needs the Traefik setup of compose.traefik.yaml (same CERT_RESOLVER / TRAEFIK_ENTRYPOINT / TRAEFIK_NETWORK).
+services:
+  app:
+    labels:
+      traefik.http.routers.comtso-forum-www.rule: "Host(`www.${SERVER_NAME}`)"
+      traefik.http.routers.comtso-forum-www.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
+      traefik.http.routers.comtso-forum-www.tls: "true"
+      traefik.http.routers.comtso-forum-www.tls.certresolver: "${CERT_RESOLVER:-letsencrypt}"
+      traefik.http.routers.comtso-forum-www.middlewares: "comtso-forum-www-redirect"
+      traefik.http.routers.comtso-forum-www.service: "noop@internal"
+      traefik.http.middlewares.comtso-forum-www-redirect.redirectregex.regex: "^https?://www\\.([^/]+)(.*)$$"
+      traefik.http.middlewares.comtso-forum-www-redirect.redirectregex.replacement: "https://$${1}$${2}"
+      traefik.http.middlewares.comtso-forum-www-redirect.redirectregex.permanent: "true"

@@ -7,6 +7,7 @@ Nothing is built on the server: it only needs Docker with Compose v2 and the two
 ```
 deploy/compose.yaml          app (FrankenPHP + Caddy + embedded Mercure hub) · migrate (one-shot) · database (MariaDB 11.4)
 deploy/compose.traefik.yaml  optional override: shared Traefik instead of published ports (see "Reverse proxy options")
+deploy/compose.www-redirect.yaml  optional second override (Traefik, apex domain only): permanent redirect www.<SERVER_NAME> -> <SERVER_NAME>
 deploy/.env.example          the settings and the 5 secrets, to copy to deploy/.env
 ```
 
@@ -72,6 +73,8 @@ the CSP with a weaker one. The CSP whitelists the one inline theme script of `te
 | **Direct HTTPS** (default) | `SERVER_NAME=forum.example.com` | Caddy listens on 80/443 and gets the certificate itself. `TRUSTED_PROXIES` stays empty. |
 | **Behind your own proxy** (nginx, Caddy, HAProxy...) | `CADDY_SITE_ADDRESS=:80`, `TRUSTED_PROXIES=<proxy IP/CIDR or private_ranges>`, `HTTP_BIND=127.0.0.1:8080`, `HTTPS_BIND=127.0.0.1:8443` | The proxy terminates TLS and forwards to `127.0.0.1:8080`, keeping `Host` and sending `X-Forwarded-For/Proto/Host`. Mercure needs streaming: disable response buffering for `/.well-known/mercure` (nginx: `proxy_buffering off; proxy_read_timeout 1h;`). |
 | **Traefik** on a shared Docker network | `COMPOSE_FILE=compose.yaml:compose.traefik.yaml`, `CADDY_SITE_ADDRESS=:80`, `TRUSTED_PROXIES=private_ranges`, `CERT_RESOLVER=<your resolver name>`, optional `TRAEFIK_NETWORK` | The override file drops the published ports, joins the external network (default `proxy`) and adds the labels (router `comtso-forum`, entrypoint `websecure`, Traefik forwards to port 80 of `app`). Traefik's own entrypoint middlewares (e.g. a global `headers` middleware) apply on top: check the final headers with `curl -I`, a global `Content-Security-Policy` there **replaces** the one of Caddy. |
+
+For the `www.` redirect add `compose.www-redirect.yaml` to `COMPOSE_FILE` (`compose.yaml:compose.traefik.yaml:compose.www-redirect.yaml`); use it only with an apex `SERVER_NAME` such as `comtso.fr` (for `next.comtso.fr` Traefik would request a certificate for `www.next.comtso.fr`).
 
 Whatever the mode, the Symfony app publishes chat updates to the embedded Mercure hub over an internal plain-HTTP listener
 (`http://app:8080`, not published); browsers subscribe through `https://$SERVER_NAME/.well-known/mercure` with a private,
