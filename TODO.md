@@ -12,9 +12,8 @@ Items marked **BLOCKED** need a decision from the owner before any work.
 ## Wave 2: hardening and photo/text features
 
 1. **CI hardening: owner commands left.** Done (2026-10-19): Dependabot, gitleaks job, prod-image smoke test in `image`, repository security settings, stale runs removed (`docs/operations.md` "GitHub repository, CI and ghcr"). Left for the owner: delete the 6 orphaned `sha-*` ghcr tags (command in that section), then, after the signed force-push of `master`, apply the recommended branch protection (command there), and check the first Dependabot pull requests.
-2. **Modern UTF-8 emojis for new messages** (old gif smilies stay). First check that `ctso_comment` is `utf8mb4` (legacy tables may be `utf8`), then the sanitizer allow-list, an editor picker next to the smilies (`assets/vue/editor/smilies.js`) and a sanitizer test with astral characters.
-3. **Quick photo rotation for the owner and admins.** Touches the photo pipeline: re-encode the WebP original, invalidate `cache/{thumb,medium,hero,avatar}`, EXIF orientation. After the avatar work; pipeline test required.
-4. **Sentry.** Plan in `docs/operations.md` ("Sentry plan"): cheap, but production is quiet and `/health` plus logs cover a 20-member forum. Do it after the first production error that cannot be diagnosed.
+2. **Quick photo rotation for the owner and admins.** Touches the photo pipeline: re-encode the WebP original, invalidate `cache/{thumb,medium,hero,avatar}`, EXIF orientation. After the avatar work; pipeline test required.
+3. **Sentry.** Plan in `docs/operations.md` ("Sentry plan"): cheap, but production is quiet and `/health` plus logs cover a 20-member forum. Do it after the first production error that cannot be diagnosed.
 
 ## Wave 3: decisions and big or optional items
 

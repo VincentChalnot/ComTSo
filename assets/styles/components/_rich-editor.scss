@@ -133,7 +133,7 @@
     }
   }
 
-  // ---- popover (smileys) -------------------------------------------------------------------------------------------------
+  // ---- popovers (smileys, emojis) ---------------------------------------------------------------------------------------
   .rich-editor-popover {
     @include texture-host;
     @include texture-tone("paper", "overlay");
@@ -158,7 +158,8 @@
       max-width: 28rem;
     }
   }
-  .rich-editor-smiley {
+  .rich-editor-smiley,
+  .rich-editor-emoji {
     display: inline-flex;
     height: 2.25rem;
     align-items: center;
@@ -175,6 +176,12 @@
       max-width: 1.5rem;
       max-height: 1.5rem;
     }
+    // an emoji is a text glyph drawn by the system's colour emoji font
+    > span {
+      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+      font-size: 1.375rem;
+      line-height: 1;
+    }
     @include hover {
       border-color: var(--c-line);
       background: var(--c-surface-2);
@@ -185,6 +192,41 @@
     @include focus {
       @include focus-ring(-2px);
     }
+  }
+
+  // Emoji picker: `.rich-editor-popover.rich-editor-emoji-popover` > category buttons (`.rich-editor-btn[aria-pressed]`) +
+  // `.rich-editor-popover-title` (open category) + `.rich-editor-emoji-grid` of `.rich-editor-emoji` buttons.
+  .rich-editor-emoji-popover {
+    display: flex;
+    max-height: 16rem;
+    flex-direction: column;
+    gap: 0.375rem;
+
+    .rich-editor-btn > span {
+      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+      font-size: 1.125rem;
+      line-height: 1;
+    }
+  }
+  .rich-editor-emoji-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  .rich-editor-popover-title {
+    margin: 0;
+    color: var(--c-fg-soft);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+  .rich-editor-emoji-grid {
+    display: grid;
+    gap: 0.125rem;
+    grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr));
   }
 
   // ---- link / video address row --------------------------------------------------------------------------------------------

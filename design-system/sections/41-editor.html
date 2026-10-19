@@ -123,6 +123,48 @@
     </div>
   </div>
 
+  <div class="ds-demo" data-title="Réplique statique : popover des émojis ouvert (catégorie « Gestes »)">
+    <div class="ds-stage is-surface">
+    <div class="rich-editor is-ready" style="--re-min-h: 6rem; margin-bottom: 14rem">
+      <div class="rich-editor-bar">
+        <div class="rich-editor-toolbar" role="toolbar" aria-label="Mise en forme du texte">
+        <button type="button" class="rich-editor-btn" title="Gras (Ctrl+B)" aria-label="Gras" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></svg></button>
+        <span class="rich-editor-sep" aria-hidden="true"></span>
+        <button type="button" class="rich-editor-btn" title="Smileys" aria-label="Smileys" aria-haspopup="true" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg></button>
+        <button type="button" class="rich-editor-btn" title="Émojis" aria-label="Émojis" aria-haspopup="true" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M18 13a6 6 0 0 1-6 5 6 6 0 0 1-6-5h12Z"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg></button>
+        </div>
+        <div class="rich-editor-popover rich-editor-emoji-popover" role="group" aria-label="Émojis">
+          <div class="rich-editor-emoji-tabs" role="group" aria-label="Catégories d’émojis">
+            <button type="button" class="rich-editor-btn" title="Visages" aria-label="Visages" aria-pressed="false"><span aria-hidden="true">😀</span></button>
+            <button type="button" class="rich-editor-btn" title="Gestes" aria-label="Gestes" aria-pressed="true"><span aria-hidden="true">👍</span></button>
+            <button type="button" class="rich-editor-btn" title="Cœurs et symboles" aria-label="Cœurs et symboles" aria-pressed="false"><span aria-hidden="true">❤️</span></button>
+            <button type="button" class="rich-editor-btn" title="Animaux et nature" aria-label="Animaux et nature" aria-pressed="false"><span aria-hidden="true">🐶</span></button>
+            <button type="button" class="rich-editor-btn" title="Nourriture et boissons" aria-label="Nourriture et boissons" aria-pressed="false"><span aria-hidden="true">🍕</span></button>
+            <button type="button" class="rich-editor-btn" title="Fêtes et activités" aria-label="Fêtes et activités" aria-pressed="false"><span aria-hidden="true">🎉</span></button>
+            <button type="button" class="rich-editor-btn" title="Voyages et objets" aria-label="Voyages et objets" aria-pressed="false"><span aria-hidden="true">🚗</span></button>
+          </div>
+          <p class="rich-editor-popover-title">Gestes</p>
+          <div class="rich-editor-emoji-grid" role="group" aria-label="Gestes">
+            <button type="button" class="rich-editor-emoji" title="Pouce levé" aria-label="Pouce levé"><span aria-hidden="true">👍</span></button>
+            <button type="button" class="rich-editor-emoji" title="Pouce baissé" aria-label="Pouce baissé"><span aria-hidden="true">👎</span></button>
+            <button type="button" class="rich-editor-emoji" title="OK" aria-label="OK"><span aria-hidden="true">👌</span></button>
+            <button type="button" class="rich-editor-emoji" title="Signe de victoire" aria-label="Signe de victoire"><span aria-hidden="true">✌️</span></button>
+            <button type="button" class="rich-editor-emoji" title="Doigts croisés" aria-label="Doigts croisés"><span aria-hidden="true">🤞</span></button>
+            <button type="button" class="rich-editor-emoji" title="Signe rock" aria-label="Signe rock"><span aria-hidden="true">🤘</span></button>
+            <button type="button" class="rich-editor-emoji" title="Main qui salue" aria-label="Main qui salue"><span aria-hidden="true">👋</span></button>
+            <button type="button" class="rich-editor-emoji" title="Mains levées" aria-label="Mains levées"><span aria-hidden="true">🙌</span></button>
+            <button type="button" class="rich-editor-emoji" title="Applaudissements" aria-label="Applaudissements"><span aria-hidden="true">👏</span></button>
+            <button type="button" class="rich-editor-emoji" title="Mains jointes" aria-label="Mains jointes"><span aria-hidden="true">🙏</span></button>
+            <button type="button" class="rich-editor-emoji" title="Poignée de main" aria-label="Poignée de main"><span aria-hidden="true">🤝</span></button>
+            <button type="button" class="rich-editor-emoji" title="Biceps" aria-label="Biceps"><span aria-hidden="true">💪</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="rich-editor-surface"><div class="ProseMirror" contenteditable="false"><p>Bravo à tous pour dimanche 👏🎉</p></div></div>
+    </div>
+    </div>
+  </div>
+
   <div class="ds-demo" data-title="Réplique statique : saisie d’un lien (avec erreur), image sélectionnée, titre, code, liste">
     <div class="ds-stage is-surface">
     <div class="rich-editor is-ready">

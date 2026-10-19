@@ -37,6 +37,37 @@ class ContentSanitizerTest extends KernelTestCase
         self::assertSame($clean, $this->sanitizer->sanitize($clean), 'sanitizing must be idempotent');
     }
 
+    /** Characters outside the Basic Multilingual Plane (4 bytes in UTF-8): emojis, skin tones, ZWJ families, flags, rare ideographs. */
+    #[DataProvider('astralTextProvider')]
+    public function testAstralCharactersAreKeptIntact(string $text): void
+    {
+        $html = '<p>'.$text.'</p>';
+
+        self::assertSame($html, $this->sanitizer->sanitize($html));
+        self::assertSame(
+            '<p><strong>'.$text.'</strong> et <a href="https://example.test/" rel="noopener noreferrer" target="_blank">'.$text.'</a></p>',
+            $this->sanitizer->sanitize('<p><strong>'.$text.'</strong> et <a href="https://example.test/">'.$text.'</a></p>'),
+            'inside formatting and links too',
+        );
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function astralTextProvider(): iterable
+    {
+        yield 'single emoji' => ['Bravo 😀'];
+        yield 'skin tone modifier' => ['👍🏽'];
+        yield 'ZWJ family' => ['👨‍👩‍👧'];
+        yield 'flag' => ['🇫🇷'];
+        yield 'emoji with variation selector' => ['❤️ ✌️'];
+        yield 'mathematical letter and rare ideograph' => ['𝒳 𠀀'];
+        yield 'only an emoji' => ['🎉'];
+    }
+
+    public function testNumericEntitiesOfAstralCharactersBecomeTheCharacter(): void
+    {
+        self::assertSame('<p>😀 😀 👍</p>', $this->sanitizer->sanitize('<p>&#x1F600; &#128512; &#x1F44D;</p>'));
+    }
+
     public function testEscapedMarkupStaysEscaped(): void
     {
         $clean = $this->sanitizer->sanitize('<p>1 &lt; 2 &amp;#61; &lt;script&gt;</p>');

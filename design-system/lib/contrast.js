@@ -46,6 +46,7 @@ export const PAIRS = [
   ['fg-soft', 'page', 4.5, 'Chapô / standfirst'],
   ['fg-soft', 'surface', 4.5, 'Chapô sur carte'],
   ['fg-soft', 'surface-2', 4.5, 'Texte secondaire sur surface en creux'],
+  ['fg-soft', 'overlay', 4.5, 'Titre de catégorie du popover d’émojis (éditeur)'],
   ['muted', 'page', 4.5, 'Texte atténué (meta, placeholder) sur canvas'],
   ['muted', 'surface', 4.5, 'post-meta, placeholder, légendes'],
   ['muted', 'surface-2', 4.5, 'Texte atténué sur surface en creux'],

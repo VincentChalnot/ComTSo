@@ -65,6 +65,7 @@ The app is exposed **only** through the shared Traefik instance (`../traefik`, e
 
 - `comtso` (app), `comtso_test` (PHPUnit). Credentials `comtso`/`comtso` (root `root`), from `.env` secrets. `docker/database/10-test-db.sql` creates the test DB + grants on first volume init. The compose project is pinned to `comtso` (`name:`): volumes `comtso_database_data`, `comtso_caddy_data`, `comtso_caddy_config` hold the dev data: **never `docker compose down -v`**.
 - Schema is managed by Doctrine migrations only (`bin/console doctrine:migrations:diff` then `migrate`). `doctrine:schema:validate` must stay green.
+- Every table and text column is `utf8mb4` (collation `utf8mb4_uca1400_ai_ci`, connection `charset=utf8mb4` in `DATABASE_URL`), checked on 2026-10-19 on the dev DB and `comtso_test`: 4-byte emojis need no migration. `tests/Content/EmojiStorageTest.php` fails if a column ever falls below `utf8mb4`.
 - All the data of the old platforms lives in this database; the one-shot import tooling was removed on 2026-10-19 (`docs/decisions.md` "Data import findings").
 
 ## Tests
@@ -166,6 +167,8 @@ private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `t
   `text-align`/`text-decoration`, links are `http(s)/mailto` with forced `rel`/`target`, images `http(s)` or site-relative, and the **only iframe allowed is a YouTube player**,
   rewritten to `https://www.youtube-nocookie.com/embed/<id>` (`App\Content\YouTube`, mirrored in `assets/vue/editor/youtube.js`); a paragraph holding only a YouTube link
   becomes the player. Adding a smiley = drop the gif in `public/smilies/` **and** list it in `assets/vue/editor/smilies.js` (a test enforces it).
+  **Emojis** are plain Unicode text (astral characters pass the sanitizer untouched, chat messages and private messages included): the editor's second popover ("Émojis", `assets/vue/editor/emojis.js`,
+  curated groups with French labels, Unicode 12 or older, inserted as text, no dependency) sits next to the gif smilies. Adding an emoji = one line in `emojis.js`; `tests/Content/EmojiPickerTest.php` checks every entry survives the sanitizer, `EmojiStorageTest` that each write path stores and shows them back.
   After changing the allow-list run `bin/console app:content:sanitize --dry-run` then without `--dry-run` (idempotent, batched, plain SQL, leaves `updated_at` alone).
 
 - **Authentication hardening** (`config/packages/security.yaml`, `framework.yaml`): `login_throttling` = 5 attempts / 15 min per username + IP (25 per IP), counters in the filesystem pool `limiter.cache`

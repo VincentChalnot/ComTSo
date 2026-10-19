@@ -25,7 +25,7 @@ The "New app" column says how each feature is handled in this rewrite (`✔` don
 | 18 | **Config** (`/gens/{me}/config`) | *Bootstrap theme* (17 bootswatch themes) and **"Ordre des messages"** (plus récent en dernier / en premier). | ✔ message order kept; bootswatch themes dropped for light/dark (users of a dark bootswatch theme default to dark); change or remove your own avatar on this page |
 | 19 | **Chat** | Floating panel: online users, history (355 messages), message box; "il y a 12 ans, samedi…" timestamps. Was reported broken. | ✔ full-page chat, Mercure live updates (private), unread badge |
 | 20 | **Random quote card** | A quote of the `ctso_quote` table (348) in the sidebar of every page, with author. | ✔; … adding a quote from a hovered quote (who may add: undecided) |
-| 21 | **Smilies** | `<img src="/images/smilies/icon_*.gif">` inside messages (~10 000 occurrences). | ✔ served from `/smilies/` (+ picker); … modern UTF-8 emojis for new messages |
+| 21 | **Smilies** | `<img src="/images/smilies/icon_*.gif">` inside messages (~10 000 occurrences). | ✔ served from `/smilies/` (+ picker); modern UTF-8 emojis for new messages (second picker, stored as text) |
 | 22 | **Legacy URLs** | `topic.php?id=N` (first PHP version) pasted in messages. | ✔ `/topic.php?id=N` redirects |
 | 23 | **Logout / login** | FOSUserBundle form login, remember me. Accounts can be disabled (`enabled=0`). | ✔ disabled accounts cannot log in; passwords migrate transparently |
 
