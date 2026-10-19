@@ -20,6 +20,13 @@ class CsrfTest extends AppWebTestCase
     /** Routes whose POST is a Symfony form (token field) or the firewall's own authenticator. */
     private const FORM_ROUTES = ['comment_create', 'people_avatar', 'people_password'];
 
+    /**
+     * Admin panel routes (config/packages/sidus.yaml) that accept a POST: the bundle's Symfony forms (edit, create) and the empty
+     * confirmation forms of the destructive actions, which all carry a form token. Routes of the bundle are `ANY` unless the
+     * configuration says otherwise, so {@see testEveryAdminRouteStatesItsMethods()} insists on explicit methods.
+     */
+    private const ADMIN_FORM_ROUTES = [];
+
     public function testEveryRouteThatChangesDataIsKnownToBeProtected(): void
     {
         $unsafe = [];
@@ -30,9 +37,20 @@ class CsrfTest extends AppWebTestCase
         }
         sort($unsafe);
 
-        $known = [...self::TOKEN_ROUTES, ...self::FORM_ROUTES];
+        $known = [...self::TOKEN_ROUTES, ...self::FORM_ROUTES, ...self::ADMIN_FORM_ROUTES];
         sort($known);
-        self::assertSame($known, $unsafe, 'A new POST/DELETE route must check a CSRF token: add it to the lists of this test and to tokenlessRequests().');
+        self::assertSame($known, $unsafe, 'A new POST/DELETE route must check a CSRF token: add it to the lists of this test and to tokenlessRequests() (admin screens: ADMIN_FORM_ROUTES and tokenlessAdminRequests()).');
+    }
+
+    public function testEveryAdminRouteStatesItsMethods(): void
+    {
+        foreach (static::getContainer()->get('router')->getRouteCollection() as $name => $route) {
+            if (!str_starts_with($name, 'sidus_admin.') && 'admin_index' !== $name) {
+                continue;
+            }
+            self::assertNotSame([], $route->getMethods(), $name.' has no `methods` in config/packages/sidus.yaml: it answers every method, which the POST audit above cannot see.');
+            self::assertSame([], array_diff($route->getMethods(), ['GET', 'POST']), $name.' must be GET and/or POST (forms), nothing else.');
+        }
     }
 
     public function testNoFormOptsOutOfCsrfProtection(): void

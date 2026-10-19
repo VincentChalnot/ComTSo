@@ -1,0 +1,6 @@
+# The routes of every screen configured in config/packages/sidus.yaml (names `sidus_admin.<screen>.<action>`).
+# Listed before the catch-all `app_fallback` of src/Controller (which also has the lowest priority).
+sidus_admin:
+    resource: .
+    type: sidus_admin
+    prefix: /admin

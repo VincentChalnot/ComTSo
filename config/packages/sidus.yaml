@@ -1,0 +1,19 @@
+# Admin panel (/admin, ROLE_ADMIN only): sidus/admin-bundle (screens, routes), sidus/datagrid-bundle (lists) and
+# sidus/filter-bundle (the filters and sorting of a list: configured INLINE under `query_handler`, there is no separate
+# `sidus_filter` block). See "Admin panel" in AGENTS.md before adding a screen.
+#
+# Conventions of every screen below:
+#  - `permissions: [ROLE_ADMIN]` (on top of `access_control: ^/admin` in security.yaml);
+#  - explicit `methods` on every action: the bundle routes are `ANY` by default, which would hide them from the POST/CSRF
+#    audit of tests/Security/CsrfTest.php. Pages that only read are GET; forms and confirmation pages are GET + POST;
+#  - destructive actions never go through the bundle's raw `DeleteAction` (EntityManager::remove): they are the custom
+#    actions of src/Admin/Action (confirmation page on GET, removal on POST with the form token);
+#  - `sortable` and the filter `attributes` are explicit allow-lists of properties (App\Admin\Action\ListAction also
+#    refuses any other sort column coming from the request).
+sidus_admin:
+    base_template: admin/base.html.twig
+    configurations: {}
+
+sidus_data_grid:
+    default_datagrid_template: admin/datagrid.html.twig
+    configurations: {}

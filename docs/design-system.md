@@ -305,6 +305,8 @@ and forced classes (`is-hover`, `is-pressed`, `is-focus`, `is-disabled`) through
 | `_dropdown` | `.dropdown` `.dropdown-menu` `.dropdown-item` `.dropdown-divider` `.dropdown-label` `.popover` `.tooltip` `[data-tooltip]` `.menu` `.menu-item` `.menu-title` |
 | `_pager` | `.pager` (`a`, `span`, `.is-current`, `.is-disabled`) |
 | `_table` | `.table` `-striped` `-hover` `-sm` `-sticky` `.table-responsive` `.dl` `.dl-stacked` |
+| `_filter-bar` | admin lists: `.filter-bar` (`-fields`, `-actions`) `.filter-range` (`-inputs`) `.list-meta` `.table-sort` (a column head that sorts, current direction = `th[aria-sort]`) `.table-actions` `.table-empty`; the table is `.table`, the pagination `.pager` |
+| `_admin` | `/admin` pages around the list: `.admin-form` (form column) `.admin-subject` (name under the title) `.admin-details` (what a removal takes along) |
 | `_skeleton` | `.skeleton*` `.empty*` `.spinner` `.progress` |
 | `_post` | `.post` `.post-body` (all sanitized elements) `.post-meta` `.post-toggle` `.post-author`, states `.is-target` `.is-active` `.is-collapsed` |
 | `_post-photos` | `.post-photos` (mosaic by count: 1, 2, 3, 4, 5+ with "+N") `.post-photo` `.post-photo-more` |
@@ -339,7 +341,7 @@ Audit of `assets/styles/app.css` (removed by the cutover), `templates/**`, `asse
 | Header/nav: brand, links with active pill, unread badges (`data-chat-badge`), search with icon, theme toggle, user chip, mobile menu (`data-nav-toggle`, `data-nav-menu`) | `layout/_masthead`, `_badge`, `_theme-toggle`, `_form` |
 | Aside: favourites list, forums list, random quote (`card border-l-4`) | `_card`, `.card-accent`, `.menu` |
 | Forum tabs (`forum/_tabs`), search tabs | `_tabs` |
-| Pagination (`_layout/pagination`) | `_pager` |
+| Pagination (`_layout/pagination`, `admin/datagrid`) | `_pager` |
 | Topic list / forum list rows, people cards, profile, definition lists (`dl grid-cols-[auto_1fr]`) | `_thread-preview`, `_people`, `_table` (`.dl`) |
 | Message (`_post/message`), user HTML, collapse (`.is-collapsed`/`.post-toggle`), hover/tap meta, permalink highlight | `_post` |
 | Star favourite toggle (`topic/_star`, `group-aria-pressed`) | `.btn-icon` + utilities (unchanged) |
@@ -576,7 +578,7 @@ Sass tree (`design-system/showcase.scss` = `@use "../assets/styles/index"` + `ds
 - Sections (files `design-system/sections/NN-*.html`, sorted): couleurs (palette, scales, roles, live contrast), typographie,
   textures (matrix colours × families × themes, live `--texture-ratio` slider, wrong-vs-right blend mode, utility API), espaces &
   reliefs, mise en page (masthead, page header, layout), boutons, cartes, formulaires, retours (alerts, badges, skeleton, empty…),
-  navigation (tabs, pager, dropdown…), données (tables, avatars), messages, photos, réponse (attach + reply), hero, aperçus de sujet,
+  navigation (tabs, pager, dropdown…), données (tables, avatars), administration (filter bar, sortable table, forms, confirmation), messages, photos, réponse (attach + reply), hero, aperçus de sujet,
   chat, éditeur (the real `RichEditor` mounted), pages (login, register, errors, people, profile, settings).
 - Adding a section: drop a file, no registration (see the header comment of `design-system/main.js`).
 - Vue components with a backend (`ChatRoom`, `PhotoManager`, `ThemeToggle`) are replicated statically; `RichEditor` is mounted for real.

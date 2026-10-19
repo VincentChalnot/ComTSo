@@ -1,0 +1,128 @@
+{# Datagrid of the admin lists (sidus_data_grid.default_datagrid_template), in the design system: filter bar, `.table`, `.pager`.
+   Variables: datagrid, admin, action (+ what a screen's ListAction adds). The whole grid is ONE GET form: filters, sort buttons
+   (a column head that sorts is a submit button of the form) and the hidden sort state. The row actions are plain links, never
+   forms (no form inside a form); destructive ones lead to a confirmation page. Page links carry the filters and the CURRENT sort
+   but never a sort button, otherwise changing page would flip the order again. #}
+{% block datagrid %}
+    {% set pager = datagrid.queryHandler.pager %}
+    {% set form = datagrid.formView %}
+    {% set sortConfig = datagrid.queryHandler.sortConfig %}
+    {% set sortable = datagrid.queryHandler.configuration.sortable %}
+    {% set route = app.current_route %}
+    {% set routeParams = app.request.attributes.get('_route_params') %}
+    {% set pageQuery = {filters: app.request.query.all('filters'), sortable: {config: {column: sortConfig.column, direction: sortConfig.direction ? 1 : 0}}} %}
+
+    {{ form_start(form, {attr: {class: 'datagrid'}}) }}
+        {% if form.filters|length > 0 %}
+            <div class="filter-bar" role="search" aria-label="{{ 'admin.list.filters'|trans }}">
+                <div class="filter-bar-fields">
+                    {% for filter in form.filters %}
+                        {% if filter.startDate is defined and filter.endDate is defined %}
+                            <div class="field filter-range" role="group" aria-labelledby="{{ filter.vars.id }}_label">
+                                <span class="label" id="{{ filter.vars.id }}_label">{{ (filter.vars.label ?: filter.vars.name|humanize)|trans }}</span>
+                                <div class="filter-range-inputs">
+                                    {{ form_widget(filter.startDate, {attr: {'aria-label': ((filter.vars.label ?: filter.vars.name|humanize)|trans) ~ ' : ' ~ ('admin.list.date_from'|trans), placeholder: ''}}) }}
+                                    <span aria-hidden="true">–</span>
+                                    {{ form_widget(filter.endDate, {attr: {'aria-label': ((filter.vars.label ?: filter.vars.name|humanize)|trans) ~ ' : ' ~ ('admin.list.date_to'|trans), placeholder: ''}}) }}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="field">
+                                {{ form_label(filter) }}
+                                {{ form_widget(filter) }}
+                                {{ form_errors(filter) }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="filter-bar-actions">
+                    <button type="submit" class="btn btn-secondary btn-sm">{{ 'admin.list.filter'|trans }}</button>
+                    <a href="{{ path(route, routeParams) }}" class="btn btn-ghost btn-sm">{{ 'admin.list.reset'|trans }}</a>
+                </div>
+            </div>
+        {% endif %}
+
+        {# the sort state, submitted again with the filters; the page is deliberately not kept (a new filter starts at page 1) #}
+        <input type="hidden" name="{{ form.sortable.config.column.vars.full_name }}" value="{{ sortConfig.column }}">
+        <input type="hidden" name="{{ form.sortable.config.direction.vars.full_name }}" value="{{ sortConfig.direction ? 1 : 0 }}">
+
+        <p class="list-meta" role="status">
+            <span>{{ 'admin.list.count'|trans({'%count%': pager.nbResults}) }}</span>
+            {% if pager.nbPages > 1 %}<span>{{ 'admin.list.page'|trans({'%page%': pager.currentPage, '%pages%': pager.nbPages}) }}</span>{% endif %}
+        </p>
+
+        {% block datagrid_table %}
+            <div class="table-responsive">
+                <table{{ attributes(datagrid.attributes, {class: 'table table-striped table-hover'}) }}>
+                    <thead>
+                        <tr>
+                            {% for column in datagrid.columns %}
+                                {% set sortIndex = null %}
+                                {% for index, name in sortable %}
+                                    {% if name == column.sortColumn %}{% set sortIndex = index %}{% endif %}
+                                {% endfor %}
+                                <th scope="col"{% if sortIndex is not null and sortConfig.column == column.sortColumn %} aria-sort="{{ sortConfig.direction ? 'descending' : 'ascending' }}"{% endif %}{{ attributes(column.attributes) }}>
+                                    {% if sortIndex is not null %}
+                                        <button type="submit" class="table-sort" name="{{ form.sortable[sortIndex].vars.full_name }}">{{ column.renderLabel }}</button>
+                                    {% else %}
+                                        {{ column.renderLabel }}
+                                    {% endif %}
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in pager %}
+                            <tr>
+                                {% for column in datagrid.columns %}
+                                    <td{{ attributes(column.attributes) }}>
+                                        {% if column.template %}
+                                            {% include column.template with column.templateVars %}
+                                        {% else %}
+                                            {{ column.renderValue(result) }}
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="{{ datagrid.columns|length }}" class="table-empty">{{ 'admin.list.empty'|trans }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endblock %}
+    {{ form_end(form, {render_rest: false}) }}
+
+    {% block pagination %}
+        {% import '_ui/icons.html.twig' as ui %}
+        {% if pager.nbPages > 1 %}
+            {% set current = pager.currentPage %}
+            {% set last = pager.nbPages %}
+            <nav class="pager my-8" aria-label="Pagination">
+                {% if pager.hasPreviousPage %}
+                    <a href="{{ path(route, routeParams|merge(pageQuery)|merge({page: current - 1})) }}" rel="prev" aria-label="Page précédente">{{ ui.icon('chevron-left', 'size-4') }}</a>
+                {% else %}
+                    <span class="is-disabled" aria-hidden="true">{{ ui.icon('chevron-left', 'size-4') }}</span>
+                {% endif %}
+
+                {% for item in range(1, last) %}
+                    {% if item == 1 or item == last or (item >= current - 2 and item <= current + 2) %}
+                        {% if item == current %}
+                            <span class="is-current" aria-current="page">{{ item }}</span>
+                        {% else %}
+                            <a href="{{ path(route, routeParams|merge(pageQuery)|merge({page: item})) }}">{{ item }}</a>
+                        {% endif %}
+                    {% elseif item == current - 3 or item == current + 3 %}
+                        <span aria-hidden="true">…</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pager.hasNextPage %}
+                    <a href="{{ path(route, routeParams|merge(pageQuery)|merge({page: current + 1})) }}" rel="next" aria-label="Page suivante">{{ ui.icon('chevron-right', 'size-4') }}</a>
+                {% else %}
+                    <span class="is-disabled" aria-hidden="true">{{ ui.icon('chevron-right', 'size-4') }}</span>
+                {% endif %}
+            </nav>
+        {% endif %}
+    {% endblock %}
+{% endblock %}

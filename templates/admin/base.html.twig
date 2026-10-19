@@ -1,0 +1,16 @@
+{# Base of every admin page (sidus_admin.base_template): the forum layout, one column, plus the strip of screens. Blocks: title, container. #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration · ComTSo{% endblock %}
+
+{% block content_layout %}
+    <main id="main" class="admin" tabindex="-1">
+        <nav class="tabs" aria-label="Écrans d’administration">
+            <a href="{{ path('admin_index') }}"{% if app.current_route == 'admin_index' %} aria-current="page"{% endif %}>Vue d’ensemble</a>
+            {% for screen in get_admins() %}
+                <a href="{{ admin_path(screen, 'list') }}"{% if admin is defined and admin.code == screen.code %} aria-current="page"{% endif %}>{{ ('admin.' ~ screen.code ~ '.title')|trans }}</a>
+            {% endfor %}
+        </nav>
+        {% block container %}{% endblock %}
+    </main>
+{% endblock %}

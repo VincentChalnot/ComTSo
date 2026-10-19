@@ -1,0 +1,95 @@
+<section class="ds-section" id="administration" data-title="Administration">
+  <header class="ds-section-head">
+    <p class="kicker">Composants</p>
+    <h2>Administration : listes, filtres, formulaires</h2>
+    <p class="standfirst">Les écrans du panneau <code>/admin</code> n’ajoutent que la barre de filtres, les en-têtes triables et les liens d’action de ligne : le tableau est <code>.table</code> et la pagination <code>.pager</code>.</p>
+  </header>
+
+  <div class="ds-demo" data-title="Liste : filtres, tri, actions, pagination">
+    <div class="ds-stage is-surface">
+      <form method="get" class="datagrid" action="#" onsubmit="return false">
+        <div class="filter-bar" role="search" aria-label="Filtres">
+          <div class="filter-bar-fields">
+            <div class="field">
+              <label class="label" for="ds-f-pseudo">Pseudo</label>
+              <input type="text" id="ds-f-pseudo" class="input" value="cam">
+            </div>
+            <div class="field">
+              <label class="label" for="ds-f-compte">Compte</label>
+              <select id="ds-f-compte" class="input"><option>Tous</option><option>Actif</option><option>Désactivé</option></select>
+            </div>
+            <div class="field filter-range" role="group" aria-labelledby="ds-f-act">
+              <span class="label" id="ds-f-act">Dernière activité</span>
+              <div class="filter-range-inputs">
+                <input type="date" class="input" aria-label="Dernière activité : depuis le" value="2026-09-01">
+                <span aria-hidden="true">–</span>
+                <input type="date" class="input" aria-label="Dernière activité : jusqu’au">
+              </div>
+            </div>
+          </div>
+          <div class="filter-bar-actions">
+            <button type="submit" class="btn btn-secondary btn-sm">Filtrer</button>
+            <a href="#" class="btn btn-ghost btn-sm">Réinitialiser</a>
+          </div>
+        </div>
+        <p class="list-meta" role="status"><span>42 résultats</span><span>Page 1 sur 2</span></p>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th scope="col" aria-sort="ascending"><button type="button" class="table-sort">Pseudo</button></th>
+                <th scope="col">Compte</th>
+                <th scope="col"><button type="button" class="table-sort">Inscription</button></th>
+                <th scope="col" aria-sort="descending"><button type="button" class="table-sort">Dernière activité</button></th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><a href="#">Camille</a></td><td><span class="badge badge-ok">Actif</span> <span class="badge badge-accent">Administrateur</span></td><td>14/03/2004</td><td>19/10/2026 08:12</td><td class="table-actions"><a href="#" class="btn btn-ghost btn-sm">Modifier</a><a href="#" class="btn btn-ghost btn-sm">Supprimer</a></td></tr>
+              <tr><td><a href="#">Maxime</a></td><td><span class="badge badge-ok">Actif</span></td><td>02/09/2005</td><td>18/10/2026 21:40</td><td class="table-actions"><a href="#" class="btn btn-ghost btn-sm">Modifier</a><a href="#" class="btn btn-ghost btn-sm">Supprimer</a></td></tr>
+              <tr><td><a href="#">Inès</a></td><td><span class="badge badge-muted">Désactivé</span></td><td>21/01/2008</td><td>—</td><td class="table-actions"><a href="#" class="btn btn-ghost btn-sm">Modifier</a><a href="#" class="btn btn-ghost btn-sm">Supprimer</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </form>
+      <nav class="pager my-8" aria-label="Pagination"><span class="is-disabled" aria-hidden="true"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></span><span class="is-current" aria-current="page">1</span><a href="#">2</a><a href="#" rel="next" aria-label="Page suivante"><svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></nav>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Liste vide">
+    <div class="ds-stage is-surface">
+      <div class="table-responsive">
+        <table class="table">
+          <thead><tr><th scope="col">Titre</th><th scope="col">Auteur</th></tr></thead>
+          <tbody><tr><td colspan="2" class="table-empty">Aucun résultat pour ces critères.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Formulaire et confirmation de suppression">
+    <div class="ds-stage is-surface">
+      <div class="ds-grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr))">
+        <div class="admin-form">
+          <p class="kicker">Membres</p>
+          <h3 class="card-title">Modifier le membre <span class="admin-subject">Camille</span></h3>
+          <form class="mt-3">
+            <div class="field mb-5"><label class="check"><input type="checkbox" checked><span>Compte actif (peut se connecter)</span></label></div>
+            <div class="field mb-5"><label class="check"><input type="checkbox"><span>Administrateur</span></label></div>
+            <div class="form-actions"><a href="#" class="btn btn-ghost">Annuler</a><button type="button" class="btn btn-primary">Enregistrer</button></div>
+          </form>
+        </div>
+        <div class="admin-form">
+          <div class="alert alert-danger" role="alert">
+            <div class="alert-body">
+              <p class="alert-title">Supprimer le membre « Camille » ?</p>
+              <ul class="admin-details"><li>12 sujets et leurs messages</li><li>348 messages dans d’autres sujets</li></ul>
+              <p>Cette action est définitive.</p>
+            </div>
+          </div>
+          <div class="form-actions"><a href="#" class="btn btn-ghost">Annuler</a><button type="button" class="btn btn-danger">Supprimer définitivement</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

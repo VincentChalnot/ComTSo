@@ -1,0 +1,142 @@
+// Admin lists (templates/admin/datagrid.html.twig): the filter bar above a `.table`, sortable column heads, the row action
+// links and the result line. The table is `_table`, the pagination `_pager`; nothing here is Bootstrap.
+//
+//   <form method="get" class="datagrid">
+//     <div class="filter-bar" role="search">
+//       <div class="filter-bar-fields"><div class="field">…</div><div class="field filter-range" role="group">…</div></div>
+//       <div class="filter-bar-actions"><button class="btn btn-secondary btn-sm">Filtrer</button><a class="btn btn-ghost btn-sm">Réinitialiser</a></div>
+//     </div>
+//     <p class="list-meta"><span>12 résultats</span></p>
+//     <div class="table-responsive"><table class="table table-striped table-hover">
+//       <thead><tr><th scope="col" aria-sort="ascending"><button class="table-sort">Pseudo</button></th>…
+//       <td class="table-actions"><a class="btn btn-ghost btn-sm">Modifier</a></td>
+//   </form>
+//   <nav class="pager">…</nav>
+@use "../abstracts" as *;
+
+@layer components {
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-md);
+    background-color: var(--c-surface);
+
+    .field {
+      margin: 0;
+    }
+  }
+  .filter-bar-fields {
+    display: flex;
+    flex: 1 1 24rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.85rem 1.25rem;
+
+    // text and select filters: a comfortable but bounded width
+    .field {
+      flex: 0 1 12.5rem;
+      min-width: 9rem;
+    }
+    .filter-range {
+      flex-basis: 21rem;
+    }
+  }
+  .filter-bar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  // Date range filter: a `.label` over two date inputs on one line (`<div class="field filter-range" role="group">`)
+  .filter-range {
+    min-width: 0;
+  }
+  .filter-range-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+
+    > .input {
+      flex: 1 1 8.5rem;
+      min-width: 0;
+    }
+  }
+
+  // "12 résultats" and the page indicator above the table
+  .list-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    margin: 0 0 0.5rem;
+    color: var(--c-muted);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // A column head that sorts: a button that looks like the head text, with an arrow for the current direction.
+  .table-sort {
+    @include eyebrow(0.6875rem, 0.12em);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &::after {
+      content: "↕";
+      opacity: 0.55;
+      font-size: 0.85em;
+      letter-spacing: 0;
+    }
+
+    @include hover {
+      color: var(--c-fg);
+    }
+    @include focus {
+      @include focus-ring;
+    }
+  }
+  th[aria-sort="ascending"] .table-sort::after {
+    content: "↑";
+    opacity: 1;
+  }
+  th[aria-sort="descending"] .table-sort::after {
+    content: "↓";
+    opacity: 1;
+  }
+  th[aria-sort] .table-sort {
+    color: var(--c-fg);
+  }
+
+  // The last cell of a row: small links/buttons side by side, right-aligned
+  .table-actions {
+    white-space: nowrap;
+    text-align: right;
+
+    > :is(a, form) {
+      display: inline-flex;
+      margin-left: 0.35rem;
+    }
+  }
+
+  // The empty result row
+  .table-empty {
+    padding: 2rem 1rem;
+    color: var(--c-muted);
+    text-align: center;
+  }
+}

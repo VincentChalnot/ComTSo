@@ -7,6 +7,7 @@
     {route: 'people_index', label: 'Les gens', match: ['people_index', 'people_show', 'people_edit']},
     {route: 'photo_index', label: 'Photos', match: ['photo_index', 'photo_show', 'photo_edit']},
     {route: 'stats_index', label: 'Statistiques', match: ['stats_index']},
+    {route: 'admin_index', label: 'Administration', match: ['admin_index'], admin: true},
 ] %}
 <!DOCTYPE html>
 <html lang="fr" data-theme="{{ app.user ? app.user.theme : 'light' }}">
@@ -65,8 +66,8 @@
                             </div>
                         </form>
                     </li>
-                    {% for link in nav_links %}
-                        {% set active = route in link.match %}
+                    {% for link in nav_links|filter(l => not (l.admin|default(false)) or is_granted('ROLE_ADMIN')) %}
+                        {% set active = route in link.match or (link.admin|default(false) and route starts with 'sidus_admin.') %}
                         <li>
                             <a href="{{ path(link.route) }}" class="masthead-link{{ active ? ' is-active' : '' }}"{% if active %} aria-current="page"{% endif %}>
                                 {{ link.label }}

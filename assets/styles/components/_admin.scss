@@ -1,0 +1,29 @@
+// Admin pages around the list (templates/admin, templates/bundles/SidusAdminBundle): form column, subject in the title,
+// what a removal takes along. The list itself is `_filter-bar` + `_table` + `_pager`.
+//
+//   <div class="admin-form"> <form>…</form> </div>              form column, readable width
+//   <h1 class="page-title">Modifier le membre <span class="admin-subject">vincent</span></h1>
+//   <ul class="admin-details"><li>12 messages</li></ul>          inside an `.alert-body`
+@use "../abstracts" as *;
+
+@layer components {
+  .admin-form {
+    max-width: 42rem;
+  }
+
+  .admin-subject {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--c-muted);
+    font-family: var(--font-sans);
+    font-size: var(--text-xl);
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .admin-details {
+    margin: 0.5rem 0;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+}

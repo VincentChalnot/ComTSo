@@ -1,0 +1,27 @@
+{# @var action \Sidus\AdminBundle\Model\Action #}
+{# Edit and create pages (create.html.twig extends this one): a Symfony form in the design system. Blocks: form_intro, form_aside. #}
+{% extends action.baseTemplate %}
+
+{% set creating = action.code == 'create' %}
+{% set screen_title = ('admin.' ~ admin.code ~ '.title')|trans %}
+
+{% block title %}{{ creating ? ('admin.' ~ admin.code ~ '.new')|trans : ('admin.' ~ admin.code ~ '.edit')|trans }} · Administration · ComTSo{% endblock %}
+
+{% block container %}
+    <header class="page-header">
+        <p class="kicker"><a href="{{ listPath }}">{{ screen_title }}</a></p>
+        <h1 class="page-title">{{ creating ? ('admin.' ~ admin.code ~ '.new')|trans : ('admin.' ~ admin.code ~ '.edit')|trans }}{% if not creating %} <span class="admin-subject">{{ data|tostring }}</span>{% endif %}</h1>
+    </header>
+
+    <div class="admin-form">
+        {% block form_intro %}{% endblock %}
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="form-actions">
+                <a href="{{ listPath }}" class="btn btn-ghost">{{ 'admin.button.cancel'|trans }}</a>
+                <button type="submit" class="btn btn-primary">{{ (creating ? 'admin.button.create' : 'admin.button.save')|trans }}</button>
+            </div>
+        {{ form_end(form) }}
+        {% block form_aside %}{% endblock %}
+    </div>
+{% endblock %}

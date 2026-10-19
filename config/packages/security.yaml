@@ -64,6 +64,8 @@ security:
         - { path: ^/mot-de-passe/(oublie|reinitialiser)$, roles: PUBLIC_ACCESS }
         - { path: ^/health$, roles: PUBLIC_ACCESS }
         - { path: ^/register$, roles: PUBLIC_ACCESS }
+        # The admin panel (sidus/admin-bundle, config/packages/sidus.yaml) is for administrators only; each screen repeats it in `permissions`.
+        - { path: ^/admin(/|$), roles: ROLE_ADMIN }
         - { path: ^/, roles: ROLE_USER }
 
 when@test:

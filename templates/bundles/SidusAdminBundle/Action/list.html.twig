@@ -1,0 +1,20 @@
+{# @var action \Sidus\AdminBundle\Model\Action #}
+{% extends action.baseTemplate %}
+{% import '_ui/icons.html.twig' as ui %}
+
+{% block title %}{{ ('admin.' ~ admin.code ~ '.title')|trans }} · Administration · ComTSo{% endblock %}
+
+{% block container %}
+    <header class="page-header">
+        <p class="kicker">Administration</p>
+        <h1 class="page-title">{{ ('admin.' ~ admin.code ~ '.title')|trans }}</h1>
+        <p class="standfirst">{{ ('admin.' ~ admin.code ~ '.description')|trans }}</p>
+        {% if admin.hasAction('create') %}
+            <div class="page-actions">
+                <a href="{{ admin_path(admin, 'create') }}" class="btn btn-primary">{{ ui.icon('plus', 'size-4') }} {{ ('admin.' ~ admin.code ~ '.new')|trans }}</a>
+            </div>
+        {% endif %}
+    </header>
+
+    {{ render_datagrid(datagrid, {action: action, admin: admin, usage: usage|default({})}) }}
+{% endblock %}

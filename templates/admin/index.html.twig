@@ -1,0 +1,25 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Administration · ComTSo{% endblock %}
+
+{% block container %}
+<header class="page-header">
+    <p class="kicker">Administration</p>
+    <h1 class="page-title">Vue d’ensemble</h1>
+    <p class="standfirst">Réservé aux administrateurs. Les listes ne montrent jamais les adresses e-mail des membres.</p>
+</header>
+
+{% if screens is empty %}
+    <p class="empty">Aucun écran d’administration n’est configuré.</p>
+{% else %}
+    <div class="people-grid">
+        {% for screen in screens %}
+            <a href="{{ admin_path(screen.admin, 'list') }}" class="card card-hover">
+                <h2 class="card-title">{{ ('admin.' ~ screen.admin.code ~ '.title')|trans }}</h2>
+                <p class="mt-2">{{ ('admin.' ~ screen.admin.code ~ '.description')|trans }}</p>
+                <p class="mt-3"><span class="badge badge-count">{{ screen.count|number_format(0, ',', ' ') }}</span></p>
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

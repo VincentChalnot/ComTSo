@@ -1,0 +1,37 @@
+# French labels of the admin panel (config/packages/sidus.yaml). The rest of the UI is written in the templates.
+# Keys: admin.<screen>.* (screen = the code in sidus.yaml), admin.list.* / admin.button.* (shared),
+# datagrid.<screen>.<column> (column heads, looked up by the datagrid bundle), admin.<screen>.filter.* (filters),
+# sidus.admin.flash.* and sidus.admin.<screen>.<action>.success (flash messages of the bundle actions).
+admin:
+    button:
+        save: Enregistrer
+        create: Créer
+        cancel: Annuler
+        delete: Supprimer définitivement
+    list:
+        filters: Filtres
+        filter: Filtrer
+        reset: Réinitialiser
+        date_from: depuis le
+        date_to: jusqu’au
+        count: '{0} Aucun résultat|{1} %count% résultat|]1,Inf[ %count% résultats'
+        page: 'Page %page% sur %pages%'
+        empty: Aucun résultat pour ces critères.
+        yes: Oui
+        no: Non
+    delete:
+        irreversible: Cette action est définitive.
+    action:
+        edit: Modifier
+        delete: Supprimer
+        view: Voir sur le forum
+
+sidus:
+    admin:
+        flash:
+            create:
+                success: L’élément a été créé.
+            edit:
+                success: Les modifications sont enregistrées.
+            delete:
+                success: L’élément a été supprimé.
