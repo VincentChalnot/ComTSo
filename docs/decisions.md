@@ -10,6 +10,7 @@ What was decided, what was found, and what happened, for whoever works on ComTSo
 | 2026-10-17 | Rewrite on Symfony 8.1 delivered; features of the old forum inventoried in `docs/LEGACY_FEATURES.md`. |
 | 2026-10-18 | Read-only recon of the production server, go-live checklist written. |
 | 2026-10-19 | Decisions D1-D14 answered; rehearsal on `next.comtso.fr`; **cutover: `comtso.fr` now serves the new app**; git history purged and rewritten (see below). |
+| 2026-10-19 | Admin panel at `/admin` (members, forums, topics, quotes, photos) on the owner's sidus bundles with three Symfony 8 fixes applied as Composer patches until they are tagged upstream; "delete empty forums" shipped as part of it; no e-mail address is ever displayed there. |
 | 2026-10-19 | Owner decisions: all the data is in the new database and the old data is forgotten, so the legacy import tooling and `docs/legacy-import.md` were removed; D1 (profile visibility option) dropped; the 10 shortened attachments accepted as they are; "Symfony 2" wording removed from the docs. |
 
 ## Go-live decisions (D1-D14, answered by the owner on 2026-10-19)

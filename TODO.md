@@ -16,11 +16,13 @@ Items marked **BLOCKED** need a decision from the owner before any work.
 
 ## Wave 3: decisions and big or optional items
 
-1. **Admin panel with datagrids** (`sidus/admin-bundle` + `datagrid-bundle`). By far the biggest item: new dependencies, security model, theming against the custom design system, CSRF-test classification. The bundles declare `symfony/*: >=6.3` so Symfony 8.1 should install, **unverified**: spike with `composer require --dry-run` first. The CLI (`app:user:*`) and SQL are enough for one admin today; do not start it soon.
-2. **Admins can delete empty forums.** Only as one action of the admin panel, never as a separate feature (deleting a forum is "SQL only" today, 6 static forums plus 7 recovered ones).
-3. **"Ajouter une citation" under a hovered quote. BLOCKED** on who may add quotes (all members or admins). `ctso_quote` has no date column.
-4. **Better logo with the brand colours (dark).** Design asset; needs the owner's taste and the five brand colours of `abstracts/_palette.scss`.
-5. **Rehearse the server rollback** (stop `app`, start old `nginx`, `docs/operations.md`): only if the old stack still exists; value disappears when it is retired.
+1. **"Ajouter une citation" under a hovered quote. BLOCKED** on who may add quotes (all members or admins). The admin panel (`/admin/quotes`) now lets administrators add, edit and delete quotes (so administrators already can), but the public hover UI for members is still undecided. `ctso_quote` has a `created_at` column but no date is shown anywhere.
+2. **Better logo with the brand colours (dark).** Design asset; needs the owner's taste and the five brand colours of `abstracts/_palette.scss`.
+3. **Rehearse the server rollback** (stop `app`, start old `nginx`, `docs/operations.md`): only if the old stack still exists; value disappears when it is retired.
+
+## Waiting for the owner (not an agent task)
+
+- **Tag the Symfony 8 fixes of the sidus bundles**: push the `symfony-8` branches of `SidusAdminBundle` and `SidusFilterBundle` (3 small fixes, committed locally), tag `sidus/admin-bundle` 5.0.7 and `sidus/filter-bundle` 6.0.4, then drop the Composer patches of the admin panel (exact steps: `AGENTS.md`, "Admin panel", "Composer patches").
 
 ## Housekeeping, not scheduled (status to confirm)
 
