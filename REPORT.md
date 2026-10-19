@@ -23,7 +23,7 @@
 | Home = digest | Everything since your previous visit, grouped by topic (`?since=` / date picker to change it). |
 | Quote card, pagination, lightbox | Random quote in the side column of every page; 20 messages/page, opening on the last page with the oldest-first order (as the old site) and on page 1 with newest-first (config "ordre des messages"); lightbox with keyboard and swipe navigation. |
 | Chat | Own page filling the container; private Mercure (JWT subscriber cookie, anonymous disabled); live unread badge in the menu and in the tab title; verified live between two browsers. |
-| Production tour | 23 features documented in `docs/LEGACY_FEATURES.md` with screenshots in `docs/legacy/`. Search, "les gens", profiles, memos, photo manager and config are ported; see gaps below. |
+| Production tour | 23 features documented in `docs/LEGACY_FEATURES.md` (the screenshots were later removed from the repository for privacy). Search, "les gens", profiles, memos, photo manager and config are ported; see gaps below. |
 | UX | Narrow cards with avatar, long posts collapsed ("Afficher le post"), meta/actions on hover (tap on mobile), permalink page per message, favourite threads (star, listed in the side column), config page with light/dark and "ordre des messages" (the Bootswatch theme is gone). |
 | Tailwind | Done now rather than later: Tailwind 4 with semantic colour tokens (`assets/styles/app.css`), so your future theme = editing CSS variables. Vue only for editor, chat, photo manager, theme toggle. |
 

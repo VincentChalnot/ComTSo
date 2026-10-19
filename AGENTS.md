@@ -101,7 +101,7 @@ private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `t
   (`security-headers@file`) replaces `Content-Security-Policy` and adds its own X-Robots-Tag, and the Symfony profiler toolbar uses inline scripts that the CSP blocks (dev only): to test the real CSP in a browser, override the response header in the test tool.
 - **Logs** (prod): Monolog = `fingers_crossed` at error (50-record buffer, info and above) + an always-on `audit` channel (notice+: `LoginAuditSubscriber` failed logins, `PasswordReset` mail trail with recipient domain only, never addresses/passwords/SMTP user), JSON on stderr, deprecations dropped. Caddy access log is OFF unless `CADDY_ACCESS_LOG=on` (snippet in `frankenphp/Caddyfile`, skips `/health`). `deploy/compose.yaml` rotates every service log (json-file 5 x 10 MB). Secrets are files created with the container: after editing `deploy/.env` use `docker compose up -d --force-recreate app`. `openssl.cafile` is set in `frankenphp/conf.d/10-app.ini` (`TlsTrustStoreTest`).
 - **Backups**: `deploy/backup.sh` (DB dump + photo originals, retention `BACKUP_KEEP_DAYS`, `BACKUP_DIR`) and `deploy/restore.sh --yes <db> [photos]`; cron line in `deploy/README.md`.
-- **Go-live**: the ordered plan for the sidus.fr server (recon facts, decisions, rehearsal, cutover, rollback, smoke tests) is `docs/deployment-checklist.md`. The prod compose project is named `comtso-forum` on purpose (the legacy Symfony 2 stack of that server is the project `comtso`).
+- **Production server** (live since 2026-10-19): server facts, rollback to the old forum, backup/restore checks, secret rotation, monitoring and the Sentry plan are in `docs/operations.md`; decisions and history in `docs/decisions.md`; the backlog in `TODO.md`. The prod compose project is named `comtso-forum` on purpose (the legacy Symfony 2 stack of that server is the project `comtso`).
 
 ## Architecture notes
 
@@ -173,7 +173,7 @@ private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `t
 
 ## Legacy data
 
-`docs/legacy/` holds screenshots of the Symfony 2 production site (reference for features/UX) and `docs/LEGACY_FEATURES.md` lists every feature seen there.
+`docs/LEGACY_FEATURES.md` lists every feature of the Symfony 2 production site (reference for features/UX). Its screenshots are NOT in the repository (they show private member information; the owner keeps them privately, `/docs/legacy/` is git-ignored): never add them back.
 Older platforms (old PHP forum MySQL dump, two phpBB installs) live in `var/legacy/`; see `docs/legacy-import.md` for the one-shot reimport command.
 
 ## Operations cheat-sheet
