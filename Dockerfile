@@ -1,21 +1,24 @@
 #syntax=docker/dockerfile:1
 
-# Versions
-FROM dunglas/frankenphp:1-php8.5 AS frankenphp_upstream
+# BASE_IMAGE: where the stages below start from.
+#  - default `php_base`: the stage defined right below, compiled locally (always works, also offline);
+#  - CI and the dev compose file pass the published image ghcr.io/vincentchalnot/comtso-base:<hash> instead, so PHP extensions are
+#    pulled, not compiled. <hash> = `docker/base-hash.sh` (hash of the block between the `base-image` markers).
+ARG BASE_IMAGE=php_base
 
 # The different stages of this Dockerfile are meant to be built into separate images
 # https://docs.docker.com/build/building/multi-stage/#stop-at-a-specific-build-stage
 # https://docs.docker.com/reference/compose-file/build/#target
 
-
-# Base FrankenPHP image
-FROM frankenphp_upstream AS frankenphp_base
+###> base-image ###
+# Everything between these markers defines the published base image: system packages + PHP extensions, nothing about the
+# application, nothing dev- or prod-specific. Editing it changes the output of docker/base-hash.sh: run `docker/base-hash.sh --write`.
+FROM dunglas/frankenphp:1-php8.5 AS php_base
 
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 
 WORKDIR /app
 
-# persistent deps
 # hadolint ignore=DL3008
 RUN <<-EOF
 	apt-get update
@@ -30,7 +33,11 @@ RUN <<-EOF
 		zip \
 		exif \
 		gd \
-		pdo_mysql
+		pdo_mysql \
+		pdo_pgsql \
+		xdebug
+	# Xdebug is compiled here once, for the dev image, but stays OFF: the dev stage enables it, the prod stages drop it.
+	rm -f "$PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini"
 	rm -rf /var/lib/apt/lists/*
 EOF
 
@@ -39,11 +46,12 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 
-###> recipes ###
-###> doctrine/doctrine-bundle ###
-RUN install-php-extensions pdo_pgsql
-###< doctrine/doctrine-bundle ###
-###< recipes ###
+LABEL org.opencontainers.image.source="https://github.com/VincentChalnot/ComTSo"
+LABEL org.opencontainers.image.description="ComTSo base image: FrankenPHP + PHP extensions (no application code)"
+###< base-image ###
+
+# Application base: the base image + the files that configure FrankenPHP (cheap layers, rebuilt in seconds)
+FROM ${BASE_IMAGE} AS frankenphp_base
 
 COPY --link frankenphp/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
 COPY --link --chmod=755 frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
@@ -61,7 +69,7 @@ ENV APP_ENV=dev
 ENV XDEBUG_MODE=off
 ENV FRANKENPHP_WORKER_CONFIG=watch
 
-# dev dependencies
+# dev dependencies (Xdebug itself is already compiled in the base image)
 # hadolint ignore=DL3008
 RUN <<-EOF
 	mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
@@ -76,7 +84,7 @@ RUN <<-EOF
 		iptables \
 		jq \
 		sudo
-	install-php-extensions xdebug
+	docker-php-ext-enable xdebug
 	rm -rf /var/lib/apt/lists/*
 	useradd -m -s /bin/bash nonroot
 	echo "nonroot ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/nonroot
@@ -87,17 +95,39 @@ COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
 
-# Builder for the prod FrankenPHP image
 # Front-end build: Vite bundles assets/ and Tailwind scans templates/ for the classes in use
 FROM node:22-alpine AS frontend_builder
 WORKDIR /app
 COPY --link package.json package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci
 COPY --link vite.config.js ./
 COPY --link assets ./assets
 COPY --link templates ./templates
 RUN npm run build
 
+# Shared libraries needed by FrankenPHP and the PHP extensions of the prod image. Depends on the base only (not on the sources):
+# built once per base, in parallel with the PHP dependency and front-end stages.
+FROM frankenphp_base AS prod_libs
+
+# Xdebug is dev only
+RUN rm -f "$(php -r 'echo ini_get("extension_dir");')"/xdebug.so
+
+# hadolint ignore=DL3008,SC3054,DL4006
+RUN <<-'EOF'
+	apt-get update
+	apt-get install -y --no-install-recommends libtree
+	mkdir -p /tmp/libs
+	BINARIES=(frankenphp php file)
+	for target in $(printf '%s\n' "${BINARIES[@]}" | xargs -I{} which {}) \
+		$(find "$(php -r 'echo ini_get("extension_dir");')" -maxdepth 2 -name "*.so"); do
+		libtree -pv "$target" 2>/dev/null | grep -oP '(?:── )\K/\S+(?= \[)' | while IFS= read -r lib; do
+			[ -f "$lib" ] && cp -n "$lib" /tmp/libs/
+		done
+	done
+	rm -rf /var/lib/apt/lists/*
+EOF
+
+# Builder for the prod FrankenPHP image
 FROM frankenphp_base AS frankenphp_prod_builder
 
 # Configuration comes from real environment variables only (compose / orchestrator): no .env file exists in the image
@@ -111,7 +141,8 @@ COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
 
 # prevent the reinstallation of vendors at every changes in the source code
 COPY --link composer.* symfony.* ./
-RUN composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
+RUN --mount=type=cache,target=/tmp/composer-cache \
+	COMPOSER_CACHE_DIR=/tmp/composer-cache composer install --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
 
 # copy sources
 COPY --link --exclude=frankenphp/ . ./
@@ -133,22 +164,6 @@ EOF
 # Compiled front-end (Vite + Tailwind): public/assets/main.{js,css}
 COPY --link --from=frontend_builder /app/public/assets ./public/assets
 
-# Collect shared libraries needed by FrankenPHP and PHP extensions
-# hadolint ignore=DL3008,SC3054,DL4006
-RUN <<-'EOF'
-	apt-get update
-	apt-get install -y --no-install-recommends libtree
-	mkdir -p /tmp/libs
-	BINARIES=(frankenphp php file)
-	for target in $(printf '%s\n' "${BINARIES[@]}" | xargs -I{} which {}) \
-		$(find "$(php -r 'echo ini_get("extension_dir");')" -maxdepth 2 -name "*.so"); do
-		libtree -pv "$target" 2>/dev/null | grep -oP '(?:── )\K/\S+(?= \[)' | while IFS= read -r lib; do
-			[ -f "$lib" ] && cp -n "$lib" /tmp/libs/
-		done
-	done
-	rm -rf /var/lib/apt/lists/*
-EOF
-
 # Prod FrankenPHP image
 FROM debian:13-slim AS frankenphp_prod
 
@@ -161,8 +176,8 @@ ENV PHP_INI_SCAN_DIR=":/usr/local/etc/php/app.conf.d"
 COPY --from=frankenphp_prod_builder /usr/local/bin/frankenphp /usr/local/bin/frankenphp
 COPY --from=frankenphp_prod_builder /usr/local/bin/php /usr/local/bin/php
 COPY --from=frankenphp_prod_builder /usr/local/bin/docker-php-entrypoint /usr/local/bin/docker-php-entrypoint
-COPY --from=frankenphp_prod_builder /usr/local/lib/php/extensions /usr/local/lib/php/extensions
-COPY --from=frankenphp_prod_builder /tmp/libs /usr/lib
+COPY --from=prod_libs /usr/local/lib/php/extensions /usr/local/lib/php/extensions
+COPY --from=prod_libs /tmp/libs /usr/lib
 
 COPY --from=frankenphp_prod_builder /usr/local/etc/php/conf.d /usr/local/etc/php/conf.d
 COPY --from=frankenphp_prod_builder /usr/local/etc/php/php.ini /usr/local/etc/php/php.ini

@@ -1,25 +1,93 @@
 name: CI
 
 # Tests on every push to the default branch and on pull requests; the production image is built on the same events
-# and pushed to ghcr.io only for the default branch and `v*` tags (never for pull requests).
+# (in parallel with the tests) and pushed to ghcr.io only after the tests passed, for the default branch and `v*` tags
+# (never for pull requests). Docs-only changes do not trigger a run.
+#
+# Job graph:    base ─┬─ test ─────┐
+#                     ├─ image ────┼─ publish (push only)
+#               frontend ──────────┤
+#               audit (advisory)
 on:
   push:
     branches: [master]
     tags: ['v*']
+    paths-ignore: ['**.md', 'docs/**', '.idea/**']
   pull_request:
+    paths-ignore: ['**.md', 'docs/**', '.idea/**']
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  # A newer push to a pull request supersedes the older run; never cancel a run that may be publishing an image.
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  # A newer push supersedes the run in progress (it republishes `latest` anyway); a release tag is never cancelled.
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 permissions:
   contents: read
 
 jobs:
-  test:
+  # The base image (system packages + PHP extensions: the slow part of any build) is published as
+  # ghcr.io/<owner>/<repo>-base:<hash of the Dockerfile base block> and only rebuilt when that block changes.
+  base:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      # The published image, or `php_base` (the Dockerfile stage, compiled locally with the gha cache) when it cannot be pushed.
+      ref: ${{ steps.ref.outputs.ref }}
+    env:
+      # Fork and Dependabot pull requests have a read-only token.
+      CAN_PUSH: ${{ github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # compose.yaml (dev) pins the same tag: fail when someone edited the base block without `docker/base-hash.sh --write`.
+      - name: Check the pinned base tag
+        run: docker/base-hash.sh --check
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Is the base image already published?
+        id: ref
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}-base:$(docker/base-hash.sh)"
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+          if docker buildx imagetools inspect "$image" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "ref=$image" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            if [ "$CAN_PUSH" = true ]; then echo "ref=$image" >> "$GITHUB_OUTPUT"; else echo "ref=php_base" >> "$GITHUB_OUTPUT"; fi
+          fi
+
+      - uses: docker/setup-buildx-action@v3
+        if: steps.ref.outputs.exists == 'false'
+
+      # Without push rights the build only warms the gha cache, which the other jobs read to build the stage locally.
+      - name: Build the base image
+        if: steps.ref.outputs.exists == 'false'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: php_base
+          push: ${{ env.CAN_PUSH == 'true' }}
+          tags: ${{ steps.ref.outputs.image }}
+          provenance: false
+          cache-from: type=gha,scope=base
+          cache-to: type=gha,scope=base,mode=max
+
+  test:
+    needs: base
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
     env:
       # Second copy of the dev stack on a CI runner: no Traefik router for it.
       TRAEFIK_ENABLE: 'false'
@@ -39,17 +107,28 @@ jobs:
           docker compose -f deploy/compose.yaml -f deploy/compose.traefik.yaml --env-file deploy/.env.example config -q
           docker compose -f deploy/compose.yaml -f deploy/compose.traefik.yaml -f deploy/compose.www-redirect.yaml --env-file deploy/.env.example config -q
 
+      - uses: docker/login-action@v3
+        if: needs.base.outputs.ref != 'php_base'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: docker/setup-buildx-action@v3
 
-      # Same image as `docker compose up` (target frankenphp_dev), loaded into the local Docker daemon under the name compose.yaml expects.
+      # Same image as `docker compose up` (target frankenphp_dev) on top of the published base, loaded into the local Docker daemon
+      # under the name compose.yaml expects. The gha cache holds the thin layers (and the base stage when it had to be built locally).
       - name: Build the dev image
         uses: docker/build-push-action@v6
         with:
           context: .
           target: frankenphp_dev
+          build-args: BASE_IMAGE=${{ needs.base.outputs.ref }}
           load: true
           tags: comtso-php-dev
-          cache-from: type=gha,scope=dev
+          cache-from: |
+            type=gha,scope=dev
+            type=gha,scope=base
           cache-to: type=gha,scope=dev,mode=max
 
       - name: Cache Composer dependencies
@@ -65,11 +144,6 @@ jobs:
           composer install --no-progress --no-interaction --prefer-dist --no-scripts
         env:
           COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
-
-      # Advisory for now (continue-on-error): flip to blocking once the dependency tree is clean.
-      - name: Composer audit (non-blocking)
-        continue-on-error: true
-        run: docker run --rm -v "$PWD:/app" -w /app comtso-php-dev composer audit --locked
 
       # `database` is healthy first (compose `depends_on`); the php entrypoint then migrates the dev database.
       - name: Start the stack
@@ -90,6 +164,17 @@ jobs:
       - name: PHPUnit
         run: docker compose exec -T php vendor/bin/phpunit
 
+      - name: Stack logs
+        if: failure()
+        run: docker compose logs --no-color --tail=200
+
+  # Independent of PHP: runs alongside `test`.
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -100,21 +185,66 @@ jobs:
           npm ci
           npm run build
 
+      - name: WCAG AA contrast check
+        run: npm run contrast
+
+  # Advisory for now (continue-on-error): flip to blocking once the dependency tree is clean.
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Composer audit (non-blocking)
+        continue-on-error: true
+        run: docker run --rm -v "$PWD:/app" -w /app composer:2 audit --locked
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: npm audit (non-blocking)
         continue-on-error: true
         run: npm audit --omit=dev --audit-level=high
 
-      - name: WCAG AA contrast check
-        run: npm run contrast
-
-      - name: Stack logs
-        if: failure()
-        run: docker compose logs --no-color --tail=200
-
+  # Builds the production image (every event, so a broken Dockerfile fails the pull request) while the tests run. Only fills the
+  # gha cache: `publish` below reuses it to push in seconds once the tests passed.
   image:
-    needs: test
+    needs: base
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        if: needs.base.outputs.ref != 'php_base'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build the production image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: frankenphp_prod
+          build-args: BASE_IMAGE=${{ needs.base.outputs.ref }}
+          provenance: false
+          cache-from: |
+            type=gha,scope=prod
+            type=gha,scope=base
+          cache-to: type=gha,scope=prod,mode=max
+
+  publish:
+    if: github.event_name != 'pull_request'
+    needs: [base, test, frontend, image]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       packages: write
@@ -124,7 +254,6 @@ jobs:
       - uses: docker/setup-buildx-action@v3
 
       - name: Log in to ghcr.io
-        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -144,14 +273,16 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
-      - name: Build (and push, except for pull requests)
+      - name: Push the production image
         uses: docker/build-push-action@v6
         with:
           context: .
           target: frankenphp_prod
-          push: ${{ github.event_name != 'pull_request' }}
+          build-args: BASE_IMAGE=${{ needs.base.outputs.ref }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
-          cache-from: type=gha,scope=prod
-          cache-to: type=gha,scope=prod,mode=max
+          cache-from: |
+            type=gha,scope=prod
+            type=gha,scope=base

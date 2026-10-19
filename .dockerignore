@@ -37,3 +37,4 @@ public/assets/
 .playwright-mcp/
 backups/
 design-system/
+docker/

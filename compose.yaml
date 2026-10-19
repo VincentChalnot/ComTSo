@@ -18,6 +18,11 @@ services:
     build:
       context: .
       target: frankenphp_dev
+      args:
+        # Pulled, not compiled: the PHP extensions come from the base image published by CI (tag = hash of the Dockerfile base block,
+        # pinned by `docker/base-hash.sh --write`). Offline, or after editing that block before CI published it:
+        #   COMTSO_BASE_IMAGE=php_base docker compose build php     (compiles the base stage locally, ~5 min once)
+        BASE_IMAGE: ${COMTSO_BASE_IMAGE:-ghcr.io/vincentchalnot/comtso-base:24fdf7bd79d847e1}
     restart: unless-stopped
     tty: true
     environment:
