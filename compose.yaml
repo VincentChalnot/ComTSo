@@ -138,16 +138,27 @@ services:
     depends_on:
       - node
 
-  # Local SMTP sink + web UI (random host ports: `docker compose port mailer 8025`).
+  # Local SMTP sink + web UI for development, exposed through Traefik reverse proxy.
   mailer:
     image: axllent/mailpit
-    ports:
-      - "1025"
-      - "8025"
+    restart: unless-stopped
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
-
+      # Allowed hosts for DNS-rebinding protection; includes the configured Mailpit host
+      MP_ALLOWED_HOSTS: "${MAILPIT_HOST:-mail.local.comtso.fr}"
+    networks:
+      - default
+      - proxy
+    labels:
+      traefik.enable: "${TRAEFIK_ENABLE:-true}"
+      traefik.docker.network: "${TRAEFIK_NETWORK:-proxy}"
+      traefik.http.routers.mailpit.rule: "Host(`${MAILPIT_HOST:-mail.local.comtso.fr}`)"
+      traefik.http.routers.mailpit.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
+      traefik.http.routers.mailpit.tls: "true"
+      traefik.http.routers.mailpit.tls.certresolver: "${CERT_RESOLVER:-gandi}"
+      # Mailpit web UI listens on port 8025 inside the container
+      traefik.http.services.mailpit.loadbalancer.server.port: "8025"
 # Dev values live in .env (copy .env.example). Nothing else secret is read by the stack.
 secrets:
   app_secret:
