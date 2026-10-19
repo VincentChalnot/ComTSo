@@ -46,9 +46,6 @@ services:
       MAILER_DSN_FILE: /run/secrets/mailer_dsn
       # Sender of the e-mails (password reset), "Name <address>".
       MAILER_FROM: ${MAILER_FROM:-ComTSo <no-reply@localhost>}
-      # Throwaway databases of the one-shot legacy reimport (profile `legacy`, see docs/legacy-import.md); read by app:legacy:reimport.
-      LEGACY_OLDPHP_URL: mysql://root:${LEGACY_MYSQL_ROOT_PASSWORD:-root}@legacy-mysql:3306/${LEGACY_MYSQL_DATABASE:-comtso_oldphp}?serverVersion=mariadb-11.4.0&charset=utf8mb4
-      LEGACY_PHPBB3_URL: pgsql://${LEGACY_PG_USER:-postgres}:${LEGACY_PG_PASSWORD:-legacy}@legacy-postgres:5432/${LEGACY_PG_DATABASE:-comtso2}?charset=utf8
       FRANKENPHP_WORKER_CONFIG: watch
       FRANKENPHP_SITE_CONFIG: hot_reload
       # Applied by the entrypoint at every start (dev only: the production stack has a dedicated one-shot `migrate` service).
@@ -69,7 +66,7 @@ services:
       - ./frankenphp/conf.d/20-app.dev.ini:/usr/local/etc/php/app.conf.d/20-app.dev.ini:ro
       # Keep var/ off the bind-mount for faster I/O; anything written there that is not bind-mounted below is lost on `down`.
       - /app/var
-      # Photo originals (private) and the legacy dumps used by app:legacy:import
+      # Photo originals (private)
       - ./var/photos:/app/var/photos
     extra_hosts:
       # Ensure that host.docker.internal is correctly defined on Linux
@@ -150,43 +147,6 @@ services:
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
-
-  # --- Temporary services for the one-shot legacy reimport (see docs/legacy-import.md). Not started by default:
-  #     docker compose --profile legacy up -d legacy-mysql legacy-postgres
-  legacy-mysql:
-    profiles: ["legacy"]
-    image: mariadb:11.4
-    # The 2004-2007 dump is MySQL 5.7 flavoured (MyISAM, zero dates, latin1 tables): load it with a permissive sql_mode.
-    command: ["--sql-mode=NO_AUTO_VALUE_ON_ZERO", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci", "--innodb-buffer-pool-size=256M", "--max-allowed-packet=256M"]
-    environment:
-      MARIADB_ROOT_PASSWORD: ${LEGACY_MYSQL_ROOT_PASSWORD:-root}
-      MARIADB_DATABASE: ${LEGACY_MYSQL_DATABASE:-comtso_oldphp}
-    volumes:
-      - ./var/legacy/comtso.sql:/docker-entrypoint-initdb.d/10-comtso.sql:ro
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 5s
-      timeout: 5s
-      retries: 60
-      start_period: 20s
-
-  legacy-postgres:
-    profiles: ["legacy"]
-    image: postgres:16-alpine
-    # The dump runs `CREATE ROLE "comtso2" WITH SUPERUSER`: the bootstrap superuser must therefore NOT be called comtso2.
-    environment:
-      POSTGRES_USER: ${LEGACY_PG_USER:-postgres}
-      POSTGRES_PASSWORD: ${LEGACY_PG_PASSWORD:-legacy}
-      POSTGRES_DB: ${LEGACY_PG_DATABASE:-comtso2}
-    volumes:
-      - ./var/legacy/dump_20260925_084618_full.sql:/legacy/phpbb3.sql:ro
-      - ./docker/legacy/10-load-phpbb3.sh:/docker-entrypoint-initdb.d/10-load-phpbb3.sh:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${LEGACY_PG_USER:-postgres} -d ${LEGACY_PG_DATABASE:-comtso2}"]
-      interval: 5s
-      timeout: 5s
-      retries: 60
-      start_period: 20s
 
 # Dev values live in .env (copy .env.example). Nothing else secret is read by the stack.
 secrets:

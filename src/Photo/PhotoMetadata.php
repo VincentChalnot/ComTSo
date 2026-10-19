@@ -27,19 +27,7 @@ final readonly class PhotoMetadata
     /** Same metadata, plus keys of an older EXIF map that this extraction does not know (its own values win). */
     public function withDefaults(array $older): self
     {
-        unset($older['ExifTool']); // the Symfony 2 forum kept the raw ExifTool dump (server paths included): not carried over
+        unset($older['ExifTool']); // the old forum kept the raw ExifTool dump (server paths included): not carried over
         return new self($this->takenAt, $this->latitude, $this->longitude, $this->altitude, $this->exif + $older, $this->orientation);
-    }
-
-    /** Columns of `ctso_photo` (DBAL inserts of the importers). @return array<string, mixed> */
-    public function toColumns(): array
-    {
-        return [
-            'taken_at' => $this->takenAt?->format('Y-m-d H:i:s'),
-            'gps_latitude' => $this->latitude,
-            'gps_longitude' => $this->longitude,
-            'gps_altitude' => $this->altitude,
-            'exif' => $this->exif ? json_encode($this->exif, \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES) : null,
-        ];
     }
 }
