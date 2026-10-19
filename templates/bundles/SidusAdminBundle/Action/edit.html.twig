@@ -4,17 +4,19 @@
 
 {% set creating = action.code == 'create' %}
 {% set screen_title = ('admin.' ~ admin.code ~ '.title')|trans %}
+{# `subject` option of the screen = the property that names an entity (pseudo, title…) #}
+{% set subject = not creating and admin.getOption('subject') ? attribute(data, admin.getOption('subject')) : '' %}
 
 {% block title %}{{ creating ? ('admin.' ~ admin.code ~ '.new')|trans : ('admin.' ~ admin.code ~ '.edit')|trans }} · Administration · ComTSo{% endblock %}
 
 {% block container %}
     <header class="page-header">
         <p class="kicker"><a href="{{ listPath }}">{{ screen_title }}</a></p>
-        <h1 class="page-title">{{ creating ? ('admin.' ~ admin.code ~ '.new')|trans : ('admin.' ~ admin.code ~ '.edit')|trans }}{% if not creating %} <span class="admin-subject">{{ data|tostring }}</span>{% endif %}</h1>
+        <h1 class="page-title">{{ creating ? ('admin.' ~ admin.code ~ '.new')|trans : ('admin.' ~ admin.code ~ '.edit')|trans }}{% if not creating %} <span class="admin-subject">{{ subject }}</span>{% endif %}</h1>
     </header>
 
     <div class="admin-form">
-        {% block form_intro %}{% endblock %}
+        {% block form_intro %}{% include ['admin/' ~ admin.code ~ '/_intro.html.twig', 'admin/_empty.html.twig'] with {data: data} %}{% endblock %}
         {{ form_start(form) }}
             {{ form_widget(form) }}
             <div class="form-actions">

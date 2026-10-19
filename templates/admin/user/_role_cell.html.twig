@@ -1,0 +1,1 @@
+{% if 'ROLE_ADMIN' in column.value(result) %}<span class="badge badge-accent">{{ 'admin.user.role.admin'|trans }}</span>{% else %}<span class="sr-only">{{ 'admin.user.role.member'|trans }}</span>{% endif %}

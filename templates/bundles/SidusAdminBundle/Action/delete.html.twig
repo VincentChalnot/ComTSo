@@ -2,6 +2,8 @@
 {# Confirmation page of a removal (GET changes nothing): the empty form carries the CSRF token, the POST removes. `details` lists what goes along. #}
 {% extends action.baseTemplate %}
 
+{% set subject = admin.getOption('subject') ? attribute(data, admin.getOption('subject')) : '' %}
+
 {% block title %}{{ ('admin.' ~ admin.code ~ '.delete')|trans }} · Administration · ComTSo{% endblock %}
 
 {% block container %}
@@ -13,7 +15,7 @@
     <div class="admin-form">
         <div class="alert alert-danger" role="alert">
             <div class="alert-body">
-                <p class="alert-title">{{ ('admin.' ~ admin.code ~ '.delete_confirm')|trans({'%entity%': data|tostring}) }}</p>
+                <p class="alert-title">{{ ('admin.' ~ admin.code ~ '.delete_confirm')|trans({'%entity%': subject}) }}</p>
                 {% if details|default([]) is not empty %}
                     <ul class="admin-details">
                         {% for detail in details %}<li>{{ detail }}</li>{% endfor %}

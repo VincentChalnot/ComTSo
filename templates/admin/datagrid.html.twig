@@ -10,7 +10,8 @@
     {% set sortable = datagrid.queryHandler.configuration.sortable %}
     {% set route = app.current_route %}
     {% set routeParams = app.request.attributes.get('_route_params') %}
-    {% set pageQuery = {filters: app.request.query.all('filters'), sortable: {config: {column: sortConfig.column, direction: sortConfig.direction ? 1 : 0}}} %}
+    {# the form is named (`form[filters][…]`, `form[sortable][config][…]`): page links rebuild that structure #}
+    {% set pageQuery = {(form.vars.name): {filters: app.request.query.all(form.vars.name).filters|default({}), sortable: {config: {column: sortConfig.column, direction: sortConfig.direction ? 1 : 0}}}} %}
 
     {{ form_start(form, {attr: {class: 'datagrid'}}) }}
         {% if form.filters|length > 0 %}

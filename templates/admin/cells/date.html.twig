@@ -1,0 +1,3 @@
+{# Datagrid cell: a date, in Paris time, dash when empty. Vars: format (default d/m/Y H:i). #}
+{% set value = column.value(result) %}
+{{ value ? value|date(format|default('d/m/Y H:i')) : '—' }}

@@ -1,0 +1,7 @@
+{# Datagrid cell: the row's action links (never forms: the grid is itself a form). Vars: actions (codes of the screen's actions),
+   subject (property naming the row, for the accessible name), skip_for_self (action codes not offered on the signed-in member's own row). #}
+{% for code in actions %}
+    {% if admin.hasAction(code) and not (code in skip_for_self|default([]) and result.id == app.user.id) %}
+        <a href="{{ admin_entity_path(admin, result, code) }}" class="btn btn-ghost btn-sm"{% if subject|default(null) %} aria-label="{{ ('admin.action.' ~ code ~ '_for')|trans({'%name%': attribute(result, subject)}) }}"{% endif %}>{{ ('admin.action.' ~ code)|trans }}</a>
+    {% endif %}
+{% endfor %}

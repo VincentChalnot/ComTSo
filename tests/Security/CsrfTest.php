@@ -25,7 +25,7 @@ class CsrfTest extends AppWebTestCase
      * confirmation forms of the destructive actions, which all carry a form token. Routes of the bundle are `ANY` unless the
      * configuration says otherwise, so {@see testEveryAdminRouteStatesItsMethods()} insists on explicit methods.
      */
-    private const ADMIN_FORM_ROUTES = [];
+    private const ADMIN_FORM_ROUTES = ['sidus_admin.user.delete', 'sidus_admin.user.edit'];
 
     public function testEveryRouteThatChangesDataIsKnownToBeProtected(): void
     {
@@ -109,6 +109,44 @@ class CsrfTest extends AppWebTestCase
         self::assertSame(1, $this->em()->getConnection()->fetchOne('SELECT COUNT(*) FROM ctso_topic'), 'the topic survived');
         self::assertSame(1, $this->em()->getConnection()->fetchOne('SELECT COUNT(*) FROM ctso_comment'), 'the message survived');
         self::assertSame(1, $this->em()->getConnection()->fetchOne('SELECT COUNT(*) FROM ctso_photo'), 'the photo survived');
+    }
+
+    /**
+     * The admin forms are Symfony forms: a POST without their token is not refused with a 403, the page is shown again with
+     * the CSRF error and nothing changes.
+     *
+     * @return array<string, array{string, array}> admin route name => [url, form fields without any token]
+     */
+    private function tokenlessAdminRequests(): array
+    {
+        $alice = $this->createUser('alice');
+
+        return [
+            'sidus_admin.user.edit' => ['/admin/users/'.$alice->getId().'/edit', ['form_user_edit' => ['role' => 'admin']]],
+            'sidus_admin.user.delete' => ['/admin/users/'.$alice->getId().'/delete', []],
+        ];
+    }
+
+    public function testAdminFormsWithoutTheirTokenChangeNothing(): void
+    {
+        $this->loginAs($this->createUser('root', ['ROLE_ADMIN']));
+        $requests = $this->tokenlessAdminRequests();
+        $sorted = array_keys($requests);
+        sort($sorted);
+        $expected = self::ADMIN_FORM_ROUTES;
+        sort($expected);
+        self::assertSame($expected, $sorted, 'every admin form route is exercised');
+
+        foreach ($requests as $route => [$url, $fields]) {
+            $this->client->request('POST', $url, $fields);
+
+            self::assertResponseStatusCodeSame(200, $route.' did not show the form again');
+        }
+
+        $this->em()->clear();
+        $alice = $this->em()->getRepository(\App\Entity\User::class)->findOneBy(['username' => 'alice']);
+        self::assertNotNull($alice, 'the member survived');
+        self::assertNotContains('ROLE_ADMIN', $alice->getRoles(), 'the role did not change');
     }
 
     public function testActionsWithAWrongTokenAreRefused(): void

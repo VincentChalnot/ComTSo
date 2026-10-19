@@ -12,8 +12,60 @@
 #    refuses any other sort column coming from the request).
 sidus_admin:
     base_template: admin/base.html.twig
-    configurations: {}
+    configurations:
+        # Members: list with filters, enable/disable + administrator role, removal through App\Forum\UserRemover.
+        # No create (accounts are made with `app:user:create`) and no e-mail address anywhere.
+        user:
+            entity: App\Entity\User
+            prefix: /users
+            # first match wins: custom action of this screen, the guarded list, then the bundle's own
+            controller_pattern: &controllers ['App\Admin\Action\{{Admin}}\{{Action}}Action', 'App\Admin\Action\{{Action}}Action', 'Sidus\AdminBundle\Action\{{Action}}Action']
+            template_pattern: &templates ['@SidusAdmin/Action/{{action}}.{{format}}.twig']
+            permissions: &permissions [ROLE_ADMIN]
+            form_type: App\Form\Admin\UserAdminType
+            options: { subject: username }
+            actions:
+                list: { path: /, methods: [GET] }
+                edit: { path: '/{id}/edit', requirements: { id: '\d+' }, methods: [GET, POST] }
+                delete: { path: '/{id}/delete', requirements: { id: '\d+' }, methods: [GET, POST] }
 
 sidus_data_grid:
     default_datagrid_template: admin/datagrid.html.twig
-    configurations: {}
+    configurations:
+        user:
+            query_handler:
+                provider: doctrine
+                options: { entity: App\Entity\User }
+                results_per_page: 25
+                sortable: [username, enabled, registeredAt, lastActivity, lastLogin]
+                default_sort: { username: ASC }
+                filters:
+                    username: { type: text, label: admin.user.filter.username }
+                    enabled:
+                        type: choice
+                        label: admin.user.filter.enabled
+                        form_options:
+                            placeholder: admin.list.all
+                            choices: { admin.user.status.enabled: true, admin.user.status.disabled: false }
+                    role:
+                        type: admin_role
+                        attributes: [roles]
+                        label: admin.user.filter.role
+                        form_options:
+                            placeholder: admin.list.all
+                            choices: { admin.user.role.admin_plural: admin, admin.user.role.member_plural: member }
+                    lastActivity: { type: date_range, label: admin.user.filter.last_activity }
+            columns:
+                username: { template: admin/cells/edit_link.html.twig, template_vars: { badge_self: true } }
+                enabled:
+                    template: admin/cells/badge.html.twig
+                    template_vars: { on: admin.user.status.enabled, off: admin.user.status.disabled, on_class: badge-ok, off_class: badge-muted }
+                admin: { property_path: roles, template: admin/user/_role_cell.html.twig }
+                registeredAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
+                lastActivity: { template: admin/cells/date.html.twig }
+                lastLogin: { template: admin/cells/date.html.twig }
+                actions:
+                    property_path: id
+                    template: admin/cells/actions.html.twig
+                    template_vars: { actions: [edit, delete], subject: username, skip_for_self: [delete] }
+                    attributes: { class: table-actions }

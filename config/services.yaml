@@ -37,6 +37,12 @@ services:
     # Random source of the home hero (replaced by a seeded one in tests).
     Random\Randomizer: ~
 
+    # Filter type of the admin member list (code `admin_role`, see config/packages/sidus.yaml).
+    App\Admin\Filter\AdminRoleFilterType:
+        arguments:
+            - admin_role
+            - Symfony\Component\Form\Extension\Core\Type\ChoiceType
+
     App\Service\ImageProcessingService:
         arguments:
             $photosDirectory: '%photos_directory%'

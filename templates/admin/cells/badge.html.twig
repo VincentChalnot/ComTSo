@@ -1,0 +1,3 @@
+{# Datagrid cell: a boolean as a badge. Vars: on / off (translation keys), on_class / off_class. #}
+{% set value = column.value(result) %}
+<span class="badge {{ value ? on_class : off_class }}">{{ (value ? on : off)|trans }}</span>

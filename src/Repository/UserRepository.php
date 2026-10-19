@@ -35,6 +35,18 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this->findOneBy(['username' => $identifier]) ?? $this->findOneBy(['email' => $identifier]);
     }
 
+    /** Active accounts holding ROLE_ADMIN (the roles column is a JSON array of strings). */
+    public function countEnabledAdmins(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.enabled = true')
+            ->andWhere('u.roles LIKE :admin')
+            ->setParameter('admin', '%"ROLE_ADMIN"%')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     /** @return list<User> one page of the enabled members whose pseudo, name or activities match */
     public function search(string $term, int $limit, int $offset = 0): array
     {

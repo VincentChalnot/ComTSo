@@ -19,12 +19,55 @@ admin:
         empty: Aucun résultat pour ces critères.
         yes: Oui
         no: Non
+        all: Tous
+        you: vous
     delete:
         irreversible: Cette action est définitive.
     action:
         edit: Modifier
         delete: Supprimer
         view: Voir sur le forum
+        edit_for: Modifier %name%
+        delete_for: Supprimer %name%
+        view_for: Voir %name% sur le forum
+    user:
+        title: Membres
+        description: Activer ou désactiver un compte, nommer un administrateur, supprimer un membre. Les adresses e-mail ne sont jamais affichées.
+        edit: Modifier le membre
+        delete: Supprimer le membre
+        delete_confirm: 'Supprimer le membre « %entity% » ?'
+        status:
+            enabled: Actif
+            disabled: Désactivé
+        role:
+            member: Membre
+            admin: Administrateur
+            member_plural: Membres
+            admin_plural: Administrateurs
+        field:
+            enabled: Compte actif
+            enabled_help: Un compte désactivé ne peut plus se connecter, ses messages restent affichés.
+            role: Rôle
+        filter:
+            username: Pseudo
+            enabled: Compte
+            role: Rôle
+            last_activity: Dernière activité
+        impact:
+            topics: '{1} 1 sujet, avec tous les messages des autres membres qu’il contient|]1,Inf[ %count% sujets, avec tous les messages des autres membres qu’ils contiennent'
+            comments: '{1} 1 message dans les sujets d’autres membres|]1,Inf[ %count% messages dans les sujets d’autres membres'
+            privateMessages: '{1} 1 message privé, envoyé ou reçu|]1,Inf[ %count% messages privés, envoyés ou reçus'
+            chatMessages: '{1} 1 message du chat|]1,Inf[ %count% messages du chat'
+
+datagrid:
+    user:
+        username: Pseudo
+        enabled: Compte
+        admin: Rôle
+        registeredAt: Inscription
+        lastActivity: Dernière activité
+        lastLogin: Dernière connexion
+        actions: Actions
 
 sidus:
     admin:
@@ -35,3 +78,8 @@ sidus:
                 success: Les modifications sont enregistrées.
             delete:
                 success: L’élément a été supprimé.
+        user:
+            delete:
+                success: Le membre a été supprimé, avec ce qu’il avait écrit.
+            edit:
+                success: Le membre a été mis à jour.

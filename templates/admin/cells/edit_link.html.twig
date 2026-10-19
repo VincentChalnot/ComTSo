@@ -1,0 +1,3 @@
+{# Datagrid cell: the value as a link to the edit page of the row. Vars: badge_self (add "vous" next to the signed-in member's own row). #}
+<a href="{{ admin_entity_path(admin, result, 'edit') }}">{{ column.renderValue(result) }}</a>
+{% if badge_self|default(false) and result.id == app.user.id %} <span class="badge badge-muted">{{ 'admin.list.you'|trans }}</span>{% endif %}
