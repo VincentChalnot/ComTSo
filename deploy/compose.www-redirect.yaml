@@ -5,15 +5,48 @@
 #   .env:  COMPOSE_FILE=compose.yaml:compose.traefik.yaml:compose.www-redirect.yaml
 #
 # Needs the Traefik setup of compose.traefik.yaml (same CERT_RESOLVER / TRAEFIK_ENTRYPOINT / TRAEFIK_NETWORK).
+#
+# The labels live on their OWN tiny service, not on `app`: Docker labels cannot change on a running container, so putting
+# them on `app` means recreating the forum (a short outage) just to touch the redirect, and `COMPOSE_FILE` having been
+# forgotten on the production server is exactly what left https://www.comtso.fr answering a bare 404. Here
+# `docker compose up -d --no-deps www-redirect` adds or changes the redirect without touching `app`.
+# The container only has to exist for Traefik's Docker provider to read its labels: the router points at Traefik's
+# internal `noop@internal` service (nothing is ever proxied to it), so it is the forum image idling in `sleep`
+# (already pulled: no extra image), no secrets, no published port, read-only, no capabilities.
 services:
-  app:
+  www-redirect:
+    image: ghcr.io/vincentchalnot/comtso:${COMTSO_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    entrypoint: ["sleep", "infinity"]
+    command: []
+    user: "65534:65534"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    # The image's own HEALTHCHECK probes Caddy, which is not running here: an "unhealthy" container is dropped by Traefik.
+    healthcheck:
+      disable: true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - proxy
     labels:
-      traefik.http.routers.comtso-forum-www.rule: "Host(`www.${SERVER_NAME}`)"
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK:-proxy}"
+      traefik.http.routers.comtso-forum-www.rule: "Host(`www.${SERVER_NAME:?Set SERVER_NAME in .env}`)"
       traefik.http.routers.comtso-forum-www.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
       traefik.http.routers.comtso-forum-www.tls: "true"
       traefik.http.routers.comtso-forum-www.tls.certresolver: "${CERT_RESOLVER:-letsencrypt}"
       traefik.http.routers.comtso-forum-www.middlewares: "comtso-forum-www-redirect"
       traefik.http.routers.comtso-forum-www.service: "noop@internal"
+      # Never used (the router answers through noop@internal) but required: without a service port Traefik's Docker provider
+      # drops the whole container with "service ... error: port is missing", router and middleware included.
+      traefik.http.services.comtso-forum-www.loadbalancer.server.port: "80"
       traefik.http.middlewares.comtso-forum-www-redirect.redirectregex.regex: "^https?://www\\.([^/]+)(.*)$$"
       traefik.http.middlewares.comtso-forum-www-redirect.redirectregex.replacement: "https://$${1}$${2}"
       traefik.http.middlewares.comtso-forum-www-redirect.redirectregex.permanent: "true"
