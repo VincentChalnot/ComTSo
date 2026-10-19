@@ -362,3 +362,14 @@ Validated with `docker compose config` (temporary env, removed). After deploying
 ### 11.4 Server: `/root/www/comtso-forum` prepared (stack NOT started, no data)
 
 Files copied, `.env` generated (mode 600, four 64-hex secrets generated on the server and never displayed), rehearsal settings in place (3.3-3.5), `docker compose config -q` OK, `docker compose ps -a` empty. **Waiting for the dataset** (`backups/rehearsal/`, 5.1.7), then 4.1 (start), 5.2 (restore). `MAILER_DSN` is still `null://null`: **set the Scaleway DSN yourself in `/root/www/comtso-forum/.env` at step 6.1 (after the rehearsal data is loaded and checked), then `docker compose up -d`.**
+
+### 11.5 Rehearsal deployed on `https://next.comtso.fr` (2026-10-19)
+
+Pre-check: no difference in `migrations/`, `src/Entity` or `config/packages/doctrine.yaml` between `02d8848` (pinned image) and local `HEAD` (only `87519eb`, a form constraint): the image has every migration the dump needs. Dataset `backups/rehearsal/` (`db-20261019-080838.sql.gz` 4.2 MB, `photos-20261019-080838.tar.gz` 331 MB; SHA256 verified locally and on the server).
+
+- [x] 4.1 `docker compose pull && up -d`: `migrate` exited 0, `database` + `app` healthy (project `comtso-forum`, old `comtso-*` containers untouched, `https://comtso.fr` still 302 from the old forum).
+- [x] 4.2 `https://next.comtso.fr/health` -> `ok`; Let's Encrypt certificate (issuer YR2, CN `next.comtso.fr`, valid to 2027-01-17) issued by Traefik through the `gandi` resolver.
+- [x] 5.2.1 `./restore.sh --yes db-... photos-...` -> `Restore done.`, `app` healthy again; 2425 files in `originals`, volume 336 MB. Counts: 18 users (8 enabled), 501 topics, 25 981 comments, 2 425 photos.
+- [x] 7.1-7.5 (curl): `/health` ok, `/login` 200, `/robots.txt` 200, `/` 302; headers on `/login`: the app's own CSP (`default-src 'self'; script-src 'self' 'sha256-...'`) reaches the client, plus HSTS, nosniff, `Referrer-Policy: same-origin`, `X-Frame-Options: SAMEORIGIN`, Permissions-Policy, X-Robots-Tag; anonymous `/photos/1/thumb` -> 302.
+- Resources after restore: `app` 157 MiB, `database` 114 MiB, host ~780 MiB available (swap untouched by the restore).
+- **No account has `ROLE_ADMIN` in this dataset** (all `roles` are `[]`, including `Vincent`, id 5, last login today). Nothing was promoted or created. Owner logs in with his legacy pseudo/password (hash upgraded at first login); to get moderation rights: `docker compose exec app php bin/console app:user:promote Vincent`. 5.2.2 (`app:cutover:prepare`, once) and the browser checks 4.4, 5.2.4, 7.6-7.10 are still open.
