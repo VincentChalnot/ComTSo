@@ -2,6 +2,7 @@
 
 namespace App\Tests\Admin;
 
+use App\Tests\Support\PhotoRowsTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
@@ -10,6 +11,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
  */
 class AdminPagesTest extends AdminWebTestCase
 {
+    use PhotoRowsTrait;
+
     /** @return iterable<string, array{string}> label => path (ids are filled in by {@see path()}) */
     public static function pages(): iterable
     {
@@ -23,6 +26,8 @@ class AdminPagesTest extends AdminWebTestCase
         yield 'forum delete confirmation' => ['/admin/forums/{forum}/delete'];
         yield 'topics list' => ['/admin/topics/'];
         yield 'topic delete confirmation' => ['/admin/topics/{topic}/delete'];
+        yield 'photos list' => ['/admin/photos/'];
+        yield 'photo delete confirmation' => ['/admin/photos/{photo}/delete'];
         yield 'quotes list' => ['/admin/quotes/'];
         yield 'quote create' => ['/admin/quotes/new'];
         yield 'quote edit' => ['/admin/quotes/{quote}/edit'];
@@ -68,6 +73,6 @@ class AdminPagesTest extends AdminWebTestCase
         $this->em()->persist($quote);
         $this->em()->flush();
 
-        return strtr($path, ['{user}' => (string) $target->getId(), '{forum}' => (string) $forum->getId(), '{quote}' => (string) $quote->getId(), '{topic}' => (string) $topic->getId()]);
+        return strtr($path, ['{user}' => (string) $target->getId(), '{forum}' => (string) $forum->getId(), '{quote}' => (string) $quote->getId(), '{topic}' => (string) $topic->getId(), '{photo}' => (string) $this->photoRow()->getId()]);
     }
 }

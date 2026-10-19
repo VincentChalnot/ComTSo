@@ -3,6 +3,7 @@
 //
 //   <div class="admin-form"> <form>…</form> </div>              form column, readable width
 //   <h1 class="page-title">Modifier le membre <span class="admin-subject">vincent</span></h1>
+//   <a class="photo-admin-thumb"><img></a>                    thumbnail cell of the photo list
 //   <ul class="admin-details"><li>12 messages</li></ul>          inside an `.alert-body`
 @use "../abstracts" as *;
 
@@ -19,6 +20,24 @@
     font-size: var(--text-xl);
     font-weight: 500;
     letter-spacing: 0;
+  }
+
+  // 48 px thumbnail of the photo list
+  .photo-admin-thumb {
+    display: block;
+    width: 3rem;
+    height: 3rem;
+    overflow: hidden;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-sm);
+    background-color: var(--c-surface-2);
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 
   .admin-details {

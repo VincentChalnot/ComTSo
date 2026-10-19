@@ -99,8 +99,33 @@ admin:
             title: Titre
             forum: Forum
             author: Auteur
+    photo:
+        title: Photos
+        description: Toutes les photos de la bibliothèque, en lecture seule. Supprimer une photo efface aussi ses fichiers et la retire partout où elle est utilisée.
+        delete: Supprimer la photo
+        delete_confirm: 'Supprimer la photo « %entity% » ?'
+        impact_used: 'Elle est utilisée dans un sujet, un message ou comme avatar : elle en disparaîtra, et son fichier et ses miniatures seront effacés.'
+        impact_unused: Aucun sujet, message ni avatar ne l’utilise ; son fichier et ses miniatures seront effacés.
+        unused: Inutilisée
+        in_topics: '{1} 1 sujet|]1,Inf[ %count% sujets'
+        in_comments: '{1} 1 message|]1,Inf[ %count% messages'
+        as_avatar: '{1} 1 avatar|]1,Inf[ %count% avatars'
+        filter:
+            name: Titre ou fichier
+            author: Auteur
+            taken_at: Prise le
 
 datagrid:
+    photo:
+        thumb: Aperçu
+        originalFilename: Photo
+        author: Auteur
+        fileSize: Taille
+        dimensions: Dimensions
+        takenAt: Prise le
+        createdAt: Ajoutée le
+        usage: Utilisation
+        actions: Actions
     topic:
         title: Titre
         forum: Forum
@@ -141,6 +166,9 @@ sidus:
                 success: Les modifications sont enregistrées.
             delete:
                 success: L’élément a été supprimé.
+        photo:
+            delete:
+                success: La photo a été supprimée, avec ses fichiers.
         topic:
             delete:
                 success: Le sujet a été supprimé.

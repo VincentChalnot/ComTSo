@@ -1,0 +1,3 @@
+{# Datagrid cell: title (or original file name), linking to the public photo page. #}
+<a href="{{ path('photo_show', {id: result.id}) }}">{{ result.title ?: result.originalFilename }}</a>
+{% if result.title and result.originalFilename %}<br><small class="text-muted">{{ result.originalFilename }}</small>{% endif %}

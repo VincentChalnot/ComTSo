@@ -28,7 +28,7 @@ class CsrfTest extends AppWebTestCase
     private const ADMIN_FORM_ROUTES = [
         'sidus_admin.forum.create', 'sidus_admin.forum.delete', 'sidus_admin.forum.edit',
         'sidus_admin.quote.create', 'sidus_admin.quote.delete', 'sidus_admin.quote.edit',
-        'sidus_admin.topic.delete',
+        'sidus_admin.photo.delete', 'sidus_admin.topic.delete',
         'sidus_admin.user.delete', 'sidus_admin.user.edit',
     ];
 
@@ -132,6 +132,7 @@ class CsrfTest extends AppWebTestCase
         $this->em()->flush();
 
         return [
+            'sidus_admin.photo.delete' => ['/admin/photos/'.$this->photoRow()->getId().'/delete', []],
             'sidus_admin.topic.delete' => ['/admin/topics/'.$topic->getId().'/delete', []],
             'sidus_admin.quote.create' => ['/admin/quotes/new', ['form_quote_create' => ['content' => 'Forgée', 'originalAuthor' => 'Forgeur']]],
             'sidus_admin.quote.edit' => ['/admin/quotes/'.$quote->getId().'/edit', ['form_quote_edit' => ['content' => 'Forgée', 'originalAuthor' => 'Forgeur']]],
@@ -167,6 +168,7 @@ class CsrfTest extends AppWebTestCase
         self::assertNull($this->em()->find(\App\Entity\Forum::class, 'forge'), 'no forum was created');
         $quotes = $this->em()->getRepository(\App\Entity\Quote::class)->findAll();
         self::assertSame(1, $this->em()->getRepository(\App\Entity\Topic::class)->count([]), 'the topic survived');
+        self::assertSame(1, $this->em()->getRepository(\App\Entity\Photo::class)->count([]), 'the photo survived');
         self::assertCount(1, $quotes, 'the quote survived and none was created');
         self::assertSame('Une citation', $quotes[0]->getContent(), 'the quote did not change');
         self::assertNotContains('ROLE_ADMIN', $alice->getRoles(), 'the role did not change');

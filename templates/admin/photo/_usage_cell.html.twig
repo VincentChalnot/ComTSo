@@ -1,0 +1,9 @@
+{# Datagrid cell: where the photo is used, from `usage` (PhotoListAction: three grouped queries for the page). #}
+{% set u = usage[result.id]|default({topics: 0, comments: 0, avatars: 0}) %}
+{% if u.topics + u.comments + u.avatars == 0 %}
+    <span class="badge badge-muted">{{ 'admin.photo.unused'|trans }}</span>
+{% else %}
+    {% if u.topics %}<span class="badge">{{ 'admin.photo.in_topics'|trans({'%count%': u.topics}) }}</span>{% endif %}
+    {% if u.comments %}<span class="badge">{{ 'admin.photo.in_comments'|trans({'%count%': u.comments}) }}</span>{% endif %}
+    {% if u.avatars %}<span class="badge badge-accent">{{ 'admin.photo.as_avatar'|trans({'%count%': u.avatars}) }}</span>{% endif %}
+{% endif %}

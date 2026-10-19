@@ -1,0 +1,4 @@
+{# Datagrid cell: view (public photo page) and delete (confirmation page). #}
+{% set name = result.title ?: result.originalFilename %}
+<a href="{{ path('photo_show', {id: result.id}) }}" class="btn btn-ghost btn-sm" aria-label="{{ 'admin.action.view_for'|trans({'%name%': name}) }}">{{ 'admin.action.view'|trans }}</a>
+<a href="{{ admin_entity_path(admin, result, 'delete') }}" class="btn btn-ghost btn-sm" aria-label="{{ 'admin.action.delete_for'|trans({'%name%': name}) }}">{{ 'admin.action.delete'|trans }}</a>

@@ -6,12 +6,12 @@ use App\Entity\Photo;
 use App\Entity\User;
 use App\Form\PhotoType;
 use App\Pagination\Pager;
+use App\Photo\PhotoRemover;
 use App\Photo\PhotoRotator;
 use App\Repository\CommentPhotoRepository;
 use App\Repository\PhotoLikeRepository;
 use App\Repository\PhotoRepository;
 use App\Service\ImageProcessingService;
-use App\Service\PhotoUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -171,7 +171,7 @@ class PhotoController extends AbstractController
      * that used it (and stops being anybody's avatar). The author may only delete a photo nothing uses any more.
      */
     #[Route('/photos/{id}/delete', name: 'photo_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function delete(Request $request, Photo $photo, EntityManagerInterface $em, PhotoRepository $photos, PhotoUploader $uploader): Response
+    public function delete(Request $request, Photo $photo, PhotoRepository $photos, PhotoRemover $remover): Response
     {
         $this->denyUnlessCanManage($photo);
         if (!$this->isCsrfTokenValid('delete-photo-'.$photo->getId(), $request->getPayload()->getString('_token'))) {
@@ -185,11 +185,7 @@ class PhotoController extends AbstractController
             return $this->redirectToRoute('photo_show', ['id' => $photo->getId()]);
         }
 
-        $filename = (string) $photo->getFilename();
-        $em->createQuery('UPDATE '.User::class.' u SET u.avatar = NULL WHERE u.avatar = :photo')->setParameter('photo', $photo)->execute();
-        // Links to topics, messages and likes go away with the row (ON DELETE CASCADE).
-        $em->createQuery('DELETE FROM '.Photo::class.' p WHERE p.id = :id')->setParameter('id', $photo->getId())->execute();
-        $uploader->deleteFiles($filename);
+        $remover->remove($photo);
         $this->addFlash('success', 'La photo a été supprimée.');
 
         return $this->redirectToRoute('photo_index');

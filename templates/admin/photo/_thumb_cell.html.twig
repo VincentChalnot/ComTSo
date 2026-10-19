@@ -1,0 +1,4 @@
+{# Datagrid cell: small thumbnail linking to the photo page. #}
+<a href="{{ path('photo_show', {id: result.id}) }}" class="photo-admin-thumb" aria-label="{{ 'admin.action.view_for'|trans({'%name%': result.title ?: result.originalFilename}) }}">
+    <img src="{{ photo_url(result, 'thumb') }}" alt="" loading="lazy" width="48" height="48">
+</a>

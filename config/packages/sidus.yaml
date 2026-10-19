@@ -69,6 +69,18 @@ sidus_admin:
                 list: { path: /, methods: [GET] }
                 delete: { path: '/{id}/delete', requirements: { id: '\d+' }, methods: [GET, POST] }
 
+        # Photos: READ-ONLY list; removal only through App\Photo\PhotoRemover (the file and its thumbnails go with the row).
+        photo:
+            entity: App\Entity\Photo
+            prefix: /photos
+            controller_pattern: *controllers
+            template_pattern: *templates
+            permissions: *permissions
+            options: { subject: originalFilename }
+            actions:
+                list: { path: /, methods: [GET] }
+                delete: { path: '/{id}/delete', requirements: { id: '\d+' }, methods: [GET, POST] }
+
 sidus_data_grid:
     default_datagrid_template: admin/datagrid.html.twig
     configurations:
@@ -170,3 +182,24 @@ sidus_data_grid:
                 createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
                 lastActivityAt: { template: admin/cells/date.html.twig }
                 actions: { property_path: id, template: admin/topic/_actions_cell.html.twig, attributes: { class: table-actions } }
+        photo:
+            query_handler:
+                provider: doctrine
+                options: { entity: App\Entity\Photo }
+                results_per_page: 25
+                sortable: [originalFilename, author.username, fileSize, takenAt, createdAt]
+                default_sort: { createdAt: DESC }
+                filters:
+                    name: { type: text, attributes: [title, originalFilename], label: admin.photo.filter.name }
+                    author: { type: text, attributes: [author.username], label: admin.photo.filter.author }
+                    takenAt: { type: date_range, label: admin.photo.filter.taken_at }
+            columns:
+                thumb: { property_path: id, template: admin/photo/_thumb_cell.html.twig }
+                originalFilename: { template: admin/photo/_name_cell.html.twig }
+                author: { property_path: "author?.username", sort_column: author.username, template: admin/cells/author.html.twig }
+                fileSize: { template: admin/photo/_size_cell.html.twig, attributes: { class: num } }
+                dimensions: { property_path: id, template: admin/photo/_dimensions_cell.html.twig }
+                takenAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
+                createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
+                usage: { property_path: id, template: admin/photo/_usage_cell.html.twig }
+                actions: { property_path: id, template: admin/photo/_actions_cell.html.twig, attributes: { class: table-actions } }
