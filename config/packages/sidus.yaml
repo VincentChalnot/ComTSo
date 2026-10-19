@@ -44,6 +44,20 @@ sidus_admin:
                 edit: { path: '/{id}/edit', requirements: { id: '[a-z0-9-]+' }, methods: [GET, POST] }
                 delete: { path: '/{id}/delete', requirements: { id: '[a-z0-9-]+' }, methods: [GET, POST] }
 
+        # Quotes: full CRUD, the bundle's own delete action (a quote has no dependants: confirmation page + POST with the form token).
+        quote:
+            entity: App\Entity\Quote
+            prefix: /quotes
+            controller_pattern: *controllers
+            template_pattern: *templates
+            permissions: *permissions
+            form_type: App\Form\Admin\QuoteAdminType
+            actions:
+                list: { path: /, methods: [GET] }
+                create: { path: /new, methods: [GET, POST] }
+                edit: { path: '/{id}/edit', requirements: { id: '\d+' }, methods: [GET, POST] }
+                delete: { path: '/{id}/delete', requirements: { id: '\d+' }, methods: [GET, POST] }
+
 sidus_data_grid:
     default_datagrid_template: admin/datagrid.html.twig
     configurations:
@@ -103,4 +117,23 @@ sidus_data_grid:
                     property_path: id
                     template: admin/cells/actions.html.twig
                     template_vars: { actions: [edit, delete], subject: title }
+                    attributes: { class: table-actions }
+        quote:
+            query_handler:
+                provider: doctrine
+                options: { entity: App\Entity\Quote }
+                results_per_page: 25
+                sortable: [id, originalAuthor, createdAt]
+                default_sort: { id: DESC }
+                filters:
+                    text: { type: text, attributes: [content, originalAuthor], label: admin.quote.filter.text }
+            columns:
+                content: { template: admin/cells/excerpt.html.twig, template_vars: { link: true, length: 140 } }
+                originalAuthor: ~
+                author: { property_path: "author?.username", template: admin/cells/author.html.twig }
+                createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
+                actions:
+                    property_path: id
+                    template: admin/cells/actions.html.twig
+                    template_vars: { actions: [edit, delete] }
                     attributes: { class: table-actions }

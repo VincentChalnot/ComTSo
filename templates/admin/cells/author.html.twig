@@ -1,0 +1,3 @@
+{# Datagrid cell: the pseudo of a member (a relation resolved by property_path `author.username`), dash when the author is gone. #}
+{% set pseudo = column.value(result) %}
+{{ pseudo ?: '—' }}

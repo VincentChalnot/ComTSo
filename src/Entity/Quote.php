@@ -98,6 +98,6 @@ class Quote
 
     public function __toString(): string
     {
-        return $this->content ? substr($this->content, 0, 50) . '...' : 'Quote #' . ($this->id ?? 'new');
+        return $this->content ? mb_strimwidth($this->content, 0, 60, '…') : 'Quote #' . ($this->id ?? 'new');
     }
 }

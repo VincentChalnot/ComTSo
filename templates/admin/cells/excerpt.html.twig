@@ -1,0 +1,4 @@
+{# Datagrid cell: the beginning of a long text. Vars: length (default 120), link (true = links to the row's edit page). #}
+{% set text = column.value(result)|default('') %}
+{% set shown = text|length > length|default(120) ? text|slice(0, length|default(120)) ~ '…' : text %}
+{% if link|default(false) %}<a href="{{ admin_entity_path(admin, result, 'edit') }}">{{ shown }}</a>{% else %}{{ shown }}{% endif %}

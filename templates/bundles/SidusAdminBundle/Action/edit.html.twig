@@ -5,7 +5,7 @@
 {% set creating = action.code == 'create' %}
 {% set screen_title = ('admin.' ~ admin.code ~ '.title')|trans %}
 {# `subject` option of the screen = the property that names an entity (pseudo, title…) #}
-{% set subject = not creating and admin.getOption('subject') ? attribute(data, admin.getOption('subject')) : '' %}
+{% set subject = creating ? '' : (admin.getOption('subject') ? attribute(data, admin.getOption('subject')) : data|tostring) %}
 
 {% block title %}{{ creating ? ('admin.' ~ admin.code ~ '.new')|trans : ('admin.' ~ admin.code ~ '.edit')|trans }} · Administration · ComTSo{% endblock %}
 

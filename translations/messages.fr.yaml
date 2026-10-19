@@ -75,8 +75,28 @@ admin:
             content_help: Affichée sous le titre du forum. Le titre fixe l’adresse du forum à la création ; elle ne change plus ensuite.
         filter:
             title: Titre
+    quote:
+        title: Citations
+        description: Les citations tirées au hasard dans la colonne de droite de chaque page. Texte brut.
+        new: Nouvelle citation
+        edit: Modifier la citation
+        delete: Supprimer la citation
+        delete_confirm: 'Supprimer la citation « %entity% » ?'
+        field:
+            content: Citation
+            original_author: Auteur de la citation
+            original_author_help: La personne qui l’a dite ou écrite, telle qu’elle doit apparaître sous la citation.
+        filter:
+            text: Texte ou auteur
 
 datagrid:
+    quote:
+        id: N°
+        content: Citation
+        originalAuthor: Auteur
+        author: Ajoutée par
+        createdAt: Ajoutée le
+        actions: Actions
     forum:
         order: Position
         title: Titre
@@ -102,6 +122,13 @@ sidus:
                 success: Les modifications sont enregistrées.
             delete:
                 success: L’élément a été supprimé.
+        quote:
+            create:
+                success: La citation a été ajoutée.
+            edit:
+                success: La citation a été mise à jour.
+            delete:
+                success: La citation a été supprimée.
         forum:
             create:
                 success: Le forum a été créé.

@@ -21,6 +21,10 @@ class AdminPagesTest extends AdminWebTestCase
         yield 'forum create' => ['/admin/forums/new'];
         yield 'forum edit' => ['/admin/forums/{forum}/edit'];
         yield 'forum delete confirmation' => ['/admin/forums/{forum}/delete'];
+        yield 'quotes list' => ['/admin/quotes/'];
+        yield 'quote create' => ['/admin/quotes/new'];
+        yield 'quote edit' => ['/admin/quotes/{quote}/edit'];
+        yield 'quote delete confirmation' => ['/admin/quotes/{quote}/delete'];
     }
 
     #[DataProvider('pages')]
@@ -57,7 +61,10 @@ class AdminPagesTest extends AdminWebTestCase
     {
         $target = $this->createUser('target');
         $forum = $this->createForum('vide', 'Vide');
+        $quote = (new \App\Entity\Quote())->setContent('Une citation')->setOriginalAuthor('Quelqu’un');
+        $this->em()->persist($quote);
+        $this->em()->flush();
 
-        return strtr($path, ['{user}' => (string) $target->getId(), '{forum}' => (string) $forum->getId()]);
+        return strtr($path, ['{user}' => (string) $target->getId(), '{forum}' => (string) $forum->getId(), '{quote}' => (string) $quote->getId()]);
     }
 }

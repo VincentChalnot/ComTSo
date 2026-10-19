@@ -2,7 +2,7 @@
 {# Confirmation page of a removal (GET changes nothing): the empty form carries the CSRF token, the POST removes. `details` lists what goes along. #}
 {% extends action.baseTemplate %}
 
-{% set subject = admin.getOption('subject') ? attribute(data, admin.getOption('subject')) : '' %}
+{% set subject = admin.getOption('subject') ? attribute(data, admin.getOption('subject')) : (data is defined ? data|tostring : '') %}
 
 {% block title %}{{ ('admin.' ~ admin.code ~ '.delete')|trans }} · Administration · ComTSo{% endblock %}
 
