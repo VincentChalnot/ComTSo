@@ -17,7 +17,7 @@
         "imagine/imagine": "^1.5",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.0",
-        "sidus/admin-bundle": "^5.0",
+        "sidus/admin-bundle": "^5.0.7",
         "sidus/datagrid-bundle": "^4.0",
         "sidus/filter-bundle": "^6.0",
         "stof/doctrine-extensions-bundle": "^1.12",
@@ -108,9 +108,6 @@
             "disable_dotenv": true
         },
         "patches": {
-            "sidus/admin-bundle": {
-                "Symfony 8 compatibility (VoterInterface::vote() Vote argument). Remove this patch once sidus/admin-bundle >=5.0.7 is tagged.": "patches/sidus/sidus-admin-bundle-symfony-8.patch"
-            },
             "sidus/filter-bundle": {
                 "Symfony 8 compatibility (AutowireLocator/AutowireIterator, Request::query->get for the page). Remove this patch once sidus/filter-bundle >=6.0.4 is tagged.": "patches/sidus/sidus-filter-bundle-symfony-8.patch"
             }

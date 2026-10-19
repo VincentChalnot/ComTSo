@@ -1,18 +1,6 @@
 {
-    "_hash": "adf68fd5a322a2c2d2f7418b965fcf7eb53faf2aff75d7e73d14cf8b569d1863",
+    "_hash": "ad4769b950a6a07c48622615a3b1c6f0c02e5b37925bca18497b08820d8496a0",
     "patches": {
-        "sidus/admin-bundle": [
-            {
-                "package": "sidus/admin-bundle",
-                "description": "Symfony 8 compatibility (VoterInterface::vote() Vote argument). Remove this patch once sidus/admin-bundle >=5.0.7 is tagged.",
-                "url": "patches/sidus/sidus-admin-bundle-symfony-8.patch",
-                "sha256": "68446a74466950cfc620b613668ada652421a8cf52cd2bcc2cbb7966435986d4",
-                "depth": 1,
-                "extra": {
-                    "provenance": "root"
-                }
-            }
-        ],
         "sidus/filter-bundle": [
             {
                 "package": "sidus/filter-bundle",

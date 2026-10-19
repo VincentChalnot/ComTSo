@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f8a53088626b06a5193becd57e9b5a9e",
+    "content-hash": "a15baf44a59043b16c3e8d27bc2d8e4f",
     "packages": [
         {
             "name": "cweagans/composer-configurable-plugin",
@@ -2612,16 +2612,16 @@
         },
         {
             "name": "sidus/admin-bundle",
-            "version": "v5.0.6",
+            "version": "v5.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/VincentChalnot/SidusAdminBundle.git",
-                "reference": "b44035d18557f2270532ce92716dca13e5fc83b6"
+                "reference": "47cf84e2e698caac4130bf61819fde0d5487130f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VincentChalnot/SidusAdminBundle/zipball/b44035d18557f2270532ce92716dca13e5fc83b6",
-                "reference": "b44035d18557f2270532ce92716dca13e5fc83b6",
+                "url": "https://api.github.com/repos/VincentChalnot/SidusAdminBundle/zipball/47cf84e2e698caac4130bf61819fde0d5487130f",
+                "reference": "47cf84e2e698caac4130bf61819fde0d5487130f",
                 "shasum": ""
             },
             "require": {
@@ -2662,9 +2662,9 @@
             ],
             "support": {
                 "issues": "https://github.com/VincentChalnot/SidusAdminBundle/issues",
-                "source": "https://github.com/VincentChalnot/SidusAdminBundle/tree/v5.0.6"
+                "source": "https://github.com/VincentChalnot/SidusAdminBundle/tree/v5.0.7"
             },
-            "time": "2026-07-21T20:42:36+00:00"
+            "time": "2026-10-19T17:37:08+00:00"
         },
         {
             "name": "sidus/datagrid-bundle",
