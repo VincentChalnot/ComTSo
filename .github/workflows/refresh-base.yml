@@ -1,0 +1,72 @@
+name: Refresh base image
+
+# Weekly (and on demand): rebuild the base image from scratch (fresh upstream FrankenPHP/Debian layers, no cache) and the production
+# image on top of it, so security updates reach servers on their next `docker compose pull`. The tests are not re-run: the code is the
+# default branch already validated by CI, only the OS/PHP layers change.
+on:
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: refresh-base
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  refresh:
+    # Scheduled runs always use the default branch; for a manual run, pick it.
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Base image name
+        id: base
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}-base:$(docker/base-hash.sh)" >> "$GITHUB_OUTPUT"
+
+      # Same hash tag as normal runs (they keep skipping the build when it exists) plus a dated tag for rollback.
+      - name: Rebuild the base image (pull, no cache)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: php_base
+          pull: true
+          no-cache: true
+          push: true
+          tags: |
+            ${{ steps.base.outputs.image }}
+            ${{ steps.base.outputs.image }}-${{ github.run_id }}
+          provenance: false
+
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          flavor: latest=false
+          tags: |
+            type=raw,value=latest
+            type=raw,value={{date 'YYYYMMDD'}}
+
+      - name: Rebuild and push the production image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: frankenphp_prod
+          build-args: BASE_IMAGE=${{ steps.base.outputs.image }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
