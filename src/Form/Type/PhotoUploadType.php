@@ -49,32 +49,41 @@ class PhotoUploadType extends FileType
             'existing_photos' => 0,
             'constraints' => static fn (Options $options): array => [
                 new Count(max: $options['max_files'], maxMessage: 'Vous pouvez joindre {{ limit }} photos au maximum.'),
-                new All([new Image(
-                    maxSize: $options['max_size'],
-                    mimeTypes: self::MIME_TYPES,
-                    // Decompression bombs are refused from the header, before anything decodes the pixels.
-                    maxPixels: PhotoPipeline::MAX_SOURCE_PIXELS,
-                    maxWidth: PhotoPipeline::MAX_SIDE,
-                    maxHeight: PhotoPipeline::MAX_SIDE,
-                    maxSizeMessage: 'La photo {{ name }} est trop lourde ({{ size }} {{ suffix }}) : '.intdiv($options['max_size'], 1048576).' Mo au maximum.',
-                    mimeTypesMessage: '{{ name }} n\'est pas une image acceptée : seules les images JPEG, PNG, GIF et WebP sont acceptées.',
-                    maxPixelsMessage: '{{ name }} est trop grande ({{ width }} × {{ height }} pixels) : '.(PhotoPipeline::MAX_SOURCE_PIXELS / 1_000_000).' mégapixels au maximum.',
-                    maxWidthMessage: '{{ name }} est trop large ({{ width }} pixels) : '.PhotoPipeline::MAX_SIDE.' pixels au maximum.',
-                    maxHeightMessage: '{{ name }} est trop haute ({{ height }} pixels) : '.PhotoPipeline::MAX_SIDE.' pixels au maximum.',
-                    notFoundMessage: 'Le fichier n\'a pas pu être envoyé.',
-                    notReadableMessage: 'Le fichier n\'a pas pu être lu.',
-                    // PHP refuses the file itself when it exceeds upload_max_filesize (10M): same sentence as the size constraint.
-                    uploadIniSizeErrorMessage: 'Une photo est trop lourde : '.intdiv($options['max_size'], 1048576).' Mo au maximum.',
-                    uploadFormSizeErrorMessage: 'Une photo dépasse la taille maximale autorisée.',
-                    uploadErrorMessage: 'Le fichier n\'a pas pu être envoyé.',
-                    sizeNotDetectedMessage: '{{ name }} n\'est pas une image valide.',
-                    corruptedMessage: '{{ name }} n\'est pas une image valide.',
-                )]),
+                new All([self::imageConstraint($options['max_size'])]),
             ],
         ]);
         $resolver->setAllowedTypes('max_files', 'int');
         $resolver->setAllowedTypes('max_size', 'int');
         $resolver->setAllowedTypes('existing_photos', 'int');
+    }
+
+    /**
+     * The checks every uploaded image goes through before the pipeline sees it (real content type from the file, never the
+     * client's, size and pixel limits, French messages). Shared with the avatar form.
+     */
+    public static function imageConstraint(int $maxSize = PhotoUploader::MAX_SIZE): Image
+    {
+        return new Image(
+            maxSize: $maxSize,
+            mimeTypes: self::MIME_TYPES,
+            // Decompression bombs are refused from the header, before anything decodes the pixels.
+            maxPixels: PhotoPipeline::MAX_SOURCE_PIXELS,
+            maxWidth: PhotoPipeline::MAX_SIDE,
+            maxHeight: PhotoPipeline::MAX_SIDE,
+            maxSizeMessage: 'La photo {{ name }} est trop lourde ({{ size }} {{ suffix }}) : '.intdiv($maxSize, 1048576).' Mo au maximum.',
+            mimeTypesMessage: '{{ name }} n\'est pas une image acceptée : seules les images JPEG, PNG, GIF et WebP sont acceptées.',
+            maxPixelsMessage: '{{ name }} est trop grande ({{ width }} × {{ height }} pixels) : '.(PhotoPipeline::MAX_SOURCE_PIXELS / 1_000_000).' mégapixels au maximum.',
+            maxWidthMessage: '{{ name }} est trop large ({{ width }} pixels) : '.PhotoPipeline::MAX_SIDE.' pixels au maximum.',
+            maxHeightMessage: '{{ name }} est trop haute ({{ height }} pixels) : '.PhotoPipeline::MAX_SIDE.' pixels au maximum.',
+            notFoundMessage: 'Le fichier n\'a pas pu être envoyé.',
+            notReadableMessage: 'Le fichier n\'a pas pu être lu.',
+            // PHP refuses the file itself when it exceeds upload_max_filesize (10M): same sentence as the size constraint.
+            uploadIniSizeErrorMessage: 'Une photo est trop lourde : '.intdiv($maxSize, 1048576).' Mo au maximum.',
+            uploadFormSizeErrorMessage: 'Une photo dépasse la taille maximale autorisée.',
+            uploadErrorMessage: 'Le fichier n\'a pas pu être envoyé.',
+            sizeNotDetectedMessage: '{{ name }} n\'est pas une image valide.',
+            corruptedMessage: '{{ name }} n\'est pas une image valide.',
+        );
     }
 
     public function getBlockPrefix(): string

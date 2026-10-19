@@ -136,6 +136,9 @@ private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `t
   submit works). `App\Photo\PostPhotos` stores all-or-nothing, links, detaches and `releaseOrphans()` (file + row deleted only when no topic, message or avatar still uses the photo): used by
   create/edit/delete of a comment (only author/admin; the edit page lists attached photos with a remove checkbox). Pages rendering many messages call `CommentPhotoRepository::preload($comments)` (one query) before
   rendering `_post/message.html.twig`: do the same in any new listing. In tests, `em()->clear()` before a request that must lazy-load collections created in the same test.
+- **Avatars**: a member's avatar is a `Photo` of the library (`User::avatar`, displayed by the `_ui/avatar.html.twig` macro through the `avatar` variant everywhere). Members change or remove their OWN avatar on `/gens/{pseudo}/config`
+  (`PeopleController::avatar`, POST `people_avatar`, Symfony form `AvatarType` = its own CSRF token, 10 MB and real content check through `PhotoUploadType::imageConstraint()`): `App\Photo\AvatarManager` stores the file through the photo pipeline,
+  switches the link, then releases the previous avatar with `PostPhotos::releaseOrphans()` (kept when a topic or message still uses it). Administrators cannot change somebody else's avatar (no form on their page, POST = 403).
 - **Thread previews** (forum page): `App\Forum\ThreadPreviewBuilder` builds the read model of a whole page of topics with batch queries (query count asserted in `ForumPageTest`);
   excerpts are plain text from `App\Content\TextExcerpt` (twig `excerpt_text`, auto-escaped), relative dates come from the `ago` filter. The inline "Aperçu" fetches
   `GET /forum/{forumId}/{id}/preview` (`TopicPreviewController`, HTML fragment of the last 5 messages, private/no-store) through `initThreadPreviews()` in `assets/scripts/ui.js`.

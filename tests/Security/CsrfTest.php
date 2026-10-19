@@ -18,7 +18,7 @@ class CsrfTest extends AppWebTestCase
     ];
 
     /** Routes whose POST is a Symfony form (token field) or the firewall's own authenticator. */
-    private const FORM_ROUTES = ['comment_create', 'people_password'];
+    private const FORM_ROUTES = ['comment_create', 'people_avatar', 'people_password'];
 
     public function testEveryRouteThatChangesDataIsKnownToBeProtected(): void
     {

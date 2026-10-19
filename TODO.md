@@ -8,7 +8,6 @@ Items marked **BLOCKED** need a decision from the owner before any work.
 
 1. **Backup: NAS mirror still to verify.** The restore test is done (a dev-database dump restored into a scratch database, row counts identical; server backup of 2026-10-19 passes `gzip -t`). The NAS mirror `new-forum/` did not exist yet: run the NAS `backup.sh` once, check that `new-forum/` holds the day's dump and photo archive, and restore-test that copy (`docs/operations.md` "Backups and restore checks").
 2. **`www.comtso.fr` redirect and Keres CSP** (owner only, minutes): test `compose.www-redirect.yaml` (permanent redirect to the apex) and that the Keres app still works with its own CSP (the shared Traefik no longer sets one).
-3. **Change avatar.** Most visible gap for members. Plumbing exists (`avatar` variant, photo pipeline, `Photo` avatar link): form on `/gens/{pseudo}/config`, release the old avatar through `PostPhotos::releaseOrphans`, test.
 
 ## Wave 2: hardening and photo/text features
 

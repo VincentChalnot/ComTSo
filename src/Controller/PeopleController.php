@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\Message;
 use App\Entity\User;
 use App\Form\MessageType;
+use App\Form\AvatarType;
 use App\Form\ChangePasswordType;
 use App\Form\UserProfileType;
+use App\Photo\AvatarManager;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,6 +16,7 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -105,7 +108,7 @@ class PeopleController extends AbstractController
             return $this->redirectToRoute('people_config', ['username' => $person->getUsername()]);
         }
 
-        return $this->renderConfig($person, $form, $this->passwordForm($person));
+        return $this->renderConfig($person, $form, $this->passwordForm($person), $this->avatarForm($person));
     }
 
     /**
@@ -137,7 +140,50 @@ class PeopleController extends AbstractController
             return $this->redirectToRoute('people_config', ['username' => $person->getUsername()]);
         }
 
-        return $this->renderConfig($person, $this->messageOrderForm($person), $form, Response::HTTP_UNPROCESSABLE_ENTITY);
+        return $this->renderConfig($person, $this->messageOrderForm($person), $form, $this->avatarForm($person), Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    /**
+     * Change or remove your own avatar (nobody else's, administrators included). The image goes through the photo
+     * pipeline; the previous avatar is deleted unless something else still uses it. A refused file shows the config page again (422).
+     */
+    #[Route('/gens/{username}/avatar', name: 'people_avatar', requirements: ['username' => '[^/]+'], methods: ['POST'])]
+    public function avatar(
+        Request $request,
+        #[MapEntity(mapping: ['username' => 'username'])] User $person,
+        #[CurrentUser] User $me,
+        AvatarManager $avatars,
+    ): Response {
+        if ($person !== $me) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $form = $this->avatarForm($me);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->has('remove') && $form->get('remove')->isClicked()) {
+                $avatars->remove($me);
+                $this->addFlash('success', 'Votre avatar a été retiré.');
+
+                return $this->redirectToRoute('people_config', ['username' => $me->getUsername()]);
+            }
+
+            $file = $form->get('file')->getData();
+            if (null === $file) {
+                $form->get('file')->addError(new FormError('Choisissez une image.'));
+            } else {
+                try {
+                    $avatars->change($me, $file);
+                    $this->addFlash('success', 'Votre avatar a été modifié.');
+
+                    return $this->redirectToRoute('people_config', ['username' => $me->getUsername()]);
+                } catch (\InvalidArgumentException $e) {
+                    $form->get('file')->addError(new FormError($e->getMessage()));
+                }
+            }
+        }
+
+        return $this->renderConfig($person, $this->messageOrderForm($person), $this->passwordForm($person), $form, Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /** Called by the theme toggle of the navigation bar. */
@@ -182,9 +228,21 @@ class PeopleController extends AbstractController
         ]);
     }
 
-    private function renderConfig(User $person, FormInterface $form, ?FormInterface $passwordForm, int $status = Response::HTTP_OK): Response
+    private function avatarForm(User $person): ?FormInterface
     {
-        return $this->render('people/config.html.twig', ['person' => $person, 'form' => $form, 'passwordForm' => $passwordForm], new Response(status: $status));
+        if ($person !== $this->getUser()) {
+            return null;
+        }
+
+        return $this->createForm(AvatarType::class, null, [
+            'has_avatar' => null !== $person->getAvatar(),
+            'action' => $this->generateUrl('people_avatar', ['username' => $person->getUsername()]),
+        ]);
+    }
+
+    private function renderConfig(User $person, FormInterface $form, ?FormInterface $passwordForm, ?FormInterface $avatarForm, int $status = Response::HTTP_OK): Response
+    {
+        return $this->render('people/config.html.twig', ['person' => $person, 'form' => $form, 'passwordForm' => $passwordForm, 'avatarForm' => $avatarForm], new Response(status: $status));
     }
 
     private function denyUnlessSelfOrAdmin(User $person): void

@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import '_ui/avatar.html.twig' as av %}
 
 {% block title %}Configuration · ComTSo{% endblock %}
 
@@ -19,6 +20,23 @@
             </div>
         {{ form_end(form) }}
     </div>
+
+    {% if avatarForm %}
+        <div class="card settings-card mt-6" id="avatar">
+            <h2 class="section-title">Avatar</h2>
+            <div class="flex items-center gap-4 mb-5">
+                {{ av.avatar(person, 'xl') }}
+                <p class="settings-hint mb-0">{{ person.avatar ? 'Voici votre avatar actuel.' : 'Vous n\'avez pas d\'avatar : votre initiale s\'affiche à la place.' }}</p>
+            </div>
+            {{ form_start(avatarForm) }}
+                {{ form_row(avatarForm.file) }}
+                <div class="form-actions">
+                    {% if avatarForm.remove is defined %}{{ form_widget(avatarForm.remove) }}{% endif %}
+                    {{ form_widget(avatarForm.upload) }}
+                </div>
+            {{ form_end(avatarForm) }}
+        </div>
+    {% endif %}
 
     {% if passwordForm %}
         <div class="card settings-card mt-6" id="mot-de-passe">
