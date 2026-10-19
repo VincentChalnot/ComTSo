@@ -12,7 +12,7 @@
     <a href="{{ path('photo_show', {id: photo.id}) }}" class="photo-thumb" aria-label="Voir la photo">
         <img src="{{ photo_url(photo, 'thumb') }}" alt="">
     </a>
-    <div class="card settings-card">
+    <div class="card card-roomy">
         {{ form_start(form) }}
             {{ form_widget(form) }}
             <div class="form-actions">

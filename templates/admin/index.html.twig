@@ -12,7 +12,7 @@
 {% if screens is empty %}
     <p class="empty">Aucun écran d’administration n’est configuré.</p>
 {% else %}
-    <div class="people-grid">
+    <div class="admin-tiles">
         {% for screen in screens %}
             <a href="{{ admin_path(screen.admin, 'list') }}" class="card card-hover">
                 <h2 class="card-title">{{ ('admin.' ~ screen.admin.code ~ '.title')|trans }}</h2>

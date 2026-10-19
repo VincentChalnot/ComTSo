@@ -220,6 +220,16 @@ Here `.attach-item-remove` wraps a *checkbox + label* (a native "remove" toggle)
 ```
 Shown (hidden removed) once `GET /photos/{id}/like` answered; hidden for links without `data-photo-id`. Click: `POST /photos/{id}/like` (token from the state), updates `is-liked`, `aria-pressed`, label ("J’aime" / "Je n’aime plus") and count without closing the viewer; `disabled` while the request runs.
 
+## Cards (`components/_card.scss`)
+
+```html
+<section class="card">…</section>                         <!-- padding 1.25rem is part of .card -->
+<div class="card card-roomy"><form>…</form></div>          <!-- forms and settings: clamp(1.25rem, 4vw, 2rem) -->
+<div class="card card-flush overflow-hidden">…posts…</div> <!-- edge-to-edge content: message lists, photos, the chat sheet -->
+<a class="card card-hover" href="…">…</a>                  <!-- clickable tile (admin home) -->
+```
+Never put `p-*` utilities or `style="padding:…"` on a `.card`: choose `.card-roomy` or `.card-flush`. Components that need their own spacing (`.profile`, `.person-card`) set it in their partial.
+
 ## Classes outside the contract
 
 New hooks (need styling):

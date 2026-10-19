@@ -5,9 +5,16 @@
 //   <h1 class="page-title">Modifier le membre <span class="admin-subject">vincent</span></h1>
 //   <a class="photo-admin-thumb"><img></a>                    thumbnail cell of the photo list
 //   <ul class="admin-details"><li>12 messages</li></ul>          inside an `.alert-body`
+//   <div class="admin-tiles"><a class="card card-hover">…</a></div> overview tiles (admin home), at least 14rem wide
 @use "../abstracts" as *;
 
 @layer components {
+  .admin-tiles {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  }
+
   .admin-form {
     max-width: 42rem;
   }

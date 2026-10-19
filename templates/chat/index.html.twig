@@ -9,7 +9,7 @@
 {% block content_layout %}
     <main id="main" class="chat-main" tabindex="-1">
         <div class="chat-mount" data-vue-component="ChatRoom" data-props="{{ props|json_encode|e('html_attr') }}">
-            <div class="chat-room card chat-loading">
+            <div class="chat-room card card-flush chat-loading">
                 <noscript><p class="chat-edge">Le chat nécessite JavaScript.</p></noscript>
                 <p class="chat-edge" role="status">Chargement du chat…</p>
             </div>

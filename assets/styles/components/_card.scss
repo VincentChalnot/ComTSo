@@ -10,6 +10,8 @@
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sheet);
     color: var(--c-fg);
+    // the sheet carries its own padding: never add `p-*` or an inline style on a card
+    padding: 1.25rem;
 
     // cards that hold a list (messages, rows) clip their children to the paper edge
     &.overflow-hidden > .post:first-child,
@@ -17,6 +19,19 @@
       border-top-left-radius: inherit;
       border-top-right-radius: inherit;
     }
+
+    // a card that is itself a link (admin home, people grid) reads as a tile, not as underlined text
+    &:is(a) {
+      text-decoration: none;
+    }
+  }
+
+  // Padding modifiers: `.card-roomy` for forms and settings, `.card-flush` for edge-to-edge content (message lists, photos, chat)
+  .card-roomy {
+    padding: clamp(1.25rem, 4vw, 2rem);
+  }
+  .card-flush {
+    padding: 0;
   }
 
   // Quiet variants

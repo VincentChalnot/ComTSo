@@ -1,5 +1,5 @@
 <template>
-  <section class="chat-room card" aria-label="Chat">
+  <section class="chat-room card card-flush" aria-label="Chat">
     <header class="chat-head">
       <h1 class="chat-title">Chat</h1>
       <span v-if="disconnected" class="chat-offline" role="status">Reconnexion…</span>

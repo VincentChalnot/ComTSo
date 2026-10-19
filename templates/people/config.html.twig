@@ -11,7 +11,7 @@
 </header>
 
 <div class="settings">
-    <div class="card settings-card">
+    <div class="card card-roomy">
         {{ form_start(form) }}
             {{ form_row(form.message_order) }}
             <p class="settings-hint">Le thème clair / sombre se change avec le bouton ☀︎ / ☾ de la barre de navigation.</p>
@@ -22,7 +22,7 @@
     </div>
 
     {% if avatarForm %}
-        <div class="card settings-card mt-6" id="avatar">
+        <div class="card card-roomy mt-6" id="avatar">
             <h2 class="section-title">Avatar</h2>
             <div class="flex items-center gap-4 mb-5">
                 {{ av.avatar(person, 'xl') }}
@@ -39,7 +39,7 @@
     {% endif %}
 
     {% if passwordForm %}
-        <div class="card settings-card mt-6" id="mot-de-passe">
+        <div class="card card-roomy mt-6" id="mot-de-passe">
             <h2 class="section-title">Mot de passe</h2>
             <p class="settings-hint">Après le changement, les autres appareils devront se reconnecter.</p>
             {{ form_start(passwordForm) }}

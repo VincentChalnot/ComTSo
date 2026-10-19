@@ -296,7 +296,7 @@ and forced classes (`is-hover`, `is-pressed`, `is-focus`, `is-disabled`) through
 | `layout/_page` | `.page` `.page-narrow` `.page-header` (`.is-double`, `.is-centered`) `.page-title` `.page-actions` `.layout` `.layout-main` `.layout-aside` `.reading` `.section` `.section-title` `.section-more` `.stack` |
 | `layout/_masthead` | `.masthead` `.masthead-bar` `.masthead-title` `.masthead-search` `.masthead-tools` `.masthead-user` `.masthead-nav` (sticky paper strip) `.masthead-menu` `.masthead-toggle` `.masthead-link` (`.is-active`/`aria-current`) |
 | `_button` | `.btn` `.btn-primary` `.btn-secondary` `.btn-highlight` `.btn-danger` `.btn-ghost` `.btn-sm` `.btn-lg` `.btn-block` `.btn-icon` `.btn-group` |
-| `_card` | `.card` `.card-flat` `.card-sunken` `.card-stack` `.card-hover` `.card-accent` `.card-title` |
+| `_card` | `.card` (carries its own padding, 1.25rem) `.card-roomy` (forms/settings) `.card-flush` (edge-to-edge: messages, photos, chat) `.card-flat` `.card-sunken` `.card-stack` `.card-hover` `.card-accent` `.card-title` |
 | `_form` | `.input` (+`-sm`/`-lg`, `.is-invalid`, readonly) `.label` `.field` `.field-help` `.field-error` `.form-grid` `.form-actions` checkbox/radio (global) `.check` `.switch` `.input-group` `.input-addon` `.input-wrap` `.input-icon` |
 | `_alert` | `.alert` `-danger` `-ok`/`-success` `-info` `-warning` `-neutral` `-sm` `.alert-icon` `.alert-body` `.alert-title` |
 | `_badge` | `.badge` `-muted` `-accent` `-secondary` `-highlight` `-danger` `-ok` `-solid` `-lg` `-dot` `-count` |
@@ -306,7 +306,7 @@ and forced classes (`is-hover`, `is-pressed`, `is-focus`, `is-disabled`) through
 | `_pager` | `.pager` (`a`, `span`, `.is-current`, `.is-disabled`) |
 | `_table` | `.table` `-striped` `-hover` `-sm` `-sticky` `.table-responsive` `.dl` `.dl-stacked` |
 | `_filter-bar` | admin lists: `.filter-bar` (`-fields`, `-actions`) `.filter-range` (`-inputs`) `.list-meta` `.table-sort` (a column head that sorts, current direction = `th[aria-sort]`) `.table-actions` `.table-empty`; the table is `.table`, the pagination `.pager` |
-| `_admin` | `/admin` pages around the list: `.admin-form` (form column) `.admin-subject` (name under the title) `.admin-details` (what a removal takes along) |
+| `_admin` | `/admin` pages around the list: `.admin-tiles` (overview tiles, ≥14rem) `.admin-form` (form column) `.admin-subject` (name under the title) `.admin-details` (what a removal takes along) |
 | `_skeleton` | `.skeleton*` `.empty*` `.spinner` `.progress` |
 | `_post` | `.post` `.post-body` (all sanitized elements) `.post-meta` `.post-toggle` `.post-author`, states `.is-target` `.is-active` `.is-collapsed` |
 | `_post-photos` | `.post-photos` (mosaic by count: 1, 2, 3, 4, 5+ with "+N") `.post-photo` `.post-photo-more` |
