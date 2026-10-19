@@ -1582,6 +1582,89 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     enable_static_query_cache?: bool|Param, // Default: true
  *     connection_keys?: list<mixed>,
  * }
+ * @psalm-type SidusFilterConfig = array{
+ *     configurations?: list<array{ // Default: []
+ *         provider?: scalar|Param|null,
+ *         results_per_page?: int|Param, // Default: 15
+ *         sortable?: list<scalar|Param|null>,
+ *         default_sort?: list<scalar|Param|null>,
+ *         options?: mixed, // Default: []
+ *         filters?: list<array{ // Default: []
+ *             type?: scalar|Param|null, // Default: "text"
+ *             label?: scalar|Param|null, // Default: null
+ *             form_type?: scalar|Param|null, // Default: null
+ *             attributes?: list<scalar|Param|null>,
+ *             default?: mixed, // Default: null
+ *             options?: mixed, // Default: []
+ *             form_options?: mixed, // Default: []
+ *         }>,
+ *     }>,
+ * }
+ * @psalm-type SidusDataGridConfig = array{
+ *     default_form_theme?: scalar|Param|null, // Default: null
+ *     default_datagrid_template?: scalar|Param|null, // Default: "@SidusDataGrid/DataGrid/bootstrap4.html.twig"
+ *     default_column_value_renderer?: mixed, // Default: {}
+ *     default_column_label_renderer?: mixed, // Default: {}
+ *     actions?: mixed, // Default: []
+ *     configurations?: array<string, array{ // Default: []
+ *         query_handler?: mixed,
+ *         form_theme?: scalar|Param|null,
+ *         form_options?: mixed,
+ *         template?: scalar|Param|null,
+ *         template_vars?: mixed,
+ *         parent?: scalar|Param|null,
+ *         column_value_renderer?: mixed,
+ *         column_label_renderer?: mixed,
+ *         actions?: mixed,
+ *         submit_button?: mixed,
+ *         reset_button?: mixed,
+ *         attributes?: list<scalar|Param|null>,
+ *         columns?: list<array{ // Default: []
+ *             template?: scalar|Param|null,
+ *             template_vars?: mixed,
+ *             sort_column?: scalar|Param|null,
+ *             property_path?: scalar|Param|null,
+ *             label?: scalar|Param|null,
+ *             label_renderer?: mixed,
+ *             value_renderer?: mixed,
+ *             formatting_options?: mixed,
+ *             attributes?: list<scalar|Param|null>,
+ *         }>,
+ *     }>,
+ * }
+ * @psalm-type SidusAdminConfig = array{
+ *     base_template?: scalar|Param|null, // Default: "@SidusAdmin/base.html.twig"
+ *     admin_class?: scalar|Param|null, // Default: "Sidus\\AdminBundle\\Model\\Admin"
+ *     action_class?: scalar|Param|null, // Default: "Sidus\\AdminBundle\\Model\\Action"
+ *     configurations?: array<string, array{ // Default: []
+ *         controller?: scalar|Param|null, // Default: null
+ *         controller_pattern?: list<scalar|Param|null>,
+ *         base_template?: scalar|Param|null, // Default: null
+ *         template_pattern?: list<scalar|Param|null>,
+ *         prefix: scalar|Param|null,
+ *         entity: scalar|Param|null,
+ *         action_class?: scalar|Param|null,
+ *         form_type?: scalar|Param|null, // Default: null
+ *         options?: mixed, // Default: []
+ *         permissions?: mixed, // Default: []
+ *         actions?: array<string, array{ // Default: []
+ *             form_type?: scalar|Param|null, // Default: null
+ *             form_options?: mixed, // Default: []
+ *             base_template?: scalar|Param|null, // Default: null
+ *             template?: scalar|Param|null, // Default: null
+ *             template_parameters?: mixed, // Default: []
+ *             permissions?: mixed, // Default: []
+ *             path: scalar|Param|null,
+ *             defaults?: mixed, // Default: []
+ *             requirements?: mixed, // Default: []
+ *             options?: mixed, // Default: []
+ *             host?: scalar|Param|null, // Default: ""
+ *             schemes?: mixed, // Default: []
+ *             methods?: mixed, // Default: []
+ *             condition?: scalar|Param|null, // Default: null
+ *         }>,
+ *     }>,
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1595,6 +1678,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     twig?: TwigConfig,
  *     twig_extra?: TwigExtraConfig,
  *     stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
+ *     sidus_filter?: SidusFilterConfig,
+ *     sidus_data_grid?: SidusDataGridConfig,
+ *     sidus_admin?: SidusAdminConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1611,6 +1697,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         web_profiler?: WebProfilerConfig,
  *         twig_extra?: TwigExtraConfig,
  *         stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
+ *         sidus_filter?: SidusFilterConfig,
+ *         sidus_data_grid?: SidusDataGridConfig,
+ *         sidus_admin?: SidusAdminConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1625,6 +1714,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         twig?: TwigConfig,
  *         twig_extra?: TwigExtraConfig,
  *         stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
+ *         sidus_filter?: SidusFilterConfig,
+ *         sidus_data_grid?: SidusDataGridConfig,
+ *         sidus_admin?: SidusAdminConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -1641,6 +1733,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         twig_extra?: TwigExtraConfig,
  *         stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
  *         dama_doctrine_test?: DamaDoctrineTestConfig,
+ *         sidus_filter?: SidusFilterConfig,
+ *         sidus_data_grid?: SidusDataGridConfig,
+ *         sidus_admin?: SidusAdminConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

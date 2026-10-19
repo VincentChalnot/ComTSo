@@ -1,0 +1,42 @@
+diff --git a/Security/Voter/EntityVoter.php b/Security/Voter/EntityVoter.php
+index 9216bd3..5debd57 100644
+--- a/Security/Voter/EntityVoter.php
++++ b/Security/Voter/EntityVoter.php
+@@ -17,6 +17,7 @@ use Sidus\AdminBundle\Model\PermissionCheck;
+ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+ use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
++use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+ 
+ class EntityVoter implements CacheableVoterInterface
+@@ -36,7 +37,7 @@ class EntityVoter implements CacheableVoterInterface
+         return $subjectType === PermissionCheck::class;
+     }
+ 
+-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
++    public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
+     {
+         if (!$subject instanceof PermissionCheck) {
+             return self::ACCESS_ABSTAIN;
+diff --git a/Security/Voter/LegacyVoter.php b/Security/Voter/LegacyVoter.php
+index 67978ba..94f6269 100644
+--- a/Security/Voter/LegacyVoter.php
++++ b/Security/Voter/LegacyVoter.php
+@@ -17,6 +17,7 @@ use Sidus\AdminBundle\Model\PermissionCheck;
+ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+ use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
++use Symfony\Component\Security\Core\Authorization\Voter\Vote;
+ 
+ class LegacyVoter implements CacheableVoterInterface
+ {
+@@ -43,7 +44,7 @@ class LegacyVoter implements CacheableVoterInterface
+         }
+     }
+ 
+-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
++    public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
+     {
+         // Trigger deprecation error:
+         trigger_deprecation(

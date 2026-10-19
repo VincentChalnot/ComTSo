@@ -52,6 +52,15 @@
             "bin/phpunit"
         ]
     },
+    "sidus/admin-bundle": {
+        "version": "v5.0.6"
+    },
+    "sidus/datagrid-bundle": {
+        "version": "v4.0.2"
+    },
+    "sidus/filter-bundle": {
+        "version": "v6.0.3"
+    },
     "stof/doctrine-extensions-bundle": {
         "version": "1.15",
         "recipe": {

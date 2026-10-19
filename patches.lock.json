@@ -1,0 +1,29 @@
+{
+    "_hash": "adf68fd5a322a2c2d2f7418b965fcf7eb53faf2aff75d7e73d14cf8b569d1863",
+    "patches": {
+        "sidus/admin-bundle": [
+            {
+                "package": "sidus/admin-bundle",
+                "description": "Symfony 8 compatibility (VoterInterface::vote() Vote argument). Remove this patch once sidus/admin-bundle >=5.0.7 is tagged.",
+                "url": "patches/sidus/sidus-admin-bundle-symfony-8.patch",
+                "sha256": "68446a74466950cfc620b613668ada652421a8cf52cd2bcc2cbb7966435986d4",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "sidus/filter-bundle": [
+            {
+                "package": "sidus/filter-bundle",
+                "description": "Symfony 8 compatibility (AutowireLocator/AutowireIterator, Request::query->get for the page). Remove this patch once sidus/filter-bundle >=6.0.4 is tagged.",
+                "url": "patches/sidus/sidus-filter-bundle-symfony-8.patch",
+                "sha256": "810354dd98933e2ba0fb1df3e503553907f9ab292ebd973bb58d1cc012f09bb6",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ]
+    }
+}
