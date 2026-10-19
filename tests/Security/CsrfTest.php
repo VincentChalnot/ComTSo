@@ -25,7 +25,10 @@ class CsrfTest extends AppWebTestCase
      * confirmation forms of the destructive actions, which all carry a form token. Routes of the bundle are `ANY` unless the
      * configuration says otherwise, so {@see testEveryAdminRouteStatesItsMethods()} insists on explicit methods.
      */
-    private const ADMIN_FORM_ROUTES = ['sidus_admin.user.delete', 'sidus_admin.user.edit'];
+    private const ADMIN_FORM_ROUTES = [
+        'sidus_admin.forum.create', 'sidus_admin.forum.delete', 'sidus_admin.forum.edit',
+        'sidus_admin.user.delete', 'sidus_admin.user.edit',
+    ];
 
     public function testEveryRouteThatChangesDataIsKnownToBeProtected(): void
     {
@@ -120,8 +123,12 @@ class CsrfTest extends AppWebTestCase
     private function tokenlessAdminRequests(): array
     {
         $alice = $this->createUser('alice');
+        $this->createForum('vide', 'Vide');
 
         return [
+            'sidus_admin.forum.create' => ['/admin/forums/new', ['form_forum_create' => ['title' => 'Forgé']]],
+            'sidus_admin.forum.edit' => ['/admin/forums/vide/edit', ['form_forum_edit' => ['title' => 'Forgé']]],
+            'sidus_admin.forum.delete' => ['/admin/forums/vide/delete', []],
             'sidus_admin.user.edit' => ['/admin/users/'.$alice->getId().'/edit', ['form_user_edit' => ['role' => 'admin']]],
             'sidus_admin.user.delete' => ['/admin/users/'.$alice->getId().'/delete', []],
         ];
@@ -146,6 +153,8 @@ class CsrfTest extends AppWebTestCase
         $this->em()->clear();
         $alice = $this->em()->getRepository(\App\Entity\User::class)->findOneBy(['username' => 'alice']);
         self::assertNotNull($alice, 'the member survived');
+        self::assertSame('Vide', $this->em()->find(\App\Entity\Forum::class, 'vide')?->getTitle(), 'the forum survived and kept its title');
+        self::assertNull($this->em()->find(\App\Entity\Forum::class, 'forge'), 'no forum was created');
         self::assertNotContains('ROLE_ADMIN', $alice->getRoles(), 'the role did not change');
     }
 

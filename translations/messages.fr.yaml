@@ -58,8 +58,32 @@ admin:
             comments: '{1} 1 message dans les sujets d’autres membres|]1,Inf[ %count% messages dans les sujets d’autres membres'
             privateMessages: '{1} 1 message privé, envoyé ou reçu|]1,Inf[ %count% messages privés, envoyés ou reçus'
             chatMessages: '{1} 1 message du chat|]1,Inf[ %count% messages du chat'
+    forum:
+        title: Forums
+        description: Créer, renommer, ordonner un forum. Seul un forum vide (sans aucun sujet) peut être supprimé.
+        new: Nouveau forum
+        edit: Modifier le forum
+        delete: Supprimer le forum
+        delete_confirm: 'Supprimer le forum « %entity% » ?'
+        not_empty: '{1} Le forum « %forum% » contient encore 1 sujet : supprimez-le d’abord (page du sujet), un forum n’est supprimé que vide.|]1,Inf[ Le forum « %forum% » contient encore %count% sujets : supprimez-les d’abord (page de chaque sujet), un forum n’est supprimé que vide.'
+        topics_count: '{0} aucun sujet|{1} 1 sujet|]1,Inf[ %count% sujets'
+        field:
+            title: Titre
+            order: Position
+            order_help: Les forums sont classés par position croissante, puis par titre.
+            content: Description
+            content_help: Affichée sous le titre du forum. Le titre fixe l’adresse du forum à la création ; elle ne change plus ensuite.
+        filter:
+            title: Titre
 
 datagrid:
+    forum:
+        order: Position
+        title: Titre
+        id: Adresse
+        topics: Sujets
+        createdAt: Création
+        actions: Actions
     user:
         username: Pseudo
         enabled: Compte
@@ -78,6 +102,13 @@ sidus:
                 success: Les modifications sont enregistrées.
             delete:
                 success: L’élément a été supprimé.
+        forum:
+            create:
+                success: Le forum a été créé.
+            edit:
+                success: Le forum a été mis à jour.
+            delete:
+                success: Le forum vide a été supprimé.
         user:
             delete:
                 success: Le membre a été supprimé, avec ce qu’il avait écrit.

@@ -17,6 +17,10 @@ class AdminPagesTest extends AdminWebTestCase
         yield 'users list' => ['/admin/users/'];
         yield 'user edit' => ['/admin/users/{user}/edit'];
         yield 'user delete confirmation' => ['/admin/users/{user}/delete'];
+        yield 'forums list' => ['/admin/forums/'];
+        yield 'forum create' => ['/admin/forums/new'];
+        yield 'forum edit' => ['/admin/forums/{forum}/edit'];
+        yield 'forum delete confirmation' => ['/admin/forums/{forum}/delete'];
     }
 
     #[DataProvider('pages')]
@@ -52,7 +56,8 @@ class AdminPagesTest extends AdminWebTestCase
     private function path(string $path): string
     {
         $target = $this->createUser('target');
+        $forum = $this->createForum('vide', 'Vide');
 
-        return strtr($path, ['{user}' => (string) $target->getId()]);
+        return strtr($path, ['{user}' => (string) $target->getId(), '{forum}' => (string) $forum->getId()]);
     }
 }

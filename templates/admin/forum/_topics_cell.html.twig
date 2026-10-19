@@ -1,0 +1,2 @@
+{# Topic count of the forum row, from `usage` (ForumListAction: one grouped query for the page). #}
+{{ 'admin.forum.topics_count'|trans({'%count%': usage[result.id]|default(0)}) }}
