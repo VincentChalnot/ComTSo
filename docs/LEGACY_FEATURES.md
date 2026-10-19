@@ -1,4 +1,4 @@
-# Features of the Symfony 2 production forum (comtso.fr)
+# Features of the old forum (comtso.fr before 2026-10-19)
 
 Observed on 2026-10-17 by browsing the live site (read-only, nothing posted or deleted). The screenshots taken at the time were removed from the repository (they showed private member information) and are kept privately by the owner.
 The "New app" column says how each feature is handled in this rewrite (`✔` done, `≈` done differently, `—` deliberately dropped, `…` still to do).
@@ -19,7 +19,7 @@ The "New app" column says how each feature is handled in this rewrite (`✔` don
 | 12 | **Rich text editor** | WYSIWYG toolbar: bold, italic, underline, strike, sub/superscript, clear formatting, lists, indent/outdent, quote, alignment, link/unlink, image, **YouTube**. Content stored as HTML. | ✔ Tiptap editor (+ smilies picker), stored as sanitized HTML, YouTube restricted to the nocookie embed |
 | 13 | **Topic editing** | Title, forum (move), author, content. | ✔ title + description (+ move for admins); author change dropped |
 | 14 | **Search** (`/recherche?q=`) | "Accès rapide aux résultats": *Commentaires, Photos, Chats, Membres, Topics, Citations*; results with highlighted term, "Voir le post". | ✔ same six sections; … pagination and results by type in tabs |
-| 15 | **Les gens** (`/gens`) | Grid of round avatars of the active members. | ✔ active members; … show ALL users, disabled ones included |
+| 15 | **Les gens** (`/gens`) | Grid of round avatars of the active members. | ✔ enabled members; disabled accounts deliberately not shown (the relevant former members were re-enabled) |
 | 16 | **Profile** (`/gens/{user}`) | Name + (pseudo), avatar, quote/signature, email, website, activities, birthday (age), registered on, phone, address, "Modifier". | ✔ |
 | 17 | **Private messages** | On somebody's profile: "Messages privés" = conversation thread with that person + quick reply box. On your own profile: **"Mes mémos"** (notes to self). | ✔ |
 | 18 | **Config** (`/gens/{me}/config`) | *Bootstrap theme* (17 bootswatch themes) and **"Ordre des messages"** (plus récent en dernier / en premier). | ✔ message order kept; bootswatch themes dropped for light/dark (users of a dark bootswatch theme default to dark); … change avatar on this page |

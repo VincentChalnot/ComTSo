@@ -123,36 +123,6 @@ Daily cron (adjust the path; cron mails you the output when it fails):
 Both scripts need the stack running (`docker compose up -d`). Copy the backups off the server: the DB dump holds password hashes and private
 messages, treat it as a secret.
 
-## Legacy import (history before 2012)
-
-The history of the old platforms was imported once on the development machine (`app:legacy:import` for the Symfony 2 dump, then the
-single-use `app:legacy:reimport` for the older phpBB/PHP forums, see `docs/legacy-import.md`). **The recommended way to populate production is to
-ship that result**: take a DB dump and a `originals/` archive on the dev stack (same commands as in "Backup and restore", with the dev compose file), then restore them on the server as above.
-
-The full chain was rehearsed on the dev stack on 2026-10-19 (timings, counts and the list of recovered phpBB 3 attachments in `docs/legacy-import.md`): the result is a pair `db-<stamp>.sql.gz` +
-`photos-<stamp>.tar.gz` in exactly the format of `backup.sh` (`photos-*.tar.gz` holds a top-level `originals/`), so `./restore.sh` takes it as is; the same order applies to a new run — dump → `comtso_legacy`
-→ `app:legacy:import --force` (repairs the double-encoded text, converts the photos) → `app:legacy:reimport` (phpBB 2/3, old PHP forum, attachments) → `app:photos:reprocess` → `app:content:sanitize`.
-Imported accounts stay disabled (their real e-mail address is kept when the old platform knew it): members who want back in use "forgotten password".
-
-`app:legacy:reimport` needs two throwaway databases (`legacy-mysql`, `legacy-postgres`) that only exist in the dev `compose.yaml`; do not run it in production.
-
-To run the Symfony 2 importer directly in production instead (empty database only, `--force` wipes the content tables):
-
-```bash
-# 1. a side database on the same server, readable by the application user
-docker compose exec -T database sh -c 'mariadb -uroot -p"$(cat /run/secrets/database_root_password)" -e "CREATE DATABASE comtso_legacy CHARACTER SET utf8mb4; GRANT SELECT ON comtso_legacy.* TO \"comtso\"@\"%\";"'
-# 2. load the dump (it stays on the host, e.g. ./legacy/2610110300.sql.gz)
-zcat legacy/2610110300.sql.gz | docker compose exec -T database sh -c 'mariadb -uroot -p"$(cat /run/secrets/database_root_password)" comtso_legacy'
-# 3. legacy photo files into a scratch directory of the photos volume (the importer moves/copies them to originals/)
-docker compose exec -T app mkdir -p /app/var/photos/legacy-files
-docker compose cp legacy/photos/. app:/app/var/photos/legacy-files/
-docker compose exec -u root app chown -R www-data:root /app/var/photos
-# 4. import (add --force if the target already holds users), then drop the side database and the scratch files
-docker compose exec app php bin/console app:legacy:import --source=comtso_legacy --photos-source=/app/var/photos/legacy-files --copy-photos
-docker compose exec -T database sh -c 'mariadb -uroot -p"$(cat /run/secrets/database_root_password)" -e "DROP DATABASE comtso_legacy"'
-docker compose exec -T app rm -rf /app/var/photos/legacy-files
-```
-
 ## Operations
 
 ```bash
@@ -160,7 +130,7 @@ docker compose logs -f app                                  # Caddy access log +
 docker compose exec app php bin/console app:photos:warm     # pre-generate thumbnails (lazy otherwise)
 docker compose exec app php bin/console app:content:sanitize --dry-run   # after changing the HTML allow-list
 docker compose exec app php bin/console app:user:reset-password <pseudo>   # lost password and no usable e-mail: prints a one-time password to hand over
-docker compose exec -T -e XDEBUG_MODE=off app php bin/console app:cutover:prepare --no-debug --dry-run   # once, right after the final import; then without --dry-run (--delete-user=<pseudo> for test accounts)
+docker compose exec -T -e XDEBUG_MODE=off app php bin/console app:cutover:prepare --no-debug --dry-run   # once, right before opening the doors; then without --dry-run (--delete-user=<pseudo> for test accounts)
 docker compose down                                          # stop (volumes are kept); NEVER add -v unless you want to destroy the data
 ```
 

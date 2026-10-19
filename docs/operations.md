@@ -9,7 +9,7 @@ logs). This file only holds what is specific to the production server and not co
 | --- | --- |
 | Host | `sidus.fr`: Ubuntu 24.04, x86_64 (same architecture as the CI image), 2 vCPU, 1.8 GiB RAM with swap. The only account is `root`. Several unrelated Compose projects run on it behind one shared Traefik. Keep an eye on `free -h` and `docker stats --no-stream`: RAM is tight, so photo reprocessing never runs here (dev machine only). |
 | New forum | `/root/www/comtso-forum` (`ST` below): `compose.yaml`, `compose.traefik.yaml`, `compose.www-redirect.yaml`, `.env` (mode 600, never copied from dev), `backup.sh`, `restore.sh`, `README.md`. Compose project `comtso-forum`. After any change in `deploy/`, copy the files again: `rsync -av compose.yaml compose.traefik.yaml compose.www-redirect.yaml .env.example backup.sh restore.sh README.md sidus.fr:/root/www/comtso-forum/`. |
-| Old forum | `/root/www/comtso`, Compose project `comtso` (Symfony 2, PHP 5.6, `nginx` + `php-fpm` + MariaDB 10.3). Do not reuse this directory or project name for anything new. Its weekly dumps and original photos are under `shared/app/data/` there. |
+| Old forum | `/root/www/comtso`, Compose project `comtso` (the old Symfony forum, PHP 5.6, `nginx` + `php-fpm` + MariaDB 10.3). Do not reuse this directory or project name for anything new. Its weekly dumps and original photos are under `shared/app/data/` there. |
 | Traefik | `/root/www/traefik`, owns host ports 80 and 443, Docker provider on the external network `proxy`, resolver `gandi` (HTTP-01). A global middleware `security-headers@file` adds HSTS and `X-Frame-Options: SAMEORIGIN` to every router and no longer sets a CSP (D6). |
 | DNS | NS at Gandi. `comtso.fr`, `www.comtso.fr` and the wildcard `*.comtso.fr` resolve to the server (the wildcard does not cover `www.next.comtso.fr`, hence the `www` redirect is for the apex only). Mail records for Scaleway TEM: MX `blackhole.tem.scaleway.com`, SPF `include:_spf.tem.scaleway.com`, DMARC `p=none`; the DKIM record comes from the TEM console. |
 | fail2ban | Jails `sshd` and `traefik-404` (20 x 404 in 60 s = 1 h ban). Check: `fail2ban-client status traefik-404`; unban: `fail2ban-client set traefik-404 unbanip <ip>`. |
@@ -36,7 +36,7 @@ Traefik global file: it is a single-file bind mount, so restore it IN PLACE with
 
 ## Retiring the old stack
 
-After a stable period, with a fresh dump kept off the server: `cd /root/www/comtso && docker compose stop` (never `down -v`), and much later remove the folder. Never run its `make deploy` again. Then remove the one-shot import tooling (`docs/legacy-import.md` "Removing the temporary tooling") and delete the `db-*.sql.gz` / `photos-*.tar.gz` uploads left in `ST` (they hold password hashes and private messages).
+After a stable period, with a fresh dump kept off the server: `cd /root/www/comtso && docker compose stop` (never `down -v`), and much later remove the folder. Never run its `make deploy` again. Then delete the `db-*.sql.gz` / `photos-*.tar.gz` uploads left in `ST` (they hold password hashes and private messages).
 
 ## Backups and restore checks
 

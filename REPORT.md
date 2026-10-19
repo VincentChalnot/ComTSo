@@ -15,7 +15,7 @@
 |---|---|
 | Traefik + SSL | Labels on the `php` service, external network `proxy`, `*.local.sidus.fr`. **Port: I used 80, not the `8843` you wrote** — nothing listens on 8843 (Caddy serves plain HTTP on 80). Change `loadbalancer.server.port` in `compose.yaml` if you really run another port. |
 | AGENTS.md | Rules (private forum, flag, sanitized HTML, **every bug needs a regression test**), Traefik/DB/test setup, architecture, operations cheat-sheet, gotchas. |
-| Re-import of older dumps | `docker compose --profile legacy` (MySQL + Postgres loaded from `var/legacy/`) and the single-use `app:legacy:reimport` (idempotent, `--dry-run`, `--source`). Details and per-table numbers in `docs/legacy-import.md`. |
+| Re-import of older dumps | Done with one-shot tooling that was removed on 2026-10-19 (`docs/decisions.md`). |
 | Private forum / flag | `access_control` ends with `^/ ROLE_USER`; unknown URLs also redirect; photos and thumbnails moved out of `public/` and served by authenticated controllers. |
 | Tests with DB | PHPUnit 12 + DAMA; base class `tests/Support/AppWebTestCase.php`; suites Security, Forum, Photos, Chat, Content, Legacy, Smoke. |
 | Latest Symfony 8 | 8.1.9 (bundles, PHPUnit 12, Mercure bundle 0.6 adjusted). |
@@ -32,7 +32,7 @@ Extras I added because they were needed: unread private-message badges ("Les gen
 ## 3. Imported data (live database)
 
 Before → after: comments 22 068 → **25 971**, topics 367 → 501, private messages 392 → 569, forums 6 → 13, users 12 → 18, photos 2 394 → 2 396; history now starts on **2004-04-30**.
-Per-source numbers (phpBB 2: 134 topics / 3 891 posts new; phpBB 3: 12 missing posts; old PHP forum: 17 messages and 2 photos) and every rule used (user matching, dedupe by timestamp + normalised text, forum mapping) are in `docs/legacy-import.md`; a second run imports 0 rows.
+Per-source numbers (phpBB 2: 134 topics / 3 891 posts new; phpBB 3: 12 missing posts; old PHP forum: 17 messages and 2 photos) and every rule used (user matching, dedupe by timestamp + normalised text, forum mapping) were documented in `docs/legacy-import.md`, removed on 2026-10-19 with the import tooling (see `docs/decisions.md`).
 
 Decisions that deserve your eye:
 

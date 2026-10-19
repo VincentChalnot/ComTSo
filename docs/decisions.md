@@ -1,7 +1,7 @@
 # Decisions and history
 
 What was decided, what was found, and what happened, for whoever works on ComTSo next. Short on purpose: procedures are in
-`deploy/README.md` and `docs/operations.md`, the data import in `docs/legacy-import.md`, the backlog in `TODO.md`.
+`deploy/README.md` and `docs/operations.md`, the backlog in `TODO.md`.
 
 ## Timeline
 
@@ -10,12 +10,14 @@ What was decided, what was found, and what happened, for whoever works on ComTSo
 | 2026-10-17 | Rewrite on Symfony 8.1 delivered; features of the old forum inventoried in `docs/LEGACY_FEATURES.md`. |
 | 2026-10-18 | Read-only recon of the production server, go-live checklist written. |
 | 2026-10-19 | Decisions D1-D14 answered; rehearsal on `next.comtso.fr`; **cutover: `comtso.fr` now serves the new app**; git history purged and rewritten (see below). |
+| 2026-10-19 | Owner decisions: all the data is in the new database and the old data is forgotten, so the legacy import tooling and `docs/legacy-import.md` were removed; D1 (profile visibility option) dropped; the 10 shortened attachments accepted as they are; "Symfony 2" wording removed from the docs. |
 
 ## Go-live decisions (D1-D14, answered by the owner on 2026-10-19)
 
 | Id | Decision |
 | --- | --- |
-| D1 | Profile visibility: recorded as decided with no change requested at go-live. `TODO.md` still lists a "profile visibility option": what it is must be clarified with the owner first. |
+| D1 | Profile visibility option: **dropped** (owner, 2026-10-19). Enabled profiles stay visible to every member; the former accounts that were relevant were re-enabled by the owner. |
+| D1b | "Les Gens" showing disabled accounts too: not needed (the relevant former members were re-enabled), dropped from the backlog. |
 | D2 | Password minimum length is 10 everywhere (registration, change, reset). |
 | D3 | Login throttling: owner decided, no change recorded (current limits: `AGENTS.md` "Authentication hardening"). |
 | D4 | Rehearsal host `next.comtso.fr` (wildcard DNS, nothing to create). `www.comtso.fr` redirects permanently to the apex: `deploy/compose.www-redirect.yaml`, apex `SERVER_NAME` only. |
@@ -26,14 +28,14 @@ What was decided, what was found, and what happened, for whoever works on ComTSo
 | D9 | fail2ban unchanged (jail `traefik-404`: 20 responses 404 in 60 s from one IP = 1 h ban, no `ignoreip`). Side effect to remember: missing thumbnails or a stopped web container can get a member banned. |
 | D10 | `MAILER_FROM="ComTSo <no-reply@comtso.fr>"`; outgoing mail through Scaleway Transactional Email; the owner types the DSN himself in the server `.env`. |
 | D11 | Backups: the weekly dumps of the OLD forum are written by a script on the NAS (cron on the NAS side, not on the server). That script was extended to back up the new stack too (see "Backups" below). |
-| D12 | The legacy import and photo processing run on the dev machine; the server only receives a DB dump and a photo archive and runs `restore.sh`. |
-| D13 | Open questions of the legacy import answered: see `docs/legacy-import.md` "Owner's decisions". |
+| D12 | The photo processing and the data load ran on the dev machine; the server only received a DB dump and a photo archive and ran `restore.sh`. |
+| D13 | Open questions of the data import answered by the owner; the import itself is closed (see "Data import findings"). |
 | D14 | The old forum kept serving during the whole rehearsal; the short freeze was needed at the final cutover only. |
 
 ## Cutover facts that still matter
 
 - **Server** (`sidus.fr`, Ubuntu 24.04, 2 vCPU, 1.8 GiB RAM: tight, so heavy jobs such as `app:photos:reprocess` and big warm-ups run on the dev machine). It runs several unrelated Compose projects behind one shared Traefik.
-- **Two stacks, two project names.** New forum: directory `/root/www/comtso-forum`, Compose project **`comtso-forum`** (volumes `comtso-forum_*`), Traefik router `comtso-forum`. Old Symfony 2 forum: `/root/www/comtso`, project **`comtso`** (router `comtso`). The names are deliberately different: reusing `comtso` would make Compose treat the old containers as orphans. Never run the old `make deploy` again (it rebuilds the stack under the project `comtso`).
+- **Two stacks, two project names.** New forum: directory `/root/www/comtso-forum`, Compose project **`comtso-forum`** (volumes `comtso-forum_*`), Traefik router `comtso-forum`. Old Symfony forum: `/root/www/comtso`, project **`comtso`** (router `comtso`). The names are deliberately different: reusing `comtso` would make Compose treat the old containers as orphans. Never run the old `make deploy` again (it rebuilds the stack under the project `comtso`).
 - **Traefik** owns host ports 80/443; certificate resolver `gandi` (it uses the HTTP-01 challenge); the new forum is exposed only through `deploy/compose.traefik.yaml`. Traefik's entrypoint middleware still adds HSTS and `X-Frame-Options: SAMEORIGIN` to every router (D6).
 - **Cutover**: rehearsal data kept (no reload), image pinned to a `sha-*` tag, `backup.sh` run just before, `app:cutover:prepare` run once (18 `previous_login`, 17 `chat_last_read_id`, one `ROLE_ADMIN`: the owner), old `nginx` stopped, `SERVER_NAME=comtso.fr`. Never run `app:cutover:prepare` a second time: it resets everybody's "what's new" pointers.
 - **Dataset at go-live**: 18 users (8 enabled), 13 forums, 501 topics, 25 981 comments, 569 private messages, 2 425 photos.
@@ -43,10 +45,10 @@ What was decided, what was found, and what happened, for whoever works on ComTSo
 
 ## Data import findings that still matter
 
-- **Accepted losses**: 6 phpBB 3 attachments that cannot be decoded (#2, 4, 5, 11, 13, 36; the files were damaged by a text-mode FTP copy long ago, no intact copy exists) and comment 842 (a Chinese quote, two characters lost bytes in the dump, the rest reads correctly). 3 old-forum photos (#302, #400, #401) have no file anywhere.
-- **To eyeball**: the 10 attachments imported a few bytes shorter than recorded (#9, 10, 12, 14, 20, 27, 28, 29, 32, 37): they decode, but must be checked by eye (`TODO.md` wave 1).
-- Only accounts that exist in the old platforms but not in the live forum were created, **disabled**, with an unusable password and a `*.invalid` placeholder address when no real one was known. Members of the old Symfony 2 forum keep their password (two historical hash formats, both accepted and upgraded at first login: `AGENTS.md` "Gotchas"). Before go-live only the owner's account had been verified end to end with an old-style hash.
-- Everything else (formats, mapping rules, matching, mojibake repair, rollback SQL): `docs/legacy-import.md`.
+- **Accepted as is (owner, 2026-10-19): all the data is in the new database, the old data is forgotten.** The one-shot import tooling (`app:legacy:import`, `app:legacy:reimport`, `src/Legacy/`, the `legacy-mysql`/`legacy-postgres` compose services, `docs/legacy-import.md`) was removed on 2026-10-19; the old dumps are no longer used and no migration script remains.
+- **Accepted losses**: 6 phpBB 3 attachments that cannot be decoded (#2, 4, 5, 11, 13, 36; the files were damaged by a text-mode FTP copy long ago, no intact copy exists) and comment 842 (a Chinese quote, two characters lost bytes in the dump, the rest reads correctly). 3 old-forum photos (#302, #400, #401) have no file anywhere. The 10 attachments imported a few bytes shorter than recorded (#9, 10, 12, 14, 20, 27, 28, 29, 32, 37) are accepted as they are (no eyeball check).
+- **`legacy_ref`** (unique, on imported rows of users, forums, topics, comments, photos...) is kept as provenance only (`<source>:<id>`); the columns stay in the schema and nothing reads them to import anything.
+- Accounts that existed only in the old platforms were created **disabled**, with an unusable password and a `*.invalid` placeholder address when no real one was known. Members of the old Symfony forum keep their password (two historical hash formats, both accepted and upgraded at first login: `AGENTS.md` "Gotchas"). The former accounts that were relevant were re-enabled by the owner.
 
 ## History purge and rewrite (2026-10-19)
 

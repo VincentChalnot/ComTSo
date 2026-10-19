@@ -36,7 +36,7 @@ in the `environment:` block of the `php` service (overridable from the shell), a
 ## Production
 
 Pre-built image `ghcr.io/vincentchalnot/comtso` (published by GitHub Actions, `.github/workflows/ci.yml`) + `deploy/compose.yaml`:
-see [`deploy/README.md`](deploy/README.md) (first deploy, upgrade, rollback, backups, legacy import).
+see [`deploy/README.md`](deploy/README.md) (first deploy, upgrade, rollback, backups).
 
 ## Quality
 
@@ -45,8 +45,6 @@ docker compose exec php sh -c 'APP_ENV=test php bin/console doctrine:migrations:
 docker compose exec php vendor/bin/phpunit
 ```
 
-## Data migration from the old platforms
+## Photos
 
-- The Symfony 2 database (`var/2610110300.sql.gz`) is imported with `bin/console app:legacy:import` (see the command help; side database `comtso_legacy`).
-- Older platforms (first PHP forum, two phpBB installs) are recovered by the single-use `app:legacy:reimport`: see [`docs/legacy-import.md`](docs/legacy-import.md).
 - Photo originals live in `var/photos/originals` (private, never under `public/`); thumbnails are generated lazily (`bin/console app:photos:warm` pre-generates them).
