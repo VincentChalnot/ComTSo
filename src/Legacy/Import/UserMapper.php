@@ -276,7 +276,7 @@ final class UserMapper
         }
         $this->createdLog[] = sprintf('%s (%s)', $username, implode(', ', array_map(static fn (LegacyUser $m): string => $m->ref(), $members)));
 
-        return $this->insertDisabled($username, self::normalize($username).'@legacy.invalid', $primary->ref(), $registered ?? new \DateTimeImmutable('2007-06-23 00:00:00'));
+        return $this->insertDisabled($username, $this->emailOf($members) ?? self::normalize($username).'@legacy.invalid', $primary->ref(), $registered ?? new \DateTimeImmutable('2007-06-23 00:00:00'));
     }
 
     private function guestUser(): int
@@ -291,6 +291,25 @@ final class UserMapper
         $this->createdLog[] = sprintf('%s (anonymous posts of the old platforms)', $username);
 
         return $this->guestId = $this->insertDisabled($username, 'guest@legacy.invalid', self::GUEST_REF, new \DateTimeImmutable('2004-04-28 19:49:59'));
+    }
+
+    /**
+     * The real address of the account when a platform knew it (the account stays disabled, it only keeps the member's identity);
+     * null when none is usable: unknown, malformed, or already the address of another account (e-mails are unique).
+     *
+     * @param list<LegacyUser> $members
+     */
+    private function emailOf(array $members): ?string
+    {
+        $taken = array_map(static fn (array $u): string => mb_strtolower((string) $u['email']), $this->liveUsers);
+        foreach ($members as $member) {
+            $email = trim((string) $member->email);
+            if ('' !== $email && false !== filter_var($email, \FILTER_VALIDATE_EMAIL) && !str_ends_with(mb_strtolower($email), '@legacy.invalid') && !\in_array(mb_strtolower($email), $taken, true)) {
+                return $email;
+            }
+        }
+
+        return null;
     }
 
     private function usernameTaken(string $username): bool
