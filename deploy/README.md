@@ -129,6 +129,11 @@ The history of the old platforms was imported once on the development machine (`
 single-use `app:legacy:reimport` for the older phpBB/PHP forums, see `docs/legacy-import.md`). **The recommended way to populate production is to
 ship that result**: take a DB dump and a `originals/` archive on the dev stack (same commands as in "Backup and restore", with the dev compose file), then restore them on the server as above.
 
+The full chain was rehearsed on the dev stack on 2026-10-19 (timings, counts and the list of recovered phpBB 3 attachments in `docs/legacy-import.md`): the result is a pair `db-<stamp>.sql.gz` +
+`photos-<stamp>.tar.gz` in exactly the format of `backup.sh` (`photos-*.tar.gz` holds a top-level `originals/`), so `./restore.sh` takes it as is; the same order applies to a new run — dump → `comtso_legacy`
+→ `app:legacy:import --force` (repairs the double-encoded text, converts the photos) → `app:legacy:reimport` (phpBB 2/3, old PHP forum, attachments) → `app:photos:reprocess` → `app:content:sanitize`.
+Imported accounts stay disabled (their real e-mail address is kept when the old platform knew it): members who want back in use "forgotten password".
+
 `app:legacy:reimport` needs two throwaway databases (`legacy-mysql`, `legacy-postgres`) that only exist in the dev `compose.yaml`; do not run it in production.
 
 To run the Symfony 2 importer directly in production instead (empty database only, `--force` wipes the content tables):
