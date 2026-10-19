@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use App\Legacy\Import\MojibakeRepairer;
+use App\Photo\PhotoReprocessor;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -10,7 +12,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use App\Photo\PhotoReprocessor;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -35,12 +36,16 @@ class ImportLegacyCommand extends Command
         'ctso_message', 'ctso_chat_message', 'ctso_quote', 'fos_user', 'ctso_photo',
     ];
 
+    /** `ctso_topic.last_activity_at` did not exist in the Symfony 2 schema: the last message, else the creation. */
+    private const LAST_ACTIVITY_SQL = 'GREATEST(s.created_at, COALESCE((SELECT MAX(c.created_at) FROM {src}.ctso_comment c WHERE c.topic_id = s.id), s.created_at))';
+
     private const MIME_TYPES = ['jpeg' => 'image/jpeg', 'jpg' => 'image/jpeg', 'png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp'];
 
     public function __construct(
         private readonly Connection $connection,
         private readonly Filesystem $filesystem,
         private readonly PhotoReprocessor $photoReprocessor,
+        private readonly MojibakeRepairer $mojibake,
         #[Autowire('%photos_directory%')]
         private readonly string $photosDirectory,
         #[Autowire('%kernel.project_dir%/var/photos/originals')]
@@ -91,6 +96,8 @@ class ImportLegacyCommand extends Command
             $this->importPhotos($src, $io);
             $this->importUsers($src, $io);
             $this->importSimpleTables($src, $io);
+            $repaired = $this->mojibake->repair();
+            $io->writeln(sprintf('  double-encoded UTF-8 repaired in %d row(s)', array_sum(array_map('count', $repaired))));
             $this->connection->commit();
         } catch (\Throwable $e) {
             if ($this->connection->isTransactionActive()) {
@@ -175,7 +182,7 @@ class ImportLegacyCommand extends Command
         $content = fn (string $column) => $this->contentSql($column);
         $tables = [
             'ctso_forum' => ['id', 'author_id', 'ord', 'created_at', 'updated_at', 'title', 'content*'],
-            'ctso_topic' => ['id', 'forum_id', 'author_id', 'views', 'comment_count', 'created_at', 'updated_at', 'title', 'content*'],
+            'ctso_topic' => ['id', 'forum_id', 'author_id', 'views', 'comment_count', 'created_at', 'updated_at', 'title', 'content*', 'last_activity_at' => self::LAST_ACTIVITY_SQL],
             'ctso_comment' => ['id', 'topic_id', 'author_id', 'created_at', 'updated_at', 'content*'],
             'ctso_photo_topic' => ['id', 'topic_id', 'photo_id', 'author_id', 'ord', 'created_at', 'updated_at'],
             'ctso_message' => ['id', 'recipient_id', 'author_id', 'state', 'created_at', 'updated_at', 'content*'],
@@ -185,10 +192,18 @@ class ImportLegacyCommand extends Command
         ];
 
         foreach ($tables as $table => $columns) {
-            $names = array_map(fn ($c) => rtrim($c, '*'), $columns);
-            $selects = array_map(fn ($c) => str_ends_with($c, '*') ? $content(rtrim($c, '*')) : $c, $columns);
+            $names = $selects = [];
+            foreach ($columns as $key => $column) {
+                if (\is_string($key)) { // target column => SQL expression over the source row `s`
+                    $names[] = $key;
+                    $selects[] = str_replace('{src}', $src, $column);
+                } else {
+                    $names[] = rtrim($column, '*');
+                    $selects[] = str_ends_with($column, '*') ? $content(rtrim($column, '*')) : $column;
+                }
+            }
             $count = $this->connection->executeStatement(sprintf(
-                'INSERT INTO %s (%s) SELECT %s FROM %s.%s',
+                'INSERT INTO %s (%s) SELECT %s FROM %s.%s AS s',
                 $table,
                 implode(', ', $names),
                 implode(', ', $selects),
