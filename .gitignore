@@ -28,7 +28,7 @@
 /.idea/
 /.vscode/
 
-# Old Symfony 2 backup
+# Old Symfony backup
 /.old-symfony2/
 
 # Screenshots of the old site (private member information): kept privately by the owner, never commit them

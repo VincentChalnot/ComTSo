@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 
 /**
- * Single entry point to make user-provided HTML safe. Every write path (forms, imports) stores the
+ * Single entry point to make user-provided HTML safe. Every write path (forms) stores the
  * sanitized result, and rendering sanitizes again as defense in depth.
  *
  * The allow-list itself lives in config/packages/html_sanitizer.yaml (+ App\Content\AttributeSanitizer\*).

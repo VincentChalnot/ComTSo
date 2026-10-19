@@ -15,9 +15,8 @@ use Symfony\Component\Routing\Attribute\Route;
  * the firewall sends anonymous visitors to the login before these routes run).
  *
  * - the very first PHP version: `topic.php?id=153`;
- * - the Symfony 2 forum: `/photos/preview/73.jpg` (a picture opened in a new tab) and `/photos/thumbnail/73.jpg` (its thumbnail),
- *   where 73 is the old forum's photo number, i.e. the `73.jpg` stored in `ctso_photo.original_filename` by the import
- *   (see docs/legacy-import.md). The same name can come back later when somebody uploads a camera file called `73.jpg`:
+ * - the old forum: `/photos/preview/73.jpg` (a picture opened in a new tab) and `/photos/thumbnail/73.jpg` (its thumbnail),
+ *   where 73 is the old forum's photo number, i.e. the `73.jpg` stored in `ctso_photo.original_filename` by the one-off data load. The same name can come back later when somebody uploads a camera file called `73.jpg`:
  *   the oldest photo wins, which is the imported one.
  */
 class LegacyRedirectController extends AbstractController

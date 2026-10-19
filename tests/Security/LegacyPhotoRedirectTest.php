@@ -6,8 +6,8 @@ use App\Entity\Photo;
 use App\Tests\Support\AppWebTestCase;
 
 /**
- * 68 imported messages link to the Symfony 2 photo routes `/photos/preview/N.jpg` (a picture opened in a new tab) and
- * `/photos/thumbnail/N.jpg`; N is the old forum's photo number, stored as `original_filename` "N.jpg" by the import.
+ * 68 imported messages link to the old forum's photo routes `/photos/preview/N.jpg` (a picture opened in a new tab) and
+ * `/photos/thumbnail/N.jpg`; N is the old forum's photo number, stored as `original_filename` "N.jpg" by the one-off data load.
  */
 class LegacyPhotoRedirectTest extends AppWebTestCase
 {

@@ -6,8 +6,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Identifies a row imported from an older platform (e.g. "phpbb3:post:1234"), so that
- * importing the same source twice never duplicates anything.
+ * Provenance of a row carried over from an older platform (e.g. "phpbb3:post:1234"); kept for
+ * reference only, nothing imports from it anymore.
  */
 trait LegacyRefTrait
 {

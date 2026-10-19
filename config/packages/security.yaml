@@ -1,7 +1,7 @@
 security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
-        # Passwords imported from the Symfony 2 forum (see App\Security\LegacyPasswordHasher)
+        # Passwords from the old forum (see App\Security\LegacyPasswordHasher)
         legacy_sha512:
             id: App\Security\LegacyPasswordHasher
         # The first entry matching the user wins, so no generic interface entry may precede this one.

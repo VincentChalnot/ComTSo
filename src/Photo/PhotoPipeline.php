@@ -3,7 +3,7 @@
 namespace App\Photo;
 
 /**
- * The only way an image enters the photo library (uploads, importers, `app:photos:reprocess`):
+ * The only way an image enters the photo library (uploads, `app:photos:reprocess`):
  *
  * 1. the header is inspected WITHOUT decoding the pixels: real type (never the client's), dimensions, pixel bomb check;
  * 2. EXIF is read from the untouched original (before it is lost by the re-encoding);

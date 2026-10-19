@@ -36,7 +36,7 @@ class LoginTest extends AppWebTestCase
 
     public function testMemberWhosePasswordPredatesFosUserBundleCanLogIn(): void
     {
-        // The Symfony 2 forum accepted sha512(sha1(sha1(password))) too (its custom authentication provider).
+        // The old forum accepted sha512(sha1(sha1(password))) too (its custom authentication provider).
         $user = $this->createUser('vincent');
         $user->setSalt('abcsalt123')->setPassword($this->legacyHash(sha1(sha1('Old-pass-1')), 'abcsalt123'));
         $this->em()->flush();

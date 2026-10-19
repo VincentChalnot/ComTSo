@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * Runs a photo that is already a row of `ctso_photo` (legacy library, restored backup) through the {@see PhotoPipeline}
  * and updates the row in place: new file name, size, type, dimensions, EXIF map, shooting date and GPS. The old
- * file and its cached thumbnails are deleted once the row points to the new file. Plain DBAL, so the importers can use it too.
+ * file and its cached thumbnails are deleted once the row points to the new file. Plain DBAL.
  */
 class PhotoReprocessor
 {

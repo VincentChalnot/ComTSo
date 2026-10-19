@@ -29,7 +29,7 @@ final class PhotosReprocessCommandTest extends AppWebTestCase
         parent::tearDown();
     }
 
-    /** A photo as the Symfony 2 forum left it: a JPEG with its orientation in EXIF, a thin EXIF map with the raw ExifTool dump. */
+    /** A photo as the old forum left it: a JPEG with its orientation in EXIF, a thin EXIF map with the raw ExifTool dump. */
     private function legacyPhoto(string $name, int $width = 400, int $height = 300): Photo
     {
         file_put_contents($this->photoDir.'/'.$name, ExifJpeg::build($width, $height, ['Orientation' => 6, 'Make' => 'ZTE', 'Model' => 'Blade A54', 'DateTimeOriginal' => '2024:09:07 11:08:48', 'GPSLatitudeRef' => 'N', 'GPSLatitude' => [[48, 1], [51, 1], [0, 1]], 'GPSLongitudeRef' => 'E', 'GPSLongitude' => [[2, 1], [21, 1], [0, 1]]]));
@@ -143,9 +143,9 @@ final class PhotosReprocessCommandTest extends AppWebTestCase
         self::assertSame('junk.jpeg', $this->reload($junk)->getFilename());
     }
 
-    public function testImportersCopyFromAnotherDirectoryThroughTheSamePipeline(): void
+    public function testItCopiesFromAnotherDirectoryThroughTheSamePipeline(): void
     {
-        // The importers' path: the old file stays where it is (or is removed, per option), the stored copy is a processed WebP.
+        // Reprocessing from another directory: the old file stays where it is (or is removed, per option), the stored copy is a processed WebP.
         $legacyDir = sys_get_temp_dir().'/legacy-'.bin2hex(random_bytes(4));
         mkdir($legacyDir);
         file_put_contents($legacyDir.'/61a.jpeg', ExifJpeg::build(400, 300, ['Orientation' => 6, 'Model' => 'Old phone', 'DateTimeOriginal' => '2012:05:01 09:00:00']));

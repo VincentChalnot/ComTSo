@@ -10,7 +10,7 @@
 #          Symfony reads them with `%env(trim:file:APP_SECRET_FILE)%`-style processors, Caddy with `{file.*}`, MariaDB with `*_FILE`.
 # Single replica: do NOT scale `app` (the Mercure hub is embedded in Caddy and keeps its state in the container;
 #          migrations run once, in `migrate`, before `app` starts).
-# Project name: deliberately NOT `comtso`, which is what the legacy Symfony 2 stack uses on the production server
+# Project name: deliberately NOT `comtso`, which is what the old Symfony stack uses on the production server
 # (same project name = shared network, `--remove-orphans` would delete the old containers). Volumes: comtso-forum_<name>.
 name: comtso-forum
 

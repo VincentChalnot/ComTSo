@@ -6,7 +6,7 @@ use App\Entity\Photo;
 
 /**
  * The "Détails" of the photo page: French labels and human values built from the stored columns and the curated EXIF
- * map (also tolerates the older, thinner EXIF maps of the Symfony 2 forum). Only rows that exist are returned.
+ * map (also tolerates the older, thinner EXIF maps of the old forum). Only rows that exist are returned.
  * GPS is only included when the caller says the viewer may see it (owner, administrators).
  */
 final class PhotoDetails

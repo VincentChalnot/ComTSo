@@ -1,7 +1,7 @@
 framework:
     html_sanitizer:
         sanitizers:
-            # Allow-list of what the rich editor (Tiptap) emits plus what the imported legacy posts contain.
+            # Allow-list of what the rich editor (Tiptap) emits plus what the old posts contain.
             # Unknown elements are dropped with their content (script, style, svg, form controls...), except the
             # harmless wrappers listed in block_elements whose text is kept. Inline CSS only survives through
             # App\Content\AttributeSanitizer\StyleSanitizer (validated text-align/text-decoration), and the

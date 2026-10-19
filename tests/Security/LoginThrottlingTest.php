@@ -87,7 +87,7 @@ class LoginThrottlingTest extends AppWebTestCase
         self::assertResponseRedirects('/');
     }
 
-    /** The upgrade of the Symfony 2 hash (migrate_from) is part of a successful login: the throttling must not get in its way. */
+    /** The upgrade of the old forum hash (migrate_from) is part of a successful login: the throttling must not get in its way. */
     public function testAMemberStillOnALegacyHashCanLogInAfterAFewMistakes(): void
     {
         $user = $this->createUser('marie');

@@ -14,7 +14,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Last step before opening the forum to its members, once the legacy data has been imported: nobody should find
+ * Last step before opening the forum to its members, once the data is in place: nobody should find
  * 20 years of "new since your last visit" on the home page, nor a chat badge counting the whole history.
  * Run it once, then open the doors: it moves the pointers forward again at every run, so never on a live forum.
  * Safe to repeat (and with --dry-run to look first): pointers only ever move forward, a removed test account is just reported as gone.

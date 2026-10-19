@@ -6,7 +6,7 @@ use Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
- * Verifies passwords stored by the Symfony 2 forum (FOSUserBundle, sha512 x5000, base64, per-user salt).
+ * Verifies passwords stored by the old forum (FOSUserBundle era, sha512 x5000, base64, per-user salt).
  *
  * The old forum's custom authentication provider also accepted members whose password predates FOSUserBundle:
  * those were stored as the sha512 digest of sha1(sha1(password)). Both forms are accepted here; on a successful

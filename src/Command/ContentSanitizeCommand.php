@@ -17,7 +17,7 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Runs the stored HTML through ContentSanitizer again (after the allow-list changed, or after an import that did
+ * Runs the stored HTML through ContentSanitizer again (after the allow-list changed, or after data that did
  * not sanitize). Idempotent: a second run changes nothing.
  *
  * Only the columns that hold HTML are processed. Plain-text columns (chat messages, quotes, photo descriptions,

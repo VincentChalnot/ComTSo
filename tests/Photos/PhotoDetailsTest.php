@@ -13,7 +13,7 @@ final class PhotoDetailsTest extends AppWebTestCase
         $photo = (new Photo())->setFilename('d-'.bin2hex(random_bytes(3)).'.webp')->setOriginalFilename('IMG_0001.jpg')->setFileSize(266 * 1024)->setFileType('image/webp')
             ->setWidth(1600)->setHeight(1200)->setTakenAt(new \DateTime('2018-10-20 13:22:00'))->setAuthor($author)
             ->setGpsLatitude(48.856614)->setGpsLongitude(2.352222)->setGpsAltitude(35.5)
-            // The thinner map the Symfony 2 forum stored: strings, the exposure as a decimal number.
+            // The thinner map the old forum stored: strings, the exposure as a decimal number.
             ->setExif(['Make' => 'samsung', 'Model' => 'SM-A310F', 'ExposureTime' => '0.0303030303', 'FNumber' => '1.9', 'ISOSpeedRatings' => '160', 'FocalLength' => '3.7']);
 
         return $photo;

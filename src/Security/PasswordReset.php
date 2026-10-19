@@ -44,7 +44,7 @@ final class PasswordReset
     ) {
     }
 
-    /** Only enabled members with a real address get mail: imported placeholders (`@legacy.invalid`, `.invalid` is reserved by RFC 2606) never do. */
+    /** Only enabled members with a real address get mail: placeholder accounts (`@legacy.invalid`, `.invalid` is reserved by RFC 2606) never do. */
     public function canReceiveMail(User $user): bool
     {
         $email = trim((string) $user->getEmail());
