@@ -21,8 +21,7 @@ Items marked **BLOCKED** need a decision from the owner before any work.
 3. **Statistics panel** (messages per person per year, charts). Read-only nice-to-have: one SQL aggregate and a Vue chart widget; a normal page, independent of the admin panel.
 4. **"Ajouter une citation" under a hovered quote. BLOCKED** on who may add quotes (all members or admins). `ctso_quote` has no date column.
 5. **Better logo with the brand colours (dark).** Design asset; needs the owner's taste and the five brand colours of `abstracts/_palette.scss`.
-6. **Digest-sample email test** locking the layout reuse contract: add it in the same commit as the next email layout change.
-7. **Rehearse the server rollback** (stop `app`, start old `nginx`, `docs/operations.md`): only if the old stack still exists; value disappears when it is retired.
+6. **Rehearse the server rollback** (stop `app`, start old `nginx`, `docs/operations.md`): only if the old stack still exists; value disappears when it is retired.
 
 ## Housekeeping, not scheduled (status to confirm)
 
