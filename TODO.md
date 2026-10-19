@@ -6,14 +6,13 @@ Items marked **BLOCKED** need a decision from the owner before any work.
 
 ## Wave 1: safety and visible gaps (about 2-3 working days)
 
-1. **Backup check (NAS mirror).** Verify the NAS backup of the new stack (`new-forum/` mirror, see `docs/operations.md`) and do one restore test of a dump into a scratch database (`deploy/restore.sh`, or the scratch-DB procedure in `docs/operations.md`). Biggest risk reduction per minute.
-2. **CI first run: CHECK.** The first real GitHub Actions run happens on the history-rewrite push. Verify end to end: `base`, `test`, `frontend`, `image`, `publish` green, `latest` pushed to ghcr, then make the `comtso-base` package public (otherwise a fork or a clean machine cannot pull the base image). Docs-only pushes are skipped (`paths-ignore`): trigger manually or push a non-docs commit if nothing started.
-3. **`www.comtso.fr` redirect and Keres CSP** (owner only, minutes): test `compose.www-redirect.yaml` (permanent redirect to the apex) and that the Keres app still works with its own CSP (the shared Traefik no longer sets one).
-4. **Change avatar.** Most visible gap for members. Plumbing exists (`avatar` variant, photo pipeline, `Photo` avatar link): form on `/gens/{pseudo}/config`, release the old avatar through `PostPhotos::releaseOrphans`, test.
+1. **Backup: NAS mirror still to verify.** The restore test is done (a dev-database dump restored into a scratch database, row counts identical; server backup of 2026-10-19 passes `gzip -t`). The NAS mirror `new-forum/` did not exist yet: run the NAS `backup.sh` once, check that `new-forum/` holds the day's dump and photo archive, and restore-test that copy (`docs/operations.md` "Backups and restore checks").
+2. **`www.comtso.fr` redirect and Keres CSP** (owner only, minutes): test `compose.www-redirect.yaml` (permanent redirect to the apex) and that the Keres app still works with its own CSP (the shared Traefik no longer sets one).
+3. **Change avatar.** Most visible gap for members. Plumbing exists (`avatar` variant, photo pipeline, `Photo` avatar link): form on `/gens/{pseudo}/config`, release the old avatar through `PostPhotos::releaseOrphans`, test.
 
 ## Wave 2: hardening and photo/text features
 
-1. **CI hardening.** Dependabot (a few lines of YAML, security value: right after the CI check above), ghcr cleanup of old `sha-*` tags (the history rewrite orphaned them; keep the tag currently deployed, see `deploy/README.md` "Rollback"), a prod-image smoke test in CI.
+1. **CI hardening: owner commands left.** Done (2026-10-19): Dependabot, gitleaks job, prod-image smoke test in `image`, repository security settings, stale runs removed (`docs/operations.md` "GitHub repository, CI and ghcr"). Left for the owner: delete the 6 orphaned `sha-*` ghcr tags (command in that section), then, after the signed force-push of `master`, apply the recommended branch protection (command there), and check the first Dependabot pull requests.
 2. **Modern UTF-8 emojis for new messages** (old gif smilies stay). First check that `ctso_comment` is `utf8mb4` (legacy tables may be `utf8`), then the sanitizer allow-list, an editor picker next to the smilies (`assets/vue/editor/smilies.js`) and a sanitizer test with astral characters.
 3. **Quick photo rotation for the owner and admins.** Touches the photo pipeline: re-encode the WebP original, invalidate `cache/{thumb,medium,hero,avatar}`, EXIF orientation. After the avatar work; pipeline test required.
 4. **Sentry.** Plan in `docs/operations.md` ("Sentry plan"): cheap, but production is quiet and `/health` plus logs cover a 20-member forum. Do it after the first production error that cannot be diagnosed.
@@ -30,7 +29,7 @@ Items marked **BLOCKED** need a decision from the owner before any work.
 
 ## Housekeeping, not scheduled (status to confirm)
 
-From the go-live checklist, none of it is in the agreed waves: retire the old stack after a stable period; tighten DMARC from `p=none` once SPF/DKIM pass in real mails; replace the real-looking dev `MERCURE_JWT_SECRET` of `.env.example` by an obvious placeholder; optional gitleaks CI step.
+From the go-live checklist, none of it is in the agreed waves: retire the old stack after a stable period; tighten DMARC from `p=none` once SPF/DKIM pass in real mails.
 
 ## Dropped (do not re-add; re-open only on a real request)
 

@@ -15,7 +15,7 @@ logs). This file only holds what is specific to the production server and not co
 | fail2ban | Jails `sshd` and `traefik-404` (20 x 404 in 60 s = 1 h ban). Check: `fail2ban-client status traefik-404`; unban: `fail2ban-client set traefik-404 unbanip <ip>`. |
 | Outbound | `smtp.tem.scaleway.com:587` and `ghcr.io:443` are reachable. |
 
-Server `ST/.env` (secrets omitted, generated on the server with `openssl rand -hex 32`, never printed): `COMTSO_IMAGE_TAG=sha-<short>` (a green CI build; bump it to upgrade),
+Server `ST/.env` (secrets omitted, generated on the server with `openssl rand -hex 32`, never printed): `COMTSO_IMAGE_TAG=latest` on 2026-10-19 (the weekly refresh and every green push of `master` move it; pin `sha-<short>` of a green build to freeze a release, see `deploy/README.md` "Rollback"),
 `SERVER_NAME=comtso.fr`, `COMPOSE_FILE=compose.yaml:compose.traefik.yaml:compose.www-redirect.yaml`, `CADDY_SITE_ADDRESS=:80`, `TRUSTED_PROXIES=private_ranges`,
 `CERT_RESOLVER=gandi`, `TRAEFIK_NETWORK=proxy`, `HSTS_ENABLED=true`, `MAILER_FROM="ComTSo <no-reply@comtso.fr>"`, `MAILER_DSN` (Scaleway TEM, `deploy/README.md`).
 Validate after an edit without printing values: `cd ST && docker compose config -q && echo CONFIG_OK`.
@@ -55,6 +55,32 @@ After a stable period, with a fresh dump kept off the server: `cd /root/www/comt
   Expected: two identical numbers; also `tar tzf /var/backups/comtso/photos-<stamp>.tar.gz | head`.
 - **Off-site**: the dump holds password hashes and private messages (treat as a secret). Keep a copy of `ST/.env` in the password manager.
 - **Photos**: `restore.sh` extracts the archive as `www-data` into the named volume; do not bind-mount the old photo directory (uid 1000 on the host). To replace the data completely, wipe `/app/var/photos/originals` and `/app/var/photos/cache` in the `app` container first, otherwise stale files stay.
+- **Checked on 2026-10-19**: (a) a restore test of a full dump of the dev database (it holds the production data) into a scratch database restored cleanly and `fos_user` / `ctso_comment` / `ctso_topic` / `ctso_photo` row counts were identical (18 / 25 981 / 501 / 2 425); (b) on the server `/var/backups/comtso` holds one manual run (`db-20261019-113347.sql.gz`, 4.4 MB, and `photos-…tar.gz`, 347 MB, 2 426 entries), both `gzip -t` clean; (c) **the NAS mirror `Backups/comtso/new-forum/` did not exist yet**: the NAS job has not run since the new stack went live (last NAS dump of the old forum: 2026-10-19 07:39). Owner: run `Backups/comtso/backup.sh` on the NAS once by hand (or wait for the Sunday 03:00 run), then check that `new-forum/` holds a `db-*.sql.gz` and a `photos-*.tar.gz` of the day and that `ls -l` sizes match the server's; repeat the scratch restore of the NAS copy once (procedure above).
+
+## GitHub repository, CI and ghcr
+
+- **Settings applied on 2026-10-19** (`gh api repos/vincentchalnot/comtso`): secret scanning and push protection on, Dependabot alerts and security updates on, the default workflow token read-only (`default_workflow_permissions=read`, Actions cannot approve pull requests; every workflow also declares `permissions:`), wiki and projects off, branches deleted after merge. Unchanged: public repository, default branch `master`, issues on, forks allowed (one fork exists, `freshy969/ComTSo`, last pushed 2022: it carries the old, pre-rewrite history; ask GitHub Support to purge it together with the cached views, see `docs/decisions.md`), all three merge methods allowed.
+- **Branch protection is NOT on yet**, deliberately: it would reject the one force-push of `master` that follows the rebase-signing of the latest commits. Once that push is done, apply (classic protection: no force push, no deletion, linear history, the CI jobs must be green, admins keep a bypass so the owner can still push directly; a push of unchecked commits then needs the checks to have run, so the normal flow becomes branch + pull request):
+
+  ```bash
+  gh api -X PUT repos/vincentchalnot/comtso/branches/master/protection --input - <<'EOF'
+  {"required_status_checks":{"strict":false,"contexts":["test","frontend","image","gitleaks"]},"enforce_admins":false,
+   "required_pull_request_reviews":null,"restrictions":null,"required_linear_history":true,"allow_force_pushes":false,"allow_deletions":false}
+  EOF
+  gh api -X POST repos/vincentchalnot/comtso/branches/master/protection/required_signatures
+  ```
+
+  Remove it temporarily (`gh api -X DELETE repos/vincentchalnot/comtso/branches/master/protection`) before any intentional force-push.
+- **Security checks of CI**: `gitleaks` scans the whole history on every run (blocking, required by `publish`; `.gitleaks.toml` allows only the reviewed development findings, by path and line so that a rebase does not invalidate it), `audit` is advisory, `.github/dependabot.yml` opens weekly grouped pull requests (composer, npm, docker, docker-compose, github-actions; FrankenPHP, the MariaDB line and Symfony majors are ignored on purpose, see the comments in that file). The `image` job also boots the freshly built production image through `deploy/compose.yaml` with throwaway secrets (`/health` = `ok`, `/` redirects to `/login`); it is loaded into the runner only, never pushed.
+- **ghcr**: `comtso` and `comtso-base` are both public (anonymous pull token works). `comtso-base` keeps one tag, the pin of `compose.yaml`: never delete it. Do not change package visibility through the API (not possible), only in the package settings page. Orphaned application tags (their commits no longer exist after the history rewrite; the server runs the digest of `sha-74d6881`, which is NOT orphaned): `sha-9148a6d sha-02d8848 sha-7df1a52 sha-85c15d7 sha-8270580 sha-18efd24`. Deleting a tag needs the token scopes `read:packages` and `delete:packages` (the stock `gh` token has neither):
+
+  ```bash
+  gh auth refresh -h github.com -s read:packages,delete:packages
+  for t in sha-9148a6d sha-02d8848 sha-7df1a52 sha-85c15d7 sha-8270580 sha-18efd24; do
+    id=$(gh api --paginate /user/packages/container/comtso/versions --jq ".[] | select(.metadata.container.tags | index(\"$t\")) | .id")
+    [ -n "$id" ] && gh api -X DELETE "/user/packages/container/comtso/versions/$id"
+  done
+  ```
 
 ## Secret rotation
 
