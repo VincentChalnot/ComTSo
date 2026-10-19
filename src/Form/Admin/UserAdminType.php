@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Admin form of a member: whether the account can log in and whether it administers the forum. Nothing else is editable
@@ -40,12 +41,15 @@ class UserAdminType extends AbstractType
                 'mapped' => false,
                 'expanded' => true,
                 'choices' => ['admin.user.role.member' => self::MEMBER, 'admin.user.role.admin' => self::ADMIN],
+                // A submission without a role must not silently mean "member".
+                'constraints' => [new NotBlank(message: 'Choisissez un rôle.')],
             ]);
 
         // State of the account when the form was built: what the guard compares the submission with.
         $initial = ['enabled' => true, 'roles' => []];
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use (&$initial): void {
+        // POST_SET_DATA: the data mapper resets unmapped children while it maps the entity, so the role is set once it is done.
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use (&$initial): void {
             $user = $event->getData();
             if (!$user instanceof User) {
                 return;

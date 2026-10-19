@@ -116,6 +116,46 @@ class UserAdminTest extends AdminWebTestCase
         $this->assertNoEmailAddress();
     }
 
+    public function testTheFormShowsTheCurrentStateAndSavingItUntouchedChangesNothing(): void
+    {
+        $this->loginAdmin('root');
+        $other = $this->createUser('other', ['ROLE_ADMIN']);
+        $member = $this->createUser('member');
+        $member->setEnabled(false);
+        $this->em()->flush();
+
+        $crawler = $this->client->request('GET', '/admin/users/'.$other->getId().'/edit');
+        self::assertSame('admin', $crawler->filter('input[name="form_user_edit[role]"]:checked')->attr('value'));
+        self::assertSame(1, $crawler->filter('input[name="form_user_edit[enabled]"][checked]')->count());
+        $this->client->submit($crawler->selectButton('Enregistrer')->form());
+        self::assertResponseRedirects();
+        self::assertContains('ROLE_ADMIN', $this->reloadUser($other->getId())->getRoles());
+
+        $crawler = $this->client->request('GET', '/admin/users/'.$member->getId().'/edit');
+        self::assertSame('member', $crawler->filter('input[name="form_user_edit[role]"]:checked')->attr('value'));
+        self::assertSame(0, $crawler->filter('input[name="form_user_edit[enabled]"][checked]')->count());
+        self::assertStringContainsString('ne peut plus se connecter', $crawler->filter('.field-help')->text(), 'the help text is translated');
+        $this->client->submit($crawler->selectButton('Enregistrer')->form());
+        $member = $this->reloadUser($member->getId());
+        self::assertFalse($member->isEnabled());
+        self::assertNotContains('ROLE_ADMIN', $member->getRoles());
+    }
+
+    public function testASubmissionWithoutARoleIsRefusedInsteadOfDemoting(): void
+    {
+        $this->loginAdmin('root');
+        $other = $this->createUser('other', ['ROLE_ADMIN']);
+
+        $crawler = $this->client->request('GET', '/admin/users/'.$other->getId().'/edit');
+        $form = $crawler->selectButton('Enregistrer')->form();
+        $values = $form->getPhpValues();
+        unset($values['form_user_edit']['role']);
+        $this->client->request('POST', $form->getUri(), $values);
+
+        self::assertResponseIsSuccessful(); // the form again, with an error
+        self::assertContains('ROLE_ADMIN', $this->reloadUser($other->getId())->getRoles());
+    }
+
     public function testTheEditFormChangesNothingWithoutItsToken(): void
     {
         $this->loginAdmin('root');

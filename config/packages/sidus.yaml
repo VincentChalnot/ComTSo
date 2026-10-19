@@ -198,7 +198,7 @@ sidus_data_grid:
                 originalFilename: { template: admin/photo/_name_cell.html.twig }
                 author: { property_path: "author?.username", sort_column: author.username, template: admin/cells/author.html.twig }
                 fileSize: { template: admin/photo/_size_cell.html.twig, attributes: { class: num } }
-                dimensions: { property_path: id, template: admin/photo/_dimensions_cell.html.twig }
+                dimensions: { property_path: id, template: admin/photo/_dimensions_cell.html.twig, attributes: { class: num } }
                 takenAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
                 createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
                 usage: { property_path: id, template: admin/photo/_usage_cell.html.twig }

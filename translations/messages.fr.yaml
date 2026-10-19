@@ -27,7 +27,7 @@ admin:
     action:
         edit: Modifier
         delete: Supprimer
-        view: Voir sur le forum
+        view: Voir
         edit_for: Modifier %name%
         delete_for: Supprimer %name%
         view_for: Voir %name% sur le forum
