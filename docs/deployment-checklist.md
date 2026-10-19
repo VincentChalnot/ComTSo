@@ -386,3 +386,13 @@ Evidence (server logs + masked probes): (1) the running `app` container had been
 * **Monolog**: a `sentry` handler at level `error` on the `main` fingers_crossed chain (not the `audit` channel, which stays in the logs).
 * **Browser SDK** (optional, later): would need `connect-src 'self' https://*.ingest.sentry.io` (or a tunnel route) in the Caddyfile CSP and a hash/nonce story; skip at first, server-side errors only.
 * **Order**: install on a branch, deploy to `next.comtso.fr`, trigger a test exception, check scrubbing in the event JSON, then enable in prod.
+
+### 11.8 Cutover done on 2026-10-19
+
+Rehearsal data kept (no reload). Image pinned to `sha-18efd24` (= `origin/master`, CI run 39241812931 green); before the cutover `backup.sh` wrote `/var/backups/comtso/db-20261019-113347.sql.gz` + `photos-...tar.gz`. `app:cutover:prepare` dry run then real (18 `previous_login`, 17 `chat_last_read_id`, 1 ROLE_ADMIN: Vincent). Old `comtso-nginx-1` stopped (php-fpm and mysql still up, volumes untouched), `SERVER_NAME=comtso.fr` + `up -d`: Let's Encrypt cert issued for `comtso.fr` (valid to 2027-01-16), `/health` ok, `/login` 200, `/robots.txt` 200, `/` 302, anonymous photo 302, anonymous Mercure 401, app CSP + HSTS + XFO reach the client; the other five sites unchanged (200/200/302/200/302). `next.comtso.fr` now answers 404 (its router followed `SERVER_NAME`). `app:photos:warm` runs in the background (`/root/comtso-warm.log`).
+
+**www redirect (owner to test)**: in `/root/www/comtso-forum/.env` set `COMPOSE_FILE=compose.yaml:compose.traefik.yaml:compose.www-redirect.yaml`, then `docker compose up -d`.
+
+**Rollback (old forum)**: `ssh sidus.fr 'cd /root/www/comtso-forum && docker compose stop app && cd /root/www/comtso && docker compose start nginx'` then `curl -sI https://comtso.fr` (expect `x-powered-by: PHP/5.6.40`). Old compose config validated (`config -q`). Traefik file: `cat /root/www/traefik/traefik.yaml.bak-precutover-2026-10-19 > /root/www/traefik/traefik.yaml`. New stack data restore: `./restore.sh --yes /var/backups/comtso/db-20261019-113347.sql.gz /var/backups/comtso/photos-20261019-113347.tar.gz`.
+
+The NAS script could not be run from the dev machine (ssh host key of `root@100.93.187.57` unknown here: it runs from the NAS); on the server side its condition for the new stack (`app` running) is true.
