@@ -14,8 +14,16 @@
 # (same project name = shared network, `--remove-orphans` would delete the old containers). Volumes: comtso-forum_<name>.
 name: comtso-forum
 
+# Docker's default json-file driver never rotates: cap each service at 5 x 10 MB.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 x-app: &app
   image: ghcr.io/vincentchalnot/comtso:${COMTSO_IMAGE_TAG:-latest}
+  logging: *default-logging
   environment: &app-environment
     APP_ENV: prod
     APP_DEBUG: "0"
@@ -58,6 +66,8 @@ services:
       #  - `http://app:8080`: internal-only plain listener (not published) for the Mercure publisher of the Symfony app.
       # They share one Mercure hub thanks to `name comtso` in the Caddyfile.
       CADDY_SITE_ADDRESS: ${CADDY_SITE_ADDRESS:-${SERVER_NAME}}, http://app:8080
+      # Caddy access log: `on` writes every request (not /health) to the container log; off by default, app errors come from Monolog.
+      CADDY_ACCESS_LOG: ${CADDY_ACCESS_LOG:-off}
     depends_on:
       database:
         condition: service_healthy
@@ -98,6 +108,7 @@ services:
   database:
     image: mariadb:11.4
     restart: unless-stopped
+    logging: *default-logging
     environment:
       MARIADB_DATABASE: comtso
       MARIADB_USER: comtso

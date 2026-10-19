@@ -26,7 +26,7 @@ Run every command below **from `deploy/`** (on the server a directory holding `c
   Secrets therefore do not appear in `docker inspect` or `printenv`.
 - The secrets: `APP_SECRET`, `DATABASE_PASSWORD`, `DATABASE_ROOT_PASSWORD`, `MERCURE_JWT_SECRET`, `MAILER_DSN` (the DSN embeds
   the SMTP password). Use hex/alphanumeric values for the passwords (they are placed in a database URL).
-- To rotate a secret: edit `.env`, `docker compose up -d` (the containers using it are recreated). Exceptions: the database
+- To rotate a secret: edit `.env`, then `docker compose up -d --force-recreate app` (a secret is a file created WITH the container: `restart` keeps the old value, and `up -d` alone does not notice that only the value in `.env` changed; verified in production: after fixing `MAILER_DSN` the running container still held the old DSN). Exceptions: the database
   passwords are applied by MariaDB when the volume is created, change them with `ALTER USER` first; changing `APP_SECRET` logs everybody out.
 
 ## First deploy
@@ -177,9 +177,16 @@ MAILER_FROM="ComTSo <no-reply@your-validated-domain>"
 ```
 
 The username is the Scaleway project ID, the password an API secret key (both from the Scaleway console); the sender domain must be validated in the TEM console
-(SPF + DKIM records, MX + DMARC recommended) before the first mail. Apply with `docker compose up -d` (the secret is a file: containers using it are recreated), then request a reset from `/login`
+(SPF + DKIM records, MX + DMARC recommended) before the first mail. Apply with `docker compose up -d --force-recreate app` (the secret is a file created with the container), then request a reset from `/login`
 with one real address and check the headers (`spf=pass dkim=pass`).
 
 ## Go-live checklist
 
 The ordered, step-by-step plan to take the redesigned forum to production on the sidus.fr server (decisions, secrets, rehearsal, cutover, rollback, smoke tests): [`docs/deployment-checklist.md`](../docs/deployment-checklist.md).
+
+## Logs
+
+- **Application** (Symfony/Monolog, JSON on stderr, `docker compose logs app`): silent until an error occurs, then the last 50 records (info and above) that led to it are written. A separate **`audit`** channel is always written (notice and above): failed logins and throttling (`Login failed`: pseudo as typed, client IP, reason class, never the password) and the password-reset mail trail (`Password reset requested, no e-mail sent: <reason>`, `... handed to the mail transport`, `Password reset e-mail NOT sent` with the recipient *domain*, the exception class and the masked reason). Deprecations are dropped in production.
+- **Caddy access log is off** by default (the healthcheck alone would add a line every 30 s and Caddy cannot filter on status). `CADDY_ACCESS_LOG=on` in `.env` writes every request except `/health` (the Mercure `authorization` query parameter is redacted). Caddy's own runtime messages stay on.
+- **Docker** rotates every service's log (json-file, 5 x 10 MB).
+- Quick looks: `docker compose logs --since 1h app | grep -E '"channel":"audit"'`, `... | grep '"level":"ERROR"'`.

@@ -53,7 +53,14 @@ class PasswordResetController extends AbstractController
             $identifier = trim((string) $form->get('identifier')->getData());
             $user = $users->findOneByUsernameOrEmail($identifier);
             // Per account: silently drops the excess, so the answer never depends on whether the account exists.
-            if ($user && $reset->canReceiveMail($user) && $passwordResetAccountLimiter->create((string) $user->getId())->consume()->isAccepted()) {
+            // The reason is logged server-side only (member id, never the typed identifier).
+            if (!$user) {
+                $reset->skipped('no matching account');
+            } elseif (!$reset->canReceiveMail($user)) {
+                $reset->skipped('account disabled or without a usable address', $user);
+            } elseif (!$passwordResetAccountLimiter->create((string) $user->getId())->consume()->isAccepted()) {
+                $reset->skipped('per-account limit (3 per hour) reached', $user);
+            } else {
                 $link = $reset->link($user, $request);
                 AfterResponseSubscriber::defer($request, static fn () => $reset->send($user, $link));
             }

@@ -10,16 +10,24 @@
 
 {$CADDY_EXTRA_CONFIG}
 
-{$CADDY_SITE_ADDRESS:localhost} {
+# Access log: OFF by default (the container healthcheck alone would write a line every 30 s, and Caddy cannot filter on the status).
+# Application errors and security events are logged by Symfony/Monolog (config/packages/monolog.yaml). To turn it on, set
+# CADDY_ACCESS_LOG=on (never logs /health, redacts the `authorization` query parameter that Mercure clients may send).
+(access_log_off) {
+}
+(access_log_on) {
+	log_skip /health
 	log {
-		{$CADDY_SERVER_LOG_OPTIONS}
-		# Redact the authorization query parameter that can be set by Mercure
 		format filter {
 			request>uri query {
 				replace authorization REDACTED
 			}
 		}
 	}
+}
+
+{$CADDY_SITE_ADDRESS:localhost} {
+	import access_log_{$CADDY_ACCESS_LOG:off}
 
 	root /app/public
 	encode zstd br gzip

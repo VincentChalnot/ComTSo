@@ -4,10 +4,13 @@ namespace App\Security;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Monolog\Attribute\WithMonologChannel;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -20,6 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * current password hash and e-mail, so the link dies as soon as the password changes (the reset itself, a password
  * change, even the transparent upgrade of a legacy hash at login) or the address is edited: single use without storage.
  */
+#[WithMonologChannel('audit')]
 final class PasswordReset
 {
     public const LIFETIME = 'PT1H';
@@ -36,6 +40,7 @@ final class PasswordReset
         private readonly string $from,
         #[Autowire('%app.public_url%')]
         private readonly ?string $publicUrl,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -79,15 +84,39 @@ final class PasswordReset
         return $user;
     }
 
+    /**
+     * Hands the mail to the transport. Runs after the response (see AfterResponseSubscriber), so a failure can only be reported
+     * in the logs: member id and recipient DOMAIN only, never the address, and the SMTP user name is masked.
+     */
     public function send(User $user, string $link): void
     {
-        $this->mailer->send((new TemplatedEmail())
-            ->from(Address::create($this->from))
-            ->to(new Address((string) $user->getEmail(), $user->getUsername()))
-            ->subject('ComTSo : réinitialisation de votre mot de passe')
-            ->textTemplate('email/password_reset.txt.twig')
-            ->htmlTemplate('email/password_reset.html.twig')
-            ->context(['username' => $user->getUsername(), 'link' => $link, 'lifetime_minutes' => 60]));
+        $email = (string) $user->getEmail();
+        $context = ['user_id' => $user->getId(), 'recipient_domain' => strtolower(substr($email, (int) strrpos($email, '@') + 1))];
+
+        try {
+            $this->mailer->send((new TemplatedEmail())
+                ->from(Address::create($this->from))
+                ->to(new Address($email, $user->getUsername()))
+                ->subject('ComTSo : réinitialisation de votre mot de passe')
+                ->textTemplate('email/password_reset.txt.twig')
+                ->htmlTemplate('email/password_reset.html.twig')
+                ->context(['username' => $user->getUsername(), 'link' => $link, 'lifetime_minutes' => 60]));
+        } catch (TransportExceptionInterface $e) {
+            $this->logger->error('Password reset e-mail NOT sent', $context + [
+                'exception' => $e::class,
+                'reason' => preg_replace('/username "[^"]*"/', 'username "***"', substr($e->getMessage(), 0, 300)),
+            ]);
+
+            return;
+        }
+
+        $this->logger->notice('Password reset e-mail handed to the mail transport', $context);
+    }
+
+    /** Server-side audit line explaining why a request produced no mail (the visitor always gets the same neutral answer). */
+    public function skipped(string $reason, ?User $user = null): void
+    {
+        $this->logger->notice('Password reset requested, no e-mail sent: '.$reason, null === $user ? [] : ['user_id' => $user->getId()]);
     }
 
     private function key(User $user): string
