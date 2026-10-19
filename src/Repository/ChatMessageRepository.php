@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\ChatMessage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 class ChatMessageRepository extends ServiceEntityRepository
@@ -13,18 +14,31 @@ class ChatMessageRepository extends ServiceEntityRepository
         parent::__construct($registry, ChatMessage::class);
     }
 
-    /** @return list<ChatMessage> */
-    public function search(string $term, int $limit = 30): array
+    /** @return list<ChatMessage> one page of the messages containing the term, newest first */
+    public function search(string $term, int $limit, int $offset = 0): array
     {
-        return $this->createQueryBuilder('m')
+        return $this->searchBuilder($term)
             ->addSelect('a')
             ->leftJoin('m.author', 'a')
-            ->where('m.content LIKE :q')
-            ->setParameter('q', '%'.addcslashes($term, '%_\\').'%')
             ->orderBy('m.createdAt', 'DESC')
+            ->addOrderBy('m.id', 'DESC')
+            ->setFirstResult($offset)
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+    }
+
+    /** How many messages {@see self::search()} finds, whatever the page. */
+    public function countSearch(string $term): int
+    {
+        return (int) $this->searchBuilder($term)->select('COUNT(m.id)')->getQuery()->getSingleScalarResult();
+    }
+
+    private function searchBuilder(string $term): QueryBuilder
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.content LIKE :q')
+            ->setParameter('q', '%'.addcslashes($term, '%_\\').'%');
     }
 
     /** Chat messages written by other members after the last one this member has seen. */

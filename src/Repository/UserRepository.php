@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -34,16 +35,31 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this->findOneBy(['username' => $identifier]) ?? $this->findOneBy(['email' => $identifier]);
     }
 
-    /** @return list<User> enabled members whose pseudo, name or activities match */
-    public function search(string $term, int $limit = 30): array
+    /** @return list<User> one page of the enabled members whose pseudo, name or activities match */
+    public function search(string $term, int $limit, int $offset = 0): array
+    {
+        return $this->searchBuilder($term)
+            ->addSelect('av')
+            ->leftJoin('u.avatar', 'av') // shown next to every result: no lazy load per member
+            ->orderBy('u.username')
+            ->addOrderBy('u.id')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** How many members {@see self::search()} finds, whatever the page. */
+    public function countSearch(string $term): int
+    {
+        return (int) $this->searchBuilder($term)->select('COUNT(u.id)')->getQuery()->getSingleScalarResult();
+    }
+
+    private function searchBuilder(string $term): QueryBuilder
     {
         return $this->createQueryBuilder('u')
             ->where('u.enabled = true')
             ->andWhere('u.username LIKE :q OR u.name LIKE :q OR u.surname LIKE :q OR u.activities LIKE :q')
-            ->setParameter('q', '%'.addcslashes($term, '%_\\').'%')
-            ->orderBy('u.username')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('q', '%'.addcslashes($term, '%_\\').'%');
     }
 }

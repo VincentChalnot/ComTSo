@@ -8,33 +8,30 @@
 <header class="page-header">
     <p class="kicker">Recherche</p>
     <h1 class="page-title">{% if term %}Résultats pour « {{ term }} »{% else %}Recherche{% endif %}</h1>
-    {% if results is null %}
+    {% if not searched %}
         <p class="standfirst">Saisissez au moins deux caractères dans la barre de recherche.</p>
     {% else %}
-        {% set total = 0 %}{% set capped = false %}
-        {% for list in results %}{% set total = total + list|length %}{% set capped = capped or list|length >= limit %}{% endfor %}
         <p class="standfirst">
-            {% if total == 0 %}Rien ne correspond à cette recherche.{% else %}{{ capped ? 'Plus de ' : '' }}{{ total }} résultat{{ total > 1 ? 's' : '' }} dans les messages, sujets, photos, chats, membres et citations.{% endif %}
+            {% if total == 0 %}Rien ne correspond à cette recherche.{% else %}{{ total|number_format(0, ',', ' ') }} résultat{{ total > 1 ? 's' : '' }} dans les messages, sujets, photos, chats, membres et citations.{% endif %}
         </p>
     {% endif %}
 </header>
 
-{% if results is not null %}
-    {% set sections = [
-        {key: 'comments', label: 'Messages'}, {key: 'topics', label: 'Sujets'}, {key: 'photos', label: 'Photos'},
-        {key: 'chat', label: 'Chat'}, {key: 'people', label: 'Membres'}, {key: 'quotes', label: 'Citations'},
-    ] %}
-    <nav class="nav-pills -ml-3" aria-label="Accès rapide aux résultats">
-        {% for section in sections %}
-            <a href="#r-{{ section.key }}">{{ section.label }} <span class="badge badge-count{{ results[section.key]|length ? '' : ' badge-muted' }}">{{ results[section.key]|length }}{{ results[section.key]|length >= limit ? '+' : '' }}</span></a>
+{% if searched %}
+    <nav class="tabs" aria-label="Types de résultats">
+        {% for key, definition in tabs %}
+            <a href="{{ path('search', {q: term, tab: key}) }}"{% if key == tab %} aria-current="page"{% endif %}>{{ definition.label }} <span class="badge badge-count{{ counts[key] ? '' : ' badge-muted' }}">{{ counts[key]|number_format(0, ',', ' ') }}<span class="sr-only"> résultat{{ counts[key] > 1 ? 's' : '' }}</span></span></a>
         {% endfor %}
     </nav>
 
-    <section class="section" id="r-comments" aria-labelledby="t-comments">
-        <h2 class="section-title" id="t-comments">Messages</h2>
-        {% if results.comments %}
+    <section class="section" aria-labelledby="results-title">
+        <h2 class="section-title" id="results-title">{{ tabs[tab].label }}{% if pager.pageCount > 1 %} <span class="byline">page {{ pager.page }} sur {{ pager.pageCount }}</span>{% endif %}</h2>
+
+        {% if items is empty %}
+            <div class="empty empty-sm"><p class="empty-text">{{ tabs[tab].empty }}</p></div>
+        {% elseif tab == 'comments' %}
             <ol class="result-list">
-                {% for comment in results.comments %}
+                {% for comment in items %}
                     <li class="result has-avatar">
                         <span class="result-aside">{{ av.avatar(comment.author, 'md') }}</span>
                         <div class="result-body">
@@ -50,16 +47,9 @@
                     </li>
                 {% endfor %}
             </ol>
-        {% else %}
-            <div class="empty empty-sm"><p class="empty-text">Aucun message.</p></div>
-        {% endif %}
-    </section>
-
-    <section class="section" id="r-topics" aria-labelledby="t-topics">
-        <h2 class="section-title" id="t-topics">Sujets</h2>
-        {% if results.topics %}
+        {% elseif tab == 'topics' %}
             <ol class="result-list">
-                {% for topic in results.topics %}
+                {% for topic in items %}
                     <li class="result">
                         <div class="result-body">
                             <p class="kicker is-plain">{{ topic.forum.title }}</p>
@@ -69,27 +59,13 @@
                     </li>
                 {% endfor %}
             </ol>
-        {% else %}
-            <div class="empty empty-sm"><p class="empty-text">Aucun sujet.</p></div>
-        {% endif %}
-    </section>
-
-    <section class="section" id="r-photos" aria-labelledby="t-photos">
-        <h2 class="section-title" id="t-photos">Photos</h2>
-        {% if results.photos %}
+        {% elseif tab == 'photos' %}
             <div class="photo-grid">
-                {% for photo in results.photos %}{{ ph.thumb(photo, 'search', 'aspect-square w-full') }}{% endfor %}
+                {% for photo in items %}{{ ph.thumb(photo, 'search', 'aspect-square w-full') }}{% endfor %}
             </div>
-        {% else %}
-            <div class="empty empty-sm"><p class="empty-text">Aucune photo.</p></div>
-        {% endif %}
-    </section>
-
-    <section class="section" id="r-chat" aria-labelledby="t-chat">
-        <h2 class="section-title" id="t-chat">Chat</h2>
-        {% if results.chat %}
+        {% elseif tab == 'chat' %}
             <ol class="result-list">
-                {% for message in results.chat %}
+                {% for message in items %}
                     <li class="result">
                         <div class="result-body">
                             <p class="byline">
@@ -101,16 +77,9 @@
                     </li>
                 {% endfor %}
             </ol>
-        {% else %}
-            <div class="empty empty-sm"><p class="empty-text">Aucun message de chat.</p></div>
-        {% endif %}
-    </section>
-
-    <section class="section" id="r-people" aria-labelledby="t-people">
-        <h2 class="section-title" id="t-people">Membres</h2>
-        {% if results.people %}
+        {% elseif tab == 'people' %}
             <ol class="result-list">
-                {% for person in results.people %}
+                {% for person in items %}
                     <li class="result has-avatar">
                         <a class="result-aside" href="{{ path('people_show', {username: person.username}) }}" tabindex="-1" aria-hidden="true">{{ av.avatar(person, 'md') }}</a>
                         <div class="result-body">
@@ -121,15 +90,8 @@
                 {% endfor %}
             </ol>
         {% else %}
-            <div class="empty empty-sm"><p class="empty-text">Aucun membre.</p></div>
-        {% endif %}
-    </section>
-
-    <section class="section" id="r-quotes" aria-labelledby="t-quotes">
-        <h2 class="section-title" id="t-quotes">Citations</h2>
-        {% if results.quotes %}
             <ol class="result-list">
-                {% for quote in results.quotes %}
+                {% for quote in items %}
                     <li class="result">
                         <div class="result-body">
                             <p class="result-excerpt is-quote">{{ quote.content|excerpt(term, 300) }}</p>
@@ -138,9 +100,9 @@
                     </li>
                 {% endfor %}
             </ol>
-        {% else %}
-            <div class="empty empty-sm"><p class="empty-text">Aucune citation.</p></div>
         {% endif %}
     </section>
+
+    {% include '_layout/pagination.html.twig' with {pager: pager, route: 'search', params: {q: term, tab: tab}} %}
 {% endif %}
 {% endblock %}

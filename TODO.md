@@ -9,8 +9,7 @@ Items marked **BLOCKED** need a decision from the owner before any work.
 1. **Backup check (NAS mirror).** Verify the NAS backup of the new stack (`new-forum/` mirror, see `docs/operations.md`) and do one restore test of a dump into a scratch database (`deploy/restore.sh`, or the scratch-DB procedure in `docs/operations.md`). Biggest risk reduction per minute.
 2. **CI first run: CHECK.** The first real GitHub Actions run happens on the history-rewrite push. Verify end to end: `base`, `test`, `frontend`, `image`, `publish` green, `latest` pushed to ghcr, then make the `comtso-base` package public (otherwise a fork or a clean machine cannot pull the base image). Docs-only pushes are skipped (`paths-ignore`): trigger manually or push a non-docs commit if nothing started.
 3. **`www.comtso.fr` redirect and Keres CSP** (owner only, minutes): test `compose.www-redirect.yaml` (permanent redirect to the apex) and that the Keres app still works with its own CSP (the shared Traefik no longer sets one).
-4. **Search: paginate, results by type in tabs.** Correctness/performance, not a nicety: results are unbounded over about 26 000 comments. Keep the six legacy sections as tabs (Commentaires, Photos, Chats, Membres, Topics, Citations); `tests/Forum` search tests cover it.
-5. **Change avatar.** Most visible gap for members. Plumbing exists (`avatar` variant, photo pipeline, `Photo` avatar link): form on `/gens/{pseudo}/config`, release the old avatar through `PostPhotos::releaseOrphans`, test.
+4. **Change avatar.** Most visible gap for members. Plumbing exists (`avatar` variant, photo pipeline, `Photo` avatar link): form on `/gens/{pseudo}/config`, release the old avatar through `PostPhotos::releaseOrphans`, test.
 
 ## Wave 2: hardening and photo/text features
 

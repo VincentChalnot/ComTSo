@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Comment;
 use App\Entity\Topic;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 class CommentRepository extends ServiceEntityRepository
@@ -117,26 +118,40 @@ class CommentRepository extends ServiceEntityRepository
     }
 
     /**
-     * Messages containing a term (case/accent-insensitive thanks to the column collation), newest first.
+     * Messages containing a term (case/accent-insensitive thanks to the column collation), newest first, one page.
      *
      * @return list<Comment>
      */
-    public function search(string $term, int $limit = 30): array
+    public function search(string $term, int $limit, int $offset = 0): array
     {
-        return $this->createQueryBuilder('c')
-            ->addSelect('a', 't', 'f')
+        return $this->searchBuilder($term)
+            ->addSelect('a', 'av', 't', 'f')
             ->leftJoin('c.author', 'a')
+            ->leftJoin('a.avatar', 'av') // the avatar is shown next to every result: no lazy load per author
             ->innerJoin('c.topic', 't')
             ->innerJoin('t.forum', 'f')
+            ->orderBy('c.createdAt', 'DESC')
+            ->addOrderBy('c.id', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** How many messages {@see self::search()} finds, whatever the page. */
+    public function countSearch(string $term): int
+    {
+        return (int) $this->searchBuilder($term)->select('COUNT(c.id)')->getQuery()->getSingleScalarResult();
+    }
+
+    private function searchBuilder(string $term): QueryBuilder
+    {
+        return $this->createQueryBuilder('c')
             // Stored HTML escapes quotes and ampersands, and escapers disagree on the spelling of the
             // apostrophe (&#39; in the legacy data, &#039; from PHP): look for every spelling.
             ->where('c.content LIKE :q OR c.content LIKE :qe OR c.content LIKE :qe2')
             ->setParameter('q', '%'.addcslashes($term, '%_\\').'%')
             ->setParameter('qe', '%'.addcslashes(htmlspecialchars($term, ENT_QUOTES), '%_\\').'%')
-            ->setParameter('qe2', '%'.addcslashes(str_replace('&#039;', '&#39;', htmlspecialchars($term, ENT_QUOTES)), '%_\\').'%')
-            ->orderBy('c.createdAt', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('qe2', '%'.addcslashes(str_replace('&#039;', '&#39;', htmlspecialchars($term, ENT_QUOTES)), '%_\\').'%');
     }
 }

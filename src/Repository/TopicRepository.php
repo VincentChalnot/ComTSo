@@ -92,20 +92,33 @@ class TopicRepository extends ServiceEntityRepository
     }
 
     /**
-     * Case-insensitive search in topic titles and descriptions.
+     * Case-insensitive search in topic titles and descriptions, most recently active first, one page.
      *
      * @return list<Topic>
      */
-    public function search(string $term, int $limit = 30): array
+    public function search(string $term, int $limit, int $offset = 0): array
     {
-        return $this->createQueryBuilder('t')
+        return $this->searchBuilder($term)
             ->addSelect('f')
             ->innerJoin('t.forum', 'f')
-            ->where('t.title LIKE :q OR t.content LIKE :q')
-            ->setParameter('q', '%'.addcslashes($term, '%_\\').'%')
             ->orderBy('t.lastActivityAt', 'DESC')
+            ->addOrderBy('t.id', 'DESC')
+            ->setFirstResult($offset)
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+    }
+
+    /** How many topics {@see self::search()} finds, whatever the page. */
+    public function countSearch(string $term): int
+    {
+        return (int) $this->searchBuilder($term)->select('COUNT(t.id)')->getQuery()->getSingleScalarResult();
+    }
+
+    private function searchBuilder(string $term): QueryBuilder
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.title LIKE :q OR t.content LIKE :q')
+            ->setParameter('q', '%'.addcslashes($term, '%_\\').'%');
     }
 }
