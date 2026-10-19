@@ -16,6 +16,7 @@ Vite + Tailwind CSS 4 + Vue 3 (only for interactive widgets), Mercure for the ch
 ## Git workflow
 
 - **Always commit WITHOUT signing**: the repo has `commit.gpgsign=true`, so use `git -c commit.gpgsign=false commit ...`. The owner reviews the commits and rebases to sign them later. Never stop or loop because of GPG.
+- **Never push** to `master`/`main` (or force-push anything): the owner pushes after reviewing and signing the commits. Commit locally and stop; report the commits instead.
 - **Atomic commits**: one logical change each; the tests and docs that belong to a change go in the same commit; the tree stays green after each commit.
 - **One message convention**: Conventional Commits, `type(scope): imperative English summary`. Types used here: `feat`, `fix`, `refactor`, `docs`, `test`, `ci`, `chore`; optional scope (`mail`, `photos`, `design`, `deploy`...). Summary lower-case, no trailing period, 72 characters at most; a body only when the why is not obvious.
 
