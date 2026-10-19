@@ -1,0 +1,76 @@
+# Dependabot version updates (the security updates and alerts are a repository setting, independent of this file).
+# Weekly, Monday morning Paris time; minor and patch updates are grouped in one pull request per ecosystem, a major update
+# stays its own pull request. Every pull request runs the normal CI (`test`, `frontend`, `image`, `gitleaks`).
+version: 2
+
+updates:
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Paris
+    open-pull-requests-limit: 5
+    groups:
+      composer-minor-patch:
+        update-types: [minor, patch]
+    # Symfony is pinned to the 8.1 line by composer.json `extra.symfony.require`: a bump of the line is a deliberate migration.
+    ignore:
+      - dependency-name: symfony/*
+        update-types: [version-update:semver-major]
+
+  # One package.json at the root: the design system showcase (design-system/) uses it too, it has none of its own.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Paris
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Paris
+    open-pull-requests-limit: 3
+    groups:
+      docker-minor-patch:
+        update-types: [minor, patch]
+    # The FrankenPHP/PHP base is refreshed by the weekly `refresh-base` workflow; moving it (PHP minor, new FrankenPHP major) edits
+    # the `base-image` block of the Dockerfile and needs `docker/base-hash.sh --write`: a deliberate change, not an automatic one.
+    ignore:
+      - dependency-name: dunglas/frankenphp
+
+  # compose.yaml (dev) and deploy/compose.yaml (production): MariaDB, Mailpit, Node. The MariaDB line (11.4 LTS) is moved by hand:
+  # a new major/minor needs a dump/restore rehearsal first.
+  - package-ecosystem: docker-compose
+    directories: [/, /deploy]
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Paris
+    open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: mariadb
+        update-types: [version-update:semver-major, version-update:semver-minor]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Paris
+    open-pull-requests-limit: 3
+    groups:
+      actions-minor-patch:
+        update-types: [minor, patch]
