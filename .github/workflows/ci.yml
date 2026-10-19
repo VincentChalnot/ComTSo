@@ -5,7 +5,7 @@ name: CI
 # (never for pull requests). Docs-only changes do not trigger a run.
 #
 # Job graph:    base ─┬─ test ─────┐
-#                     ├─ image ────┼─ publish (push only)
+#                     ├─ image ────┼─ publish (push only)   (`image` also smoke-tests the production image)
 #               frontend ──────────┤
 #               audit (advisory)
 on:
@@ -228,17 +228,62 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
+      # `load: true` keeps the image in the runner's Docker daemon (under a local-only tag) for the smoke test below; nothing is pushed.
       - name: Build the production image
         uses: docker/build-push-action@v6
         with:
           context: .
           target: frankenphp_prod
           build-args: BASE_IMAGE=${{ needs.base.outputs.ref }}
+          load: true
+          tags: ghcr.io/vincentchalnot/comtso:ci-smoke
           provenance: false
           cache-from: |
             type=gha,scope=prod
             type=gha,scope=base
           cache-to: type=gha,scope=prod,mode=max
+
+      # Runs the image the way production does: deploy/compose.yaml (migrate, app, a throwaway MariaDB) with secrets generated on the
+      # fly, plain HTTP on loopback. Proves that the image boots, migrates an empty database and serves: /health answers `ok`
+      # (Caddy + PHP + database) and the private forum sends an anonymous visitor to /login.
+      - name: Smoke-test the production image
+        env:
+          COMPOSE_FILE: deploy/compose.yaml
+          COMPOSE_PROJECT_NAME: comtso-smoke
+          COMTSO_IMAGE_TAG: ci-smoke
+          SERVER_NAME: smoke.invalid
+          CADDY_SITE_ADDRESS: ':80'
+          HTTP_BIND: '127.0.0.1:8080'
+          HTTPS_BIND: '127.0.0.1:8443'
+          # Throwaway secrets, valid for this job only (compose turns each into a /run/secrets file).
+          MAILER_DSN: 'null://null'
+        run: |
+          APP_SECRET=$(openssl rand -hex 32)
+          DATABASE_PASSWORD=$(openssl rand -hex 16)
+          DATABASE_ROOT_PASSWORD=$(openssl rand -hex 16)
+          MERCURE_JWT_SECRET=$(openssl rand -hex 32)
+          export APP_SECRET DATABASE_PASSWORD DATABASE_ROOT_PASSWORD MERCURE_JWT_SECRET
+          docker compose up -d --no-build --pull never
+          for _ in $(seq 1 60); do
+            [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/health)" = 200 ] && break
+            sleep 2
+          done
+          test "$(curl -sS http://127.0.0.1:8080/health)" = ok
+          headers="$(curl -sS -o /dev/null -D - http://127.0.0.1:8080/)"
+          echo "$headers"
+          echo "$headers" | head -n 1 | grep -qE '^HTTP/[0-9.]+ 302'
+          echo "$headers" | grep -iqE '^location: .*/login\r?$'
+
+      - name: Smoke-test logs
+        if: failure()
+        env:
+          COMPOSE_FILE: deploy/compose.yaml
+          COMPOSE_PROJECT_NAME: comtso-smoke
+          COMTSO_IMAGE_TAG: ci-smoke
+        run: |
+          export SERVER_NAME=smoke.invalid APP_SECRET=x DATABASE_PASSWORD=x DATABASE_ROOT_PASSWORD=x MERCURE_JWT_SECRET=x MAILER_DSN=x
+          docker compose ps -a
+          docker compose logs --no-color --tail=200
 
   publish:
     if: github.event_name != 'pull_request'
