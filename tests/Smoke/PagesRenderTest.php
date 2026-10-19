@@ -30,7 +30,7 @@ class PagesRenderTest extends AppWebTestCase
             "/comment/{$comment->getId()}", "/comment/{$comment->getId()}/edit",
             '/gens', '/gens/bob', '/gens/alice', '/gens/alice/edit', '/gens/alice/config',
             '/photos', "/photos/{$photo->getId()}", "/photos/{$photo->getId()}/edit",
-            '/recherche?q=lien', '/recherche?q=x', '/recherche',
+            '/recherche?q=lien', '/recherche?q=x', '/recherche', '/statistiques',
         ];
         foreach ($urls as $url) {
             $this->client->request('GET', $url);

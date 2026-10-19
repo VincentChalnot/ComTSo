@@ -317,6 +317,7 @@ and forced classes (`is-hover`, `is-pressed`, `is-focus`, `is-disabled`) through
 | `_chat` | every `.chat-*` class of the original chat (page layout is unlayered on purpose) |
 | `_rich-editor` | every `.rich-editor*` class, ProseMirror content typeset like `.post-body` |
 | `_people` | `.people-grid` `.person-card*` `.profile*` `.settings*` `.result-list` `.result*` `.search-hit` (search highlight, `mark`) |
+| `_stats` | `.stats-chart*` `.stats-bar` `.stats-series-N` `.stats-legend*` `.stats-swatch` (SVG bar chart of `StatsChart.vue`; series colours = `link`, `kicker`) |
 | `_auth` | `.auth` `.auth-card` `.auth-brand` `.auth-wordmark` `.auth-title` `.auth-lead` `.auth-form` `.auth-remember` `.auth-footer` |
 | `_error` | `.error-page` `.error-code` `.error-title` `.error-text` `.error-actions` |
 | `_theme-toggle` | `.theme-toggle` `.theme-toggle-floating` |
@@ -346,6 +347,7 @@ Audit of `assets/styles/app.css` (removed by the cutover), `templates/**`, `asse
 | Lightbox (built by `ui.js`, `data-lb-*`) | `_lightbox` |
 | Chat (`ChatRoom.vue`, `chat-badge.js`) | `_chat` |
 | Rich editor (`RichEditor.vue`, `form/rich_text`) | `_rich-editor` |
+| Statistics chart (`StatsChart.vue`, `stats/index`) | `_stats` |
 | Login / register / error pages | `_auth`, `_error` |
 | Avatars (`_ui/avatar`: image, initial on `hsl()` background, `?`) | `_avatar` |
 | Search result highlights | `mark` (base) |

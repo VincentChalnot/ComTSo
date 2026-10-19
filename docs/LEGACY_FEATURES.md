@@ -29,5 +29,5 @@ The "New app" column says how each feature is handled in this rewrite (`✔` don
 | 22 | **Legacy URLs** | `topic.php?id=N` (first PHP version) pasted in messages. | ✔ `/topic.php?id=N` redirects |
 | 23 | **Logout / login** | FOSUserBundle form login, remember me. Accounts can be disabled (`enabled=0`). | ✔ disabled accounts cannot log in; passwords migrate transparently |
 
-Not present in the old site (ideas for later): per-user notifications by mail, unread markers per topic, drafts, image paste in the editor; a user admin screen and a statistics page are planned (`TODO.md` wave 3).
+Not present in the old site (ideas for later): per-user notifications by mail, unread markers per topic, drafts, image paste in the editor; a user admin screen is planned (`TODO.md` wave 3). The statistics page (`/statistiques`: messages per member and per year, charts and table) exists.
 The `…` markers above match the backlog in `TODO.md`.

@@ -1,0 +1,72 @@
+// Statistics page (templates/stats/index.html.twig, assets/vue/components/StatsChart.vue): stacked SVG bars.
+//
+//   <figure class="stats-chart"><div class="stats-chart-scroll"><svg class="stats-chart-svg">
+//     <rect class="stats-bar stats-series-0|1">…  <text class="stats-axis|stats-value">
+//   </svg></div><figcaption class="stats-legend"><span class="stats-legend-item"><span class="stats-swatch stats-series-0"></span>Forum</span>…
+//
+// Series colours are `link` (0, blue) and `kicker` (1, sand); a surface-coloured outline separates stacked segments. Both pass 4.5:1
+// against `surface` in both themes (existing `link` and `kicker` pairs of npm run contrast).
+@use "../abstracts" as *;
+
+@layer components {
+  .stats-chart {
+    margin: 0;
+  }
+  .stats-chart-scroll {
+    overflow-x: auto;
+  }
+  .stats-chart-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font-sans);
+  }
+  .stats-grid {
+    stroke: var(--c-line);
+    stroke-width: 1;
+  }
+  .stats-axis {
+    fill: var(--c-muted);
+    font-size: 11px;
+  }
+  .stats-value {
+    fill: var(--c-fg-soft);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+  .stats-bar {
+    stroke: var(--c-surface);
+    stroke-width: 1.5;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+  .stats-series-0 {
+    fill: var(--c-link);
+    background-color: var(--c-link);
+  }
+  .stats-series-1 {
+    fill: var(--c-kicker);
+    background-color: var(--c-kicker);
+  }
+  .stats-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    margin-top: 0.5rem;
+    color: var(--c-fg-soft);
+    font-size: 0.8125rem;
+  }
+  .stats-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .stats-swatch {
+    display: inline-block;
+    width: 0.85rem;
+    height: 0.85rem;
+    border-radius: 2px;
+  }
+}

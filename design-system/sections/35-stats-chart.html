@@ -1,0 +1,27 @@
+<section class="ds-section" id="stats-chart" data-title="Graphique de statistiques">
+  <header class="ds-section-head">
+    <p class="kicker">Composants éditoriaux</p>
+    <h2>Graphique en barres empilées</h2>
+    <p class="standfirst">Le widget <code>StatsChart</code> (page Statistiques) : du SVG pur, sans dépendance. Deux séries (<code>link</code> et <code>kicker</code>, AA sur la carte dans les deux thèmes), un liseré de la couleur de la carte entre les segments, une légende en HTML. Le tableau de la page reprend les mêmes chiffres : c’est l’alternative accessible.</p>
+  </header>
+  <div class="ds-demo" data-title="Réplique statique : barres verticales (messages par année)">
+    <div class="ds-stage is-surface">
+      <figure class="stats-chart">
+        <div class="stats-chart-scroll">
+          <svg viewBox="0 0 720 300" class="stats-chart-svg" role="img" aria-label="Messages par année : 2019 120, 2020 340, 2021 210.">
+            <line class="stats-grid" x1="48" y1="272" x2="712" y2="272"/><text class="stats-axis" x="42" y="276" text-anchor="end">0</text>
+            <line class="stats-grid" x1="48" y1="136" x2="712" y2="136"/><text class="stats-axis" x="42" y="140" text-anchor="end">200</text>
+            <line class="stats-grid" x1="48" y1="8" x2="712" y2="8"/><text class="stats-axis" x="42" y="12" text-anchor="end">400</text>
+            <rect class="stats-bar stats-series-0" x="120" y="190" width="120" height="82"/><rect class="stats-bar stats-series-1" x="120" y="163" width="120" height="27"/><text class="stats-axis" x="180" y="290" text-anchor="middle">2019</text>
+            <rect class="stats-bar stats-series-0" x="320" y="60" width="120" height="212"/><rect class="stats-bar stats-series-1" x="320" y="40" width="120" height="20"/><text class="stats-axis" x="380" y="290" text-anchor="middle">2020</text>
+            <rect class="stats-bar stats-series-0" x="520" y="140" width="120" height="132"/><rect class="stats-bar stats-series-1" x="520" y="120" width="120" height="20"/><text class="stats-axis" x="580" y="290" text-anchor="middle">2021</text>
+          </svg>
+        </div>
+        <figcaption class="stats-legend">
+          <span class="stats-legend-item"><span class="stats-swatch stats-series-0" aria-hidden="true"></span>Forum</span>
+          <span class="stats-legend-item"><span class="stats-swatch stats-series-1" aria-hidden="true"></span>Chat</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
