@@ -28,7 +28,7 @@ class LegacyPhotoRedirectTest extends AppWebTestCase
 
         $this->client->request('GET', '/photos/preview/73.jpg');
 
-        self::assertResponseRedirects('/photos/'.$photo->getId().'/medium', 301);
+        self::assertResponseRedirects('/photos/'.$photo->getId().'/medium?v='.$photo->getFileVersion(), 301);
     }
 
     public function testAThumbnailLinkGoesToTheThumbnailOfThePhoto(): void
@@ -38,7 +38,7 @@ class LegacyPhotoRedirectTest extends AppWebTestCase
 
         $this->client->request('GET', '/photos/thumbnail/73.jpg');
 
-        self::assertResponseRedirects('/photos/'.$photo->getId().'/thumb', 301);
+        self::assertResponseRedirects('/photos/'.$photo->getId().'/thumb?v='.$photo->getFileVersion(), 301);
     }
 
     /** A camera file called 73.jpg uploaded years later must not steal the old links. */
@@ -50,7 +50,7 @@ class LegacyPhotoRedirectTest extends AppWebTestCase
 
         $this->client->request('GET', '/photos/preview/73.jpg');
 
-        self::assertResponseRedirects('/photos/'.$imported->getId().'/medium', 301);
+        self::assertResponseRedirects('/photos/'.$imported->getId().'/medium?v='.$imported->getFileVersion(), 301);
     }
 
     public function testAnUnknownOldNumberIsNotFound(): void

@@ -11,6 +11,7 @@ use App\Form\CommentType;
 use App\Form\TopicType;
 use App\Forum\TopicPageBuilder;
 use App\Forum\TopicRemover;
+use App\Photo\PhotoUrls;
 use App\Repository\PhotoTopicRepository;
 use App\Service\PhotoUploader;
 use Doctrine\ORM\EntityManagerInterface;
@@ -133,6 +134,7 @@ class TopicController extends AbstractController
         #[MapEntity(id: 'id')] Topic $topic,
         #[CurrentUser] User $user,
         PhotoUploader $uploader,
+        PhotoUrls $photoUrls,
         PhotoTopicRepository $photoTopics,
         EntityManagerInterface $em,
     ): JsonResponse {
@@ -158,7 +160,7 @@ class TopicController extends AbstractController
         $em->persist($link);
         $em->flush();
 
-        return new JsonResponse(['id' => $photo->getId(), 'link' => $link->getId(), 'thumb' => $this->generateUrl('photo_variant', ['id' => $photo->getId(), 'variant' => 'thumb'])], Response::HTTP_CREATED);
+        return new JsonResponse(['id' => $photo->getId(), 'link' => $link->getId(), 'thumb' => $photoUrls->url($photo, 'thumb')], Response::HTTP_CREATED);
     }
 
     #[Route('/photos/order', name: 'topic_photos_order', methods: ['POST'])]

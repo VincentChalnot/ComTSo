@@ -9,10 +9,20 @@
     <p class="kicker"><a href="{{ path('photo_index') }}">Photothèque</a></p>
     <h1 class="page-title">{{ caption }}</h1>
     <div class="page-actions">
-        <a href="{{ path('photo_source', {id: photo.id, download: 1}) }}" class="btn">{{ ui.icon('download', 'size-4') }} Télécharger ({{ (photo.fileSize / 1024)|round(1) }} Ko)</a>
+        <a href="{{ photo_url(photo, 'download') }}" class="btn">{{ ui.icon('download', 'size-4') }} Télécharger ({{ (photo.fileSize / 1024)|round(1) }} Ko)</a>
         {% set canManage = app.user and (photo.author == app.user or is_granted('ROLE_ADMIN')) %}
         {% if canManage %}
             <a href="{{ path('photo_edit', {id: photo.id}) }}" class="btn btn-ghost">{{ ui.icon('pencil', 'size-4') }} Modifier</a>
+            {% if photo.fileType != 'image/gif' %}
+                {# A quarter turn re-encodes the stored picture: not offered for GIFs (animated ones cannot be turned). #}
+                {% for direction, rotation in {left: {label: 'Pivoter à gauche', icon: 'rotate-ccw'}, right: {label: 'Pivoter à droite', icon: 'rotate-cw'}} %}
+                    <form method="post" action="{{ path('photo_rotate', {id: photo.id}) }}" class="inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('rotate-photo-' ~ photo.id) }}">
+                        <input type="hidden" name="direction" value="{{ direction }}">
+                        <button type="submit" class="btn btn-ghost">{{ ui.icon(rotation.icon, 'size-4') }} {{ rotation.label }}</button>
+                    </form>
+                {% endfor %}
+            {% endif %}
             <form method="post" action="{{ path('photo_delete', {id: photo.id}) }}" class="inline"
                   data-confirm="{% if is_granted('ROLE_ADMIN') and (photo.topics|length or messageUsages) %}Supprimer définitivement cette photo ? Elle disparaîtra aussi des sujets et des messages où elle apparaît.{% else %}Supprimer définitivement cette photo ?{% endif %}">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete-photo-' ~ photo.id) }}">
@@ -24,9 +34,9 @@
 
 <figure class="photo-figure">
     <a href="{{ path('photo_show', {id: photo.id}) }}"
-       data-lightbox="photo-{{ photo.id }}" data-photo-id="{{ photo.id }}" data-src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}" data-full="{{ path('photo_source', {id: photo.id}) }}"
-       data-download="{{ path('photo_source', {id: photo.id, download: 1}) }}" data-caption="{{ caption }}">
-        <img src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}" alt="{{ caption }}">
+       data-lightbox="photo-{{ photo.id }}" data-photo-id="{{ photo.id }}" data-src="{{ photo_url(photo, 'medium') }}" data-full="{{ photo_url(photo, 'source') }}"
+       data-download="{{ photo_url(photo, 'download') }}" data-caption="{{ caption }}">
+        <img src="{{ photo_url(photo, 'medium') }}" alt="{{ caption }}">
     </a>
     <figcaption>
         <form method="post" action="{{ path('photo_like', {id: photo.id}) }}" class="like" id="likes">

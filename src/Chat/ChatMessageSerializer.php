@@ -4,14 +4,14 @@ namespace App\Chat;
 
 use App\Entity\ChatMessage;
 use App\Entity\User;
+use App\Photo\PhotoUrls;
 use App\Twig\LayoutExtension;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /** JSON shape of chat messages and members shared by the HTTP endpoints, the Mercure updates and the page. */
 class ChatMessageSerializer
 {
     public function __construct(
-        private readonly UrlGeneratorInterface $urls,
+        private readonly PhotoUrls $photoUrls,
         private readonly LayoutExtension $layout,
     ) {
     }
@@ -52,7 +52,7 @@ class ChatMessageSerializer
         return [
             'id' => $user->getId(),
             'username' => $user->getUsername(),
-            'avatarUrl' => $avatar ? $this->urls->generate('photo_variant', ['id' => $avatar->getId(), 'variant' => 'avatar']) : null,
+            'avatarUrl' => $avatar ? $this->photoUrls->url($avatar, 'avatar') : null,
             // Same hue as the `user_hue()` Twig function, so the placeholder avatar looks the same everywhere.
             'hue' => $this->layout->userHue($user),
         ];

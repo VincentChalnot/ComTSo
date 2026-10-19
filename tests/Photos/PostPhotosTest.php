@@ -78,7 +78,7 @@ class PostPhotosTest extends AppWebTestCase
 
         $crawler = $this->client->request('GET', "/forum/general/{$this->topic->getId()}");
         self::assertCount(2, $crawler->filter("#post-{$comment->getId()} ul.post-photos li.post-photo a[data-lightbox]"));
-        self::assertCount(1, $crawler->filter('#post-'.$comment->getId().' a[data-lightbox="post-'.$comment->getId().'"][data-src$="/medium"]')->slice(0, 1), 'The lightbox group is the message.');
+        self::assertCount(1, $crawler->filter('#post-'.$comment->getId().' a[data-lightbox="post-'.$comment->getId().'"][data-src*="/medium?v="]')->slice(0, 1), 'The lightbox group is the message.');
     }
 
     public function testPhotosAlsoAppearInTheGlobalLibrary(): void

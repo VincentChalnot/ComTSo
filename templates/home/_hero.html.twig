@@ -8,12 +8,12 @@
     <a class="hero-media" href="{{ path('photo_show', {id: photo.id}) }}" aria-label="Agrandir la photo : {{ title }}"
        data-lightbox="hero"
        data-photo-id="{{ photo.id }}"
-       data-src="{{ path('photo_variant', {id: photo.id, variant: 'hero'}) }}"
-       data-full="{{ path('photo_source', {id: photo.id}) }}"
-       data-download="{{ path('photo_source', {id: photo.id, download: 1}) }}"
+       data-src="{{ photo_url(photo, 'hero') }}"
+       data-full="{{ photo_url(photo, 'source') }}"
+       data-download="{{ photo_url(photo, 'download') }}"
        data-page="{{ path('photo_show', {id: photo.id}) }}"
        data-caption="{{ title }}">
-        <img class="hero-image" src="{{ path('photo_variant', {id: photo.id, variant: 'hero'}) }}" alt="{{ title }}"{% if size %} width="{{ size.width }}" height="{{ size.height }}"{% endif %} fetchpriority="high" decoding="async">
+        <img class="hero-image" src="{{ photo_url(photo, 'hero') }}" alt="{{ title }}"{% if size %} width="{{ size.width }}" height="{{ size.height }}"{% endif %} fetchpriority="high" decoding="async">
     </a>
     <div class="hero-body">
         <p class="kicker">{{ constant('App\\Photo\\FeaturedPhoto::KICKER') }}</p>

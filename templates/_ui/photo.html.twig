@@ -6,11 +6,11 @@
    class="photo-thumb shrink-0 {{ size }}"
    data-lightbox="{{ group }}"
    data-photo-id="{{ photo.id }}"
-   data-src="{{ path('photo_variant', {id: photo.id, variant: 'medium'}) }}"
-   data-full="{{ path('photo_source', {id: photo.id}) }}"
-   data-download="{{ path('photo_source', {id: photo.id, download: 1}) }}"
+   data-src="{{ photo_url(photo, 'medium') }}"
+   data-full="{{ photo_url(photo, 'source') }}"
+   data-download="{{ photo_url(photo, 'download') }}"
    data-page="{{ path('photo_show', {id: photo.id}) }}"
    data-caption="{{ photo.title ?: photo.originalFilename }}">
-    <img src="{{ path('photo_variant', {id: photo.id, variant: 'thumb'}) }}" alt="{{ photo.title ?: photo.originalFilename }}" loading="lazy">
+    <img src="{{ photo_url(photo, 'thumb') }}" alt="{{ photo.title ?: photo.originalFilename }}" loading="lazy">
 </a>
 {% endmacro %}

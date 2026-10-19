@@ -95,6 +95,64 @@ final class PhotoPipelineTest extends TestCase
         }
     }
 
+    public function testAQuarterTurnSwapsTheShapeAndGoesTheRequestedWay(): void
+    {
+        $image = imagecreatetruecolor(300, 200);
+        imagefill($image, 0, 0, imagecolorallocate($image, 0, 0, 255));
+        imagefilledrectangle($image, 0, 0, 59, 39, imagecolorallocate($image, 255, 0, 0));
+        ob_start();
+        imagepng($image);
+        $source = $this->file((string) ob_get_clean(), 'wide.png');
+
+        $right = $this->pipeline->rotate($source, $this->out, true);
+        $left = $this->pipeline->rotate($source, $this->out, false);
+
+        foreach ([$right, $left] as $turned) {
+            self::assertSame('image/webp', $turned->mimeType);
+            self::assertSame([200, 300], [$turned->width, $turned->height]);
+            self::assertSame([200, 300], \array_slice(getimagesize($this->out.'/'.$turned->filename), 0, 2));
+            self::assertSame($turned->fileSize, filesize($this->out.'/'.$turned->filename));
+        }
+        self::assertNotSame($right->filename, $left->filename);
+        $isRed = static function (string $file, int $x, int $y): bool {
+            $rgb = imagecolorat(imagecreatefromwebp($file), $x, $y);
+
+            return (($rgb >> 16) & 0xFF) > 150 && ($rgb & 0xFF) < 100;
+        };
+        self::assertTrue($isRed($this->out.'/'.$right->filename, 180, 20), 'Clockwise: top-left goes to the top-right.');
+        self::assertTrue($isRed($this->out.'/'.$left->filename, 20, 280), 'Counter-clockwise: top-left goes to the bottom-left.');
+        self::assertFileExists($source, 'The source is left untouched.');
+    }
+
+    public function testATurnAlsoAppliesTheExifOrientationOfAFileThatNeverWentThroughTheLibrary(): void
+    {
+        // EXIF 6 = "rotate 90° clockwise to read": 300 × 200 on disk is a 200 × 300 portrait; one more clockwise turn makes it 300 × 200.
+        $source = $this->file(ExifJpeg::build(300, 200, ['Orientation' => 6]), 'legacy.jpg');
+
+        $turned = $this->pipeline->rotate($source, $this->out, true);
+
+        self::assertSame([300, 200], [$turned->width, $turned->height]);
+    }
+
+    public function testAnAnimatedGifCannotBeTurned(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('GIF animé');
+
+        try {
+            $this->pipeline->rotate($this->file($this->animatedGif(), 'anim.gif'), $this->out, true);
+        } finally {
+            self::assertSame([], glob($this->out.'/*') ?: [], 'Nothing is written.');
+        }
+    }
+
+    public function testATurnRefusesWhatIsNotAnImage(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->pipeline->rotate($this->file('<?php echo 1;', 'evil.jpg'), $this->out, true);
+    }
+
     public function testSmallPicturesAreNeverUpscaled(): void
     {
         $stored = $this->pipeline->ingest($this->file(ExifJpeg::build(300, 200)), $this->out);

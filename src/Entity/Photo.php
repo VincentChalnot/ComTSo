@@ -103,6 +103,15 @@ class Photo implements \JsonSerializable
         return $this;
     }
 
+    /**
+     * Short token that changes whenever the stored file is replaced (a rotation writes a new file). Image URLs carry it
+     * (`?v=`, see App\Photo\PhotoUrls): the responses are cached by browsers for a year, so the URL must change with the pixels.
+     */
+    public function getFileVersion(): string
+    {
+        return hash('crc32b', (string) $this->filename);
+    }
+
     public function getOriginalFilename(): ?string
     {
         return $this->originalFilename;

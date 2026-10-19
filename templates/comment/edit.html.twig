@@ -19,7 +19,7 @@
                     {% for child in form.remove_photos %}
                         {% set photo = form.remove_photos.vars.choices[loop.index0].data.photo %}
                         <li class="attach-item">
-                            <img src="{{ path('photo_variant', {id: photo.id, variant: 'thumb'}) }}" alt="" width="80" height="80" loading="lazy">
+                            <img src="{{ photo_url(photo, 'thumb') }}" alt="" width="80" height="80" loading="lazy">
                             <span class="attach-item-name">{{ photo.title ?: photo.originalFilename }}</span>
                             <span class="attach-item-remove">{{ form_widget(child) }} {{ form_label(child, 'Retirer') }}</span>
                         </li>

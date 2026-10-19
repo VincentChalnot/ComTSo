@@ -84,7 +84,7 @@ final class AvatarTest extends AppWebTestCase
         $this->loginAs($alice);
         $this->submitAvatar($this->jpegUpload());
         $avatar = $this->reload('alice')->getAvatar();
-        $src = "/photos/{$avatar->getId()}/avatar";
+        $src = "/photos/{$avatar->getId()}/avatar?v={$avatar->getFileVersion()}";
 
         $this->client->request('GET', '/gens/alice');
         $crawler = $this->client->getCrawler();

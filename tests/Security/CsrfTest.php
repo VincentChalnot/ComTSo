@@ -13,7 +13,7 @@ class CsrfTest extends AppWebTestCase
 
     /** Routes that check an explicit token with isCsrfTokenValid(). */
     private const TOKEN_ROUTES = [
-        'chat_read', 'chat_send', 'comment_delete', 'photo_delete', 'photo_like', 'topic_delete', 'topic_photo_remove',
+        'chat_read', 'chat_send', 'comment_delete', 'photo_delete', 'photo_like', 'photo_rotate', 'topic_delete', 'topic_photo_remove',
         'topic_photos_order', 'topic_photos_upload', 'topic_star', 'topic_unstar', 'user_theme',
     ];
 
@@ -60,6 +60,7 @@ class CsrfTest extends AppWebTestCase
             'comment_delete' => ['POST', '/comment/'.$comment->getId().'/delete', []],
             'photo_delete' => ['POST', '/photos/'.$photo->getId().'/delete', []],
             'photo_like' => ['POST', '/photos/'.$photo->getId().'/like', []],
+            'photo_rotate' => ['POST', '/photos/'.$photo->getId().'/rotate', ['direction' => 'right']],
             'topic_delete' => ['POST', $base.'/delete', []],
             'topic_photo_remove' => ['POST', $base.'/photos/1/remove', ['delete_file' => true]],
             'topic_photos_order' => ['POST', $base.'/photos/order', ['links' => [1]]],

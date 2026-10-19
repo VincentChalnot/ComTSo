@@ -6,7 +6,7 @@
 {%- if user is null -%}
     <span class="{{ cls }} avatar-initial" style="--avatar-hue: 30" aria-hidden="true">?</span>
 {%- elseif user.avatar -%}
-    <img src="{{ path('photo_variant', {id: user.avatar.id, variant: 'avatar'}) }}" alt="{{ user.username }}" title="{{ user.username }}" width="96" height="96" loading="lazy" class="{{ cls }}">
+    <img src="{{ photo_url(user.avatar, 'avatar') }}" alt="{{ user.username }}" title="{{ user.username }}" width="96" height="96" loading="lazy" class="{{ cls }}">
 {%- else -%}
     <span title="{{ user.username }}" class="{{ cls }} avatar-initial" style="--avatar-hue: {{ user_hue(user) }}">{{ user.username|slice(0, 1)|upper }}</span>
 {%- endif -%}

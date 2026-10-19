@@ -14,7 +14,7 @@
     orderUrl: path('topic_photos_order', {forumId: topic.forum.id, id: topic.id}),
     removeUrl: path('topic_photo_remove', {forumId: topic.forum.id, id: topic.id, linkId: 0}),
     token: csrf_token('photos-' ~ topic.id),
-    photos: photos|map(link => {link: link.id, id: link.photo.id, title: link.photo.title ?: link.photo.originalFilename, thumb: path('photo_variant', {id: link.photo.id, variant: 'thumb'}), page: path('photo_show', {id: link.photo.id})}),
+    photos: photos|map(link => {link: link.id, id: link.photo.id, title: link.photo.title ?: link.photo.originalFilename, thumb: photo_url(link.photo, 'thumb'), page: path('photo_show', {id: link.photo.id})}),
     backUrl: path('topic_show', {forumId: topic.forum.id, id: topic.id}),
 }|json_encode|e('html_attr') }}"></div>
 {% endblock %}

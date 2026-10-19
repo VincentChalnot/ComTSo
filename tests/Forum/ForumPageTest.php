@@ -94,8 +94,8 @@ class ForumPageTest extends AppWebTestCase
         self::assertSame('true', $cover->attr('aria-hidden'));
         self::assertSame('-1', $cover->attr('tabindex'));
         self::assertSame('', $cover->filter('img')->attr('alt'), 'The cover duplicates the headline link: decorative.');
-        self::assertSame("/photos/{$photo->getId()}/thumb", $cover->filter('img')->attr('src'));
-        self::assertSame("/photos/{$messagePhoto->getId()}/thumb", $this->article($withMessagePhoto->getId())->filter('a.thread-preview-cover img')->attr('src'));
+        self::assertSame("/photos/{$photo->getId()}/thumb?v={$photo->getFileVersion()}", $cover->filter('img')->attr('src'));
+        self::assertSame("/photos/{$messagePhoto->getId()}/thumb?v={$messagePhoto->getFileVersion()}", $this->article($withMessagePhoto->getId())->filter('a.thread-preview-cover img')->attr('src'));
 
         $bareArticle = $this->article($bare->getId());
         self::assertCount(1, $bareArticle);

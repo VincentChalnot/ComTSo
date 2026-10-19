@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Photo\PhotoUrls;
 use App\Repository\PhotoRepository;
 use App\Repository\TopicRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,13 +34,17 @@ class LegacyRedirectController extends AbstractController
     }
 
     #[Route('/photos/{kind}/{number}.{extension}', name: 'legacy_photo', requirements: ['kind' => 'preview|thumbnail', 'number' => '\d+', 'extension' => 'jpe?g|png|gif'])]
-    public function photo(string $kind, string $number, string $extension, PhotoRepository $photos): RedirectResponse
+    public function photo(string $kind, string $number, string $extension, PhotoRepository $photos, PhotoUrls $photoUrls): RedirectResponse
     {
         $photo = $photos->findOneBy(['originalFilename' => $number.'.'.$extension], ['id' => 'ASC']);
         if (!$photo) {
             throw $this->createNotFoundException();
         }
 
-        return $this->redirectToRoute('photo_variant', ['id' => $photo->getId(), 'variant' => 'preview' === $kind ? 'medium' : 'thumb'], Response::HTTP_MOVED_PERMANENTLY);
+        $response = new RedirectResponse($photoUrls->url($photo, 'preview' === $kind ? 'medium' : 'thumb'), Response::HTTP_MOVED_PERMANENTLY);
+        // Browsers keep a 301 forever by default: the target carries the file version, which changes when the photo is rotated.
+        $response->setPrivate()->setMaxAge(3600);
+
+        return $response;
     }
 }

@@ -58,7 +58,7 @@ class HomeHeroTest extends AppWebTestCase
         self::assertSame('hero', $media->attr('data-lightbox'), 'The picture opens the lightbox…');
         self::assertSame((string) $photo->getId(), $media->attr('data-photo-id'), '…whose heart needs the photo id.');
         $image = $hero->filter('img.hero-image');
-        self::assertSame("/photos/{$photo->getId()}/hero", $image->attr('src'));
+        self::assertSame("/photos/{$photo->getId()}/hero?v={$photo->getFileVersion()}", $image->attr('src'));
         self::assertSame('Grand large', $image->attr('alt'));
         self::assertSame(['1600', '900'], [$image->attr('width'), $image->attr('height')]);
         self::assertSame('high', $image->attr('fetchpriority'));

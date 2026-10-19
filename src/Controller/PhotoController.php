@@ -6,6 +6,7 @@ use App\Entity\Photo;
 use App\Entity\User;
 use App\Form\PhotoType;
 use App\Pagination\Pager;
+use App\Photo\PhotoRotator;
 use App\Repository\CommentPhotoRepository;
 use App\Repository\PhotoLikeRepository;
 use App\Repository\PhotoRepository;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -135,6 +137,33 @@ class PhotoController extends AbstractController
         }
 
         return $this->render('photo/edit.html.twig', ['photo' => $photo, 'form' => $form]);
+    }
+
+    /**
+     * Turns the picture a quarter turn (`direction` = `left` or `right`), for its owner and the administrators. The stored
+     * WebP is re-encoded by {@see PhotoRotator}; an animated GIF is refused.
+     */
+    #[Route('/photos/{id}/rotate', name: 'photo_rotate', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function rotate(Request $request, Photo $photo, PhotoRotator $rotator): Response
+    {
+        $this->denyUnlessCanManage($photo);
+        if (!$this->isCsrfTokenValid('rotate-photo-'.$photo->getId(), $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        $direction = $request->getPayload()->getString('direction');
+        if (!\in_array($direction, ['left', 'right'], true)) {
+            throw new BadRequestHttpException('Unknown rotation direction.');
+        }
+
+        try {
+            $rotator->rotate($photo, 'right' === $direction);
+            $this->addFlash('success', 'La photo a été pivotée vers la '.('right' === $direction ? 'droite' : 'gauche').'.');
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('photo_show', ['id' => $photo->getId()]);
     }
 
     /**

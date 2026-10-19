@@ -8,7 +8,7 @@
 {% set starred = app.user.starredTopics.contains(topic) %}
 <article class="thread-preview{{ preview.coverPhoto ? ' has-cover' }}{{ preview.isNew ? ' is-new' }}" aria-labelledby="thread-title-{{ topic.id }}">
     {% if preview.coverPhoto %}
-        <a class="thread-preview-cover" href="{{ topicUrl }}" tabindex="-1" aria-hidden="true"><img src="{{ path('photo_variant', {id: preview.coverPhoto.id, variant: 'thumb'}) }}" alt="" width="320" height="320" loading="lazy"></a>
+        <a class="thread-preview-cover" href="{{ topicUrl }}" tabindex="-1" aria-hidden="true"><img src="{{ photo_url(preview.coverPhoto, 'thumb') }}" alt="" width="320" height="320" loading="lazy"></a>
     {% endif %}
     <div class="thread-preview-body">
         <p class="kicker">{{ topic.forum.title }} · <time datetime="{{ topic.lastActivityAt|date('c') }}" title="{{ topic.lastActivityAt|date('d/m/Y à H:i') }}">{{ topic.lastActivityAt|ago }}</time></p>

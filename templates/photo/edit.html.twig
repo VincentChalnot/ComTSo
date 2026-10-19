@@ -10,7 +10,7 @@
 
 <div class="grid items-start gap-8 md:grid-cols-[14rem_minmax(0,1fr)]">
     <a href="{{ path('photo_show', {id: photo.id}) }}" class="photo-thumb" aria-label="Voir la photo">
-        <img src="{{ path('photo_variant', {id: photo.id, variant: 'thumb'}) }}" alt="">
+        <img src="{{ photo_url(photo, 'thumb') }}" alt="">
     </a>
     <div class="card settings-card">
         {{ form_start(form) }}
