@@ -7,6 +7,7 @@ name: CI
 # Job graph:    base ─┬─ test ─────┐
 #                     ├─ image ────┼─ publish (push only)   (`image` also smoke-tests the production image)
 #               frontend ──────────┤
+#               gitleaks ──────────┘
 #               audit (advisory)
 on:
   push:
@@ -188,6 +189,21 @@ jobs:
       - name: WCAG AA contrast check
         run: npm run contrast
 
+  # Secret scan of the whole git history (blocking). `.gitleaks.toml` allows only the owner-accepted development findings.
+  # The pinned official image is used rather than gitleaks-action: no token, no licence, same version as the one run locally.
+  gitleaks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan the history for secrets
+        run: >
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1
+          detect --source /repo --config /repo/.gitleaks.toml --redact --verbose --no-banner
+
   # Advisory for now (continue-on-error): flip to blocking once the dependency tree is clean.
   audit:
     runs-on: ubuntu-latest
@@ -287,7 +303,7 @@ jobs:
 
   publish:
     if: github.event_name != 'pull_request'
-    needs: [base, test, frontend, image]
+    needs: [base, test, frontend, image, gitleaks]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:

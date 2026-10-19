@@ -1,0 +1,32 @@
+# gitleaks configuration, used by the `gitleaks` job of .github/workflows/ci.yml (the whole git history is scanned on every run).
+#
+# The default rule set is kept; only the findings the owner reviewed and accepted (docs/decisions.md, "Secret scan") are allowed:
+#
+#  1. The DEVELOPMENT Mercure JWT secret that `.env.example` carried (and a `.env` that was tracked for a while, in the
+#     `MERCURE_JWT_SECRET` / `CADDY_MERCURE_JWT_SECRET` lines): a throwaway value that protects no real system. It lives in the
+#     history for good, so it is allowed there, restricted to the two file names and to that variable, NOT by value (a literal
+#     here would put the secret back in the tree). `.env.example` now holds an obvious placeholder.
+#  2. The fake password of a test fixture (tests/Security/PasswordResetLoggingTest.php, the `_password` form field).
+#
+# Matching by path + line (never by commit id) survives the history being rebased and re-signed. Anything else, in particular a
+# new secret in any other file or any other variable of `.env*`, still fails the job.
+title = "ComTSo"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Development Mercure JWT secret in .env / .env.example (history only, owner-accepted)"
+condition = "AND"
+targetRules = ["generic-api-key"]
+paths = ['''^\.env(\.example)?$''']
+regexTarget = "match"
+regexes = ['''(?i)^(CADDY_)?MERCURE_JWT_SECRET=''']
+
+[[allowlists]]
+description = "Fake password of a test fixture"
+condition = "AND"
+targetRules = ["generic-api-key"]
+paths = ['''^tests/Security/PasswordResetLoggingTest\.php$''']
+regexTarget = "match"
+regexes = ['''_password''']
