@@ -29,7 +29,7 @@ class RegistrationFormType extends AbstractType
             ->add('plainPassword', PasswordType::class, [
                 'label' => 'Mot de passe',
                 'mapped' => false,
-                'constraints' => [new NotBlank(), new Length(min: 8)],
+                'constraints' => [new NotBlank(), new Length(min: ChangePasswordType::MIN_LENGTH)],
             ]);
     }
 

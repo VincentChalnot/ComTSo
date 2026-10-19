@@ -55,4 +55,27 @@ class RegistrationFlagTest extends AppWebTestCase
 
         self::assertResponseIsSuccessful();
     }
+
+    private function register(string $username, string $password): void
+    {
+        self::ensureKernelShutdown();
+        $this->setFlag('true');
+        $this->client = static::createClient();
+        $crawler = $this->client->request('GET', '/register');
+        $form = $crawler->selectButton('Créer mon compte')->form();
+        $values = $form->getPhpValues();
+        $values['registration_form'] = ['username' => $username, 'email' => $username.'@example.test', 'plainPassword' => $password] + $values['registration_form'];
+        $this->client->request('POST', $form->getUri(), $values, server: ['HTTP_ORIGIN' => 'http://localhost']);
+    }
+
+    public function testRegistrationRefusesNinePasswordCharactersAndAcceptsTen(): void
+    {
+        $this->register('shorty', '123456789');
+        self::assertResponseStatusCodeSame(422);
+        self::assertNull($this->em()->getRepository(User::class)->findOneBy(['username' => 'shorty']));
+
+        $this->register('longer', '1234567890');
+        self::assertResponseRedirects('/login');
+        self::assertNotNull($this->em()->getRepository(User::class)->findOneBy(['username' => 'longer']));
+    }
 }
