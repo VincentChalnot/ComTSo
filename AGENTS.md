@@ -13,6 +13,12 @@ Vite + Tailwind CSS 4 + Vue 3 (only for interactive widgets), Mercure for the ch
 5. **UI language is French, code/comments/commit messages are English.** Dates are displayed in `Europe/Paris` (the data is stored in Paris local time, `date.timezone=Europe/Paris`).
 6. Never post or delete anything on the real production forum (`comtso.fr`, which is this app) when browsing it for reference.
 
+## Git workflow
+
+- **Always commit WITHOUT signing**: the repo has `commit.gpgsign=true`, so use `git -c commit.gpgsign=false commit ...`. The owner reviews the commits and rebases to sign them later. Never stop or loop because of GPG.
+- **Atomic commits**: one logical change each; the tests and docs that belong to a change go in the same commit; the tree stays green after each commit.
+- **One message convention**: Conventional Commits, `type(scope): imperative English summary`. Types used here: `feat`, `fix`, `refactor`, `docs`, `test`, `ci`, `chore`; optional scope (`mail`, `photos`, `design`, `deploy`...). Summary lower-case, no trailing period, 72 characters at most; a body only when the why is not obvious.
+
 ## Running the app
 
 Everything runs in Docker through the **single dev `compose.yaml`** (production is `deploy/compose.yaml`, see "Deploy" below). Never run PHP/composer/npm on the host.
