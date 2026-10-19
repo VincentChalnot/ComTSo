@@ -100,7 +100,10 @@ final class TextNormalizer
 
             return ' ';
         }, $text) ?? $text;
-        $text = preg_replace('~\[pièce jointe : ([^\]]*)\]~u', ' $1 ', $text) ?? $text;
+        // Attachment markers (raw phpBB tag, converted note, note left once the file could not be recovered) never count: the
+        // attachments import rewrites them in the live text, which must not make a post look new.
+        $text = preg_replace('~\[attachment=\d+(?::[a-z0-9]+)?\].*?\[/attachment(?::[a-z0-9]+)?\]~is', ' ', $text) ?? $text;
+        $text = preg_replace('~\[pièce jointe(?: perdue)? : [^\]]*\]~u', ' ', $text) ?? $text;
         $text = preg_replace('~<iframe\b[^>]*\bsrc=(["\'])(.*?)\1[^>]*>(?:</iframe>)?~is', ' $2 ', $text) ?? $text;
         $text = preg_replace('~</?(?:p|br|div|li|tr|td|blockquote|cite|h[1-6]|pre|ul|ol|table)\b[^>]*>~i', ' ', $text) ?? $text;
         $text = strip_tags($text);

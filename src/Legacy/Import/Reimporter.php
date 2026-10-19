@@ -41,6 +41,8 @@ final class Reimporter
     /** @var array<string, true> smiley files referenced by imported HTML */
     private array $smilies = [];
     private int $fakeId = 0;
+    /** @var array<string, int> phpBB post ref => live comment id (matched or inserted), for the attachments */
+    private array $postComments = [];
 
     public function __construct(
         private readonly Connection $live,
@@ -58,7 +60,7 @@ final class Reimporter
         $this->report = new ImportReport();
         $this->users = new UserMapper($this->live, $options->dryRun);
         $this->forums = new ForumMapper($this->live, $options->dryRun);
-        $this->topicClaims = $this->touchedTopics = $this->smilies = $this->existingRefs = $this->topicsByTitle = [];
+        $this->topicClaims = $this->touchedTopics = $this->smilies = $this->existingRefs = $this->topicsByTitle = $this->postComments = [];
 
         // Every platform's accounts are registered first: identities are matched across platforms.
         $this->users->register($this->phpbb3->users());
@@ -82,7 +84,7 @@ final class Reimporter
                 $this->topicClaims = [];
                 match ($source) {
                     'phpbb2' => $this->importPlatform('phpbb2', $this->phpbb2->topics(), $this->phpbb2->forums(), $this->phpbb2->messages()),
-                    'phpbb3' => $this->importPlatform('phpbb3', $this->phpbb3->topics(), $this->phpbb3->forums(), $this->phpbb3->messages()),
+                    'phpbb3' => $this->importPhpbb3(),
                     'oldphp' => $this->importOldPhp(),
                 };
             }
@@ -185,6 +187,12 @@ final class Reimporter
         $this->importMessages($source, $messages);
     }
 
+    private function importPhpbb3(): void
+    {
+        $this->importPlatform('phpbb3', $this->phpbb3->topics(), $this->phpbb3->forums(), $this->phpbb3->messages());
+        (new AttachmentImporter($this->live, $this->users, $this->report, $this->options, $this->photoPipeline))->import($this->phpbb3->attachments(), $this->postComments);
+    }
+
     private function importOldPhp(): void
     {
         // Photos first: the posts embed them and their links are rewritten to the live photo ids.
@@ -220,6 +228,7 @@ final class Reimporter
                 continue;
             }
             $r->present($source, 'posts');
+            $this->postComments[$post->ref()] = $match->id;
             if (null !== $match->topicId) {
                 $votes[$match->topicId] = ($votes[$match->topicId] ?? 0) + 1;
             }
@@ -339,6 +348,7 @@ final class Reimporter
             'legacy_ref' => $post->ref(),
         ]);
         $this->comments->add('c', $id, $topicId, $authorId, self::wallClock($post->createdAt), $html, true);
+        $this->postComments[$post->ref()] = $id;
         $this->existingRefs[$post->ref()] = true;
         $this->touchedTopics[$topicId] = true;
         $this->report->imported($source, 'posts');

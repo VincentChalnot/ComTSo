@@ -43,6 +43,20 @@ final class TextNormalizerTest extends TestCase
         );
     }
 
+    public function testAttachmentMarkersInEveryFormAreIgnored(): void
+    {
+        $fingerprint = TextNormalizer::fingerprint('<p>Sans commentaire.</p>');
+
+        foreach ([
+            'Sans commentaire.<br />[attachment=1]Photo 9.jpg[/attachment]',
+            '<p>Sans commentaire.</p><p><em>[pièce jointe : Photo 9.jpg]</em></p>',
+            'Sans commentaire.[attachment=0:cc8e2]<!-- ia0 -->Photo 9.jpg<!-- ia0 -->[/attachment:cc8e2]',
+            'Sans commentaire. <em>[pièce jointe perdue : Photo 9.jpg]</em>',
+        ] as $content) {
+            self::assertSame($fingerprint, TextNormalizer::fingerprint($content), $content);
+        }
+    }
+
     public function testYoutubeLinksAreComparedByVideo(): void
     {
         self::assertSame(

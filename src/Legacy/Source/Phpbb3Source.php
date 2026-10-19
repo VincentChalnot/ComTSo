@@ -3,6 +3,7 @@
 namespace App\Legacy\Source;
 
 use App\Legacy\LegacyDate;
+use App\Legacy\Model\LegacyAttachment;
 use App\Legacy\Model\LegacyMessage;
 use App\Legacy\Model\LegacyPost;
 use App\Legacy\Model\LegacyTopic;
@@ -114,5 +115,33 @@ final class Phpbb3Source
         }
 
         return $messages;
+    }
+
+    /**
+     * Files attached to posts (private message attachments do not exist on this board).
+     *
+     * @return list<LegacyAttachment>
+     */
+    public function attachments(): array
+    {
+        $attachments = [];
+        foreach ($this->db->fetchAllAssociative(
+            'SELECT attach_id, post_msg_id, poster_id, physical_filename, real_filename, attach_comment, mimetype, filesize, filetime
+             FROM phpbb3_attachments WHERE in_message = 0 ORDER BY attach_id'
+        ) as $r) {
+            $attachments[] = new LegacyAttachment(
+                (int) $r['attach_id'],
+                (int) $r['post_msg_id'],
+                (int) $r['poster_id'],
+                $r['physical_filename'],
+                TextRepair::decodeEntities($r['real_filename']),
+                trim(TextRepair::decodeEntities((string) $r['attach_comment'])),
+                $r['mimetype'],
+                (int) $r['filesize'],
+                LegacyDate::fromUnix((int) $r['filetime']),
+            );
+        }
+
+        return $attachments;
     }
 }
