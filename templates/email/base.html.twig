@@ -1,0 +1,58 @@
+{#
+  Layout of every HTML e-mail of the forum (light "daylight paper" look of the design system, table layout, inline styles).
+  Child templates: {% extends 'email/base.html.twig' %}, import 'email/_macros.html.twig' as m, and fill:
+    {% block preheader %}…{% endblock %}   hidden summary shown by inboxes next to the subject (plain text)
+    {% block content %}…{% endblock %}     the body, built with the macros
+  Variables: app_name (Twig global), site_url (public address, may be null) + whatever the mail's own context carries.
+  Always send through App\Mail\TemplatedMailFactory, with a matching <name>.txt.twig (see base.txt.twig).
+#}
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>{{ email.subject|default(app_name) }}</title>
+  {# Only a progressive enhancement: without it the 600px layout simply scales down. #}
+  <style>
+    @media only screen and (max-width: 620px) {
+      .mail-container { width: 100% !important; }
+      .mail-pad { padding-left: 20px !important; padding-right: 20px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#f9f4eb;-webkit-text-size-adjust:100%;">
+  <div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">{% block preheader %}{% endblock %}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
+  <table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#f9f4eb" style="background-color:#f9f4eb;">
+    <tr>
+      <td align="center" style="padding:24px 12px;">
+        <table role="presentation" class="mail-container" width="600" border="0" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;">
+          <tr>
+            <td class="mail-pad" style="padding:8px 32px 14px 32px;">
+              {% if site_url|default %}<a href="{{ site_url }}" target="_blank" style="text-decoration:none;color:#2b2118;">{% endif %}<span style="font-family:Georgia,'Iowan Old Style','Palatino Linotype',Palatino,'Times New Roman',serif;font-size:32px;line-height:1.1;font-weight:bold;letter-spacing:-0.5px;color:#2b2118;">{{ app_name }}</span>{% if site_url|default %}</a>{% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td style="height:5px;line-height:5px;font-size:1px;border-top:1px solid #aec6cb;border-bottom:3px solid #950952;">&nbsp;</td>
+          </tr>
+          <tr>
+            <td class="mail-pad" bgcolor="#fdfbf7" style="padding:32px 32px 16px 32px;background-color:#fdfbf7;border-left:1px solid #cedee1;border-right:1px solid #cedee1;border-bottom:1px solid #cedee1;">
+              {% block content %}{% endblock %}
+            </td>
+          </tr>
+          <tr>
+            <td class="mail-pad" style="padding:20px 32px 8px 32px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;color:#625951;">
+              {% block footer %}
+              Vous recevez ce message parce que vous avez un compte sur {{ app_name }}.{% if site_url|default %}<br>
+              <a href="{{ site_url }}" target="_blank" style="color:#00487c;text-decoration:underline;">{{ site_url|replace({'https://': '', 'http://': ''}) }}</a>{% endif %}
+              {% endblock %}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

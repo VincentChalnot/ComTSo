@@ -586,3 +586,13 @@ Sass tree (`design-system/showcase.scss` = `@use "../assets/styles/index"` + `ds
 - Inputs, `<img>` and `<select>` cannot carry pseudo-elements: they are paper-coloured, without texture.
 - Dev-only warning at build: Vite prints nothing for `@textures`/fonts (aliases resolve); the dev server needs `fs.allow` on the repo
   (set in `design-system/vite.config.js`).
+
+
+## Emails
+
+Every mail of the forum has an HTML and a plain-text part, built by **`App\Mail\TemplatedMailFactory::create($name, $subject, Address $to, array $context)`** (sender = `MAILER_FROM`, `site_url` added to the context from `DEFAULT_URI`, `app_name` is a Twig global). It renders `templates/email/<name>.html.twig` and `<name>.txt.twig` **immediately** and throws when a part is empty. Never leave rendering to the mailer: mails are delivered from `kernel.terminate` (`AfterResponseSubscriber`), and after FrankenPHP closed the response Twig cannot open an output buffer (`ob_start(): Failed to create buffer`), which sent password-reset mails with empty bodies. Prepare the message in the request, defer only `MailerInterface::send()`.
+
+* `email/base.html.twig`: 600 px table layout, inline styles, light-theme tokens only (cream page `#f9f4eb`, sheet `#fdfbf7`, ink `#2b2118`, plum `#950952` button and rule, blue `#00487c` links, Georgia/Palatino stack for text and the `ComTSo` wordmark, Arial for buttons/footer), hidden preheader, footer "Vous recevez ce message parce que vous avez un compte sur ComTSo" + site link, a single optional `@media` block for narrow screens. Blocks: `preheader`, `content`, `footer`.
+* `email/_macros.html.twig`: `heading`, `paragraph(text, muted)`, `button(label, url)` (bulletproof table button), `link_line(url)`, `divider`, `kicker`, `quote(excerpt, author)`, `items([{title, url, meta?, excerpt?}])` (digest lists). All arguments are escaped; build markup with `{% set %}` blocks.
+* `email/base.txt.twig` + `email/_macros.txt.twig`: the plain-text twins (`heading`, `button`, `divider`, `quote`, `items`); URLs alone on their line, no escaping (never pass HTML).
+* New mail = `templates/email/<name>.html.twig` extending the base (`{% import 'email/_macros.html.twig' as m %}`, blocks `preheader` and `content`) + `<name>.txt.twig`, then `$factory->create('<name>', ...)`. No remote images or tracking pixels; the logo is the text wordmark.

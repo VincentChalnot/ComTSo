@@ -3,6 +3,7 @@
 namespace App\Tests\Security;
 
 use App\Entity\User;
+use App\Mail\TemplatedMailFactory;
 use App\Repository\UserRepository;
 use App\Security\PasswordReset;
 use App\Tests\Support\AppWebTestCase;
@@ -19,7 +20,12 @@ class PasswordResetLoggingTest extends AppWebTestCase
 {
     private function reset(MailerInterface $mailer, LoggerInterface $logger): PasswordReset
     {
-        return new PasswordReset(new UriSigner('secret'), $this->createStub(UrlGeneratorInterface::class), $this->createStub(UserRepository::class), $mailer, 'secret', 'ComTSo <no-reply@example.com>', 'https://forum.test', $logger);
+        return new PasswordReset(new UriSigner('secret'), $this->createStub(UrlGeneratorInterface::class), $this->createStub(UserRepository::class), $mailer, static::getContainer()->get(TemplatedMailFactory::class), 'secret', 'https://forum.test', $logger);
+    }
+
+    private function message(User $user): \Symfony\Component\Mime\Email
+    {
+        return static::getContainer()->get(TemplatedMailFactory::class)->create('password_reset', 'Sujet', new \Symfony\Component\Mime\Address((string) $user->getEmail()), ['username' => $user->getUsername(), 'link' => 'https://forum.test/link', 'lifetime_minutes' => 60]);
     }
 
     public function testATransportFailureIsLoggedAsAnErrorWithTheRecipientDomainOnly(): void
@@ -29,7 +35,7 @@ class PasswordResetLoggingTest extends AppWebTestCase
         $mailer->method('send')->willThrowException(new TransportException('Failed to authenticate on SMTP server with username "SCW-SECRET-USER" using the following authenticators'));
         $user = (new User())->setUsername('alice')->setEmail('alice@mail.example.org');
 
-        $this->reset($mailer, new Logger('audit', [$handler]))->send($user, 'https://forum.test/link');
+        $this->reset($mailer, new Logger('audit', [$handler]))->send($user, $this->message($user));
 
         self::assertTrue($handler->hasErrorRecords(), 'a failed send must be an error');
         $record = $handler->getRecords()[0];
@@ -46,7 +52,7 @@ class PasswordResetLoggingTest extends AppWebTestCase
         $handler = new TestHandler();
         $user = (new User())->setUsername('alice')->setEmail('alice@mail.example.org');
 
-        $this->reset($this->createStub(MailerInterface::class), new Logger('audit', [$handler]))->send($user, 'https://forum.test/link');
+        $this->reset($this->createStub(MailerInterface::class), new Logger('audit', [$handler]))->send($user, $this->message($user));
 
         self::assertTrue($handler->hasNoticeThatContains('handed to the mail transport'));
     }

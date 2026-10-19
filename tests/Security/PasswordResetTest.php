@@ -53,7 +53,7 @@ class PasswordResetTest extends AppWebTestCase
     private function resetLinkOf(Email $email): string
     {
         self::assertSame(1, preg_match('~https?://\S+~', (string) $email->getTextBody(), $m), 'the text version carries the link');
-        self::assertSame(1, preg_match('~href="(https?://[^"]+)"~', (string) $email->getHtmlBody(), $h), 'the HTML version carries the link');
+        self::assertSame(1, preg_match('~href="(https?://[^"]+/mot-de-passe/reinitialiser[^"]*)"~', (string) $email->getHtmlBody(), $h), 'the HTML version carries the link');
         self::assertSame(html_entity_decode($h[1]), $m[0], 'both versions carry the same link');
 
         return parse_url($m[0], \PHP_URL_PATH).'?'.parse_url($m[0], \PHP_URL_QUERY);
@@ -99,6 +99,21 @@ class PasswordResetTest extends AppWebTestCase
         $crawler = $this->client->request('GET', '/login');
 
         self::assertCount(1, $crawler->filter('a[href="/mot-de-passe/oublie"]'));
+    }
+
+    public function testBothPartsOfTheMailAreNotEmptyAndCarryThePseudoAndTheLink(): void
+    {
+        $this->createUser('alice');
+
+        $this->askForALink('alice');
+
+        $email = $this->sentEmail();
+        $link = $this->resetLinkOf($email);
+        foreach (['text' => (string) $email->getTextBody(), 'HTML' => (string) $email->getHtmlBody()] as $part => $body) {
+            self::assertGreaterThan(200, \strlen(trim(strip_tags($body))), "the $part part has a real body");
+            self::assertStringContainsString('alice', $body, "the $part part greets the member");
+            self::assertStringContainsString(html_entity_decode(htmlspecialchars($link)), html_entity_decode($body), "the $part part carries the link");
+        }
     }
 
     public function testAMemberAsksByPseudoAndGetsASignedLink(): void

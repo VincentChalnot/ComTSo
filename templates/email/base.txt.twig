@@ -1,0 +1,14 @@
+{#
+  Plain-text layout, twin of base.html.twig (every mail has both parts; this one must be readable on its own).
+  Child: {% extends 'email/base.txt.twig' %}, import 'email/_macros.txt.twig' as m, fill {% block content %}.
+  Conventions: lines under 72 characters when you write them, every URL alone on its line, blank line between blocks.
+#}
+{{ app_name|upper }}
+==========
+
+{% block content %}{% endblock %}
+
+--
+Vous recevez ce message parce que vous avez un compte sur {{ app_name }}.
+{% if site_url|default %}{{ site_url }}
+{% endif %}

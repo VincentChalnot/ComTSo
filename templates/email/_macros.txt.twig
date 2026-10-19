@@ -1,0 +1,31 @@
+{# Plain-text twins of the HTML macros. Output is not escaped (text/plain), do not feed it HTML. #}
+{% macro heading(text) %}
+{{ text|upper }}
+{% endmacro %}
+
+{% macro button(label, url) %}
+{{ label }} :
+{{ url }}
+{% endmacro %}
+
+{% macro divider() %}
+----------------------------------------
+{% endmacro %}
+
+{% macro quote(excerpt, author = null) %}
+{% if author %}{{ author }} :
+{% endif %}
+{% for line in excerpt|split("\n") %}> {{ line }}
+{% endfor %}
+{% endmacro %}
+
+{# items = [{title, url, meta?, excerpt?}] #}
+{% macro items(items) %}
+{% for item in items %}
+* {{ item.title }}{% if item.meta|default %} ({{ item.meta }}){% endif %}
+
+  {{ item.url }}
+{% if item.excerpt|default %}  {{ item.excerpt }}
+{% endif %}
+{% endfor %}
+{% endmacro %}

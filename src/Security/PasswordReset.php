@@ -6,13 +6,14 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use App\Mail\TemplatedMailFactory;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -34,10 +35,9 @@ final class PasswordReset
         private readonly UrlGeneratorInterface $urls,
         private readonly UserRepository $users,
         private readonly MailerInterface $mailer,
+        private readonly TemplatedMailFactory $mails,
         #[Autowire('%kernel.secret%')]
         private readonly string $secret,
-        #[Autowire('%app.mailer_from%')]
-        private readonly string $from,
         #[Autowire('%app.public_url%')]
         private readonly ?string $publicUrl,
         private readonly LoggerInterface $logger,
@@ -84,23 +84,27 @@ final class PasswordReset
         return $user;
     }
 
+    /** The e-mail, fully rendered (both parts). Call it during the request: only {@see self::send()} may run after the response. */
+    public function message(User $user, string $link): Email
+    {
+        return $this->mails->create('password_reset', 'ComTSo : réinitialisation de votre mot de passe', new Address((string) $user->getEmail(), $user->getUsername()), [
+            'username' => $user->getUsername(),
+            'link' => $link,
+            'lifetime_minutes' => 60,
+        ]);
+    }
+
     /**
-     * Hands the mail to the transport. Runs after the response (see AfterResponseSubscriber), so a failure can only be reported
+     * Hands the rendered mail to the transport. Runs after the response (see AfterResponseSubscriber), so a failure can only be reported
      * in the logs: member id and recipient DOMAIN only, never the address, and the SMTP user name is masked.
      */
-    public function send(User $user, string $link): void
+    public function send(User $user, Email $message): void
     {
         $email = (string) $user->getEmail();
         $context = ['user_id' => $user->getId(), 'recipient_domain' => strtolower(substr($email, (int) strrpos($email, '@') + 1))];
 
         try {
-            $this->mailer->send((new TemplatedEmail())
-                ->from(Address::create($this->from))
-                ->to(new Address($email, $user->getUsername()))
-                ->subject('ComTSo : réinitialisation de votre mot de passe')
-                ->textTemplate('email/password_reset.txt.twig')
-                ->htmlTemplate('email/password_reset.html.twig')
-                ->context(['username' => $user->getUsername(), 'link' => $link, 'lifetime_minutes' => 60]));
+            $this->mailer->send($message);
         } catch (TransportExceptionInterface $e) {
             $this->logger->error('Password reset e-mail NOT sent', $context + [
                 'exception' => $e::class,

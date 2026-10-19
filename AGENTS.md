@@ -163,6 +163,7 @@ private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `t
   "Mot de passe oublié ?" (`PasswordResetController`, `App\Security\PasswordReset`) mails a link signed with `UriSigner` (1 h) bound to the member's current password hash + e-mail, so it is single use without any table;
   the answer is always neutral (no enumeration; mail is sent in `kernel.terminate`), 10 requests/h per IP and 3/h per account (`rate_limiter` in `framework.yaml`), never to disabled accounts or `*.invalid` placeholder addresses.
   Links are built on `DEFAULT_URI`, sender is `MAILER_FROM`. Fallback for the owner: `bin/console app:user:reset-password <pseudo> [--password=…]`.
+- **E-mails**: always built with `App\Mail\TemplatedMailFactory` (templates `email/<name>.html.twig` + `.txt.twig` extending `email/base.*.twig`, macros in `email/_macros.*.twig`, see `docs/design-system.md` "Emails"). The factory renders BOTH parts immediately: never render Twig in a `kernel.terminate` deferred task (after the response, `ob_start()` fails under FrankenPHP and the mail leaves empty); only `MailerInterface::send()` may be deferred.
 - **Health**: `GET /health` is public, `200 ok` (`SELECT 1`) or `503 unavailable`, `Cache-Control: no-store`, nothing else leaks.
 - **Moderation**: administrators delete a whole topic from its page (`topic_delete`, confirm + CSRF; `App\Forum\TopicRemover`: bulk delete of messages, photo links, favourites, then `PostPhotos::releaseOrphans`).
   Deleting a whole forum is deliberately not offered (SQL only).

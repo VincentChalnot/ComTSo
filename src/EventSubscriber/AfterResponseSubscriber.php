@@ -12,6 +12,9 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
  * calls on `kernel.terminate`. Used so that sending an e-mail does not make a request measurably slower than one that
  * sends none (no way to tell, by timing, which accounts exist). Stored on the request, never on the dispatcher: the
  * kernel survives across requests in FrankenPHP worker mode.
+ *
+ * Deferred tasks must NOT render Twig templates: once the response is closed Twig cannot start an output buffer any more
+ * (`ob_start(): Failed to create buffer`) and renders nothing (see App\Mail\TemplatedMailFactory). Prepare in the request, deliver here.
  */
 #[AsEventListener(event: TerminateEvent::class)]
 final class AfterResponseSubscriber

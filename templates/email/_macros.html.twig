@@ -1,0 +1,69 @@
+{#
+  Building blocks of the HTML e-mails (table layout, inline styles only: mail clients drop or rewrite <style>).
+  Colours are the LIGHT theme tokens of the design system (assets/styles/themes/_light.scss, all pairs AA on the sheet #fdfbf7):
+    ink #2b2118 · soft ink #4a4037 · muted #625951 · plum #950952 · blue (links) #00487c · line #aec6cb · line-soft #cedee1 · kicker #8d5c2f
+  Usage: {% import 'email/_macros.html.twig' as m %} then {{ m.heading('Titre') }} … inside `{% block content %}`.
+  Every argument is escaped (autoescape); to put markup in a paragraph, build it with {% set x %}…{% endset %} and pass it.
+#}
+{% macro heading(text) %}
+<h1 style="margin:0 0 16px 0;padding:0;font-family:Georgia,'Iowan Old Style','Palatino Linotype',Palatino,'Times New Roman',serif;font-size:26px;line-height:1.2;font-weight:bold;color:#2b2118;">{{ text }}</h1>
+{% endmacro %}
+
+{% macro paragraph(text, muted = false) %}
+<p style="margin:0 0 16px 0;padding:0;font-family:Georgia,'Iowan Old Style','Palatino Linotype',Palatino,'Times New Roman',serif;font-size:{{ muted ? 14 : 16 }}px;line-height:1.6;color:{{ muted ? '#625951' : '#2b2118' }};">{{ text }}</p>
+{% endmacro %}
+
+{# Bulletproof call to action: a table cell carries the fill, the link fills the cell (works without CSS support for padding on <a>). #}
+{% macro button(label, url) %}
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:8px 0 24px 0;border-collapse:separate;">
+  <tr>
+    <td align="center" bgcolor="#950952" style="border-radius:4px;background-color:#950952;">
+      <a href="{{ url }}" target="_blank" style="display:inline-block;padding:13px 26px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.2;font-weight:bold;color:#fdfbf7;text-decoration:none;border-radius:4px;">{{ label }}</a>
+    </td>
+  </tr>
+</table>
+{% endmacro %}
+
+{# The address spelled out, for clients that block buttons or when the link must be copied. #}
+{% macro link_line(url) %}
+<p style="margin:0 0 16px 0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;color:#625951;word-break:break-all;overflow-wrap:anywhere;"><a href="{{ url }}" target="_blank" style="color:#00487c;text-decoration:underline;">{{ url }}</a></p>
+{% endmacro %}
+
+{% macro divider() %}
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td height="1" style="height:1px;line-height:1px;font-size:1px;border-top:1px solid #cedee1;padding:0;">&nbsp;</td></tr></table>
+<div style="height:16px;line-height:16px;font-size:1px;">&nbsp;</div>
+{% endmacro %}
+
+{# Small uppercase label above a block (kicker of the design system). #}
+{% macro kicker(text) %}
+<p style="margin:0 0 6px 0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.4;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#8d5c2f;">{{ text }}</p>
+{% endmacro %}
+
+{# A quoted excerpt (a message, a topic preview): plain text only, `author` optional. #}
+{% macro quote(excerpt, author = null) %}
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:0 0 16px 0;">
+  <tr>
+    <td style="padding:10px 16px;border-left:3px solid #aec6cb;background-color:#f9f4eb;font-family:Georgia,'Iowan Old Style','Palatino Linotype',Palatino,'Times New Roman',serif;font-size:15px;line-height:1.55;color:#4a4037;">
+      {% if author %}<strong style="color:#2b2118;">{{ author }}</strong><br>{% endif %}{{ excerpt }}
+    </td>
+  </tr>
+</table>
+{% endmacro %}
+
+{#
+  A list of linked items, for notifications and digests. items = [{title, url, meta?, excerpt?}], all plain text.
+  Example: {{ m.items([{title: 'Sujet', url: 'https://…', meta: 'Forum · 3 nouveaux messages', excerpt: '…'}]) }}
+#}
+{% macro items(items) %}
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:0 0 16px 0;">
+  {% for item in items %}
+  <tr>
+    <td style="padding:12px 0;{{ not loop.last ? 'border-bottom:1px solid #cedee1;' : '' }}font-family:Georgia,'Iowan Old Style','Palatino Linotype',Palatino,'Times New Roman',serif;">
+      <a href="{{ item.url }}" target="_blank" style="font-size:17px;line-height:1.35;font-weight:bold;color:#00487c;text-decoration:underline;">{{ item.title }}</a>
+      {% if item.meta|default %}<div style="margin:2px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.4;color:#625951;">{{ item.meta }}</div>{% endif %}
+      {% if item.excerpt|default %}<div style="margin:6px 0 0 0;font-size:15px;line-height:1.55;color:#4a4037;">{{ item.excerpt }}</div>{% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endmacro %}

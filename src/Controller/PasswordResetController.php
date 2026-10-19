@@ -61,8 +61,9 @@ class PasswordResetController extends AbstractController
             } elseif (!$passwordResetAccountLimiter->create((string) $user->getId())->consume()->isAccepted()) {
                 $reset->skipped('per-account limit (3 per hour) reached', $user);
             } else {
-                $link = $reset->link($user, $request);
-                AfterResponseSubscriber::defer($request, static fn () => $reset->send($user, $link));
+                // Rendered now, while Twig can still buffer output; only the delivery runs after the response.
+                $message = $reset->message($user, $reset->link($user, $request));
+                AfterResponseSubscriber::defer($request, static fn () => $reset->send($user, $message));
             }
 
             $this->addFlash('success', 'Si un compte correspond à cette demande, un e-mail contenant un lien de réinitialisation (valable une heure) vient de lui être envoyé.');
