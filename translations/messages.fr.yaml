@@ -20,6 +20,7 @@ admin:
         yes: Oui
         no: Non
         all: Tous
+        all_forums: Tous les forums
         you: vous
     delete:
         irreversible: Cette action est définitive.
@@ -88,8 +89,26 @@ admin:
             original_author_help: La personne qui l’a dite ou écrite, telle qu’elle doit apparaître sous la citation.
         filter:
             text: Texte ou auteur
+    topic:
+        title: Sujets
+        description: Tous les sujets du forum, en lecture seule. Pour en modifier un, ouvrez-le sur le forum ; ici on peut seulement le supprimer.
+        delete: Supprimer le sujet
+        delete_confirm: 'Supprimer le sujet « %entity% » ?'
+        impact: '{0} Aucun message ne sera supprimé avec lui.|{1} Son message sera supprimé avec lui, ainsi que les liens vers ses photos.|]1,Inf[ Ses %count% messages seront supprimés avec lui, ainsi que les liens vers ses photos.'
+        filter:
+            title: Titre
+            forum: Forum
+            author: Auteur
 
 datagrid:
+    topic:
+        title: Titre
+        forum: Forum
+        author: Auteur
+        commentCount: Messages
+        createdAt: Création
+        lastActivityAt: Dernier message
+        actions: Actions
     quote:
         id: N°
         content: Citation
@@ -122,6 +141,9 @@ sidus:
                 success: Les modifications sont enregistrées.
             delete:
                 success: L’élément a été supprimé.
+        topic:
+            delete:
+                success: Le sujet a été supprimé.
         quote:
             create:
                 success: La citation a été ajoutée.

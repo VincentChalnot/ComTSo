@@ -1,0 +1,2 @@
+{# Datagrid cell: the topic title, linking to its PUBLIC page (the admin list is read-only). #}
+<a href="{{ path('topic_show', {forumId: result.forum.id, id: result.id}) }}">{{ result.title }}</a>

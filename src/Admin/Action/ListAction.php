@@ -34,10 +34,16 @@ class ListAction implements ActionInjectableInterface
     public function __invoke(Request $request): ActionResponseInterface
     {
         $dataGrid = $this->dataGridHelper->buildDataGridForm($this->action, $request);
+        $this->prepareQuery($dataGrid);
         $this->restrictSortColumn($request, $dataGrid);
         $dataGrid->handleRequest($request);
 
         return $this->templatingHelper->renderListAction($this->action, $dataGrid, $this->extraViewParameters($dataGrid));
+    }
+
+    /** Called before the request is applied: a screen adds the joins/selects of the columns it shows here (no query per row). */
+    protected function prepareQuery(DataGrid $dataGrid): void
+    {
     }
 
     /**

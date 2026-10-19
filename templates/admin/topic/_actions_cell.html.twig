@@ -1,0 +1,3 @@
+{# Datagrid cell: view on the forum (public page) and delete (confirmation page). #}
+<a href="{{ path('topic_show', {forumId: result.forum.id, id: result.id}) }}" class="btn btn-ghost btn-sm" aria-label="{{ 'admin.action.view_for'|trans({'%name%': result.title}) }}">{{ 'admin.action.view'|trans }}</a>
+<a href="{{ admin_entity_path(admin, result, 'delete') }}" class="btn btn-ghost btn-sm" aria-label="{{ 'admin.action.delete_for'|trans({'%name%': result.title}) }}">{{ 'admin.action.delete'|trans }}</a>
