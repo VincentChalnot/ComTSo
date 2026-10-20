@@ -48,6 +48,9 @@ x-app: &app
     MAILER_DSN_FILE: /run/secrets/mailer_dsn
     # Sender of the e-mails (password reset), "Name <address>".
     MAILER_FROM: ${MAILER_FROM:-ComTSo <no-reply@localhost>}
+    # Error reporting to Sentry (config/packages/sentry.yaml). Optional: empty = nothing is sent. A plain variable, not a secret file:
+    # a DSN only allows sending events to the project. Forwarded to `migrate` too, so a failing migration is reported.
+    SENTRY_DSN: ${SENTRY_DSN:-}
   secrets:
     - app_secret
     - database_password

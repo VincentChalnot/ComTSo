@@ -1,0 +1,44 @@
+# Error reporting to Sentry (production). See "Sentry" in docs/operations.md.
+#
+# SENTRY_DSN is optional: unset or empty (dev, tests, CI, a server that did not set it) = the SDK has no DSN, so it sends
+# nothing and nothing fails. It is a plain environment variable (compose `environment:`), not a secret file: a DSN only
+# lets someone send events to the project, it does not read anything.
+#
+# Errors only: no tracing, no profiling, no logs, no metrics. This is a private forum, so nothing that identifies a member or
+# carries what was written travels: `data_collection` below switches off the user (and IP), cookies, headers, request and
+# response bodies, query strings, stack-frame variables and SQL data; events keep the exception, its stack trace, the
+# route name, the environment and the release.
+sentry:
+    dsn: '%env(default::SENTRY_DSN)%'
+    options:
+        environment: '%kernel.environment%'
+        send_default_pii: false
+        # Expected 4xx (404, 403, 401, CSRF, rate limit, 422) are dropped here, only real failures are reported.
+        before_send: App\Sentry\ExpectedErrorFilter
+        enable_logs: false
+        enable_metrics: false
+        data_collection:
+            user_info: false
+            cookies: { mode: 'off' }
+            http_headers: { mode: 'off' }
+            http_bodies: []
+            url_query_params: { mode: 'off' }
+            stack_frame_variables: false
+            database_query_data: false
+            queues: false
+    tracing:
+        enabled: false
+    messenger:
+        enabled: false
+
+when@test:
+    sentry:
+        # No process-wide PHP error handler per booted test kernel.
+        register_error_handler: false
+        options:
+            # Never a network call from tests: events are recorded instead (see tests/Sentry).
+            transport: App\Tests\Sentry\RecordingTransport
+
+    services:
+        App\Tests\Sentry\RecordingTransport:
+            public: true

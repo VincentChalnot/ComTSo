@@ -52,6 +52,9 @@
             "bin/phpunit"
         ]
     },
+    "sentry/sentry-symfony": {
+        "version": "5.14.0"
+    },
     "sidus/admin-bundle": {
         "version": "v5.0.6"
     },

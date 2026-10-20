@@ -28,6 +28,7 @@ Run every command below **from `deploy/`** (on the server a directory holding `c
   the SMTP password). Use hex/alphanumeric values for the passwords (they are placed in a database URL).
 - To rotate a secret: edit `.env`, then `docker compose up -d --force-recreate app` (a secret is a file created WITH the container: `restart` keeps the old value, and `up -d` alone does not notice that only the value in `.env` changed; verified in production: after fixing `MAILER_DSN` the running container still held the old DSN). Exceptions: the database
   passwords are applied by MariaDB when the volume is created, change them with `ALTER USER` first; changing `APP_SECRET` logs everybody out.
+- `SENTRY_DSN` (optional, empty by default) is a plain setting, not a secret file: it turns on error reporting to Sentry (`docs/operations.md` "Sentry"). Change it in `.env` and run `docker compose up -d`.
 
 ## First deploy
 
@@ -160,5 +161,6 @@ The ordered, step-by-step plan to take the redesigned forum to production on the
 
 - **Application** (Symfony/Monolog, JSON on stderr, `docker compose logs app`): silent until an error occurs, then the last 50 records (info and above) that led to it are written. A separate **`audit`** channel is always written (notice and above): failed logins and throttling (`Login failed`: pseudo as typed, client IP, reason class, never the password) and the password-reset mail trail (`Password reset requested, no e-mail sent: <reason>`, `... handed to the mail transport`, `Password reset e-mail NOT sent` with the recipient *domain*, the exception class and the masked reason). Deprecations are dropped in production.
 - **Caddy access log is off** by default (the healthcheck alone would add a line every 30 s and Caddy cannot filter on status). `CADDY_ACCESS_LOG=on` in `.env` writes every request except `/health` (the Mercure `authorization` query parameter is redacted). Caddy's own runtime messages stay on.
+- **Sentry**: with `SENTRY_DSN` set, unhandled errors (5xx, failing commands) are also sent to Sentry, without member data; `docker compose exec app php bin/console sentry:test --no-debug` checks the wiring. Expected 4xx are never sent.
 - **Docker** rotates every service's log (json-file, 5 x 10 MB).
 - Quick looks: `docker compose logs --since 1h app | grep -E '"channel":"audit"'`, `... | grep '"level":"ERROR"'`.

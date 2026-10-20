@@ -14,6 +14,7 @@ return [
     Twig\Extra\TwigExtraBundle\TwigExtraBundle::class => ['all' => true],
     Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle::class => ['all' => true],
     DAMA\DoctrineTestBundle\DAMADoctrineTestBundle::class => ['test' => true],
+    Sentry\SentryBundle\SentryBundle::class => ['all' => true],
     Sidus\FilterBundle\SidusFilterBundle::class => ['all' => true],
     Sidus\DataGridBundle\SidusDataGridBundle::class => ['all' => true],
     Sidus\AdminBundle\SidusAdminBundle::class => ['all' => true],

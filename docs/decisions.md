@@ -12,6 +12,7 @@ What was decided, what was found, and what happened, for whoever works on ComTSo
 | 2026-10-19 | Decisions D1-D14 answered; rehearsal on `next.comtso.fr`; **cutover: `comtso.fr` now serves the new app**; git history purged and rewritten (see below). |
 | 2026-10-19 | Admin panel at `/admin` (members, forums, topics, quotes, photos) on the owner's sidus bundles with three Symfony 8 fixes applied as Composer patches until they are tagged upstream; "delete empty forums" shipped as part of it; no e-mail address is ever displayed there. |
 | 2026-10-19 | Owner decisions: all the data is in the new database and the old data is forgotten, so the legacy import tooling and `docs/legacy-import.md` were removed; D1 (profile visibility option) dropped; the 10 shortened attachments accepted as they are; "Symfony 2" wording removed from the docs. |
+| 2026-10-20 | Sentry error reporting (`sentry/sentry-symfony`): the DSN is the optional plain variable `SENTRY_DSN` (the owner already set it on the server), errors only, no personal data, expected 4xx filtered out; unset = disabled, so dev, tests and CI never need it (`docs/operations.md` "Sentry"). |
 
 ## Go-live decisions (D1-D14, answered by the owner on 2026-10-19)
 

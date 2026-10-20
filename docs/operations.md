@@ -84,7 +84,7 @@ Rotate every secret that was pasted in a chat, ticket or terminal log (Scaleway 
 
 - Uptime check on `https://comtso.fr/health` (`200` and body `ok`; `503` = database down): UptimeRobot, Scaleway Cockpit or similar.
 - After an upgrade: `docker compose logs --since 30m app | grep -iE "error|critical|emergency"`, `docker compose ps` all healthy, `free -h` still has headroom, no member IP in `fail2ban-client status traefik-404`.
-- Sentry is not installed: see the plan below.
+- Errors reach Sentry when `SENTRY_DSN` is set: see "Sentry" below.
 
 ## Mail troubleshooting
 
@@ -112,11 +112,15 @@ D6 (each project owns its CSP): on 2026-10-19 the line `contentSecurityPolicy: "
 Keres (`app.playkeres.com`) sets none itself: a per-router CSP is prepared in its own repository as Traefik labels (`traefik.http.middlewares.keres-csp.headers.contentsecuritypolicy`), with `'unsafe-inline'` for script and style because it has 2 inline `<script>` blocks and about 58 inline `style=` attributes, Mercure through a same-origin `EventSource`, no third-party scripts or fonts, `frame-ancestors 'self' https://*.sidus.fr`.
 After it is deployed, check the lobby, a game and the settings for CSP violations and that live updates arrive; relax only the directive named in a console message. A nonce-based policy is a later step.
 
-## Sentry plan (not installed; `TODO.md` wave 2)
+## Sentry
 
-- **Hosting**: sentry.io free/developer plan, EU region (member data). Self-hosted Sentry needs 16 GB+, far beyond this server.
-- **SDK**: `composer require sentry/sentry-symfony`; `config/packages/sentry.yaml` under `when@prod`; DSN through `%env(trim:file:SENTRY_DSN_FILE)%` (a `*_FILE` secret like the others: `.env.example`, `secrets:` entries, `SENTRY_DSN_FILE`); `release: '%env(APP_RELEASE)%'` set from the image tag (`COMTSO_IMAGE_TAG`); `environment: prod`.
-- **Privacy** (private forum, no message content in events): `send_default_pii: false`, tracing and profiling off (`traces_sample_rate: 0`), a `before_send` that drops request bodies, cookies and `Authorization` and scrubs `password`, `_password`, `plainPassword` and the reset-link parameters (`u=`, `k=`).
-- **Monolog**: a `sentry` handler at level `error` on the `main` fingers_crossed chain, not on the `audit` channel (which stays in the logs).
-- **Browser SDK**: optional, later; it would need `connect-src 'self' https://*.ingest.sentry.io` (or a tunnel route) in the Caddyfile CSP. Server-side errors only at first.
-- **Order**: install on a branch, deploy to a rehearsal host, trigger a test exception, check the scrubbing in the event JSON, then enable in production.
+Server-side error reporting with `sentry/sentry-symfony` (`config/packages/sentry.yaml`, `App\Sentry\ExpectedErrorFilter`). Hosting: sentry.io (EU region); self-hosted Sentry needs 16 GB+, far beyond this server.
+
+- **Switch**: the environment variable `SENTRY_DSN`. Unset or empty (dev, tests, CI, and a server that does not set it) = the SDK has no DSN, sends nothing and nothing fails. It is a plain variable, not a `*_FILE` secret: a DSN only lets its holder send events to the project, it reads nothing. On the server it lives in `deploy/.env` (`SENTRY_DSN=https://<key>@<host>/<project>`; `deploy/.env.example` has it commented out) and `deploy/compose.yaml` forwards it to `app` and `migrate` (a failing migration is reported too). The dev `compose.yaml` does not forward it on purpose.
+- **Enable / change / disable**: edit `SENTRY_DSN` in `deploy/.env`, then `docker compose up -d` (an environment change recreates the containers; no image rebuild). Disable = empty the value or delete the line. Never paste the DSN into a ticket, a chat or a commit.
+- **What is reported**: uncaught exceptions (HTTP 500 and any HTTP exception of 500 and above) and failing console commands, with the stack trace, the route name (`route` tag) and `environment` = the kernel environment (`prod`). One event per failure, no performance tracing, profiling, logs or metrics. The `release` is the SDK default (Composer root package version).
+- **What is NOT reported** (expected answers, `ExpectedErrorFilter`): any HTTP exception below 500 (404 and the fallback page, 403, 401, 405, 422, 429 rate limits), access denied, failed authentication and invalid CSRF tokens. Login throttling and the `audit` Monolog channel are untouched and stay in the logs only (Monolog is not wired to Sentry: a logged-but-caught error is not an event).
+- **Privacy** (private forum): `send_default_pii: false` and the `data_collection` block switch off the member identity and IP address, cookies, request and response headers (so no `Authorization`), request/response bodies (no message text, password or token), the query string (reset-link parameters `u=`/`k=`, search terms, filters), stack-frame variables and SQL data. An event holds the exception message and class, the file/line trace with source lines of the code, the path of the URL, the HTTP method, the route name and the server name (container id). Exception messages come from our code and libraries: keep member data out of them. `tests/Sentry/SentryReportingTest` checks with the real SDK serializer that a request carrying a cookie, a bearer header, a body, a query string and a member session leaves none of it in the event.
+- **Browser SDK**: none (no CSP change). If it is ever added it needs `connect-src 'self' https://*.ingest.sentry.io` (or a tunnel route) in the Caddyfile CSP.
+- **Verify after a deploy** (never prints the DSN): `docker compose exec app php bin/console sentry:test --no-debug` answers `DSN correctly configured` and `Message sent successfully with ID ...` (`No DSN configured` = the variable did not reach the container: `docker compose exec app printenv SENTRY_DSN | wc -c` is 1 when empty). The "This is a test message" event appears in the Sentry project within a minute; resolve it there. A real exception check belongs on a rehearsal host only (an unhandled 500 is a real error on production).
+- **Tests**: the test environment replaces the HTTP transport with `App\Tests\Sentry\RecordingTransport`, so nothing in the suite reaches a network.
