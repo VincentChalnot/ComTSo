@@ -1,0 +1,77 @@
+// Settings centre: a menu of sections on the LEFT and the section's form on the right (no aside). On a phone the menu becomes a
+// row of pills above the content that scrolls sideways.
+//
+//   <div class="settings-layout">
+//     <nav class="settings-nav" aria-label="Paramètres">
+//       <ul class="nav-pills is-vertical">
+//         <li><a href aria-current="page">Profil</a></li> <li><a href>Avatar</a></li> …
+//       </ul>
+//       <a class="btn settings-nav-admin" href>Administration</a>     administrators only, a button and not a section
+//     </nav>
+//     <main id="main" class="settings-main" tabindex="-1"> <header class="page-header">…</header> <div class="settings">…</div> </main>
+//   </div>
+@use "../abstracts" as *;
+
+@layer components {
+  .settings-layout {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr);
+
+    @include up(md) {
+      grid-template-columns: 13.5rem minmax(0, 1fr);
+      gap: clamp(2rem, 4vw, 3.5rem);
+      align-items: start;
+    }
+  }
+
+  .settings-nav {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+
+    // phone: one row that scrolls sideways (the pills keep their size)
+    > .nav-pills {
+      flex-direction: row;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding: 0.25rem;
+      margin: -0.25rem;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      > li {
+        flex: none;
+      }
+    }
+
+    @include up(md) {
+      position: sticky;
+      top: 4.5rem;
+      padding-right: clamp(1rem, 2vw, 1.75rem);
+      border-right: 1px solid var(--c-line);
+
+      > .nav-pills {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        overflow: visible;
+        padding: 0;
+        margin: 0;
+
+        > li > a {
+          flex: 1;
+        }
+      }
+    }
+  }
+
+  .settings-nav-admin {
+    justify-self: start;
+  }
+
+  .settings-main {
+    min-width: 0;
+  }
+}

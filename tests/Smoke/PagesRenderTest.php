@@ -28,9 +28,9 @@ class PagesRenderTest extends AppWebTestCase
             '/', '/?since=2000-01-01', '/forums/', '/forums/general', '/forums/general/nouveau',
             "/forum/general/{$topic->getId()}", "/forum/general/{$topic->getId()}/edit", "/forum/general/{$topic->getId()}/photos", "/forum/general/{$topic->getId()}/preview",
             "/comment/{$comment->getId()}", "/comment/{$comment->getId()}/edit",
-            '/gens', '/gens/bob', '/gens/alice', '/gens/alice/edit', '/gens/alice/config',
+            '/gens', '/gens/bob', '/gens/alice', '/gens/alice/parametres/profil', '/gens/alice/parametres/avatar', '/gens/alice/parametres/securite', '/gens/alice/parametres/affichage', '/gens/alice/parametres/statistiques',
             '/photos', "/photos/{$photo->getId()}", "/photos/{$photo->getId()}/edit",
-            '/recherche?q=lien', '/recherche?q=x', '/recherche', '/statistiques',
+            '/recherche?q=lien', '/recherche?q=x', '/recherche',
         ];
         foreach ($urls as $url) {
             $this->client->request('GET', $url);

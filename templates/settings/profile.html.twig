@@ -1,14 +1,10 @@
-{% extends 'base.html.twig' %}
+{% extends 'settings/_layout.html.twig' %}
 
-{% block title %}Modifier le profil · ComTSo{% endblock %}
+{% block title %}Profil · Paramètres · ComTSo{% endblock %}
+{% block settings_title %}Profil{% endblock %}
+{% block settings_intro %}Ce que les autres membres voient sur votre fiche.{% endblock %}
 
-{% block body %}
-<header class="page-header">
-    <p class="kicker"><a href="{{ path('people_show', {username: person.username}) }}">{{ person.username }}</a></p>
-    <h1 class="page-title">Modifier le profil</h1>
-    <p class="standfirst">Ce que les autres membres voient sur votre fiche.</p>
-</header>
-
+{% block settings_body %}
 <div class="settings">
     <div class="card card-roomy">
         {{ form_start(form) }}

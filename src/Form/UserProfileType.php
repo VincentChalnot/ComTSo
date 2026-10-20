@@ -12,19 +12,22 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class UserProfileType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class, ['label' => 'Prénom', 'required' => false])
-            ->add('surname', TextType::class, ['label' => 'Nom', 'required' => false])
-            ->add('email', EmailType::class, ['label' => 'Email'])
+            ->add('name', TextType::class, ['label' => 'Prénom', 'required' => false, 'constraints' => [new Length(max: 32)]])
+            ->add('surname', TextType::class, ['label' => 'Nom', 'required' => false, 'constraints' => [new Length(max: 32)]])
+            ->add('email', EmailType::class, ['label' => 'Email', 'constraints' => [new NotBlank(message: 'Indiquez votre adresse e-mail.'), new Email(message: 'Cette adresse e-mail n’est pas valide.', mode: Email::VALIDATION_MODE_HTML5), new Length(max: 180)]])
             ->add('birthday', BirthdayType::class, ['label' => 'Date de naissance', 'required' => false, 'widget' => 'single_text'])
-            ->add('phone', TextType::class, ['label' => 'Téléphone', 'required' => false])
+            ->add('phone', TextType::class, ['label' => 'Téléphone', 'required' => false, 'constraints' => [new Length(max: 20)]])
             ->add('address', TextareaType::class, ['label' => 'Adresse', 'required' => false, 'attr' => ['rows' => 2]])
-            ->add('website', UrlType::class, ['label' => 'Site web', 'required' => false, 'default_protocol' => 'https'])
+            ->add('website', UrlType::class, ['label' => 'Site web', 'required' => false, 'default_protocol' => 'https', 'constraints' => [new Length(max: 128)]])
             ->add('activities', TextareaType::class, ['label' => 'Activités', 'required' => false, 'attr' => ['rows' => 3]])
             ->add('signature', RichTextType::class, ['label' => 'Citation / signature', 'required' => false]);
     }

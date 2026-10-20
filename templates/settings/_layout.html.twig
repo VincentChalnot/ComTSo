@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+{# The settings centre: a menu of sections on the left, no aside. Sections extend this and fill `settings_body`; they pass `person` and `section`. #}
+{% set own = person.id == app.user.id %}
+{% set sections = [
+    {key: 'profile', route: 'settings_profile', label: 'Profil', own_only: false},
+    {key: 'avatar', route: 'settings_avatar', label: 'Avatar', own_only: true},
+    {key: 'security', route: 'settings_security', label: 'Sécurité', own_only: true},
+    {key: 'display', route: 'settings_display', label: 'Affichage', own_only: false},
+    {key: 'stats', route: 'settings_stats', label: 'Statistiques', own_only: true},
+] %}
+
+{% block content_layout %}
+<div class="settings-layout">
+    <nav class="settings-nav" aria-label="Paramètres">
+        <ul class="nav-pills is-vertical">
+            {% for item in sections|filter(i => own or not i.own_only) %}
+                <li><a href="{{ path(item.route, {username: person.username}) }}"{% if item.key == section %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+            {% endfor %}
+        </ul>
+        {% if own and is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('admin_index') }}" class="btn settings-nav-admin">Administration</a>
+        {% endif %}
+    </nav>
+    <main id="main" class="settings-main" tabindex="-1">
+        <header class="page-header">
+            <p class="kicker"><a href="{{ path('people_show', {username: person.username}) }}">{{ person.username }}</a></p>
+            <h1 class="page-title">{% block settings_title %}{% endblock %}</h1>
+            <p class="standfirst">{% block settings_intro %}{% endblock %}</p>
+        </header>
+        {% block settings_body %}{% endblock %}
+    </main>
+</div>
+{% endblock %}

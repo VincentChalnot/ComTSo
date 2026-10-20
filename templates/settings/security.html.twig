@@ -1,0 +1,19 @@
+{% extends 'settings/_layout.html.twig' %}
+
+{% block title %}Sécurité · Paramètres · ComTSo{% endblock %}
+{% block settings_title %}Sécurité{% endblock %}
+{% block settings_intro %}Changer votre mot de passe.{% endblock %}
+
+{% block settings_body %}
+<div class="settings">
+    <div class="card card-roomy">
+        <p class="settings-hint">Après le changement, les autres appareils devront se reconnecter.</p>
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Changer le mot de passe</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

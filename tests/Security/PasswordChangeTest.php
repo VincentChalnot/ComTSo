@@ -17,11 +17,11 @@ class PasswordChangeTest extends AppWebTestCase
         $this->client->submitForm('Se connecter', ['_username' => $username, '_password' => $password], serverParameters: ['HTTP_ORIGIN' => 'http://localhost']);
     }
 
-    /** Fills and submits the password form of the member's configuration page. */
+    /** Fills and submits the password form of the member's security settings page. */
     private function changePassword(string $username, string $current, string $new, ?string $confirmation = null, bool $withToken = true): void
     {
-        $crawler = $this->client->request('GET', '/gens/'.$username.'/config');
-        $form = $crawler->filter('form[action$="/gens/'.$username.'/mot-de-passe"]')->form();
+        $crawler = $this->client->request('GET', '/gens/'.$username.'/parametres/securite');
+        $form = $crawler->filter('main form')->form();
         $values = $form->getPhpValues();
         $values['change_password']['currentPassword'] = $current;
         $values['change_password']['plainPassword'] = ['first' => $new, 'second' => $confirmation ?? $new];
@@ -50,11 +50,11 @@ class PasswordChangeTest extends AppWebTestCase
 
         $this->changePassword('alice', self::CURRENT, self::NEW);
 
-        self::assertResponseRedirects('/gens/alice/config');
+        self::assertResponseRedirects('/gens/alice/parametres/securite');
         $user = $this->reload($user);
         self::assertTrue($this->hasher()->isPasswordValid($user, self::NEW));
         self::assertFalse($this->hasher()->isPasswordValid($user, self::CURRENT));
-        $this->client->request('GET', '/gens/alice/config');
+        $this->client->request('GET', '/gens/alice/parametres/securite');
         self::assertResponseIsSuccessful('this device is signed in again on a fresh session');
 
         $this->logOut();
@@ -76,7 +76,7 @@ class PasswordChangeTest extends AppWebTestCase
 
         $this->changePassword('marie', 'Old-pass-1', self::NEW);
 
-        self::assertResponseRedirects('/gens/marie/config');
+        self::assertResponseRedirects('/gens/marie/parametres/securite');
         $user = $this->reload($user);
         self::assertNull($user->getSalt());
         self::assertStringStartsWith('$', $user->getPassword(), 'rehashed with the native hasher');
@@ -129,11 +129,10 @@ class PasswordChangeTest extends AppWebTestCase
         $bob = $this->createUser('bob', password: 'Bob-password-1');
         $this->loginAs($this->createUser('root', ['ROLE_ADMIN'], 'Root-password-1'));
 
-        $crawler = $this->client->request('GET', '/gens/bob/config');
-        self::assertResponseIsSuccessful();
-        self::assertCount(0, $crawler->filter('form[action$="/gens/bob/mot-de-passe"]'), 'the form is not offered');
+        $this->client->request('GET', '/gens/bob/parametres/securite');
+        self::assertResponseStatusCodeSame(403, 'the form is not offered');
 
-        $this->client->request('POST', '/gens/bob/mot-de-passe', ['change_password' => ['plainPassword' => ['first' => self::NEW, 'second' => self::NEW]]], server: ['HTTP_ORIGIN' => 'http://localhost']);
+        $this->client->request('POST', '/gens/bob/parametres/securite', ['change_password' => ['plainPassword' => ['first' => self::NEW, 'second' => self::NEW]]], server: ['HTTP_ORIGIN' => 'http://localhost']);
 
         self::assertResponseStatusCodeSame(403);
         self::assertTrue($this->hasher()->isPasswordValid($this->reload($bob), 'Bob-password-1'));
@@ -148,7 +147,7 @@ class PasswordChangeTest extends AppWebTestCase
         self::assertNotNull($before, 'members are remembered on their device');
 
         $this->changePassword('alice', self::CURRENT, self::NEW);
-        self::assertResponseRedirects('/gens/alice/config');
+        self::assertResponseRedirects('/gens/alice/parametres/securite');
         $after = $jar->get('REMEMBERME');
         self::assertNotNull($after, 'this device gets a fresh remember-me cookie');
 

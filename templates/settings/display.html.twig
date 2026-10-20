@@ -1,0 +1,19 @@
+{% extends 'settings/_layout.html.twig' %}
+
+{% block title %}Affichage · Paramètres · ComTSo{% endblock %}
+{% block settings_title %}Affichage{% endblock %}
+{% block settings_intro %}Quelques réglages de lecture, propres à ce compte.{% endblock %}
+
+{% block settings_body %}
+<div class="settings">
+    <div class="card card-roomy">
+        {{ form_start(form) }}
+            {{ form_row(form.message_order) }}
+            <p class="settings-hint">Le thème clair / sombre se change avec le bouton ☀︎ / ☾ de la barre de navigation.</p>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Sauvegarder</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

@@ -65,12 +65,12 @@ class StatisticsTest extends AppWebTestCase
         self::assertSame([], $report['members']);
     }
 
-    public function testThePageShowsTheTableTheChartsAndTheNavigationLink(): void
+    public function testThePageShowsTheTableAndTheChartsInsideTheSettingsCentre(): void
     {
         $alice = $this->fixture();
         $this->loginAs($alice);
 
-        $crawler = $this->client->request('GET', '/statistiques');
+        $crawler = $this->client->request('GET', '/gens/alice/parametres/statistiques');
 
         self::assertResponseIsSuccessful();
         $rows = $crawler->filter('table[data-stats-table] tbody tr')->each(static fn (Crawler $tr) => array_map('trim', $tr->filter('th, td')->each(static fn (Crawler $c) => preg_replace('/\s+/', ' ', $c->text()))));
@@ -87,8 +87,7 @@ class StatisticsTest extends AppWebTestCase
         self::assertSame([3, 0, 5], $years['series'][0]['values']);
         self::assertSame([0, 1, 1], $years['series'][1]['values']);
 
-        self::assertSame('Statistiques', trim($crawler->filter('a.masthead-link.is-active')->text()));
-        self::assertSame('/statistiques', $crawler->filter('a.masthead-link.is-active')->attr('href'));
+        self::assertSame('Statistiques', trim($crawler->filter('.settings-nav a[aria-current="page"]')->text()));
     }
 
     public function testDisabledMembersAreNamedButNeverLinkedAndNoAddressLeaks(): void
@@ -96,7 +95,7 @@ class StatisticsTest extends AppWebTestCase
         $alice = $this->fixture();
         $this->loginAs($alice);
 
-        $crawler = $this->client->request('GET', '/statistiques');
+        $crawler = $this->client->request('GET', '/gens/alice/parametres/statistiques');
         $html = $this->client->getResponse()->getContent();
 
         self::assertCount(1, $crawler->filter('table[data-stats-table] tbody th a[href="/gens/alice"]'));
@@ -111,7 +110,7 @@ class StatisticsTest extends AppWebTestCase
     {
         $this->loginAs($this->createUser('alice'));
 
-        $crawler = $this->client->request('GET', '/statistiques');
+        $crawler = $this->client->request('GET', '/gens/alice/parametres/statistiques');
 
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('Aucun message', $crawler->filter('.standfirst')->text());
@@ -120,7 +119,7 @@ class StatisticsTest extends AppWebTestCase
 
     public function testOnlyMembersCanSeeIt(): void
     {
-        $this->client->request('GET', '/statistiques');
+        $this->client->request('GET', '/gens/alice/parametres/statistiques');
 
         self::assertResponseRedirects('/login');
     }
@@ -131,12 +130,12 @@ class StatisticsTest extends AppWebTestCase
         $this->loginAs($alice);
         $count = function (): int {
             $this->client->enableProfiler();
-            $this->client->request('GET', '/statistiques');
+            $this->client->request('GET', '/gens/alice/parametres/statistiques');
             $queries = $this->client->getProfile()->getCollector('db')->getQueries();
 
             return \count(array_filter(array_merge(...array_values($queries)), static fn (array $q): bool => str_contains($q['sql'], 'GROUP BY') && str_contains($q['sql'], 'ctso_comment')));
         };
-        $this->client->request('GET', '/statistiques'); // warm-up
+        $this->client->request('GET', '/gens/alice/parametres/statistiques'); // warm-up
         self::assertSame(1, $count());
 
         $topic = $this->em()->getRepository(\App\Entity\Topic::class)->findOneBy([]);

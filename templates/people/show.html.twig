@@ -29,8 +29,8 @@
 
     {% if isMe or is_granted('ROLE_ADMIN') %}
         <div class="profile-actions">
-            <a href="{{ path('people_edit', {username: person.username}) }}" class="btn">{{ ui.icon('pencil', 'size-4') }} Modifier le profil</a>
-            <a href="{{ path('people_config', {username: person.username}) }}" class="btn">{{ ui.icon('settings', 'size-4') }} Configuration</a>
+            <a href="{{ path('settings_profile', {username: person.username}) }}" class="btn">{{ ui.icon('pencil', 'size-4') }} Modifier le profil</a>
+            <a href="{{ path('settings_display', {username: person.username}) }}" class="btn">{{ ui.icon('settings', 'size-4') }} Paramètres</a>
         </div>
     {% endif %}
 </section>

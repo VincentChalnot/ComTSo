@@ -11,12 +11,12 @@ class UserPreferencesTest extends AppWebTestCase
         $alice = $this->createUser('alice');
         $this->loginAs($alice);
 
-        $crawler = $this->client->request('GET', '/gens/alice/config');
+        $crawler = $this->client->request('GET', '/gens/alice/parametres/affichage');
         $form = $crawler->selectButton('Sauvegarder')->form();
         $form['form[message_order]'] = 'desc';
         $this->client->submit($form);
 
-        self::assertResponseRedirects('/gens/alice/config');
+        self::assertResponseRedirects('/gens/alice/parametres/affichage');
         $this->em()->clear();
         self::assertSame('desc', $this->em()->find($alice::class, $alice->getId())->getMessageOrder());
     }
@@ -54,7 +54,7 @@ class UserPreferencesTest extends AppWebTestCase
         $this->loginAs($alice);
 
         // The toggle of the masthead is handed its URL and its CSRF token.
-        $crawler = $this->client->request('GET', '/gens/alice/config');
+        $crawler = $this->client->request('GET', '/gens/alice/parametres/affichage');
         $toggle = json_decode($crawler->filter('[data-vue-component="ThemeToggle"]')->attr('data-props'), true, flags: \JSON_THROW_ON_ERROR);
 
         $this->client->jsonRequest('POST', $toggle['url'], ['theme' => 'dark', '_token' => $toggle['csrf']]);
@@ -71,9 +71,9 @@ class UserPreferencesTest extends AppWebTestCase
         $this->createUser('alice');
         $this->loginAs($this->createUser('mallory'));
 
-        $this->client->request('GET', '/gens/alice/config');
+        $this->client->request('GET', '/gens/alice/parametres/affichage');
         self::assertResponseStatusCodeSame(403);
-        $this->client->request('GET', '/gens/alice/edit');
+        $this->client->request('GET', '/gens/alice/parametres/profil');
         self::assertResponseStatusCodeSame(403);
     }
 }

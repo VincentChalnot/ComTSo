@@ -306,6 +306,7 @@ and forced classes (`is-hover`, `is-pressed`, `is-focus`, `is-disabled`) through
 | `_pager` | `.pager` (`a`, `span`, `.is-current`, `.is-disabled`) |
 | `_table` | `.table` `-striped` `-hover` `-sm` `-sticky` `.table-responsive` `.dl` `.dl-stacked` |
 | `_filter-bar` | admin lists: `.filter-bar` (`-fields`, `-actions`) `.filter-range` (`-inputs`) `.list-meta` `.table-sort` (a column head that sorts, current direction = `th[aria-sort]`) `.table-actions` `.table-empty`; the table is `.table`, the pagination `.pager` |
+| `_settings-layout` | settings centre: `.settings-layout` (menu left + content, no aside) `.settings-nav` (wraps a `.nav-pills.is-vertical`; a row of pills that scrolls sideways under 48rem) `.settings-nav-admin` (admin button) `.settings-main` |
 | `_admin` | `/admin` pages around the list: `.admin-tiles` (overview tiles, ≥14rem) `.admin-form` (form column) `.admin-subject` (name under the title) `.admin-details` (what a removal takes along) |
 | `_skeleton` | `.skeleton*` `.empty*` `.spinner` `.progress` |
 | `_post` | `.post` `.post-body` (all sanitized elements) `.post-meta` `.post-toggle` `.post-author`, states `.is-target` `.is-active` `.is-collapsed` |

@@ -315,6 +315,6 @@ class PasswordResetTest extends AppWebTestCase
 
         $this->client->request('GET', '/mot-de-passe/oublie');
 
-        self::assertResponseRedirects('/gens/alice/config');
+        self::assertResponseRedirects('/gens/alice/parametres/securite');
     }
 }

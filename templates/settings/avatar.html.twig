@@ -1,0 +1,24 @@
+{% extends 'settings/_layout.html.twig' %}
+{% import '_ui/avatar.html.twig' as av %}
+
+{% block title %}Avatar · Paramètres · ComTSo{% endblock %}
+{% block settings_title %}Avatar{% endblock %}
+{% block settings_intro %}L’image qui accompagne vos messages.{% endblock %}
+
+{% block settings_body %}
+<div class="settings">
+    <div class="card card-roomy">
+        <div class="flex items-center gap-4 mb-5">
+            {{ av.avatar(person, 'xl') }}
+            <p class="settings-hint mb-0">{{ person.avatar ? 'Voici votre avatar actuel.' : 'Vous n’avez pas d’avatar : votre initiale s’affiche à la place.' }}</p>
+        </div>
+        {{ form_start(form) }}
+            {{ form_row(form.file) }}
+            <div class="form-actions">
+                {% if form.remove is defined %}{{ form_widget(form.remove) }}{% endif %}
+                {{ form_widget(form.upload) }}
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

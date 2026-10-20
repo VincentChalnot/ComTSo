@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
  * the firewall sends anonymous visitors to the login before these routes run).
  *
  * - the very first PHP version: `topic.php?id=153`;
+ * - the old settings page `/gens/{username}/config` (now the settings centre, profile section);
  * - the old forum: `/photos/preview/73.jpg` (a picture opened in a new tab) and `/photos/thumbnail/73.jpg` (its thumbnail),
  *   where 73 is the old forum's photo number, i.e. the `73.jpg` stored in `ctso_photo.original_filename` by the one-off data load. The same name can come back later when somebody uploads a camera file called `73.jpg`:
  *   the oldest photo wins, which is the imported one.
@@ -31,6 +32,12 @@ class LegacyRedirectController extends AbstractController
         }
 
         return $this->redirectToRoute('topic_show', ['forumId' => $topic->getForum()->getId(), 'id' => $topic->getId()], Response::HTTP_MOVED_PERMANENTLY);
+    }
+
+    #[Route('/gens/{username}/config', name: 'legacy_people_config', requirements: ['username' => '[^/]+'])]
+    public function config(string $username): RedirectResponse
+    {
+        return $this->redirectToRoute('settings_profile', ['username' => $username], Response::HTTP_MOVED_PERMANENTLY);
     }
 
     #[Route('/photos/{kind}/{number}.{extension}', name: 'legacy_photo', requirements: ['kind' => 'preview|thumbnail', 'number' => '\d+', 'extension' => 'jpe?g|png|gif'])]

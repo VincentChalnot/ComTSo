@@ -230,6 +230,25 @@ Shown (hidden removed) once `GET /photos/{id}/like` answered; hidden for links w
 ```
 Never put `p-*` utilities or `style="padding:…"` on a `.card`: choose `.card-roomy` or `.card-flush`. Components that need their own spacing (`.profile`, `.person-card`) set it in their partial.
 
+## Settings centre (`templates/settings/_layout.html.twig`, `components/_settings-layout.scss`)
+
+```html
+<div class="settings-layout">
+  <nav class="settings-nav" aria-label="Paramètres">
+    <ul class="nav-pills is-vertical">
+      <li><a href="/gens/camille/parametres/profil" aria-current="page">Profil</a></li>
+      <li><a href="…/avatar">Avatar</a></li> <li><a href="…/securite">Sécurité</a></li> <li><a href="…/affichage">Affichage</a></li> <li><a href="…/statistiques">Statistiques</a></li>
+    </ul>
+    <a href="/admin" class="btn settings-nav-admin">Administration</a>   <!-- administrators only, on their own settings -->
+  </nav>
+  <main id="main" class="settings-main" tabindex="-1">
+    <header class="page-header">…</header>
+    <div class="settings"><div class="card card-roomy"><form>…</form></div></div>
+  </main>
+</div>
+```
+Replaces the `.layout` + `.layout-aside` pair on these pages (no "accès rapide" column). The current section carries `aria-current="page"`; from 48rem the menu is a left column with a hairline, under it a row of pills that scrolls sideways.
+
 ## Classes outside the contract
 
 New hooks (need styling):

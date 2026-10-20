@@ -4,9 +4,8 @@
 {% set nav_links = [
     {route: 'app_home', label: 'Accueil', match: ['app_home']},
     {route: 'forum_index', label: 'Forums', match: ['forum_index', 'forum_show', 'topic_show', 'topic_edit', 'topic_photos', 'comment_show', 'comment_edit', 'forum_new_topic']},
-    {route: 'people_index', label: 'Les gens', match: ['people_index', 'people_show', 'people_edit']},
+    {route: 'people_index', label: 'Les gens', match: ['people_index', 'people_show']},
     {route: 'photo_index', label: 'Photos', match: ['photo_index', 'photo_show', 'photo_edit']},
-    {route: 'stats_index', label: 'Statistiques', match: ['stats_index']},
     {route: 'admin_index', label: 'Administration', match: ['admin_index'], admin: true},
 ] %}
 <!DOCTYPE html>
@@ -44,7 +43,7 @@
             {% if app.user %}
                 <div class="masthead-tools">
                     <div data-vue-component="ThemeToggle" data-props="{{ {url: path('user_theme'), csrf: csrf_token('theme')}|json_encode|e('html_attr') }}"></div>
-                    <a href="{{ path('people_config', {username: app.user.username}) }}" class="btn-icon masthead-settings" title="Configuration" aria-label="Configuration">{{ ui.icon('settings', 'size-5') }}</a>
+                    <a href="{{ path('settings_profile', {username: app.user.username}) }}" class="btn-icon masthead-settings" title="Paramètres" aria-label="Paramètres">{{ ui.icon('settings', 'size-5') }}</a>
                     <a href="{{ path('people_show', {username: app.user.username}) }}" class="masthead-user" title="Mon profil">
                         {{ av.avatar(app.user, 'sm') }}<span class="masthead-user-name">{{ app.user.username }}</span>
                     </a>
@@ -84,7 +83,7 @@
                         </a>
                     </li>
                     <li class="masthead-menu-account">
-                        <a href="{{ path('people_config', {username: app.user.username}) }}" class="masthead-link">Configuration</a>
+                        <a href="{{ path('settings_profile', {username: app.user.username}) }}" class="masthead-link">Paramètres</a>
                     </li>
                     <li class="masthead-menu-account">
                         <a href="{{ logout_path() }}" class="masthead-link">Déconnexion</a>

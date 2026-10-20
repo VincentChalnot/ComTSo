@@ -9,7 +9,7 @@ use App\Tests\Support\PhotoFilesTrait;
 use App\Tests\Support\PhotoRowsTrait;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-/** Changing and removing your own avatar on the configuration page. */
+/** Changing and removing your own avatar on the avatar page of the settings centre. */
 final class AvatarTest extends AppWebTestCase
 {
     use PhotoFilesTrait;
@@ -30,10 +30,10 @@ final class AvatarTest extends AppWebTestCase
         parent::tearDown();
     }
 
-    /** Opens the configuration page of $username and submits the avatar form through the given button. */
+    /** Opens the avatar page of $username and submits the avatar form through the given button. */
     private function submitAvatar(?UploadedFile $file, string $button = self::CHANGE, string $username = 'alice'): void
     {
-        $crawler = $this->client->request('GET', "/gens/$username/config");
+        $crawler = $this->client->request('GET', "/gens/$username/parametres/avatar");
         $form = $crawler->selectButton($button)->form();
         $this->client->request('POST', $form->getUri(), $form->getPhpValues(), $file ? ['avatar' => ['file' => $file]] : []);
     }
@@ -55,7 +55,7 @@ final class AvatarTest extends AppWebTestCase
     {
         $this->loginAs($this->createUser('alice'));
         $this->submitAvatar($this->jpegUpload('first.jpg', 400, 300));
-        self::assertResponseRedirects('/gens/alice/config');
+        self::assertResponseRedirects('/gens/alice/parametres/avatar');
 
         return $this->reload('alice')->getAvatar();
     }
@@ -66,7 +66,7 @@ final class AvatarTest extends AppWebTestCase
 
         $this->submitAvatar($this->jpegUpload('portrait.jpg', 800, 600));
 
-        self::assertResponseRedirects('/gens/alice/config');
+        self::assertResponseRedirects('/gens/alice/parametres/avatar');
         $avatar = $this->reload('alice')->getAvatar();
         self::assertNotNull($avatar);
         self::assertSame('portrait.jpg', $avatar->getOriginalFilename());
@@ -107,7 +107,7 @@ final class AvatarTest extends AppWebTestCase
 
         $this->submitAvatar($this->jpegUpload('second.jpg', 300, 300));
 
-        self::assertResponseRedirects('/gens/alice/config');
+        self::assertResponseRedirects('/gens/alice/parametres/avatar');
         $new = $this->reload('alice')->getAvatar();
         self::assertNotSame($oldId, $new->getId());
         self::assertSame('second.jpg', $new->getOriginalFilename());
@@ -126,7 +126,7 @@ final class AvatarTest extends AppWebTestCase
 
         $this->submitAvatar($this->jpegUpload('second.jpg'));
 
-        self::assertResponseRedirects('/gens/alice/config');
+        self::assertResponseRedirects('/gens/alice/parametres/avatar');
         self::assertNotSame($oldId, $this->reload('alice')->getAvatar()->getId());
         self::assertTrue($this->rowExists($oldId), 'A photo used by a topic stays in the library.');
         self::assertCount(2, $this->storedFiles(), 'Its file stays too.');
@@ -139,7 +139,7 @@ final class AvatarTest extends AppWebTestCase
 
         $this->submitAvatar(null, self::REMOVE);
 
-        self::assertResponseRedirects('/gens/alice/config');
+        self::assertResponseRedirects('/gens/alice/parametres/avatar');
         self::assertNull($this->reload('alice')->getAvatar());
         self::assertFalse($this->rowExists($id));
         self::assertSame([], $this->storedFiles());
@@ -167,7 +167,7 @@ final class AvatarTest extends AppWebTestCase
     {
         $this->loginAs($this->createUser('alice'));
 
-        $crawler = $this->client->request('GET', '/gens/alice/config');
+        $crawler = $this->client->request('GET', '/gens/alice/parametres/avatar');
         self::assertCount(1, $crawler->selectButton(self::CHANGE));
         self::assertCount(0, $crawler->selectButton(self::REMOVE));
     }
@@ -223,17 +223,15 @@ final class AvatarTest extends AppWebTestCase
         self::assertStringContainsString('Choisissez une image', $this->client->getResponse()->getContent());
     }
 
-    public function testTheFormIsOnlyOnYourOwnConfigurationPage(): void
+    public function testTheFormIsOnlyOnYourOwnAvatarPage(): void
     {
         $this->createUser('alice');
         $this->loginAs($this->createUser('root', ['ROLE_ADMIN']));
 
-        $crawler = $this->client->request('GET', '/gens/alice/config');
+        $this->client->request('GET', '/gens/alice/parametres/avatar');
+        self::assertResponseStatusCodeSame(403, 'Not even an administrator opens the avatar page of somebody else.');
 
-        self::assertResponseIsSuccessful('An administrator may open the page (message order)…');
-        self::assertCount(0, $crawler->selectButton(self::CHANGE), '…but there is no avatar form for somebody else.');
-
-        $crawler = $this->client->request('GET', '/gens/root/config');
+        $crawler = $this->client->request('GET', '/gens/root/parametres/avatar');
         self::assertCount(1, $crawler->selectButton(self::CHANGE));
     }
 
@@ -246,7 +244,7 @@ final class AvatarTest extends AppWebTestCase
         foreach (['mallory', 'root'] as $intruder) {
             $this->loginAs($this->reload($intruder));
             foreach ([['avatar' => ['upload' => '']], ['avatar' => ['remove' => '']]] as $values) {
-                $this->client->request('POST', '/gens/alice/avatar', $values, ['avatar' => ['file' => $this->jpegUpload('hack.jpg')]]);
+                $this->client->request('POST', '/gens/alice/parametres/avatar', $values, ['avatar' => ['file' => $this->jpegUpload('hack.jpg')]]);
                 self::assertResponseStatusCodeSame(403, $intruder);
             }
         }
@@ -259,7 +257,7 @@ final class AvatarTest extends AppWebTestCase
     {
         $this->createUser('alice');
 
-        $this->client->request('POST', '/gens/alice/avatar', ['avatar' => ['upload' => '']], ['avatar' => ['file' => $this->jpegUpload()]]);
+        $this->client->request('POST', '/gens/alice/parametres/avatar', ['avatar' => ['upload' => '']], ['avatar' => ['file' => $this->jpegUpload()]]);
 
         self::assertResponseRedirects('/login');
         self::assertSame([], $this->storedFiles());
@@ -269,16 +267,16 @@ final class AvatarTest extends AppWebTestCase
     {
         $avatar = $this->aliceWithAnAvatar();
 
-        $crawler = $this->client->request('GET', '/gens/alice/config');
+        $crawler = $this->client->request('GET', '/gens/alice/parametres/avatar');
         $values = $crawler->selectButton(self::REMOVE)->form()->getPhpValues();
         unset($values['avatar']['_token']);
-        $this->client->request('POST', '/gens/alice/avatar', $values);
+        $this->client->request('POST', '/gens/alice/parametres/avatar', $values);
 
         self::assertResponseStatusCodeSame(422);
         self::assertSame($avatar->getId(), $this->reload('alice')->getAvatar()->getId());
 
         $values['avatar']['_token'] = 'forged';
-        $this->client->request('POST', '/gens/alice/avatar', $values, ['avatar' => ['file' => $this->jpegUpload('csrf.jpg')]]);
+        $this->client->request('POST', '/gens/alice/parametres/avatar', $values, ['avatar' => ['file' => $this->jpegUpload('csrf.jpg')]]);
 
         self::assertResponseStatusCodeSame(422);
         self::assertSame($avatar->getId(), $this->reload('alice')->getAvatar()->getId());

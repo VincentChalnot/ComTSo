@@ -18,7 +18,7 @@ class CsrfTest extends AppWebTestCase
     ];
 
     /** Routes whose POST is a Symfony form (token field) or the firewall's own authenticator. */
-    private const FORM_ROUTES = ['comment_create', 'people_avatar', 'people_password'];
+    private const FORM_ROUTES = ['comment_create', 'settings_avatar', 'settings_display', 'settings_profile', 'settings_security'];
 
     /**
      * Admin panel routes (config/packages/sidus.yaml) that accept a POST: the bundle's Symfony forms (edit, create) and the empty
@@ -174,6 +174,22 @@ class CsrfTest extends AppWebTestCase
         self::assertNotContains('ROLE_ADMIN', $alice->getRoles(), 'the role did not change');
     }
 
+    public function testTheSettingsFormsWithoutTheirTokenChangeNothing(): void
+    {
+        $alice = $this->createUser('alice');
+        $this->loginAs($alice);
+
+        $this->client->request('POST', '/gens/alice/parametres/profil', ['user_profile' => ['name' => 'Forgé', 'email' => 'forge@example.test']]);
+        self::assertResponseStatusCodeSame(422);
+        $this->client->request('POST', '/gens/alice/parametres/affichage', ['form' => ['message_order' => 'desc']]);
+        self::assertResponseStatusCodeSame(422);
+
+        $this->em()->clear();
+        $alice = $this->em()->find(\App\Entity\User::class, $alice->getId());
+        self::assertNull($alice->getName());
+        self::assertSame('asc', $alice->getMessageOrder());
+    }
+
     public function testActionsWithAWrongTokenAreRefused(): void
     {
         $requests = $this->tokenlessRequests();
@@ -190,7 +206,7 @@ class CsrfTest extends AppWebTestCase
     {
         $alice = $this->createUser('alice');
         $this->loginAs($alice);
-        $crawler = $this->client->request('GET', '/gens/alice/config');
+        $crawler = $this->client->request('GET', '/gens/alice/parametres/profil');
         $props = json_decode($crawler->filter('[data-vue-component="ThemeToggle"]')->attr('data-props'), true, flags: \JSON_THROW_ON_ERROR);
 
         $this->client->jsonRequest('POST', $props['url'], ['theme' => 'dark', '_token' => $props['csrf']]);
@@ -222,13 +238,13 @@ class CsrfTest extends AppWebTestCase
         $this->client->request('GET', '/logout');
 
         self::assertResponseStatusCodeSame(403);
-        $this->client->request('GET', '/gens/alice/config');
+        $this->client->request('GET', '/gens/alice/parametres/profil');
         self::assertResponseIsSuccessful('still logged in');
 
         $this->logOut();
 
         self::assertResponseRedirects('/');
-        $this->client->request('GET', '/gens/alice/config');
+        $this->client->request('GET', '/gens/alice/parametres/profil');
         self::assertResponseRedirects('/login');
     }
 
@@ -241,7 +257,7 @@ class CsrfTest extends AppWebTestCase
         $this->client->request('GET', $href, server: ['HTTP_SEC_FETCH_SITE' => 'cross-site']);
 
         self::assertResponseStatusCodeSame(403);
-        $this->client->request('GET', '/gens/alice/config');
+        $this->client->request('GET', '/gens/alice/parametres/profil');
         self::assertResponseIsSuccessful('still logged in');
     }
 

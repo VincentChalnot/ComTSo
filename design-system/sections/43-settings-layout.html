@@ -1,0 +1,62 @@
+<section class="ds-section" id="parametres" data-title="Paramètres">
+  <header class="ds-section-head">
+    <p class="kicker">Composants</p>
+    <h2>Centre de paramètres</h2>
+    <p class="standfirst">Un menu de rubriques à gauche, une seule rubrique à droite, pas de colonne latérale. Sur téléphone, le menu devient une rangée de pastilles qui défile.</p>
+  </header>
+
+  <div class="ds-demo" data-title="Centre de paramètres : <code>.settings-layout</code> + <code>.settings-nav</code> (membre)">
+    <div class="ds-stage">
+      <div class="settings-layout">
+        <nav class="settings-nav" aria-label="Paramètres">
+          <ul class="nav-pills is-vertical">
+            <li><a href="#" aria-current="page">Profil</a></li>
+            <li><a href="#">Avatar</a></li>
+            <li><a href="#">Sécurité</a></li>
+            <li><a href="#">Affichage</a></li>
+            <li><a href="#">Statistiques</a></li>
+          </ul>
+        </nav>
+        <div class="settings-main">
+          <header class="page-header">
+            <p class="kicker"><a href="#">camille</a></p>
+            <h1 class="page-title">Profil</h1>
+            <p class="standfirst">Ce que les autres membres voient sur votre fiche.</p>
+          </header>
+          <div class="settings">
+            <div class="card card-roomy">
+              <form onsubmit="return false">
+                <div class="field"><label class="label" for="ds-sl-name">Prénom</label><input class="input" id="ds-sl-name" value="Camille"></div>
+                <div class="form-actions"><a class="btn" href="#">Annuler</a><button type="submit" class="btn btn-primary">Enregistrer</button></div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds-demo" data-title="Administrateur : le bouton « Administration » sous le menu (pas une rubrique)">
+    <div class="ds-stage">
+      <div class="settings-layout">
+        <nav class="settings-nav" aria-label="Paramètres">
+          <ul class="nav-pills is-vertical">
+            <li><a href="#">Profil</a></li>
+            <li><a href="#">Avatar</a></li>
+            <li><a href="#">Sécurité</a></li>
+            <li><a href="#" aria-current="page">Affichage</a></li>
+            <li><a href="#">Statistiques</a></li>
+          </ul>
+          <a href="#" class="btn settings-nav-admin">Administration</a>
+        </nav>
+        <div class="settings-main">
+          <div class="settings">
+            <div class="card card-roomy">
+              <p class="settings-hint" style="margin:0">Le contenu de la rubrique occupe toute la colonne de droite.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

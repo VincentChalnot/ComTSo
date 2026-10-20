@@ -1,20 +1,11 @@
-{% extends 'base.html.twig' %}
+{% extends 'settings/_layout.html.twig' %}
 
-{% block title %}Statistiques · ComTSo{% endblock %}
+{% block title %}Statistiques · Paramètres · ComTSo{% endblock %}
+{% block settings_title %}Qui écrit, et quand{% endblock %}
+{% block settings_intro %}{% set total = report.totals.comments + report.totals.chat %}{% if total == 0 %}Aucun message pour l’instant.{% else %}{{ report.totals.comments|number_format(0, ',', ' ') }} messages sur le forum et {{ report.totals.chat|number_format(0, ',', ' ') }} dans le chat, de {{ report.years|first }} à {{ report.years|last }}.{% endif %}{% endblock %}
 
-{% block body %}
+{% block settings_body %}
 {% set total = report.totals.comments + report.totals.chat %}
-<header class="page-header">
-    <p class="kicker">Statistiques</p>
-    <h1 class="page-title">Qui écrit, et quand</h1>
-    {% if total == 0 %}
-        <p class="standfirst">Aucun message pour l’instant.</p>
-    {% else %}
-        <p class="standfirst">
-            {{ report.totals.comments|number_format(0, ',', ' ') }} messages sur le forum et {{ report.totals.chat|number_format(0, ',', ' ') }} dans le chat, de {{ report.years|first }} à {{ report.years|last }}.
-        </p>
-    {% endif %}
-</header>
 
 {% if total > 0 %}
     {% set yearChart = {

@@ -30,7 +30,7 @@ class PasswordResetController extends AbstractController
         RateLimiterFactoryInterface $passwordResetAccountLimiter,
     ): Response {
         if ($this->getUser()) {
-            return $this->redirectToRoute('people_config', ['username' => $this->getUser()->getUserIdentifier()]);
+            return $this->redirectToRoute('settings_security', ['username' => $this->getUser()->getUserIdentifier()]);
         }
 
         $form = $this->createFormBuilder()
