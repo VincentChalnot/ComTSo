@@ -14,6 +14,11 @@ What was decided, what was found, and what happened, for whoever works on ComTSo
 | 2026-10-19 | Owner decisions: all the data is in the new database and the old data is forgotten, so the legacy import tooling and `docs/legacy-import.md` were removed; D1 (profile visibility option) dropped; the 10 shortened attachments accepted as they are; "Symfony 2" wording removed from the docs. |
 | 2026-10-20 | Sentry error reporting (`sentry/sentry-symfony`): the DSN is the optional plain variable `SENTRY_DSN` (the owner already set it on the server), errors only, no personal data, expected 4xx filtered out; unset = disabled, so dev, tests and CI never need it (`docs/operations.md` "Sentry"). |
 | 2026-10-20 | Admin panel changes asked by the owner: screens ordered members, forums, topics, comments, photos, quotes with icon tiles on the overview; e-mail addresses are now shown on the member screens only (this reverses the earlier "never an address in the admin" rule); the admin uses the full page width (`.page-wide`); new read-only comments screen with moderation removal (`CommentRemover`). |
+| 2026-10-20 | The old Symfony stack was retired from the production server (containers, image, volume, directory): no rollback to it any more, the rollback rehearsal is obsolete. |
+| 2026-10-20 | Photo backups: the NAS keeps an rsync mirror of the photo originals (no duplicates, nothing ever deleted there); the server's own `photos-*.tar.gz` is redundant for the NAS. |
+| 2026-10-20 | Settings centre at `/gens/{pseudo}/parametres/<section>` (profile, avatar, security, display, statistics) replaces the single config page; statistics left the main navigation; `/gens/{pseudo}/config` is a 301 to it. |
+| 2026-10-20 | Any member may add a quote (`/citations/nouvelle`, plain text, two fields); editing and removing stay with administrators. This closes the old "who may add quotes" question. |
+| 2026-10-20 | Photo rotation is a stored value (`ctso_photo.rotation`, 0/90/180/270) applied when the thumb/medium/hero/avatar variants are generated, not a re-encode and not CSS: the stored file is never rewritten (no quality loss), and every image already goes through `photo_url()`. The downloaded original is not turned. |
 
 ## Go-live decisions (D1-D14, answered by the owner on 2026-10-19)
 

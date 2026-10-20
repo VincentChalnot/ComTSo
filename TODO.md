@@ -1,32 +1,27 @@
 # TODO
 
-The single live backlog (agreed 2026-10-19, after the comtso.fr cutover). Waves are in execution order; inside a wave, top to bottom.
+The single live backlog (updated 2026-10-20, after the cutover week). Waves are in execution order; inside a wave, top to bottom.
 Decisions already taken and history: `docs/decisions.md`. Ops runbook: `deploy/README.md` and `docs/operations.md`.
 Items marked **BLOCKED** need a decision from the owner before any work.
 
-## Wave 1: safety and visible gaps (about 2-3 working days)
+Done and removed from this list (details in `docs/decisions.md`): GitHub/CI hardening, backup restore test and NAS photo rsync mirror, `www.comtso.fr` redirect (live), old Symfony stack retired (2026-10-20, so no rollback rehearsal), DMARC review, Sentry, admin panel (members with e-mails, forums, topics, comments, photos, quotes), settings centre, photo rotation without quality loss, quotes by any member, Mailpit through Traefik (dev), logo proposals.
 
-1. **Backup: NAS mirror still to verify.** The restore test is done (a dev-database dump restored into a scratch database, row counts identical; server backup of 2026-10-19 passes `gzip -t`). The NAS mirror `new-forum/` did not exist yet: run the NAS `backup.sh` once, check that `new-forum/` holds the day's dump and photo archive, and restore-test that copy (`docs/operations.md` "Backups and restore checks").
-2. **`www.comtso.fr` redirect and Keres CSP** (owner only, minutes): test `compose.www-redirect.yaml` (permanent redirect to the apex) and that the Keres app still works with its own CSP (the shared Traefik no longer sets one).
+## Wave 1: next agent tasks
 
-## Wave 2: hardening and photo/text features
-
-1. **CI hardening: owner commands left.** Done (2026-10-19): Dependabot, gitleaks job, prod-image smoke test in `image`, repository security settings, stale runs removed (`docs/operations.md` "GitHub repository, CI and ghcr"). Left for the owner: delete the 6 orphaned `sha-*` ghcr tags (command in that section), then, after the signed force-push of `master`, apply the recommended branch protection (command there), and check the first Dependabot pull requests.
-2. **Sentry.** Plan in `docs/operations.md` ("Sentry plan"): cheap, but production is quiet and `/health` plus logs cover a 20-member forum. Do it after the first production error that cannot be diagnosed.
-
-## Wave 3: decisions and big or optional items
-
-1. **"Ajouter une citation" under a hovered quote. BLOCKED** on who may add quotes (all members or admins). The admin panel (`/admin/quotes`) now lets administrators add, edit and delete quotes (so administrators already can), but the public hover UI for members is still undecided. `ctso_quote` has a `created_at` column but no date is shown anywhere.
-2. **Better logo with the brand colours (dark).** Design asset; needs the owner's taste and the five brand colours of `abstracts/_palette.scss`.
-3. **Rehearse the server rollback** (stop `app`, start old `nginx`, `docs/operations.md`): only if the old stack still exists; value disappears when it is retired.
+1. **Verify Sentry after the next deploy.** `SENTRY_DSN` is already set on the server: run `docker compose exec app php bin/console sentry:test` once and check the event arrives (`docs/operations.md` "Sentry").
+2. **Wire in the chosen logo** (follow-up of the owner's pick, see below): favicons, masthead, login card, e-mail header, in both themes.
 
 ## Waiting for the owner (not an agent task)
 
-- **Tag the Symfony 8 fixes of the sidus bundles**: push the `symfony-8` branches of `SidusAdminBundle` and `SidusFilterBundle` (3 small fixes, committed locally), tag `sidus/admin-bundle` 5.0.7 and `sidus/filter-bundle` 6.0.4, then drop the Composer patches of the admin panel (exact steps: `AGENTS.md`, "Admin panel", "Composer patches").
-
-## Housekeeping, not scheduled (status to confirm)
-
-From the go-live checklist, none of it is in the agreed waves: retire the old stack after a stable period; tighten DMARC from `p=none` once SPF/DKIM pass in real mails.
+- **Git**: sign/rebase the local commits and push (`git log --oneline origin/master..HEAD` lists them); then apply the recommended branch protection after the force-push and check the first Dependabot pull requests (`docs/operations.md` "GitHub repository, CI and ghcr").
+- **Delete the 6 orphaned `sha-*` ghcr tags** (command in `docs/operations.md`).
+- **Tag `sidus/filter-bundle` v6.0.4**, then drop the Composer patches (steps: `AGENTS.md` "Composer patches").
+- **Sidus registries state defect** (`DataGridRegistry` / `QueryHandlerRegistry` cache stateful objects and are not reset between requests): fix upstream; then delete the request-scoped registries workaround (`AGENTS.md` "Admin panel", `App\Admin\Registry\RequestScoped*`, `RequestScopedDatagridPass`).
+- **Choose a logo concept** in `docs/logo-proposal/` (then Wave 1 item 2).
+- **NAS**: delete the two old `photos-*.tar.gz` once the rsync mirror is trusted; optionally stop shipping the server's own photos tarball (now redundant, `docs/operations.md` "Backups").
+- **Keres CSP**: check the Keres app still works with its own CSP (the shared Traefik no longer sets one).
+- **Dev Mailpit host**: the default is `mail.comtso.local.sidus.fr`. The owner asked for `mail.local.comtso.fr`, which resolves to the public server: add a `*.local.comtso.fr` A record to 127.0.0.1, then set `MAILPIT_HOST`.
+- **DMARC**: read `dmarc=pass` once in the header of a received mail. Optional: add `rua=` reports (`docs/operations.md`); `p=none` is fine for this forum.
 
 ## Dropped (do not re-add; re-open only on a real request)
 
