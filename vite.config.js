@@ -18,9 +18,9 @@ export default defineConfig({
     // Keep the previous bundle in place while a watch rebuild runs (stable file names, no 404 flicker).
     emptyOutDir: false,
     manifest: true,
-    rollupOptions: {
+    rolldownOptions: {
       input: {
-        main: resolve(__dirname, 'assets/scripts/main.js'),
+        main: resolve(import.meta.dirname, 'assets/scripts/main.js'),
       },
       output: {
         entryFileNames: `[name].js`,
@@ -33,9 +33,9 @@ export default defineConfig({
   resolve: {
     alias: [
       // paper textures (tracked in assets/images/textures) and self-hosted fonts, referenced from SCSS url()
-      { find: /^@textures\//, replacement: resolve(__dirname, 'assets/images/textures') + '/' },
-      { find: /^@fontsource-variable\//, replacement: resolve(__dirname, 'node_modules/@fontsource-variable') + '/' },
-      { find: '@', replacement: resolve(__dirname, 'assets') },
+      { find: /^@textures\//, replacement: resolve(import.meta.dirname, 'assets/images/textures') + '/' },
+      { find: /^@fontsource-variable\//, replacement: resolve(import.meta.dirname, 'node_modules/@fontsource-variable') + '/' },
+      { find: '@', replacement: resolve(import.meta.dirname, 'assets') },
     ],
   },
 });

@@ -6,10 +6,10 @@ import vue from '@vitejs/plugin-vue';
 import tailwindcss from '@tailwindcss/postcss';
 import { resolve } from 'path';
 
-const repo = resolve(__dirname, '..');
+const repo = resolve(import.meta.dirname, '..');
 
 export default defineConfig({
-  root: __dirname,
+  root: import.meta.dirname,
   // /images (paper textures), /smilies and the favicon are served exactly like the application serves them
   publicDir: resolve(repo, 'public'),
   cacheDir: resolve(repo, 'node_modules/.vite-design-system'),
