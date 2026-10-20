@@ -140,9 +140,7 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY --link frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
 
 # prevent the reinstallation of vendors at every changes in the source code
-# (patches/ + patches.lock.json: cweagans/composer-patches applies them while installing; it uses `git apply`, installed in the base image)
-COPY --link composer.* symfony.* patches.lock.json ./
-COPY --link patches ./patches
+COPY --link composer.* symfony.* ./
 RUN --mount=type=cache,target=/tmp/composer-cache \
 	COMPOSER_CACHE_DIR=/tmp/composer-cache composer install --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
 

@@ -4,131 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4fd7f87e0888bd0dcb1fe806eb1eaca2",
+    "content-hash": "7304073f28e379212fc5e25b6eeedeb2",
     "packages": [
-        {
-            "name": "cweagans/composer-configurable-plugin",
-            "version": "2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cweagans/composer-configurable-plugin.git",
-                "reference": "15433906511a108a1806710e988629fd24b89974"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cweagans/composer-configurable-plugin/zipball/15433906511a108a1806710e988629fd24b89974",
-                "reference": "15433906511a108a1806710e988629fd24b89974",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.0.0"
-            },
-            "require-dev": {
-                "codeception/codeception": "~4.0",
-                "codeception/module-asserts": "^2.0",
-                "composer/composer": "~2.0",
-                "php-coveralls/php-coveralls": "~2.0",
-                "php-parallel-lint/php-parallel-lint": "^1.0.0",
-                "phpro/grumphp": "^1.8.0",
-                "sebastian/phpcpd": "^6.0",
-                "squizlabs/php_codesniffer": "^3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "cweagans\\Composer\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Cameron Eagans",
-                    "email": "me@cweagans.net"
-                }
-            ],
-            "description": "Provides a lightweight configuration system for Composer plugins.",
-            "support": {
-                "issues": "https://github.com/cweagans/composer-configurable-plugin/issues",
-                "source": "https://github.com/cweagans/composer-configurable-plugin/tree/2.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/cweagans",
-                    "type": "github"
-                }
-            ],
-            "time": "2023-02-12T04:58:58+00:00"
-        },
-        {
-            "name": "cweagans/composer-patches",
-            "version": "2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cweagans/composer-patches.git",
-                "reference": "bfa6018a5f864653d9ed899b902ea72f858a2cf7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cweagans/composer-patches/zipball/bfa6018a5f864653d9ed899b902ea72f858a2cf7",
-                "reference": "bfa6018a5f864653d9ed899b902ea72f858a2cf7",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^2.0",
-                "cweagans/composer-configurable-plugin": "^2.0",
-                "ext-json": "*",
-                "php": ">=8.0.0"
-            },
-            "require-dev": {
-                "codeception/codeception": "~4.0",
-                "codeception/module-asserts": "^2.0",
-                "codeception/module-cli": "^2.0",
-                "codeception/module-filesystem": "^2.0",
-                "composer/composer": "~2.0",
-                "php-coveralls/php-coveralls": "~2.0",
-                "php-parallel-lint/php-parallel-lint": "^1.0.0",
-                "phpro/grumphp": "^1.8.0",
-                "sebastian/phpcpd": "^6.0",
-                "squizlabs/php_codesniffer": "^4.0"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "_": "The following two lines ensure that composer-patches is loaded as early as possible.",
-                "class": "cweagans\\Composer\\Plugin\\Patches",
-                "plugin-modifies-downloads": true,
-                "plugin-modifies-install-path": true
-            },
-            "autoload": {
-                "psr-4": {
-                    "cweagans\\Composer\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Cameron Eagans",
-                    "email": "me@cweagans.net"
-                }
-            ],
-            "description": "Provides a way to patch Composer packages.",
-            "support": {
-                "issues": "https://github.com/cweagans/composer-patches/issues",
-                "source": "https://github.com/cweagans/composer-patches/tree/2.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/cweagans",
-                    "type": "github"
-                }
-            ],
-            "time": "2025-10-30T23:44:22+00:00"
-        },
         {
             "name": "doctrine/collections",
             "version": "3.1.0",
@@ -3102,16 +2979,16 @@
         },
         {
             "name": "sidus/filter-bundle",
-            "version": "v6.0.3",
+            "version": "v6.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/VincentChalnot/SidusFilterBundle.git",
-                "reference": "891b999b67e29117693113658110e49533dc68ef"
+                "reference": "7ce44c44773b767d021a33252b9fc52eee219772"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VincentChalnot/SidusFilterBundle/zipball/891b999b67e29117693113658110e49533dc68ef",
-                "reference": "891b999b67e29117693113658110e49533dc68ef",
+                "url": "https://api.github.com/repos/VincentChalnot/SidusFilterBundle/zipball/7ce44c44773b767d021a33252b9fc52eee219772",
+                "reference": "7ce44c44773b767d021a33252b9fc52eee219772",
                 "shasum": ""
             },
             "require": {
@@ -3119,11 +2996,11 @@
                 "doctrine/orm": ">=2.14",
                 "pagerfanta/pagerfanta": ">=2.7",
                 "php": ">=8.1",
-                "symfony/dependency-injection": ">=6.3",
-                "symfony/form": ">=6.3",
-                "symfony/http-foundation": ">=6.3",
-                "symfony/options-resolver": ">=6.3",
-                "symfony/property-access": ">=6.3"
+                "symfony/dependency-injection": "^6.4 || ^7.4 || ^8.0",
+                "symfony/form": "^6.4 || ^7.4 || ^8.0",
+                "symfony/http-foundation": "^6.4 || ^7.4 || ^8.0",
+                "symfony/options-resolver": "^6.4 || ^7.4 || ^8.0",
+                "symfony/property-access": "^6.4 || ^7.4 || ^8.0"
             },
             "suggest": {
                 "doctrine/doctrine-bundle": "Without Doctrine ORM, this bundle won't do anything out of the box"
@@ -3162,9 +3039,9 @@
             ],
             "support": {
                 "issues": "https://github.com/VincentChalnot/SidusFilterBundle/issues",
-                "source": "https://github.com/VincentChalnot/SidusFilterBundle/tree/v6.0.3"
+                "source": "https://github.com/VincentChalnot/SidusFilterBundle/tree/v6.0.4"
             },
-            "time": "2026-07-21T20:41:55+00:00"
+            "time": "2026-10-19T17:37:20+00:00"
         },
         {
             "name": "stof/doctrine-extensions-bundle",
