@@ -194,4 +194,8 @@
       color: var(--c-muted);
     }
   }
+  // the button under the quote: any member may add one
+  .aside-quote-add {
+    justify-self: start;
+  }
 }

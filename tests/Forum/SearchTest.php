@@ -61,8 +61,8 @@ class SearchTest extends AppWebTestCase
         $this->loginAs($this->createUser('alice'));
 
         $this->client->request('GET', '/gens');
-        $html = $this->client->getResponse()->getContent();
-        self::assertStringContainsString('visible', $html);
-        self::assertStringNotContainsString('ghost', $html);
+        $names = $this->client->getCrawler()->filter('.person-card-name')->each(static fn ($n) => trim($n->text()));
+        self::assertContains('visible', $names);
+        self::assertNotContains('ghost', $names);
     }
 }

@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter une citation · ComTSo{% endblock %}
+
+{% block body %}
+<header class="page-header">
+    <p class="kicker">Citations</p>
+    <h1 class="page-title">Ajouter une citation</h1>
+    <p class="standfirst">Elle pourra apparaître au hasard dans la colonne de droite de toutes les pages.</p>
+</header>
+
+<div class="settings">
+    <div class="card card-roomy">
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="form-actions">
+                <a href="{{ path('app_home') }}" class="btn">Annuler</a>
+                <button type="submit" class="btn btn-primary">Ajouter la citation</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

@@ -18,7 +18,7 @@ class CsrfTest extends AppWebTestCase
     ];
 
     /** Routes whose POST is a Symfony form (token field) or the firewall's own authenticator. */
-    private const FORM_ROUTES = ['comment_create', 'settings_avatar', 'settings_display', 'settings_profile', 'settings_security'];
+    private const FORM_ROUTES = ['comment_create', 'quote_new', 'settings_avatar', 'settings_display', 'settings_profile', 'settings_security'];
 
     /**
      * Admin panel routes (config/packages/sidus.yaml) that accept a POST: the bundle's Symfony forms (edit, create) and the empty
@@ -179,6 +179,9 @@ class CsrfTest extends AppWebTestCase
         $alice = $this->createUser('alice');
         $this->loginAs($alice);
 
+        $this->client->request('POST', '/citations/nouvelle', ['quote' => ['content' => 'Forgée', 'originalAuthor' => 'Forgeur']]);
+        self::assertResponseStatusCodeSame(422);
+        self::assertSame(0, $this->em()->getRepository(\App\Entity\Quote::class)->count([]));
         $this->client->request('POST', '/gens/alice/parametres/profil', ['user_profile' => ['name' => 'Forgé', 'email' => 'forge@example.test']]);
         self::assertResponseStatusCodeSame(422);
         $this->client->request('POST', '/gens/alice/parametres/affichage', ['form' => ['message_order' => 'desc']]);
