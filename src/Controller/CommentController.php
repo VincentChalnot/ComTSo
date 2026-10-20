@@ -6,6 +6,7 @@ use App\Entity\Comment;
 use App\Entity\Topic;
 use App\Entity\User;
 use App\Form\CommentType;
+use App\Forum\CommentRemover;
 use App\Forum\TopicPageBuilder;
 use App\Pagination\Pager;
 use App\Photo\PostPhotos;
@@ -117,7 +118,7 @@ class CommentController extends AbstractController
     }
 
     #[Route('/comment/{id}/delete', name: 'comment_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function delete(Request $request, Comment $comment, EntityManagerInterface $em, PostPhotos $postPhotos): Response
+    public function delete(Request $request, Comment $comment, CommentRemover $remover): Response
     {
         $this->denyUnlessCanManage($comment);
         if (!$this->isCsrfTokenValid('delete-comment-'.$comment->getId(), $request->getPayload()->getString('_token'))) {
@@ -125,12 +126,7 @@ class CommentController extends AbstractController
         }
 
         $topic = $comment->getTopic();
-        $topic->setCommentCount(max(0, $topic->getCommentCount() - 1));
-        // The links vanish with the message (ON DELETE CASCADE); photos used nowhere else must not stay behind as files.
-        $photos = $postPhotos->photosOf($comment);
-        $em->remove($comment);
-        $em->flush();
-        $postPhotos->releaseOrphans($photos);
+        $remover->remove($comment);
         $this->addFlash('success', 'Le message a été supprimé.');
 
         return $this->redirectToRoute('topic_show', ['forumId' => $topic->getForum()->getId(), 'id' => $topic->getId()]);
