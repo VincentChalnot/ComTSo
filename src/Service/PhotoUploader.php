@@ -77,10 +77,6 @@ class PhotoUploader
         if ('' !== $filename && is_file($path)) {
             unlink($path);
         }
-        foreach (array_keys(ImageProcessingService::VARIANTS) as $variant) {
-            foreach (glob($this->images->cacheDirectory().'/'.$variant.'/'.pathinfo($filename, PATHINFO_FILENAME).'.*') ?: [] as $cached) {
-                unlink($cached);
-            }
-        }
+        $this->images->purgeThumbnails($filename);
     }
 }

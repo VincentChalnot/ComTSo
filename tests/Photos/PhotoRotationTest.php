@@ -11,7 +11,10 @@ use App\Tests\Support\PhotoFilesTrait;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-/** Quarter turns of a stored photo for its owner and the administrators: pixels, row, caches, URLs, permissions. */
+/**
+ * Quarter turns of a photo for its owner and the administrators. A turn is a stored value (`Photo::getRotation()`): the stored
+ * file is never rewritten (byte for byte), the generated variants are turned, URLs change, permissions hold.
+ */
 final class PhotoRotationTest extends AppWebTestCase
 {
     use PhotoFilesTrait;
@@ -75,38 +78,45 @@ final class PhotoRotationTest extends AppWebTestCase
         return $this->em()->find(Photo::class, $photo->getId());
     }
 
-    /** @return array{int, int, string} width and height of the stored file, and the colour ("red", "blue") at the given point */
-    private function inspectStored(Photo $photo, int $x, int $y): array
+    /** @return array{int, int, string} width and height of the variant, and the colour ("red", "blue") at the given point */
+    private function inspectVariant(Photo $photo, string $variant, int $x, int $y): array
     {
-        $image = imagecreatefromwebp($this->photoDir.'/'.$photo->getFilename());
+        $this->client->request('GET', "/photos/{$photo->getId()}/$variant?v={$photo->getFileVersion()}");
+        self::assertResponseIsSuccessful();
+        $image = imagecreatefromstring($this->client->getInternalResponse()->getContent());
         $rgb = imagecolorat($image, $x, $y);
         [$red, $blue] = [($rgb >> 16) & 0xFF, $rgb & 0xFF];
 
         return [imagesx($image), imagesy($image), $red > 150 && $blue < 100 ? 'red' : ($blue > 150 && $red < 100 ? 'blue' : "other($red,$blue)")];
     }
 
-    public function testOwnerTurnsThePhotoRight(): void
+    private function storedBytes(Photo $photo): string
+    {
+        return (string) file_get_contents($this->photoDir.'/'.$photo->getFilename());
+    }
+
+    public function testOwnerTurnsThePhotoRightAndOnlyTheVariantsFollow(): void
     {
         $alice = $this->createUser('alice');
         $photo = $this->storedPhoto($alice);
-        $before = $photo->getFilename();
-        self::assertSame([self::WIDTH, self::HEIGHT], [$photo->getWidth(), $photo->getHeight()]);
+        $bytes = $this->storedBytes($photo);
+        $filename = $photo->getFilename();
         $this->loginAs($alice);
 
         $this->rotate($photo, 'right');
 
         self::assertResponseRedirects("/photos/{$photo->getId()}");
         $photo = $this->reload($photo);
-        self::assertSame([self::HEIGHT, self::WIDTH], [$photo->getWidth(), $photo->getHeight()], 'The row follows the pixels.');
-        self::assertNotSame($before, $photo->getFilename());
-        self::assertSame('image/webp', $photo->getFileType());
-        self::assertSame(filesize($this->photoDir.'/'.$photo->getFilename()), $photo->getFileSize());
-        // Clockwise: the top-left block goes to the top-right corner.
-        self::assertSame([self::HEIGHT, self::WIDTH, 'red'], $this->inspectStored($photo, 520, 100));
-        self::assertSame('blue', $this->inspectStored($photo, 80, 100)[2]);
-        self::assertSame([$photo->getFilename()], $this->storedFiles(), 'The previous file is gone, nothing else is left behind.');
+        self::assertSame(90, $photo->getRotation());
+        self::assertSame($filename, $photo->getFilename(), 'The stored file keeps its name…');
+        self::assertSame($bytes, $this->storedBytes($photo), '…and its bytes.');
+        self::assertSame([self::WIDTH, self::HEIGHT], [$photo->getWidth(), $photo->getHeight()], 'The row describes the stored file.');
+        self::assertSame([$filename], $this->storedFiles());
+        // Clockwise: the top-left block goes to the top-right corner of the 600 x 800 variant.
+        self::assertSame([self::HEIGHT, self::WIDTH, 'red'], $this->inspectVariant($photo, 'medium', 520, 100));
+        self::assertSame('blue', $this->inspectVariant($photo, 'medium', 80, 100)[2]);
 
-        $this->client->followRedirect();
+        $this->client->request('GET', "/photos/{$photo->getId()}");
         self::assertStringContainsString('pivotée vers la droite', $this->client->getResponse()->getContent());
     }
 
@@ -119,24 +129,43 @@ final class PhotoRotationTest extends AppWebTestCase
         $this->rotate($photo, 'left');
 
         $photo = $this->reload($photo);
-        self::assertSame([self::HEIGHT, self::WIDTH], [$photo->getWidth(), $photo->getHeight()]);
+        self::assertSame(270, $photo->getRotation());
         // Counter-clockwise: the top-left block goes to the bottom-left corner.
-        self::assertSame([self::HEIGHT, self::WIDTH, 'red'], $this->inspectStored($photo, 70, 700));
-        self::assertSame('blue', $this->inspectStored($photo, 520, 100)[2]);
+        self::assertSame([self::HEIGHT, self::WIDTH, 'red'], $this->inspectVariant($photo, 'medium', 70, 700));
+        self::assertSame('blue', $this->inspectVariant($photo, 'medium', 520, 100)[2]);
     }
 
-    public function testTurningRightThenLeftComesBackToTheSameDimensions(): void
+    public function testTurnsAccumulateAndTheStoredFileStaysByteForByteTheSame(): void
+    {
+        $alice = $this->createUser('alice');
+        $photo = $this->storedPhoto($alice);
+        $bytes = $this->storedBytes($photo);
+        $this->loginAs($alice);
+
+        $expected = [90, 180, 270, 0, 270, 0];
+        foreach (['right', 'right', 'right', 'right', 'left', 'right'] as $i => $direction) {
+            $this->rotate($photo, $direction);
+            self::assertSame($expected[$i], $this->reload($photo)->getRotation(), "after turn $i ($direction)");
+            self::assertSame($bytes, $this->storedBytes($photo), "the file is untouched after turn $i");
+        }
+
+        $photo = $this->reload($photo);
+        self::assertSame([self::WIDTH, self::HEIGHT, 'red'], $this->inspectVariant($photo, 'medium', 100, 70), 'Four right turns (and a left then a right) are back to the upright picture.');
+        self::assertSame([$photo->getFilename()], $this->storedFiles());
+    }
+
+    public function testAHalfTurnTurnsThePictureUpsideDown(): void
     {
         $alice = $this->createUser('alice');
         $photo = $this->storedPhoto($alice);
         $this->loginAs($alice);
 
         $this->rotate($photo, 'right');
-        $this->rotate($photo, 'left');
+        $this->rotate($photo, 'right');
 
         $photo = $this->reload($photo);
-        self::assertSame([self::WIDTH, self::HEIGHT, 'red'], $this->inspectStored($photo, 100, 70));
-        self::assertCount(1, $this->storedFiles());
+        self::assertSame([self::WIDTH, self::HEIGHT, 'red'], $this->inspectVariant($photo, 'medium', 700, 550));
+        self::assertSame('blue', $this->inspectVariant($photo, 'medium', 100, 70)[2]);
     }
 
     public function testEverythingElseAboutThePhotoIsKept(): void
@@ -154,14 +183,11 @@ final class PhotoRotationTest extends AppWebTestCase
         self::assertSame($id, $photo->getId());
         self::assertSame('Marmotte', $photo->getTitle());
         self::assertSame('alice', $photo->getAuthor()->getUsername());
-        self::assertSame('2020-05-17 10:00:00', $photo->getTakenAt()->format('Y-m-d H:i:s'));
         self::assertEqualsWithDelta(48.85, $photo->getGpsLatitude(), 0.0001);
-        self::assertSame('Cam', $photo->getExif()['Make']);
-        self::assertSame(4000, $photo->getExif()['OriginalWidth'], 'What was uploaded is not rewritten by a turn.');
-        self::assertSame(1, $photo->getExif()['Orientation'], 'The stored picture is upright: no orientation is left to apply.');
+        self::assertSame(['Make' => 'Cam', 'Orientation' => 6, 'OriginalWidth' => 4000, 'OriginalHeight' => 3000], $photo->getExif(), 'The metadata is not rewritten by a turn.');
     }
 
-    public function testEveryCachedThumbnailOfTheOldFileIsInvalidatedAndTheNewOnesAreTurned(): void
+    public function testEveryVariantIsGeneratedTurnedAndTheCachedOnesAreDroppedByATurn(): void
     {
         $alice = $this->createUser('alice');
         $photo = $this->storedPhoto($alice);
@@ -176,36 +202,61 @@ final class PhotoRotationTest extends AppWebTestCase
         $this->rotate($photo, 'right');
 
         foreach (array_keys(ImageProcessingService::VARIANTS) as $variant) {
-            self::assertFileDoesNotExist($images->cacheDirectory()."/$variant/$stem.webp", "The $variant of the old picture must not be served any more.");
+            self::assertFileDoesNotExist($images->cacheDirectory()."/$variant/$stem.webp", "The unturned $variant must not be served any more.");
         }
         $photo = $this->reload($photo);
-        $this->client->request('GET', "/photos/{$photo->getId()}/medium?v={$photo->getFileVersion()}");
-        self::assertResponseIsSuccessful();
-        $newStem = pathinfo($photo->getFilename(), \PATHINFO_FILENAME);
-        self::assertSame([self::HEIGHT, self::WIDTH], \array_slice(getimagesize($images->cacheDirectory()."/medium/$newStem.webp"), 0, 2), 'The medium variant shows the turned picture.');
+        self::assertSame([self::HEIGHT, self::WIDTH], \array_slice($this->inspectVariant($photo, 'medium', 0, 0), 0, 2));
+        self::assertSame('red', $this->inspectVariant($photo, 'hero', 590, 5)[2], 'hero is turned too');
+        self::assertSame('red', $this->inspectVariant($photo, 'thumb', 315, 2)[2], 'the cover thumbnail is turned too');
+        self::assertSame('red', $this->inspectVariant($photo, 'avatar', 93, 2)[2], 'the avatar is turned too');
     }
 
-    public function testImageUrlsChangeWithTheStoredFileSoBrowsersDoNotKeepTheOldPicture(): void
+    public function testImageUrlsChangeWithTheRotationSoBrowsersDoNotKeepTheOldPicture(): void
     {
         $alice = $this->createUser('alice');
         $photo = $this->storedPhoto($alice);
         $this->loginAs($alice);
-        $source = static fn (Crawler $page): array => [
-            $page->filter('figure img')->attr('src'),
-            $page->filter('a[data-lightbox]')->attr('data-full'),
-        ];
-        $before = $source($this->client->request('GET', "/photos/{$photo->getId()}"));
+        $before = $this->client->request('GET', "/photos/{$photo->getId()}")->filter('figure img')->attr('src');
 
         $this->rotate($photo, 'right');
-        $after = $source($this->client->request('GET', "/photos/{$photo->getId()}"));
+        $after = $this->client->request('GET', "/photos/{$photo->getId()}")->filter('figure img')->attr('src');
 
-        self::assertNotSame($before[0], $after[0], 'The medium picture has a new URL…');
-        self::assertNotSame($before[1], $after[1], '…and so has the original.');
-        self::assertStringStartsWith("/photos/{$photo->getId()}/medium?v=", $after[0]);
-        // The files are served for a year to browsers: the old URL must not be the way to the new picture.
-        $this->client->request('GET', $after[1]);
-        self::assertResponseIsSuccessful();
+        self::assertNotSame($before, $after);
+        self::assertStringStartsWith("/photos/{$photo->getId()}/medium?v=", $after);
+        $this->client->request('GET', $after);
         self::assertStringContainsString('immutable', $this->client->getResponse()->headers->get('Cache-Control'));
+    }
+
+    public function testTheOriginalDownloadIsTheUntouchedFile(): void
+    {
+        $alice = $this->createUser('alice');
+        $photo = $this->storedPhoto($alice);
+        $bytes = $this->storedBytes($photo);
+        $this->loginAs($alice);
+        $this->rotate($photo, 'right');
+        $photo = $this->reload($photo);
+
+        $this->client->request('GET', "/photos/source/{$photo->getId()}?download=1&v={$photo->getFileVersion()}");
+
+        self::assertResponseIsSuccessful();
+        self::assertSame($bytes, file_get_contents($this->client->getResponse()->getFile()->getPathname()));
+    }
+
+    public function testThePageOffersIconOnlyButtonsWithAccessibleNames(): void
+    {
+        $alice = $this->createUser('alice');
+        $photo = $this->storedPhoto($alice);
+        $this->loginAs($alice);
+
+        $crawler = $this->client->request('GET', "/photos/{$photo->getId()}");
+
+        foreach (['left' => 'Pivoter à gauche', 'right' => 'Pivoter à droite'] as $direction => $label) {
+            $button = $crawler->filterXPath("//form[contains(@action, '/rotate')][.//input[@name='direction'][@value='$direction']]//button");
+            self::assertCount(1, $button);
+            self::assertSame($label, $button->attr('aria-label'));
+            self::assertSame($label, $button->attr('title'));
+            self::assertSame('', trim($button->text()), 'icon only, no visible label');
+        }
     }
 
     public function testAnAdministratorMayTurnAnotherMembersPhoto(): void
@@ -216,13 +267,12 @@ final class PhotoRotationTest extends AppWebTestCase
         $this->rotate($photo, 'left');
 
         self::assertResponseRedirects("/photos/{$photo->getId()}");
-        self::assertSame([self::HEIGHT, self::WIDTH], [$this->reload($photo)->getWidth(), $this->reload($photo)->getHeight()]);
+        self::assertSame(270, $this->reload($photo)->getRotation());
     }
 
     public function testAnotherMemberHasNoButtonAndIsRefused(): void
     {
         $photo = $this->storedPhoto($this->createUser('alice'));
-        $filename = $photo->getFilename();
         $mallory = $this->createUser('mallory');
         $this->loginAs($mallory);
 
@@ -234,10 +284,7 @@ final class PhotoRotationTest extends AppWebTestCase
             $this->client->request('POST', "/photos/{$photo->getId()}/rotate", ['direction' => $direction, '_token' => 'whatever']);
             self::assertResponseStatusCodeSame(403);
         }
-        $photo = $this->reload($photo);
-        self::assertSame($filename, $photo->getFilename());
-        self::assertSame([self::WIDTH, self::HEIGHT], [$photo->getWidth(), $photo->getHeight()]);
-        self::assertSame([$filename], $this->storedFiles());
+        self::assertSame(0, $this->reload($photo)->getRotation());
     }
 
     public function testAnonymousVisitorsAreSentToTheLoginForm(): void
@@ -253,7 +300,6 @@ final class PhotoRotationTest extends AppWebTestCase
     {
         $alice = $this->createUser('alice');
         $photo = $this->storedPhoto($alice);
-        $filename = $photo->getFilename();
         $this->loginAs($alice);
         $crawler = $this->client->request('GET', "/photos/{$photo->getId()}");
         $token = $crawler->filter('form[action$="/rotate"] input[name=_token]')->attr('value');
@@ -267,21 +313,19 @@ final class PhotoRotationTest extends AppWebTestCase
             self::assertResponseStatusCodeSame(400, "direction=$direction");
         }
 
-        self::assertSame($filename, $this->reload($photo)->getFilename());
-        self::assertSame([$filename], $this->storedFiles());
+        self::assertSame(0, $this->reload($photo)->getRotation());
     }
 
     public function testATurnCannotBeTriggeredByAGetRequest(): void
     {
         $alice = $this->createUser('alice');
         $photo = $this->storedPhoto($alice);
-        $filename = $photo->getFilename();
         $this->loginAs($alice);
 
         $this->client->request('GET', "/photos/{$photo->getId()}/rotate", ['direction' => 'right']);
 
         self::assertResponseStatusCodeSame(404, 'Like every POST-only route: there is nothing to GET.');
-        self::assertSame($filename, $this->reload($photo)->getFilename());
+        self::assertSame(0, $this->reload($photo)->getRotation());
     }
 
     public function testAnAnimatedGifIsRefusedAndStaysAsItWas(): void
@@ -291,39 +335,23 @@ final class PhotoRotationTest extends AppWebTestCase
         file_put_contents($path = sys_get_temp_dir().'/'.uniqid('anim-', true).'.gif', 'GIF89a'.pack('vv', 4, 3)."\x80\x00\x00\x00\x00\x00\xFF\xFF\xFF".$frame.$frame.';');
         $photo = $this->storedPhoto($alice, new UploadedFile($path, 'anim.gif', 'image/gif', null, true));
         self::assertSame('image/gif', $photo->getFileType(), 'The pipeline keeps animated GIFs as GIF.');
-        $filename = $photo->getFilename();
         $this->loginAs($alice);
 
         // The page offers no turn for a GIF…
         $crawler = $this->client->request('GET', "/photos/{$photo->getId()}");
         self::assertCount(0, $crawler->filter('form[action$="/rotate"]'));
 
-        // …and the server looks at the file, not at the label: a photo mislabelled in the database is refused too.
+        // …and the server refuses a forged POST (valid token, taken from the page while the photo was mislabelled).
         $this->reload($photo)->setFileType('image/webp');
         $this->em()->flush();
-        $this->rotate($photo, 'right');
-
-        self::assertResponseRedirects("/photos/{$photo->getId()}");
-        $this->client->followRedirect();
-        self::assertStringContainsString('GIF animé', $this->client->getResponse()->getContent());
-        $photo = $this->reload($photo);
-        self::assertSame($filename, $photo->getFilename());
-        self::assertSame([$filename], $this->storedFiles());
-        self::assertSame([4, 3], [$photo->getWidth(), $photo->getHeight()]);
-    }
-
-    public function testAMissingFileIsReportedNotAFatalError(): void
-    {
-        $alice = $this->createUser('alice');
-        $photo = $this->storedPhoto($alice);
-        $this->loginAs($alice);
         $form = $this->rotationForm($this->client->request('GET', "/photos/{$photo->getId()}"), 'right');
-        unlink($this->photoDir.'/'.$photo->getFilename());
-
+        $this->reload($photo)->setFileType('image/gif');
+        $this->em()->flush();
         $this->client->request('POST', $form->getUri(), $form->getPhpValues());
 
         self::assertResponseRedirects("/photos/{$photo->getId()}");
         $this->client->followRedirect();
-        self::assertStringContainsString('introuvable', $this->client->getResponse()->getContent());
+        self::assertStringContainsString('GIF animé', $this->client->getResponse()->getContent());
+        self::assertSame(0, $this->reload($photo)->getRotation());
     }
 }

@@ -60,6 +60,10 @@ class Photo implements \JsonSerializable
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $exif = null;
 
+    /** Clockwise quarter turns a member asked for, in degrees (0, 90, 180 or 270). The stored file is never rewritten: variants are generated turned. */
+    #[ORM\Column(type: Types::SMALLINT, options: ['default' => 0])]
+    private int $rotation = 0;
+
     #[ORM\Column(type: Types::STRING, length: 128, nullable: true)]
     private ?string $title = null;
 
@@ -104,12 +108,25 @@ class Photo implements \JsonSerializable
     }
 
     /**
-     * Short token that changes whenever the stored file is replaced (a rotation writes a new file). Image URLs carry it
+     * Short token that changes whenever what the variants show changes (the file is replaced or turned). Image URLs carry it
      * (`?v=`, see App\Photo\PhotoUrls): the responses are cached by browsers for a year, so the URL must change with the pixels.
      */
     public function getFileVersion(): string
     {
-        return hash('crc32b', (string) $this->filename);
+        return hash('crc32b', $this->filename.'|'.$this->rotation);
+    }
+
+    public function getRotation(): int
+    {
+        return $this->rotation;
+    }
+
+    /** Turns the displayed picture by a quarter turn, cumulatively: `true` = clockwise (right), `false` = counter-clockwise (left). */
+    public function rotate(bool $clockwise): self
+    {
+        $this->rotation = ($this->rotation + ($clockwise ? 90 : 270)) % 360;
+
+        return $this;
     }
 
     public function getOriginalFilename(): ?string

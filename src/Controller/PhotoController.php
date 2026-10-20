@@ -7,7 +7,7 @@ use App\Entity\User;
 use App\Form\PhotoType;
 use App\Pagination\Pager;
 use App\Photo\PhotoRemover;
-use App\Photo\PhotoRotator;
+use App\Photo\PhotoPipeline;
 use App\Repository\CommentPhotoRepository;
 use App\Repository\PhotoLikeRepository;
 use App\Repository\PhotoRepository;
@@ -65,7 +65,7 @@ class PhotoController extends AbstractController
     #[Route('/photos/{id}/{variant}', name: 'photo_variant', requirements: ['id' => '\d+', 'variant' => 'avatar|thumb|medium|hero'])]
     public function variant(Photo $photo, string $variant, ImageProcessingService $images): Response
     {
-        $path = $images->thumbnailPath($photo->getFilename(), $variant);
+        $path = $images->thumbnailPath($photo->getFilename(), $variant, $photo->getRotation());
         if (null === $path) {
             throw $this->createNotFoundException();
         }
@@ -140,11 +140,12 @@ class PhotoController extends AbstractController
     }
 
     /**
-     * Turns the picture a quarter turn (`direction` = `left` or `right`), for its owner and the administrators. The stored
-     * WebP is re-encoded by {@see PhotoRotator}; an animated GIF is refused.
+     * Turns the picture a quarter turn (`direction` = `left` or `right`), for its owner and the administrators. Only the
+     * stored {@see Photo::getRotation()} changes (cumulative): the file is never rewritten and the thumbnails are generated turned.
+     * An animated GIF is refused (its animation is only ever shown by the untouched file).
      */
     #[Route('/photos/{id}/rotate', name: 'photo_rotate', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function rotate(Request $request, Photo $photo, PhotoRotator $rotator): Response
+    public function rotate(Request $request, Photo $photo, EntityManagerInterface $em, ImageProcessingService $images): Response
     {
         $this->denyUnlessCanManage($photo);
         if (!$this->isCsrfTokenValid('rotate-photo-'.$photo->getId(), $request->getPayload()->getString('_token'))) {
@@ -156,12 +157,16 @@ class PhotoController extends AbstractController
             throw new BadRequestHttpException('Unknown rotation direction.');
         }
 
-        try {
-            $rotator->rotate($photo, 'right' === $direction);
-            $this->addFlash('success', 'La photo a été pivotée vers la '.('right' === $direction ? 'droite' : 'gauche').'.');
-        } catch (\InvalidArgumentException $e) {
-            $this->addFlash('error', $e->getMessage());
+        if ('image/gif' === $photo->getFileType() && PhotoPipeline::isAnimatedGif($images->originalPath((string) $photo->getFilename()))) {
+            $this->addFlash('error', 'Un GIF animé ne peut pas être pivoté.');
+
+            return $this->redirectToRoute('photo_show', ['id' => $photo->getId()]);
         }
+
+        $photo->rotate('right' === $direction);
+        $em->flush();
+        $images->purgeThumbnails((string) $photo->getFilename());
+        $this->addFlash('success', 'La photo a été pivotée vers la '.('right' === $direction ? 'droite' : 'gauche').'.');
 
         return $this->redirectToRoute('photo_show', ['id' => $photo->getId()]);
     }

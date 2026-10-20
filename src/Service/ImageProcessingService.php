@@ -31,7 +31,7 @@ class ImageProcessingService
      * Returns the path of the (lazily generated, cached) WebP thumbnail of a stored photo, or null when the
      * variant is unknown or the original is missing/unreadable.
      */
-    public function thumbnailPath(string $filename, string $variant): ?string
+    public function thumbnailPath(string $filename, string $variant, int $rotation = 0): ?string
     {
         if (!isset(self::VARIANTS[$variant]) || $filename !== basename($filename)) {
             return null;
@@ -54,6 +54,10 @@ class ImageProcessingService
             if (\in_array(strtolower(pathinfo($filename, PATHINFO_EXTENSION)), ['jpg', 'jpeg'], true)) {
                 (new Autorotate())->apply($image);
             }
+            if (0 !== $rotation) {
+                // The member's quarter turns: applied to this derived copy only, the stored original is never touched.
+                $image->rotate($rotation);
+            }
             $size = $image->getSize();
             if ('inset' === $mode && $size->getWidth() <= $width && $size->getHeight() <= $height) {
                 // Never upscale: serve a re-encoded copy at the original size.
@@ -70,6 +74,16 @@ class ImageProcessingService
         }
 
         return $target;
+    }
+
+    /** Forgets every generated thumbnail of a stored file (after its rotation changed, or when it goes away). */
+    public function purgeThumbnails(string $filename): void
+    {
+        foreach (array_keys(self::VARIANTS) as $variant) {
+            foreach (glob($this->cacheDirectory.'/'.$variant.'/'.pathinfo($filename, PATHINFO_FILENAME).'.*') ?: [] as $cached) {
+                unlink($cached);
+            }
+        }
     }
 
     public function cacheDirectory(): string

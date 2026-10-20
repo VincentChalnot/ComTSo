@@ -14,12 +14,12 @@
         {% if canManage %}
             <a href="{{ path('photo_edit', {id: photo.id}) }}" class="btn btn-ghost">{{ ui.icon('pencil', 'size-4') }} Modifier</a>
             {% if photo.fileType != 'image/gif' %}
-                {# A quarter turn re-encodes the stored picture: not offered for GIFs (animated ones cannot be turned). #}
+                {# A quarter turn is a stored value applied to the thumbnails (the file is never rewritten); animated GIFs are not offered it. #}
                 {% for direction, rotation in {left: {label: 'Pivoter à gauche', icon: 'rotate-ccw'}, right: {label: 'Pivoter à droite', icon: 'rotate-cw'}} %}
                     <form method="post" action="{{ path('photo_rotate', {id: photo.id}) }}" class="inline">
                         <input type="hidden" name="_token" value="{{ csrf_token('rotate-photo-' ~ photo.id) }}">
                         <input type="hidden" name="direction" value="{{ direction }}">
-                        <button type="submit" class="btn btn-ghost">{{ ui.icon(rotation.icon, 'size-4') }} {{ rotation.label }}</button>
+                        <button type="submit" class="btn btn-ghost btn-icon" title="{{ rotation.label }}" aria-label="{{ rotation.label }}">{{ ui.icon(rotation.icon, 'size-4') }}</button>
                     </form>
                 {% endfor %}
             {% endif %}

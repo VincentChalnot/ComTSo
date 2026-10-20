@@ -11,9 +11,9 @@ namespace App\Photo;
  *    and stored as WebP: that file is "the original" from then on (it also drops embedded payloads of polyglot files);
  * 4. animated GIFs are the exception: they are kept as GIF, byte for byte (re-encoding would flatten them to one frame),
  *    and are refused when larger than the target size instead of being downscaled.
- *
- * {@see self::rotate()} is the one other way a stored picture is rewritten: a member turns it a quarter turn, through the
- * same step 3 (animated GIFs are refused).
+
+ * The stored file is never rewritten afterwards: a member's quarter turns are stored as {@see \App\Entity\Photo::getRotation()}
+ * and applied when the thumbnails are generated ({@see \App\Service\ImageProcessingService}).
  */
 final class PhotoPipeline
 {
@@ -95,48 +95,21 @@ final class PhotoPipeline
             return new ProcessedPhoto($filename, 'image/gif', (int) filesize($directory.'/'.$filename), $width, $height, $metadata->withExif($source + ['Animated' => 1]));
         }
 
-        [$filename, $size, $storedWidth, $storedHeight] = $this->render($path, $type, $width, $height, $metadata->orientation, 0, $directory);
+        [$filename, $size, $storedWidth, $storedHeight] = $this->render($path, $type, $width, $height, $metadata->orientation, $directory);
 
         return new ProcessedPhoto($filename, 'image/webp', $size, $storedWidth, $storedHeight, $metadata->withExif($source));
     }
 
     /**
-     * Stores a copy of a picture of the library turned a quarter turn, through the same decode / orient / cap / WebP steps as
-     * {@see ingest()} (so a legacy file that was never processed comes out upright and capped too). `$path` is left untouched;
-     * the result carries no metadata (the caller keeps the row's). Always WebP: the picture is re-encoded, so every turn costs a
-     * little quality (q85) – nothing a member would notice on the first few turns.
-     *
-     * @throws \InvalidArgumentException French message when the picture cannot be turned (animated GIF, unreadable, too big)
-     */
-    public function rotate(string $path, string $directory, bool $clockwise): ProcessedPhoto
-    {
-        [$width, $height, $type] = $this->inspect($path);
-        if (\IMAGETYPE_GIF === $type && self::isAnimatedGif($path)) {
-            throw new \InvalidArgumentException('Un GIF animé ne peut pas être pivoté : l\'image serait réduite à une seule vue.');
-        }
-
-        if (!is_dir($directory)) {
-            mkdir($directory, 0775, true);
-        }
-        [$filename, $size, $storedWidth, $storedHeight] = $this->render($path, $type, $width, $height, $this->exif->read($path)->orientation, $clockwise ? -90 : 90, $directory);
-
-        return new ProcessedPhoto($filename, 'image/webp', $size, $storedWidth, $storedHeight, new PhotoMetadata());
-    }
-
-    /**
-     * Decodes, applies the EXIF orientation and `$turn` (GD angle: 90 = counter-clockwise, -90 = clockwise, 0 = none), caps
-     * the size and writes the WebP.
+     * Decodes, applies the EXIF orientation, caps the size and writes the WebP.
      *
      * @return array{string, int, int, int} file name, file size, width, height of what was stored
      */
-    private function render(string $path, int $type, int $width, int $height, int $orientation, int $turn, string $directory): array
+    private function render(string $path, int $type, int $width, int $height, int $orientation, string $directory): array
     {
         $image = $this->decode($path, $type, $width, $height);
         try {
             $image = $this->orient($image, $orientation);
-            if (0 !== $turn) {
-                $image = $this->turn($image, $turn);
-            }
             $image = $this->shrink($image);
             $storedWidth = imagesx($image);
             $storedHeight = imagesy($image);
