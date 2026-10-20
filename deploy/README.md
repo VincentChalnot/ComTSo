@@ -94,6 +94,7 @@ To pin a version instead of following `latest`, set `COMTSO_IMAGE_TAG=1.2.3` (or
 The `migrate` service runs on every `docker compose up -d` (a no-op when the schema is current) and is a dependency of `app`:
 if a migration fails, `app` is **not started** (read `docker compose logs migrate`, then roll back, see below). Expect a short downtime during the upgrade.
 Never run more than one `app` container (the Mercure hub state lives in it) and never run `migrate` by hand while `app` is being replaced.
+A change of the `mariadb` image line in `compose.yaml` (e.g. 11.4 to 12.3) is NOT a plain upgrade: `docker compose up -d` would recreate `database` on the new server at once. Follow `docs/operations.md` "MariaDB upgrade" (fresh dump, clean stop, rollback), patch releases of the same tag are fine with the steps above.
 
 ## Rollback
 

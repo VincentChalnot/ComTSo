@@ -68,6 +68,7 @@ The app is exposed **only** through the shared Traefik instance (`../traefik`, e
 - Schema is managed by Doctrine migrations only (`bin/console doctrine:migrations:diff` then `migrate`). `doctrine:schema:validate` must stay green.
 - Every table and text column is `utf8mb4` (collation `utf8mb4_uca1400_ai_ci`, connection `charset=utf8mb4` in `DATABASE_URL`), checked on 2026-10-19 on the dev DB and `comtso_test`: 4-byte emojis need no migration. `tests/Content/EmojiStorageTest.php` fails if a column ever falls below `utf8mb4`.
 - All the data of the old platforms lives in this database; the one-shot import tooling was removed on 2026-10-19 (`docs/decisions.md` "Data import findings").
+- **MariaDB version**: 12.3 LTS on the rolling `12.3` tag (dev and prod; `serverVersion=mariadb-12.3.0` in the three `DATABASE_URL`s). A major/minor change needs a dump/restore rehearsal first; the production upgrade runbook, rollback and rehearsal results (11.4 -> 12.3, 2026-10-20) are in `docs/operations.md` "MariaDB upgrade".
 
 ## Tests
 
