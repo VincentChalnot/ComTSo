@@ -8,7 +8,7 @@
 #
 # With COMPOSE_FILE in .env a plain `docker compose ...` (and backup.sh / restore.sh) picks both files up.
 # Nothing is published on the host: Traefik reaches `app:80` over the shared network.
-# The router/service name is `comtso-forum` (not `comtso`, the name of the legacy stack on the production server).
+# The router/service name is `comtso-forum` (the production project name, see `name:` in compose.yaml).
 services:
   app:
     ports: !reset []
