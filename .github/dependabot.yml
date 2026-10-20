@@ -30,6 +30,10 @@ updates:
       timezone: Europe/Paris
     open-pull-requests-limit: 5
     groups:
+      # Vite and its Vue plugin declare a peer range on each other: a major of one alone fails `npm ci`, so they move in one pull
+      # request, whatever the update type. First in the list, so it wins over the minor/patch group below.
+      vite-toolchain:
+        patterns: [vite, '@vitejs/*']
       npm-minor-patch:
         update-types: [minor, patch]
 
