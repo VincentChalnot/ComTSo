@@ -15,7 +15,7 @@ class WorkerModeTest extends AdminWebTestCase
         $this->client->disableReboot();
 
         foreach (range(1, 3) as $visit) {
-            foreach (['users', 'forums', 'topics', 'quotes', 'photos'] as $screen) {
+            foreach (['users', 'forums', 'topics', 'comments', 'photos', 'quotes'] as $screen) {
                 $this->client->request('GET', "/admin/{$screen}/");
 
                 self::assertResponseIsSuccessful("visit {$visit} of /admin/{$screen}/");

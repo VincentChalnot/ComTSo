@@ -95,7 +95,7 @@ Rotate every secret that was pasted in a chat, ticket or terminal log (Scaleway 
 
 ## Admin panel (`/admin`)
 
-Administrators only (anonymous = `302 /login`, a member = 403); the page list and the rules are in `AGENTS.md` ("Admin panel"). Operations it covers: enable/disable a member and grant/remove `ROLE_ADMIN` (what `app:user:promote` does), delete a member with everything they wrote (`UserRemover`, a confirmation page lists what goes), create/rename/reorder forums and delete EMPTY ones, delete a topic (moderation), manage the random quotes, delete a photo with its files.
+Administrators only (anonymous = `302 /login`, a member = 403); the page list and the rules are in `AGENTS.md` ("Admin panel"). Operations it covers: enable/disable a member and grant/remove `ROLE_ADMIN` (what `app:user:promote` does), delete a member with everything they wrote (`UserRemover`, a confirmation page lists what goes), create/rename/reorder forums and delete EMPTY ones, delete a topic or a single message (moderation), delete a photo with its files, manage the random quotes.
 It shows e-mail addresses on the member screens only (list and edit page, read-only), never changes a password (`app:user:reset-password` stays the fallback) and cannot disable, demote or remove its own account or the last active administrator; if no administrator is left (SQL accident): `app:user:promote <pseudo>`. Destructive actions are real on production: try them on a rehearsal host with throwaway members only (create with `app:user:create`, remove from the panel). After a release, `/admin/users/` answering 200 twice in a row proves the worker-mode fix is in the image.
 
 ## Smoke test after a release (host `H`)

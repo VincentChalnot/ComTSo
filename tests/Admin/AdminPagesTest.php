@@ -28,6 +28,8 @@ class AdminPagesTest extends AdminWebTestCase
         yield 'forum delete confirmation' => ['/admin/forums/{forum}/delete', false];
         yield 'topics list' => ['/admin/topics/', false];
         yield 'topic delete confirmation' => ['/admin/topics/{topic}/delete', false];
+        yield 'comments list' => ['/admin/comments/', false];
+        yield 'comment delete confirmation' => ['/admin/comments/{comment}/delete', false];
         yield 'photos list' => ['/admin/photos/', false];
         yield 'photo delete confirmation' => ['/admin/photos/{photo}/delete', false];
         yield 'quotes list' => ['/admin/quotes/', false];
@@ -74,10 +76,11 @@ class AdminPagesTest extends AdminWebTestCase
         $target = $this->createUser('target');
         $forum = $this->createForum('vide', 'Vide');
         $topic = $this->createTopic($this->createForum('general', 'Général'), $target);
+        $comment = $this->createComment($topic, $target);
         $quote = (new \App\Entity\Quote())->setContent('Une citation')->setOriginalAuthor('Quelqu’un');
         $this->em()->persist($quote);
         $this->em()->flush();
 
-        return strtr($path, ['{user}' => (string) $target->getId(), '{forum}' => (string) $forum->getId(), '{quote}' => (string) $quote->getId(), '{topic}' => (string) $topic->getId(), '{photo}' => (string) $this->photoRow()->getId()]);
+        return strtr($path, ['{user}' => (string) $target->getId(), '{forum}' => (string) $forum->getId(), '{quote}' => (string) $quote->getId(), '{topic}' => (string) $topic->getId(), '{comment}' => (string) $comment->getId(), '{photo}' => (string) $this->photoRow()->getId()]);
     }
 }

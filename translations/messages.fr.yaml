@@ -77,19 +77,6 @@ admin:
             content_help: Affichée sous le titre du forum. Le titre fixe l’adresse du forum à la création ; elle ne change plus ensuite.
         filter:
             title: Titre
-    quote:
-        title: Citations
-        description: Les citations tirées au hasard dans la colonne de droite de chaque page. Texte brut.
-        new: Nouvelle citation
-        edit: Modifier la citation
-        delete: Supprimer la citation
-        delete_confirm: 'Supprimer la citation « %entity% » ?'
-        field:
-            content: Citation
-            original_author: Auteur de la citation
-            original_author_help: La personne qui l’a dite ou écrite, telle qu’elle doit apparaître sous la citation.
-        filter:
-            text: Texte ou auteur
     topic:
         title: Sujets
         description: Tous les sujets du forum, en lecture seule. Pour en modifier un, ouvrez-le sur le forum ; ici on peut seulement le supprimer.
@@ -100,6 +87,18 @@ admin:
             title: Titre
             forum: Forum
             author: Auteur
+    comment:
+        title: Commentaires
+        description: Tous les messages du forum, du plus récent au plus ancien, en lecture seule. Pour en modifier un, ouvrez-le sur le forum ; ici on peut seulement le supprimer.
+        delete: Supprimer le message
+        delete_confirm: 'Supprimer le message n° %entity% ?'
+        impact_where: 'Message de %author% dans le sujet « %topic% ».'
+        impact_photos: '{0} Aucune photo n’est jointe à ce message.|{1} 1 photo est jointe : elle est supprimée avec ses fichiers si aucun autre message, sujet ou avatar ne l’utilise.|]1,Inf[ %count% photos sont jointes : chacune est supprimée avec ses fichiers si aucun autre message, sujet ou avatar ne l’utilise.'
+        filter:
+            content: Texte du message
+            author: Auteur
+            topic: Sujet
+            created_at: Écrit le
     photo:
         title: Photos
         description: Toutes les photos de la bibliothèque, en lecture seule. Supprimer une photo efface aussi ses fichiers et la retire partout où elle est utilisée.
@@ -115,8 +114,53 @@ admin:
             name: Titre ou fichier
             author: Auteur
             taken_at: Prise le
+    quote:
+        title: Citations
+        description: Les citations tirées au hasard dans la colonne de droite de chaque page. Texte brut.
+        new: Nouvelle citation
+        edit: Modifier la citation
+        delete: Supprimer la citation
+        delete_confirm: 'Supprimer la citation « %entity% » ?'
+        field:
+            content: Citation
+            original_author: Auteur de la citation
+            original_author_help: La personne qui l’a dite ou écrite, telle qu’elle doit apparaître sous la citation.
+        filter:
+            text: Texte ou auteur
 
 datagrid:
+    user:
+        username: Pseudo
+        email: Adresse e-mail
+        enabled: Compte
+        admin: Rôle
+        registeredAt: Inscription
+        lastActivity: Dernière activité
+        lastLogin: Dernière connexion
+        actions: Actions
+    forum:
+        order: Position
+        title: Titre
+        id: Adresse
+        topics: Sujets
+        createdAt: Création
+        actions: Actions
+    topic:
+        title: Titre
+        forum: Forum
+        author: Auteur
+        commentCount: Messages
+        createdAt: Création
+        lastActivityAt: Dernier message
+        actions: Actions
+    comment:
+        id: N°
+        createdAt: Écrit le
+        author: Auteur
+        topic: Sujet
+        content: Message
+        photos: Photos
+        actions: Actions
     photo:
         thumb: Aperçu
         originalFilename: Photo
@@ -127,36 +171,12 @@ datagrid:
         createdAt: Ajoutée le
         usage: Utilisation
         actions: Actions
-    topic:
-        title: Titre
-        forum: Forum
-        author: Auteur
-        commentCount: Messages
-        createdAt: Création
-        lastActivityAt: Dernier message
-        actions: Actions
     quote:
         id: N°
         content: Citation
         originalAuthor: Auteur
         author: Ajoutée par
         createdAt: Ajoutée le
-        actions: Actions
-    forum:
-        order: Position
-        title: Titre
-        id: Adresse
-        topics: Sujets
-        createdAt: Création
-        actions: Actions
-    user:
-        username: Pseudo
-        email: Adresse e-mail
-        enabled: Compte
-        admin: Rôle
-        registeredAt: Inscription
-        lastActivity: Dernière activité
-        lastLogin: Dernière connexion
         actions: Actions
 
 sidus:
@@ -174,6 +194,9 @@ sidus:
         topic:
             delete:
                 success: Le sujet a été supprimé.
+        comment:
+            delete:
+                success: Le message a été supprimé.
         quote:
             create:
                 success: La citation a été ajoutée.

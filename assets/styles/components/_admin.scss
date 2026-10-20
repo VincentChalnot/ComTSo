@@ -5,14 +5,47 @@
 //   <h1 class="page-title">Modifier le membre <span class="admin-subject">vincent</span></h1>
 //   <a class="photo-admin-thumb"><img></a>                    thumbnail cell of the photo list
 //   <ul class="admin-details"><li>12 messages</li></ul>          inside an `.alert-body`
-//   <div class="admin-tiles"><a class="card card-hover">…</a></div> overview tiles (admin home), at least 14rem wide
+//   <div class="admin-tiles"><a class="card card-hover admin-tile">…</a></div> overview tiles (admin home), 1 / 2 / 3 columns:
+//     <span class="admin-tile-icon">{icon}</span><div class="admin-tile-body"><h2 class="card-title">Titre</h2><span class="badge badge-count">12</span></div>
 @use "../abstracts" as *;
 
 @layer components {
+  // 1 column on a phone, 2 from 40rem, 3 from 64rem (the six screens make two even rows)
   .admin-tiles {
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    grid-template-columns: minmax(0, 1fr);
+
+    @include up(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    @include up(lg) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  // A tile: the screen's icon in a small paper plate, the title and the row count next to it
+  .admin-tile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .admin-tile-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-md);
+    background-color: var(--c-surface-2);
+    box-shadow: 0 0 0 1px var(--c-line-soft);
+    color: var(--c-link);
+  }
+  .admin-tile-body {
+    display: grid;
+    gap: 0.4rem;
+    justify-items: start;
+    min-width: 0;
   }
 
   .admin-form {

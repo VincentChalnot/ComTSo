@@ -44,20 +44,6 @@ sidus_admin:
                 edit: { path: '/{id}/edit', requirements: { id: '[a-z0-9-]+' }, methods: [GET, POST] }
                 delete: { path: '/{id}/delete', requirements: { id: '[a-z0-9-]+' }, methods: [GET, POST] }
 
-        # Quotes: full CRUD, the bundle's own delete action (a quote has no dependants: confirmation page + POST with the form token).
-        quote:
-            entity: App\Entity\Quote
-            prefix: /quotes
-            controller_pattern: *controllers
-            template_pattern: *templates
-            permissions: *permissions
-            form_type: App\Form\Admin\QuoteAdminType
-            actions:
-                list: { path: /, methods: [GET] }
-                create: { path: /new, methods: [GET, POST] }
-                edit: { path: '/{id}/edit', requirements: { id: '\d+' }, methods: [GET, POST] }
-                delete: { path: '/{id}/delete', requirements: { id: '\d+' }, methods: [GET, POST] }
-
         # Topics: READ-ONLY list (no edit/create: members write topics on the forum). Removal = the moderation one (TopicRemover).
         topic:
             entity: App\Entity\Topic
@@ -65,6 +51,18 @@ sidus_admin:
             controller_pattern: *controllers
             template_pattern: *templates
             permissions: *permissions
+            actions:
+                list: { path: /, methods: [GET] }
+                delete: { path: '/{id}/delete', requirements: { id: '\d+' }, methods: [GET, POST] }
+
+        # Comments (the messages of the topics): READ-ONLY list, latest first. Removal = the moderation one (CommentRemover).
+        comment:
+            entity: App\Entity\Comment
+            prefix: /comments
+            controller_pattern: *controllers
+            template_pattern: *templates
+            permissions: *permissions
+            options: { subject: id }
             actions:
                 list: { path: /, methods: [GET] }
                 delete: { path: '/{id}/delete', requirements: { id: '\d+' }, methods: [GET, POST] }
@@ -79,6 +77,20 @@ sidus_admin:
             options: { subject: originalFilename }
             actions:
                 list: { path: /, methods: [GET] }
+                delete: { path: '/{id}/delete', requirements: { id: '\d+' }, methods: [GET, POST] }
+
+        # Quotes: full CRUD, the bundle's own delete action (a quote has no dependants: confirmation page + POST with the form token).
+        quote:
+            entity: App\Entity\Quote
+            prefix: /quotes
+            controller_pattern: *controllers
+            template_pattern: *templates
+            permissions: *permissions
+            form_type: App\Form\Admin\QuoteAdminType
+            actions:
+                list: { path: /, methods: [GET] }
+                create: { path: /new, methods: [GET, POST] }
+                edit: { path: '/{id}/edit', requirements: { id: '\d+' }, methods: [GET, POST] }
                 delete: { path: '/{id}/delete', requirements: { id: '\d+' }, methods: [GET, POST] }
 
 sidus_data_grid:
@@ -143,25 +155,6 @@ sidus_data_grid:
                     template: admin/cells/actions.html.twig
                     template_vars: { actions: [edit, delete], subject: title }
                     attributes: { class: table-actions }
-        quote:
-            query_handler:
-                provider: doctrine
-                options: { entity: App\Entity\Quote }
-                results_per_page: 25
-                sortable: [id, originalAuthor, createdAt]
-                default_sort: { id: DESC }
-                filters:
-                    text: { type: text, attributes: [content, originalAuthor], label: admin.quote.filter.text }
-            columns:
-                content: { template: admin/cells/excerpt.html.twig, template_vars: { link: true, length: 140 } }
-                originalAuthor: ~
-                author: { property_path: "author?.username", template: admin/cells/author.html.twig }
-                createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
-                actions:
-                    property_path: id
-                    template: admin/cells/actions.html.twig
-                    template_vars: { actions: [edit, delete] }
-                    attributes: { class: table-actions }
         topic:
             query_handler:
                 provider: doctrine
@@ -184,6 +177,26 @@ sidus_data_grid:
                 createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
                 lastActivityAt: { template: admin/cells/date.html.twig }
                 actions: { property_path: id, template: admin/topic/_actions_cell.html.twig, attributes: { class: table-actions } }
+        comment:
+            query_handler:
+                provider: doctrine
+                options: { entity: App\Entity\Comment }
+                results_per_page: 25
+                sortable: [id, author.username, topic.title, createdAt]
+                default_sort: { createdAt: DESC }
+                filters:
+                    content: { type: text, label: admin.comment.filter.content }
+                    author: { type: text, attributes: [author.username], label: admin.comment.filter.author }
+                    topic: { type: text, attributes: [topic.title], label: admin.comment.filter.topic }
+                    createdAt: { type: date_range, label: admin.comment.filter.created_at }
+            columns:
+                id: { attributes: { class: num } }
+                createdAt: { template: admin/cells/date.html.twig, attributes: { class: nowrap } }
+                author: { property_path: "author?.username", sort_column: author.username, template: admin/cells/author.html.twig }
+                topic: { property_path: topic.title, sort_column: topic.title, template: admin/comment/_topic_cell.html.twig }
+                content: { template: admin/comment/_excerpt_cell.html.twig }
+                photos: { property_path: id, template: admin/comment/_photos_cell.html.twig, attributes: { class: num } }
+                actions: { property_path: id, template: admin/comment/_actions_cell.html.twig, attributes: { class: table-actions } }
         photo:
             query_handler:
                 provider: doctrine
@@ -205,3 +218,22 @@ sidus_data_grid:
                 createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
                 usage: { property_path: id, template: admin/photo/_usage_cell.html.twig }
                 actions: { property_path: id, template: admin/photo/_actions_cell.html.twig, attributes: { class: table-actions } }
+        quote:
+            query_handler:
+                provider: doctrine
+                options: { entity: App\Entity\Quote }
+                results_per_page: 25
+                sortable: [id, originalAuthor, createdAt]
+                default_sort: { id: DESC }
+                filters:
+                    text: { type: text, attributes: [content, originalAuthor], label: admin.quote.filter.text }
+            columns:
+                content: { template: admin/cells/excerpt.html.twig, template_vars: { link: true, length: 140 } }
+                originalAuthor: ~
+                author: { property_path: "author?.username", template: admin/cells/author.html.twig }
+                createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
+                actions:
+                    property_path: id
+                    template: admin/cells/actions.html.twig
+                    template_vars: { actions: [edit, delete] }
+                    attributes: { class: table-actions }

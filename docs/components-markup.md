@@ -239,6 +239,17 @@ Never put `p-*` utilities or `style="padding:…"` on a `.card`: choose `.card-r
 ```
 The masthead and the footer stay as they are. A template picks the variant by overriding the `page_class` block of `base.html.twig` (`{% block page_class %} page-wide{% endblock %}`; `admin/base.html.twig` does it for every admin page). Wide tables sit in `.table-responsive` and scroll sideways on a phone.
 
+## Admin overview tile (`components/_admin.scss`)
+
+```html
+<div class="admin-tiles">
+  <a href="/admin/users/" class="card card-hover admin-tile">
+    <span class="admin-tile-icon"><svg class="size-6" aria-hidden="true">…</svg></span>   <!-- one icon per screen: users, folder, file-text, message-square, image, quote -->
+    <div class="admin-tile-body"><h2 class="card-title">Membres</h2><span class="badge badge-count">20</span></div>
+  </a>
+</div>
+```
+
 ## Settings centre (`templates/settings/_layout.html.twig`, `components/_settings-layout.scss`)
 
 ```html
