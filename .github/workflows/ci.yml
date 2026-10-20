@@ -279,6 +279,8 @@ jobs:
           DATABASE_ROOT_PASSWORD=$(openssl rand -hex 16)
           MERCURE_JWT_SECRET=$(openssl rand -hex 32)
           export APP_SECRET DATABASE_PASSWORD DATABASE_ROOT_PASSWORD MERCURE_JWT_SECRET
+          # Only the database image comes from the registry; the app image is the one built above and must never be pulled.
+          docker compose pull database
           docker compose up -d --no-build --pull never
           for _ in $(seq 1 60); do
             [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/health)" = 200 ] && break
