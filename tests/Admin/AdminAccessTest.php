@@ -4,7 +4,7 @@ namespace App\Tests\Admin;
 
 use App\Tests\Support\AppWebTestCase;
 
-/** The admin panel is for administrators: anonymous visitors go to the login, members are refused, the nav link is theirs only. */
+/** The admin panel is for administrators: anonymous visitors go to the login, members are refused; the main navigation never links to it (the settings centre does). */
 class AdminAccessTest extends AppWebTestCase
 {
     public function testAnonymousVisitorsAreSentToTheLogin(): void
@@ -14,7 +14,7 @@ class AdminAccessTest extends AppWebTestCase
         self::assertResponseRedirects('/login');
     }
 
-    public function testMembersAreRefusedAndDoNotSeeTheNavLink(): void
+    public function testMembersAreRefusedAndTheNavHasNoAdminLink(): void
     {
         $this->loginAs($this->createUser('alice'));
 
@@ -25,7 +25,7 @@ class AdminAccessTest extends AppWebTestCase
         self::assertSame(0, $crawler->filter('.masthead-menu a[href="/admin"]')->count());
     }
 
-    public function testAdministratorsSeeTheOverviewAndTheNavLink(): void
+    public function testAdministratorsSeeTheOverviewButTheNavHasNoAdminLink(): void
     {
         $this->loginAs($this->createUser('root', ['ROLE_ADMIN']));
 
@@ -33,7 +33,10 @@ class AdminAccessTest extends AppWebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('h1', 'Vue d’ensemble');
-        self::assertSame(1, $crawler->filter('.masthead-menu a[href="/admin"]')->count());
-        self::assertSame('page', $crawler->filter('.masthead-menu a[href="/admin"]')->attr('aria-current'));
+        self::assertSame(0, $crawler->filter('.masthead-menu a[href="/admin"], .masthead-menu a:contains("Administration")')->count(), 'on the admin pages');
+
+        $crawler = $this->client->request('GET', '/');
+        self::assertSame(0, $crawler->filter('.masthead-menu a[href="/admin"], .masthead-menu a:contains("Administration")')->count(), 'on the home page');
+        self::assertSame(0, $crawler->filter('.masthead a[href="/admin"]')->count(), 'nowhere in the masthead');
     }
 }

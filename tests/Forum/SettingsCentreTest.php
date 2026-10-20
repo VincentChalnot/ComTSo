@@ -61,6 +61,7 @@ class SettingsCentreTest extends AppWebTestCase
         self::assertCount(1, $button);
         self::assertSame('Administration', trim($button->text()));
         self::assertCount(5, $crawler->filter('.settings-nav li'), 'a button, not a section of the menu');
+        self::assertCount(0, $crawler->filter('.masthead a[href="/admin"]'), 'the settings button is the only way in: the main navigation has no admin link');
     }
 
     public function testTheMainNavigationHasNoStatisticsLinkAndTheUserMenuReachesTheProfile(): void
