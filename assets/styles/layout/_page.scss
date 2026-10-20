@@ -7,6 +7,9 @@
 //       <aside class="layout-aside"> … </aside>
 //     </div>
 //   </div>
+//
+// Width variants of `.page`: `.page-narrow` (reading column) and `.page-wide` (admin lists, wide tables: no max width, the
+// responsive side padding stays). A template picks one through the `page_class` block of base.html.twig.
 @use "../abstracts" as *;
 
 @layer components {
@@ -18,6 +21,9 @@
   }
   .page-narrow {
     max-width: var(--container-reading);
+  }
+  .page-wide {
+    max-width: none;
   }
 
   .page-header {

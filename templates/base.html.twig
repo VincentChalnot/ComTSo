@@ -94,7 +94,7 @@
     </header>
     {% endblock %}
 
-    <div class="page">
+    <div class="page{% block page_class %}{% endblock %}">
         {% for type, messages in app.flashes %}
             {% for message in messages %}
                 {% set variant = type in ['error', 'danger'] ? 'danger' : (type == 'warning' ? 'warning' : (type == 'info' ? 'info' : 'ok')) %}

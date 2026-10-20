@@ -3,6 +3,9 @@
 
 {% block title %}Administration · ComTSo{% endblock %}
 
+{# The admin uses the whole width of the viewport (wide tables): `.page-wide`, see layout/_page.scss. #}
+{% block page_class %} page-wide{% endblock %}
+
 {% block content_layout %}
     <main id="main" class="admin" tabindex="-1">
         <nav class="tabs" aria-label="Écrans d’administration">

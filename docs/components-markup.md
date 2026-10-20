@@ -230,6 +230,15 @@ Shown (hidden removed) once `GET /photos/{id}/like` answered; hidden for links w
 ```
 Never put `p-*` utilities or `style="padding:…"` on a `.card`: choose `.card-roomy` or `.card-flush`. Components that need their own spacing (`.profile`, `.person-card`) set it in their partial.
 
+## Page width (`layout/_page.scss`)
+
+```html
+<div class="page">…</div>                 <!-- default: centred, max-width var(--container-page) -->
+<div class="page page-narrow">…</div>     <!-- reading column -->
+<div class="page page-wide">…</div>       <!-- whole viewport width, same responsive side padding: admin lists and wide tables -->
+```
+The masthead and the footer stay as they are. A template picks the variant by overriding the `page_class` block of `base.html.twig` (`{% block page_class %} page-wide{% endblock %}`; `admin/base.html.twig` does it for every admin page). Wide tables sit in `.table-responsive` and scroll sideways on a phone.
+
 ## Settings centre (`templates/settings/_layout.html.twig`, `components/_settings-layout.scss`)
 
 ```html

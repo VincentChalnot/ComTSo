@@ -293,7 +293,7 @@ and forced classes (`is-hover`, `is-pressed`, `is-focus`, `is-disabled`) through
 
 | Partial | Classes |
 |---|---|
-| `layout/_page` | `.aside-quote-add` (button under the aside quote) `.page` `.page-narrow` `.page-header` (`.is-double`, `.is-centered`) `.page-title` `.page-actions` `.layout` `.layout-main` `.layout-aside` `.reading` `.section` `.section-title` `.section-more` `.stack` |
+| `layout/_page` | `.aside-quote-add` (button under the aside quote) `.page` `.page-narrow` `.page-wide` (no max width: admin lists, wide tables; chosen with the `page_class` block of `base.html.twig`) `.page-header` (`.is-double`, `.is-centered`) `.page-title` `.page-actions` `.layout` `.layout-main` `.layout-aside` `.reading` `.section` `.section-title` `.section-more` `.stack` |
 | `layout/_masthead` | `.masthead` `.masthead-bar` `.masthead-title` `.masthead-search` `.masthead-tools` `.masthead-user` `.masthead-nav` (sticky paper strip) `.masthead-menu` `.masthead-toggle` `.masthead-link` (`.is-active`/`aria-current`) |
 | `_button` | `.btn` `.btn-primary` `.btn-secondary` `.btn-highlight` `.btn-danger` `.btn-ghost` `.btn-sm` `.btn-lg` `.btn-block` `.btn-icon` `.btn-group` |
 | `_card` | `.card` (carries its own padding, 1.25rem) `.card-roomy` (forms/settings) `.card-flush` (edge-to-edge: messages, photos, chat) `.card-flat` `.card-sunken` `.card-stack` `.card-hover` `.card-accent` `.card-title` |
