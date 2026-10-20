@@ -9,17 +9,14 @@ Done and removed from this list (details in `docs/decisions.md`): GitHub/CI hard
 ## Wave 1: next agent tasks
 
 1. **Verify Sentry after the next deploy.** `SENTRY_DSN` is already set on the server: run `docker compose exec app php bin/console sentry:test` once and check the event arrives (`docs/operations.md` "Sentry").
-2. **Wire in the chosen logo** (follow-up of the owner's pick, see below): favicons, masthead, login card, e-mail header, in both themes.
 
 ## Waiting for the owner (not an agent task)
 
 - **Git**: sign/rebase the local commits and push (`git log --oneline origin/master..HEAD` lists them); then apply the recommended branch protection after the force-push and check the first Dependabot pull requests (`docs/operations.md` "GitHub repository, CI and ghcr").
 - **Delete the 6 orphaned `sha-*` ghcr tags** (command in `docs/operations.md`).
 - **Sidus registries state defect** (`DataGridRegistry` / `QueryHandlerRegistry` cache stateful objects and are not reset between requests): fix upstream; then delete the request-scoped registries workaround (`AGENTS.md` "Admin panel", `App\Admin\Registry\RequestScoped*`, `RequestScopedDatagridPass`).
-- **Choose a logo concept** in `docs/logo-proposal/` (then Wave 1 item 2).
 - **NAS**: delete the two old `photos-*.tar.gz` once the rsync mirror is trusted; optionally stop shipping the server's own photos tarball (now redundant, `docs/operations.md` "Backups").
 - **Keres CSP**: check the Keres app still works with its own CSP (the shared Traefik no longer sets one).
-- **Dev Mailpit host**: the default is `mail.comtso.local.sidus.fr`. The owner asked for `mail.local.comtso.fr`, which resolves to the public server: add a `*.local.comtso.fr` A record to 127.0.0.1, then set `MAILPIT_HOST`.
 - **DMARC**: read `dmarc=pass` once in the header of a received mail. Optional: add `rua=` reports (`docs/operations.md`); `p=none` is fine for this forum.
 
 ## Dropped (do not re-add; re-open only on a real request)
