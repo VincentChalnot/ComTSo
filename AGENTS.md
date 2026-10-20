@@ -232,3 +232,4 @@ Styling pipeline in one line: `assets/scripts/main.js` imports `assets/styles/ap
 - Run whole-database console commands (`app:content:sanitize`, `app:photos:warm`) with `-e XDEBUG_MODE=off` and `--no-debug`: Xdebug and the dev
   profiler make them an order of magnitude slower. Id columns are not always integers (`ctso_forum.id` is a slug): never page on `(int) $id`.
 - Private messages: `ctso_message.state` NULL = unread; opening `/gens/{user}` marks the messages received from that member as read. Memos (author = recipient) never count.
+- Node: one major everywhere (26): `frontend_builder` in the `Dockerfile`, the `node`/`design-system` services of `compose.yaml` and `node-version` of the two `actions/setup-node` steps in `ci.yml`. Dependabot tracks the image tags only, not `node-version`: move the three together. Vite 8 needs Node >= 20.19 or 22.12.
