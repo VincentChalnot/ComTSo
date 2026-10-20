@@ -33,7 +33,7 @@ admin:
         view_for: Voir %name% sur le forum
     user:
         title: Membres
-        description: Activer ou désactiver un compte, nommer un administrateur, supprimer un membre. Les adresses e-mail ne sont jamais affichées.
+        description: Activer ou désactiver un compte, nommer un administrateur, supprimer un membre. Les adresses e-mail ne s’affichent que sur les écrans des membres.
         edit: Modifier le membre
         delete: Supprimer le membre
         delete_confirm: 'Supprimer le membre « %entity% » ?'
@@ -51,6 +51,7 @@ admin:
             role: Rôle
         filter:
             username: Pseudo
+            email: Adresse e-mail
             enabled: Compte
             role: Rôle
             last_activity: Dernière activité
@@ -150,6 +151,7 @@ datagrid:
         actions: Actions
     user:
         username: Pseudo
+        email: Adresse e-mail
         enabled: Compte
         admin: Rôle
         registeredAt: Inscription

@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Admin form of a member: whether the account can log in and whether it administers the forum. Nothing else is editable
- * here (members keep their profile, e-mail address and password to themselves; there is no e-mail field on purpose).
+ * here (members keep their profile, e-mail address and password to themselves: the address is shown read-only above the form, there is no e-mail field on purpose).
  * A change that would disable or demote the current administrator, or the last active one, is refused (AdminAccountGuard).
  */
 class UserAdminType extends AbstractType

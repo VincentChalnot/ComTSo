@@ -1,6 +1,7 @@
-{# Read-only facts above the user form. No e-mail address on purpose. #}
+{# Read-only facts above the user form. The member screens are the only admin pages that show the e-mail address. #}
 <dl class="dl mb-6">
     <dt>Pseudo</dt><dd>{{ data.username }}</dd>
+    <dt>Adresse e-mail</dt><dd>{{ data.email ?: '—' }}</dd>
     {% if data.name or data.surname %}<dt>Nom</dt><dd>{{ data.name }} {{ data.surname }}</dd>{% endif %}
     <dt>Inscription</dt><dd>{{ data.registeredAt ? data.registeredAt|date('d/m/Y') : '—' }}</dd>
     <dt>Dernière connexion</dt><dd>{{ data.lastLogin ? data.lastLogin|date('d/m/Y H:i') : '—' }}</dd>

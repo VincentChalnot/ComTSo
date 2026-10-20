@@ -14,7 +14,7 @@ sidus_admin:
     base_template: admin/base.html.twig
     configurations:
         # Members: list with filters, enable/disable + administrator role, removal through App\Forum\UserRemover.
-        # No create (accounts are made with `app:user:create`) and no e-mail address anywhere.
+        # No create (accounts are made with `app:user:create`). The ONLY screen that shows e-mail addresses (list and edit page).
         user:
             entity: App\Entity\User
             prefix: /users
@@ -89,10 +89,11 @@ sidus_data_grid:
                 provider: doctrine
                 options: { entity: App\Entity\User }
                 results_per_page: 25
-                sortable: [username, enabled, registeredAt, lastActivity, lastLogin]
+                sortable: [username, email, enabled, registeredAt, lastActivity, lastLogin]
                 default_sort: { username: ASC }
                 filters:
                     username: { type: text, label: admin.user.filter.username }
+                    email: { type: text, label: admin.user.filter.email }
                     enabled:
                         type: choice
                         label: admin.user.filter.enabled
@@ -109,13 +110,14 @@ sidus_data_grid:
                     lastActivity: { type: date_range, label: admin.user.filter.last_activity }
             columns:
                 username: { template: admin/cells/edit_link.html.twig, template_vars: { badge_self: true } }
+                email: { attributes: { class: nowrap } }
                 enabled:
                     template: admin/cells/badge.html.twig
                     template_vars: { on: admin.user.status.enabled, off: admin.user.status.disabled, on_class: badge-ok, off_class: badge-muted }
                 admin: { property_path: roles, template: admin/user/_role_cell.html.twig }
-                registeredAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
-                lastActivity: { template: admin/cells/date.html.twig }
-                lastLogin: { template: admin/cells/date.html.twig }
+                registeredAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y }, attributes: { class: nowrap } }
+                lastActivity: { template: admin/cells/date.html.twig, attributes: { class: nowrap } }
+                lastLogin: { template: admin/cells/date.html.twig, attributes: { class: nowrap } }
                 actions:
                     property_path: id
                     template: admin/cells/actions.html.twig

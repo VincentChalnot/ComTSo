@@ -10,7 +10,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class UserAdminTest extends AdminWebTestCase
 {
-    public function testTheListShowsTheMembersByPseudoWithoutAnyAddress(): void
+    public function testTheListShowsTheMembersWithTheirAddress(): void
     {
         $this->loginAdmin('root');
         $this->createUser('zoe');
@@ -21,7 +21,21 @@ class UserAdminTest extends AdminWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSame(['anna', 'root', 'zoe'], $this->pseudos($crawler));
         self::assertSelectorTextContains('.list-meta', '3 résultats');
-        $this->assertNoEmailAddress();
+        self::assertSame(['anna@example.test', 'root@example.test', 'zoe@example.test'], $crawler->filter('table.table tbody tr')->each(fn (Crawler $row) => trim($row->filter('td')->eq(1)->text())));
+        self::assertStringNotContainsString('password', strtolower($crawler->filter('table.table')->html()), 'no hash column');
+    }
+
+    public function testTheListIsFilterableAndSortableByAddress(): void
+    {
+        $this->loginAdmin('root');
+        $this->createUser('anna');
+        $this->createUser('zoe');
+        $this->createUser('bob')->setEmail('aaa-first@example.test');
+        $this->em()->flush();
+
+        self::assertSame(['zoe'], $this->pseudos($this->client->request('GET', '/admin/users/', ['form' => ['filters' => ['email' => 'zoe@']]])));
+        self::assertSame(['bob', 'anna', 'root', 'zoe'], $this->pseudos($this->client->request('GET', '/admin/users/', ['form' => ['sortable' => ['config' => ['column' => 'email', 'direction' => '0']]]])));
+        self::assertSame(['zoe', 'root', 'anna', 'bob'], $this->pseudos($this->client->request('GET', '/admin/users/', ['form' => ['sortable' => ['config' => ['column' => 'email', 'direction' => '1']]]])));
     }
 
     public function testFiltersNarrowTheList(): void
@@ -52,7 +66,7 @@ class UserAdminTest extends AdminWebTestCase
         }
         $this->em()->flush();
 
-        foreach (['password', 'email', 'nope.nope', 'username'] as $column) {
+        foreach (['password', 'nope.nope', 'username'] as $column) {
             $crawler = $this->client->request('GET', '/admin/users/', ['form' => ['sortable' => ['config' => ['column' => $column, 'direction' => '1']]]]);
 
             self::assertResponseIsSuccessful($column);
@@ -101,7 +115,8 @@ class UserAdminTest extends AdminWebTestCase
 
         $crawler = $this->client->request('GET', '/admin/users/'.$alice->getId().'/edit');
         self::assertResponseIsSuccessful();
-        $this->assertNoEmailAddress();
+        self::assertStringContainsString('alice@example.test', $crawler->filter('dl.dl')->text(), 'the edit page shows the address, read-only');
+        self::assertCount(0, $crawler->filter('input[type=email], input[name*=email]'), 'and offers no field to change it');
         $form = $crawler->selectButton('Enregistrer')->form();
         $form['form_user_edit[enabled]']->untick();
         $form['form_user_edit[role]']->select('admin');
@@ -113,7 +128,6 @@ class UserAdminTest extends AdminWebTestCase
         self::assertContains('ROLE_ADMIN', $alice->getRoles());
         $crawler = $this->client->followRedirect();
         self::assertSelectorExists('.alert-ok');
-        $this->assertNoEmailAddress();
     }
 
     public function testTheFormShowsTheCurrentStateAndSavingItUntouchedChangesNothing(): void

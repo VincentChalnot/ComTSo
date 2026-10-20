@@ -1,12 +1,14 @@
 // Tables: hairline rules, small-caps heads, tabular figures. Plus the definition list used on profile pages.
 //
 //   <div class="table-responsive"><table class="table table-striped table-hover table-sm">…</table></div>
-//   .table-sticky (sticky head)   th.num / td.num (right-aligned figures)   tr.is-selected
+//   .table-sticky (sticky head)   th.num / td.num (right-aligned figures)   .nowrap (a cell that never wraps: dates, e-mail addresses)   tr.is-selected
 //   <dl class="dl"><dt>Membre depuis</dt><dd>2004</dd>…</dl>      .dl-stacked: term over value
 @use "../abstracts" as *;
 
 @layer components {
   .table-responsive {
+    // positioned: `.sr-only` (absolute) cells scroll with the table instead of widening the page
+    position: relative;
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -64,6 +66,9 @@
     .num,
     td[data-num] {
       text-align: right;
+      white-space: nowrap;
+    }
+    .nowrap {
       white-space: nowrap;
     }
     a {
