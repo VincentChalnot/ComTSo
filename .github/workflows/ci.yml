@@ -287,10 +287,10 @@ jobs:
             sleep 2
           done
           test "$(curl -sS http://127.0.0.1:8080/health)" = ok
-          headers="$(curl -sS -o /dev/null -D - http://127.0.0.1:8080/)"
+          headers="$(curl -sS -o /dev/null -D - http://127.0.0.1:8080/ | tr -d '\r')"
           echo "$headers"
           echo "$headers" | head -n 1 | grep -qE '^HTTP/[0-9.]+ 302'
-          echo "$headers" | grep -iqE '^location: .*/login\r?$'
+          echo "$headers" | grep -iqE '^location: .*/login$'
 
       - name: Smoke-test logs
         if: failure()
