@@ -96,7 +96,7 @@ COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
 
 # Front-end build: Vite bundles assets/ and Tailwind scans templates/ for the classes in use
-FROM node:22-alpine AS frontend_builder
+FROM node:26-alpine AS frontend_builder
 WORKDIR /app
 COPY --link package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci
