@@ -3,7 +3,7 @@
 Private forum for a circle of friends (history back to 2004): forums and topics, photo albums with a lightbox, private
 messages/memos, a real-time chat, favourites, a "what's new since your last visit" home page and full-text search.
 
-**Stack:** Symfony 8.1 · FrankenPHP (Caddy + Mercure) · MariaDB 11.4 · Vite · Tailwind CSS 4 · Vue 3 (editor, chat, uploads) · PHPUnit 12.
+**Stack:** Symfony 8.1 · FrankenPHP (Caddy + Mercure) · MariaDB 12.3 · Vite · Tailwind CSS 4 · Vue 3 (editor, chat, uploads) · PHPUnit 12.
 
 > Working on the code (humans and agents): read [`AGENTS.md`](AGENTS.md) first. Feature inventory of the old site: [`docs/LEGACY_FEATURES.md`](docs/LEGACY_FEATURES.md).
 

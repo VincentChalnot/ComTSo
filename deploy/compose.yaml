@@ -36,7 +36,7 @@ x-app: &app
     # The forum is private: set to true to let anybody create an account at /register.
     REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}
     # The password is read from the secret file at runtime (Doctrine `resolve:` processor); never put it here.
-    DATABASE_URL: mysql://comtso:%env(trim:file:DATABASE_PASSWORD_FILE)%@database:3306/comtso?serverVersion=mariadb-11.4.0&charset=utf8mb4
+    DATABASE_URL: mysql://comtso:%env(trim:file:DATABASE_PASSWORD_FILE)%@database:3306/comtso?serverVersion=mariadb-12.3.0&charset=utf8mb4
     # The Symfony app publishes to the embedded hub over the internal listener (`http://app:8080`, see CADDY_SITE_ADDRESS);
     # browsers subscribe through the public URL.
     MERCURE_URL: http://app:8080/.well-known/mercure
@@ -109,7 +109,7 @@ services:
         condition: service_healthy
 
   database:
-    image: mariadb:11.4
+    image: mariadb:12.3
     restart: unless-stopped
     logging: *default-logging
     environment:
@@ -117,7 +117,9 @@ services:
       MARIADB_USER: comtso
       MARIADB_PASSWORD_FILE: /run/secrets/database_password
       MARIADB_ROOT_PASSWORD_FILE: /run/secrets/database_root_password
-      # Lets the image upgrade the system tables when `mariadb:11.4` moves to a newer patch release.
+      # Needed to upgrade the system tables (mariadb-upgrade) when the volume was created by an older MariaDB (11.4 -> 12.3) or
+      # `mariadb:12.3` moves to a newer patch release; the image also dumps the `mysql` schema into the data directory first.
+      # Without it the server starts but the upgrade is only logged as "required, but skipped".
       MARIADB_AUTO_UPGRADE: "1"
     secrets:
       - database_password

@@ -36,7 +36,7 @@ services:
       # The forum is private: set to true to let anybody create an account at /register.
       REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}
       # The password is read from the secret file at runtime (Doctrine `resolve:` processor); never put it here.
-      DATABASE_URL: mysql://comtso:%env(trim:file:DATABASE_PASSWORD_FILE)%@database:3306/comtso?serverVersion=mariadb-11.4.0&charset=utf8mb4
+      DATABASE_URL: mysql://comtso:%env(trim:file:DATABASE_PASSWORD_FILE)%@database:3306/comtso?serverVersion=mariadb-12.3.0&charset=utf8mb4
       MERCURE_URL: http://php/.well-known/mercure
       MERCURE_PUBLIC_URL: https://${SERVER_NAME:-comtso.local.sidus.fr}/.well-known/mercure
       # Secrets: paths of the files mounted by `secrets:` below.
@@ -89,13 +89,15 @@ services:
       traefik.http.services.comtso.loadbalancer.server.port: "80"
 
   database:
-    image: mariadb:11.4
+    image: mariadb:12.3
     restart: unless-stopped
     environment:
       MARIADB_DATABASE: comtso
       MARIADB_USER: comtso
       MARIADB_PASSWORD_FILE: /run/secrets/database_password
       MARIADB_ROOT_PASSWORD_FILE: /run/secrets/database_root_password
+      # Upgrades the system tables when the volume was created by an older MariaDB (11.4 -> 12.3) or `mariadb:12.3` moves to a newer patch release.
+      MARIADB_AUTO_UPGRADE: "1"
     secrets:
       - database_password
       - database_root_password

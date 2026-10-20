@@ -153,7 +153,7 @@ RUN <<-EOF
 	composer dump-autoload --classmap-authoritative --no-dev
 	# The cache warmup instantiates services, which resolves these two variables (nothing connects). Build-time placeholders for
 	# THIS RUN ONLY: they are not stored in the image, the real values come from the environment at runtime.
-	export DATABASE_URL='mysql://build:build@127.0.0.1:3306/build?serverVersion=mariadb-11.4.0&charset=utf8mb4'
+	export DATABASE_URL='mysql://build:build@127.0.0.1:3306/build?serverVersion=mariadb-12.3.0&charset=utf8mb4'
 	export MERCURE_URL='http://localhost/.well-known/mercure'
 	composer run-script --no-dev post-install-cmd
 	chmod +x bin/console

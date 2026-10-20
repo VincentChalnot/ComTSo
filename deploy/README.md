@@ -5,7 +5,7 @@ Production runs from the **pre-built image** `ghcr.io/vincentchalnot/comtso` tha
 Nothing is built on the server: it only needs Docker with Compose v2 and the two files of this directory.
 
 ```
-deploy/compose.yaml          app (FrankenPHP + Caddy + embedded Mercure hub) · migrate (one-shot) · database (MariaDB 11.4)
+deploy/compose.yaml          app (FrankenPHP + Caddy + embedded Mercure hub) · migrate (one-shot) · database (MariaDB 12.3)
 deploy/compose.traefik.yaml  optional override: shared Traefik instead of published ports (see "Reverse proxy options")
 deploy/compose.www-redirect.yaml  optional second override (Traefik, apex domain only): permanent redirect www.<SERVER_NAME> -> <SERVER_NAME>
 deploy/.env.example          the settings and the 5 secrets, to copy to deploy/.env

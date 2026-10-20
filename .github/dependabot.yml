@@ -53,7 +53,7 @@ updates:
     ignore:
       - dependency-name: dunglas/frankenphp
 
-  # compose.yaml (dev) and deploy/compose.yaml (production): MariaDB, Mailpit, Node. The MariaDB line (11.4 LTS) is moved by hand:
+  # compose.yaml (dev) and deploy/compose.yaml (production): MariaDB, Mailpit, Node. The MariaDB line (12.3 LTS) is moved by hand:
   # a new major/minor needs a dump/restore rehearsal first.
   - package-ecosystem: docker-compose
     directories: [/, /deploy]

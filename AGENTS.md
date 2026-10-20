@@ -1,6 +1,6 @@
 # AGENTS.md — ComTSo forum
 
-Private forum for a circle of friends (French-speaking, history back to 2004). Symfony 8.1 + FrankenPHP/Caddy + MariaDB 11.4,
+Private forum for a circle of friends (French-speaking, history back to 2004). Symfony 8.1 + FrankenPHP/Caddy + MariaDB 12.3 (LTS),
 Vite + Tailwind CSS 4 + Vue 3 (only for interactive widgets), Mercure for the chat. **Read this file before changing anything.**
 
 ## Golden rules
@@ -90,7 +90,7 @@ private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `t
 
 - **Production** = `deploy/compose.yaml` + `deploy/.env.example` (copied to `deploy/.env` on the server, never committed) running the **pre-built image** `ghcr.io/vincentchalnot/comtso:${COMTSO_IMAGE_TAG:-latest}`
   (`frankenphp_prod` target: assets built in `frontend_builder`, `composer --no-dev --classmap-authoritative`, `APP_ENV=prod`, `APP_DEBUG=0`, no `.env`/dotenv in the image). Services: `app` (Caddy + FrankenPHP + the embedded
-  Mercure hub, healthcheck = public `GET /health` through loopback on the internal `http://app:8080` listener with `Host: app`: `healthy` = Caddy + PHP + MariaDB), `migrate` (one-shot `doctrine:migrations:migrate`, `app` waits for it: single replica only), `database` (MariaDB 11.4, healthcheck, no published port).
+  Mercure hub, healthcheck = public `GET /health` through loopback on the internal `http://app:8080` listener with `Host: app`: `healthy` = Caddy + PHP + MariaDB), `migrate` (one-shot `doctrine:migrations:migrate`, `app` waits for it: single replica only), `database` (MariaDB 12.3 on the rolling `12.3` tag, `MARIADB_AUTO_UPGRADE=1`, healthcheck, no published port).
   Same secret mechanism as dev (see "Configuration and secrets"). Volumes: `photos` (`/app/var/photos`), `caddy_data`, `caddy_config`, `database_data`. Direct HTTPS by Caddy (`SERVER_NAME`) or behind a proxy
   (`CADDY_SITE_ADDRESS=:80`, `TRUSTED_PROXIES`; shared Traefik = override file `deploy/compose.traefik.yaml` via `COMPOSE_FILE` in `deploy/.env`, router `comtso-forum`, knobs `CERT_RESOLVER`/`TRAEFIK_NETWORK`). The Symfony app publishes to Mercure on an internal-only listener `http://app:8080`.
   Outgoing mail: `MAILER_DSN` is a Symfony Mailer DSN (`symfony/mailer`, `smtp://` needs no extra package); **Scaleway Transactional Email is the recommended provider**: `smtp://<SCW_PROJECT_ID>:<SCW_SECRET_KEY>@smtp.tem.scaleway.com:587` (sender domain validated in the TEM console, `MAILER_FROM` on it), see `deploy/.env.example`. Runbook (first deploy, admin, upgrade, rollback, backup): `deploy/README.md`.
