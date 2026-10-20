@@ -114,7 +114,7 @@ services:
 
   # Vite build in watch mode: assets are rebuilt into public/assets (git-ignored) on every change.
   node:
-    image: node:20-alpine
+    image: node:26-alpine
     working_dir: /app
     volumes:
       - ./:/app
@@ -125,7 +125,7 @@ services:
   # Design-system showcase: Vite dev server compiling the same Sass/Tailwind sources as the application
   # (docs/design-system.md). http://localhost:${DESIGN_SYSTEM_PORT:-5174}/ (plain HTTP, published on the host). Dev only.
   design-system:
-    image: node:20-alpine
+    image: node:26-alpine
     working_dir: /app
     volumes:
       - ./:/app
