@@ -123,6 +123,8 @@ Daily cron (adjust the path; cron mails you the output when it fails):
 Both scripts need the stack running (`docker compose up -d`). Copy the backups off the server: the DB dump holds password hashes and private
 messages, treat it as a secret.
 
+Off-server copy without duplicates (what the owner's NAS job does, details in `docs/operations.md` "Backups and restore checks"): pull each `db-*.sql.gz` as a dated file, and mirror the photos with `rsync -a --exclude 'cache/'` from the `photos` volume directory (`/var/lib/docker/volumes/comtso-forum_photos/_data/`, readable by root) into ONE tree, never with `--delete`: only new or changed originals travel and nothing is ever removed from the copy. Do not pull `photos-*.tar.gz` every night: each one is a near-identical 350 MB duplicate.
+
 ## Operations
 
 ```bash
