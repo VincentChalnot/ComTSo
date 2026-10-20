@@ -60,6 +60,7 @@ The app is exposed **only** through the shared Traefik instance (`../traefik`, e
   nothing listens on that port in this stack, so `80` is used.
 - Symfony trusts the proxy headers (`TRUSTED_PROXIES=private_ranges`, `framework.trusted_proxies`) so generated URLs and cookies are `https`.
 - No port is published on the host except MariaDB (`DATABASE_PORT`, default `3307`) and the dev-only design-system showcase (`DESIGN_SYSTEM_PORT`, default `5174`, plain HTTP). `TRAEFIK_ENABLE=false` removes the Traefik router (second copy of the stack, CI).
+- **Mailpit** (dev-only email testing): the `mailer` service captures all SMTP e-mails (port 1025, internal only) and hosts a web UI at port 8025. Exposed through Traefik at **https://mail.local.comtso.fr** (router name `comtso-mailer`, `MAILPIT_HOST` env var, defaults to `mail.local.comtso.fr`, HTTPS with `CERT_RESOLVER`). The hostname must resolve and support Traefik's DNS-challenge cert resolver: `*.local.sidus.fr` resolves to 127.0.0.1 and is supported by the Gandi resolver. If `mail.local.comtso.fr` does not resolve, use `mail.comtso.local.sidus.fr` instead (or add to `/etc/hosts: 127.0.0.1 mail.local.comtso.fr`). Access the UI to read captured e-mails, inspect headers and attachments, and test digest/password-reset mails.
 
 ### Database
 
