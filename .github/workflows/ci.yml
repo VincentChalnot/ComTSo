@@ -66,7 +66,7 @@ jobs:
             if [ "$CAN_PUSH" = true ]; then echo "ref=$image" >> "$GITHUB_OUTPUT"; else echo "ref=php_base" >> "$GITHUB_OUTPUT"; fi
           fi
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
         if: steps.ref.outputs.exists == 'false'
 
       # Without push rights the build only warms the gha cache, which the other jobs read to build the stage locally.
@@ -115,7 +115,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       # Same image as `docker compose up` (target frankenphp_dev) on top of the published base, loaded into the local Docker daemon
       # under the name compose.yaml expects. The gha cache holds the thin layers (and the base stage when it had to be built locally).
@@ -242,7 +242,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       # `load: true` keeps the image in the runner's Docker daemon (under a local-only tag) for the smoke test below; nothing is pushed.
       - name: Build the production image
@@ -314,7 +314,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       - name: Log in to ghcr.io
         uses: docker/login-action@v3
