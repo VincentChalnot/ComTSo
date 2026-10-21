@@ -169,16 +169,12 @@ sidus_data_grid:
                 pagination: { per_page: 25 }
                 filters:
                     title: { type: text, form: { label: admin.topic.filter.title } }
-                    # Neither `relation` nor `forum.id`: the forum id is a slug and the Doctrine provider compiles an equality on a string
-                    # foreign key to SIDUS_BINARY(root.forum) on MariaDB, which DQL refuses ("Must be a StateFieldPathExpression").
-                    # The title (the slug is derived from it) goes through the shared join and compiles fine.
                     forum:
-                        type: choice
-                        attributes: [forum.title]
+                        type: relation
+                        options: { class: App\Entity\Forum }
                         form:
                             label: admin.topic.filter.forum
-                            type: Symfony\Bridge\Doctrine\Form\Type\EntityType
-                            options: { class: App\Entity\Forum, choice_label: title, choice_value: title, placeholder: admin.list.all_forums }
+                            options: { choice_label: title, placeholder: admin.list.all_forums }
                     author: { type: text, attributes: [author.username], form: { label: admin.topic.filter.author } }
         comment:
             default_sort: [{ column: createdAt, direction: desc }]

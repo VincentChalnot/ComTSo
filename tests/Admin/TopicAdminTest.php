@@ -33,7 +33,7 @@ class TopicAdminTest extends AdminWebTestCase
 
         self::assertSame(['Vacances'], $this->titles($this->client->request('GET', '/admin/topics/', ['filters' => ['title' => 'vac']])));
         self::assertSame(['Vinyles'], $this->titles($this->client->request('GET', '/admin/topics/', ['filters' => ['author' => 'bo']])));
-        $crawler = $this->client->request('GET', '/admin/topics/', ['filters' => ['forum' => 'Musique']]);
+        $crawler = $this->client->request('GET', '/admin/topics/', ['filters' => ['forum' => 'musique']]);
         self::assertEqualsCanonicalizing(['Concerts', 'Vinyles'], $this->titles($crawler));
     }
 
