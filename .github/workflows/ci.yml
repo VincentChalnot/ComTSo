@@ -41,7 +41,7 @@ jobs:
       # Fork and Dependabot pull requests have a read-only token.
       CAN_PUSH: ${{ github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # compose.yaml (dev) pins the same tag: fail when someone edited the base block without `docker/base-hash.sh --write`.
       - name: Check the pinned base tag
@@ -93,7 +93,7 @@ jobs:
       # Second copy of the dev stack on a CI runner: no Traefik router for it.
       TRAEFIK_ENABLE: 'false'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The dev compose file reads its (throwaway) secrets from .env and joins the external Traefik network.
       - name: Prepare the dev stack inputs
@@ -174,7 +174,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:
@@ -195,7 +195,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -209,7 +209,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Composer audit (non-blocking)
         continue-on-error: true
@@ -233,7 +233,7 @@ jobs:
       contents: read
       packages: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: docker/login-action@v3
         if: needs.base.outputs.ref != 'php_base'
@@ -312,7 +312,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: docker/setup-buildx-action@v3
 
