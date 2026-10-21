@@ -41,7 +41,7 @@ jobs:
       # Fork and Dependabot pull requests have a read-only token.
       CAN_PUSH: ${{ github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # compose.yaml (dev) pins the same tag: fail when someone edited the base block without `docker/base-hash.sh --write`.
       - name: Check the pinned base tag
@@ -66,7 +66,7 @@ jobs:
             if [ "$CAN_PUSH" = true ]; then echo "ref=$image" >> "$GITHUB_OUTPUT"; else echo "ref=php_base" >> "$GITHUB_OUTPUT"; fi
           fi
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
         if: steps.ref.outputs.exists == 'false'
 
       # Without push rights the build only warms the gha cache, which the other jobs read to build the stage locally.
@@ -93,7 +93,7 @@ jobs:
       # Second copy of the dev stack on a CI runner: no Traefik router for it.
       TRAEFIK_ENABLE: 'false'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The dev compose file reads its (throwaway) secrets from .env and joins the external Traefik network.
       - name: Prepare the dev stack inputs
@@ -115,7 +115,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       # Same image as `docker compose up` (target frankenphp_dev) on top of the published base, loaded into the local Docker daemon
       # under the name compose.yaml expects. The gha cache holds the thin layers (and the base stage when it had to be built locally).
@@ -133,7 +133,7 @@ jobs:
           cache-to: type=gha,scope=dev,mode=max
 
       - name: Cache Composer dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: vendor
           key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
@@ -174,7 +174,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:
@@ -195,7 +195,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -209,7 +209,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Composer audit (non-blocking)
         continue-on-error: true
@@ -233,7 +233,7 @@ jobs:
       contents: read
       packages: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: docker/login-action@v3
         if: needs.base.outputs.ref != 'php_base'
@@ -242,7 +242,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       # `load: true` keeps the image in the runner's Docker daemon (under a local-only tag) for the smoke test below; nothing is pushed.
       - name: Build the production image
@@ -312,9 +312,9 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
 
       - name: Log in to ghcr.io
         uses: docker/login-action@v3
