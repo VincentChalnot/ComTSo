@@ -61,6 +61,9 @@
     "sidus/datagrid-bundle": {
         "version": "v4.0.2"
     },
+    "sidus/doctrine-filter-bundle": {
+        "version": "v1.0.0"
+    },
     "sidus/filter-bundle": {
         "version": "v6.0.3"
     },

@@ -3,9 +3,9 @@
 namespace App\Tests\Admin;
 
 /**
- * FrankenPHP serves many requests with the same container (worker mode, dev and production). The sidus registries cache the
- * datagrid and query handler they build (stateful: form, sort, pager) in a shared service and never reset it, so the second
- * visit of a list used to fail with "Pager already applied": the registries are request-scoped now (`RequestScopedDatagridPass`).
+ * FrankenPHP serves many requests with the same container (worker mode, dev and production). The sidus bundles keep nothing
+ * of a request in a service (datagrid, query handler, form and the admin/action are created for each request): every list can
+ * be served again and a filtered visit leaves nothing behind.
  */
 class WorkerModeTest extends AdminWebTestCase
 {
@@ -29,7 +29,7 @@ class WorkerModeTest extends AdminWebTestCase
         $this->createUser('alice');
         $this->client->disableReboot();
 
-        foreach (['/admin/users/', '/admin/users/?form[filters][username]=ali', '/admin/users/'] as $url) {
+        foreach (['/admin/users/', '/admin/users/?filters[username]=ali', '/admin/users/'] as $url) {
             $crawler = $this->client->request('GET', $url);
 
             self::assertResponseIsSuccessful($url);

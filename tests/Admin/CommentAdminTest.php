@@ -104,11 +104,11 @@ class CommentAdminTest extends AdminWebTestCase
         $b = $this->commentAt($music, $bob, '<p>Un super concert</p>', '2026-02-10 10:00');
         $c = $this->commentAt($music, $alice, '<p>Merci pour la plage</p>', '2026-03-10 10:00');
 
-        $filter = fn (array $filters) => $this->ids($this->client->request('GET', '/admin/comments/', ['form' => ['filters' => $filters]]));
+        $filter = fn (array $filters) => $this->ids($this->client->request('GET', '/admin/comments/', ['filters' => $filters]));
         self::assertEqualsCanonicalizing([$a->getId(), $c->getId()], $filter(['content' => 'plage']));
         self::assertSame([$b->getId()], $filter(['author' => 'bo']));
         self::assertEqualsCanonicalizing([$b->getId(), $c->getId()], $filter(['topic' => 'concert']));
-        self::assertSame([$b->getId()], $filter(['createdAt' => ['startDate' => '2026-02-01', 'endDate' => '2026-02-28']]));
+        self::assertSame([$b->getId()], $filter(['createdAt' => ['from' => '2026-02-01', 'to' => '2026-02-28']]));
     }
 
     public function testSortingIsRestrictedToTheAllowList(): void
@@ -121,10 +121,10 @@ class CommentAdminTest extends AdminWebTestCase
         $second = $this->commentAt($topic, $alice, '<p>Deux</p>', '2026-02-01 10:00');
         $this->em()->flush();
 
-        $sort = fn (string $column, string $direction) => $this->ids($this->client->request('GET', '/admin/comments/', ['form' => ['sortable' => ['config' => ['column' => $column, 'direction' => $direction]]]]));
+        $sort = fn (string $column, string $direction) => $this->ids($this->client->request('GET', '/admin/comments/', ['sort' => ('1' === $direction ? '-' : '').$column]));
         self::assertSame([$first->getId(), $second->getId()], $sort('createdAt', '0'));
-        self::assertSame([$second->getId(), $first->getId()], $sort('author.username', '0'));
-        self::assertSame([$first->getId(), $second->getId()], $sort('author.username', '1'));
+        self::assertSame([$second->getId(), $first->getId()], $sort('author', '0'));
+        self::assertSame([$first->getId(), $second->getId()], $sort('author', '1'));
         // not an allowed column: replaced by the default one (latest first), never used as ORDER BY
         self::assertSame([$second->getId(), $first->getId()], $sort('content', '0'));
         self::assertSame([$second->getId(), $first->getId()], $sort('author.password', '0'));

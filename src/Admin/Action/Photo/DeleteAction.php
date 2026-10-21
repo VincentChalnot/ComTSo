@@ -14,15 +14,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** The administrator's photo deletion ({@see PhotoRemover}, same as the button of the photo page): the files go with the row. */
 #[AsController]
-class DeleteAction extends AbstractRemovalAction
+readonly class DeleteAction extends AbstractRemovalAction
 {
     public function __construct(
         FormHelper $formHelper,
         TemplatingHelper $templatingHelper,
         FlashHelper $flashHelper,
-        private readonly PhotoRemover $remover,
-        private readonly PhotoRepository $photos,
-        private readonly TranslatorInterface $translator,
+        private PhotoRemover $remover,
+        private PhotoRepository $photos,
+        private TranslatorInterface $translator,
     ) {
         parent::__construct($formHelper, $templatingHelper, $flashHelper);
     }

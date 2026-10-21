@@ -2,10 +2,9 @@
 
 namespace App\Admin\Action;
 
-use Sidus\AdminBundle\Action\ActionInjectableInterface;
-use Sidus\AdminBundle\Action\ActionInjectableTrait;
 use Sidus\AdminBundle\Attribute\AdminEntity;
 use Sidus\AdminBundle\Form\FormHelper;
+use Sidus\AdminBundle\Model\Action;
 use Sidus\AdminBundle\Request\ActionResponseInterface;
 use Sidus\AdminBundle\Request\RedirectActionResponse;
 use Sidus\AdminBundle\Session\FlashHelper;
@@ -19,20 +18,20 @@ use Symfony\Component\HttpFoundation\Request;
  * raw EntityManager::remove(): subclasses call the service that owns it.
  *
  * To use one, point a screen's `delete` action at it with `controller_pattern` (App\Admin\Action\<Screen>\DeleteAction).
+ * Like every admin action it is stateless (`readonly`): the action and the entity are arguments.
  */
-abstract class AbstractRemovalAction implements ActionInjectableInterface
+abstract readonly class AbstractRemovalAction
 {
-    use ActionInjectableTrait;
-
     public function __construct(
-        private readonly FormHelper $formHelper,
-        private readonly TemplatingHelper $templatingHelper,
-        private readonly FlashHelper $flashHelper,
+        protected FormHelper $formHelper,
+        protected TemplatingHelper $templatingHelper,
+        protected FlashHelper $flashHelper,
     ) {
     }
 
     public function __invoke(
         Request $request,
+        Action $action,
         #[AdminEntity]
         object $data,
     ): ActionResponseInterface {
@@ -40,19 +39,19 @@ abstract class AbstractRemovalAction implements ActionInjectableInterface
         if (null !== $reason = $this->refusal($data)) {
             $session->getFlashBag()->add('error', $reason);
 
-            return $this->backToList();
+            return $this->backToList($action);
         }
 
-        $form = $this->formHelper->getEmptyForm($this->action, $request);
+        $form = $this->formHelper->getEmptyForm($action, $request);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->remove($data);
-            $this->flashHelper->addFlash($this->action, $session);
+            $this->flashHelper->addFlash($action, $session);
 
-            return $this->backToList();
+            return $this->backToList($action);
         }
 
-        return $this->templatingHelper->renderFormAction($this->action, $form, $data, ['details' => $this->details($data)]);
+        return $this->templatingHelper->renderFormAction($action, $form, $data, ['details' => $this->details($data)]);
     }
 
     /** @return string|null why the entity must not be removed (French, shown as an error flash), null when it may be */
@@ -69,8 +68,8 @@ abstract class AbstractRemovalAction implements ActionInjectableInterface
 
     abstract protected function remove(object $entity): void;
 
-    private function backToList(): ActionResponseInterface
+    private function backToList(Action $action): ActionResponseInterface
     {
-        return new RedirectActionResponse($this->action->getAdmin()->getAction($this->action->getOption('redirect_action', 'list')));
+        return new RedirectActionResponse($action->getAdmin()->getAction($action->getOption('redirect_action', 'list')));
     }
 }

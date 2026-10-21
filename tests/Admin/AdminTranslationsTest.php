@@ -2,8 +2,9 @@
 
 namespace App\Tests\Admin;
 
-use Sidus\AdminBundle\Configuration\AdminRegistry;
+use Sidus\AdminBundle\Registry\AdminRegistry;
 use Sidus\DataGridBundle\Registry\DataGridRegistry;
+use Sidus\FilterBundle\Registry\ListDefinitionRegistry;
 use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -26,7 +27,7 @@ class AdminTranslationsTest extends AdminWebTestCase
             }
         };
 
-        $admins = $container->get(AdminRegistry::class)->getAdmins();
+        $admins = $container->get(AdminRegistry::class)->all();
         self::assertNotEmpty($admins);
         foreach ($admins as $admin) {
             $code = $admin->getCode();
@@ -50,13 +51,17 @@ class AdminTranslationsTest extends AdminWebTestCase
                 }
             }
 
-            $grid = $container->get(DataGridRegistry::class)->getDataGrid($code);
-            foreach ($grid->getColumns() as $column) {
-                $need("datagrid.$code.{$column->getCode()}");
+            $grid = $container->get(DataGridRegistry::class)->get($code);
+            foreach ($grid->columns as $column) {
+                $need("datagrid.$code.{$column->code}");
             }
-            foreach ($grid->getQueryHandler()->getConfiguration()->getFilters() as $filter) {
-                self::assertNotNull($filter->getLabel(), "filter $code.{$filter->getCode()} has no label");
-                $need($filter->getLabel());
+            foreach ($container->get(ListDefinitionRegistry::class)->get($grid->list)->filters as $filter) {
+                if ($filter->type === 'sort') {
+                    continue;
+                }
+                $label = $filter->form['label'] ?? null;
+                self::assertNotNull($label, "filter $code.{$filter->key} has no label");
+                $need($label);
             }
         }
 

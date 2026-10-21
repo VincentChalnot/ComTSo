@@ -2,28 +2,56 @@
 
 namespace App\Admin\Filter;
 
-use Doctrine\ORM\QueryBuilder;
-use Sidus\FilterBundle\Doctrine\Filter\Type\AbstractSimpleFilterType;
+use Sidus\DoctrineFilterBundle\Factory\DoctrineQueryHandlerFactory;
+use Sidus\DoctrineFilterBundle\Query\DoctrineQueryContext;
+use Sidus\FilterBundle\Criterion\Criterion;
+use Sidus\FilterBundle\Criterion\Native;
+use Sidus\FilterBundle\Definition\FilterDefinition;
+use Sidus\FilterBundle\Filter\NormalizedValue;
+use Sidus\FilterBundle\Filter\Type\AbstractFilterType;
+use Sidus\FilterBundle\Input\Violation;
 
 /**
- * Filter of the member list on ROLE_ADMIN: `admin` = administrators, `member` = everybody else. The `roles` column is a JSON
- * array of strings, so the role is looked for as a quoted string (config/services.yaml gives the type its code and widget).
+ * Filter type `admin_role` of the member list on ROLE_ADMIN: `admin` = administrators, `member` = everybody else. The `roles`
+ * column is a JSON array of strings, so the role is looked for as a quoted string in a native DQL condition
+ * (its form field is {@see AdminRoleFormMapper}).
  */
-class AdminRoleFilterType extends AbstractSimpleFilterType
+class AdminRoleFilterType extends AbstractFilterType
 {
     public const ADMIN = 'admin';
     public const MEMBER = 'member';
 
-    protected function applyDQL(QueryBuilder $qb, string $column, $data): string
+    public static function getName(): string
     {
-        $uid = uniqid('role', false);
-        $qb->setParameter($uid, '%"ROLE_ADMIN"%');
-
-        return self::ADMIN === $data ? "{$column} LIKE :{$uid}" : "{$column} NOT LIKE :{$uid}";
+        return 'admin_role';
     }
 
-    protected function isEmpty(mixed $data): bool
+    public static function getRequiredOperations(FilterDefinition $filter): array
     {
-        return !\in_array($data, [self::ADMIN, self::MEMBER], true);
+        return [Native::class];
+    }
+
+    public function normalize(FilterDefinition $filter, mixed $raw): NormalizedValue
+    {
+        if (self::isBlank($raw)) {
+            return NormalizedValue::empty();
+        }
+        if (!\in_array($raw, [self::ADMIN, self::MEMBER], true)) {
+            return NormalizedValue::invalid(new Violation('', 'Expected "admin" or "member".', $raw));
+        }
+
+        return NormalizedValue::of($raw);
+    }
+
+    public function buildCriterion(FilterDefinition $filter, mixed $value): ?Criterion
+    {
+        $roles = $filter->attributes[0]->path;
+
+        return new Native(DoctrineQueryHandlerFactory::PROVIDER, static function (DoctrineQueryContext $query) use ($value, $roles): string {
+            $column = $query->rootAlias().'.'.$roles;
+            $param = $query->parameter('%"ROLE_ADMIN"%');
+
+            return self::ADMIN === $value ? "{$column} LIKE {$param}" : "{$column} NOT LIKE {$param}";
+        });
     }
 }

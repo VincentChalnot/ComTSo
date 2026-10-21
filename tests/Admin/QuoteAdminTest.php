@@ -26,7 +26,7 @@ class QuoteAdminTest extends AdminWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSame(['Seconde citation', 'Première citation'], $this->contents($crawler));
 
-        $crawler = $this->client->request('GET', '/admin/quotes/', ['form' => ['filters' => ['text' => 'alphonse']]]);
+        $crawler = $this->client->request('GET', '/admin/quotes/', ['filters' => ['text' => 'alphonse']]);
         self::assertSame(['Première citation'], $this->contents($crawler));
     }
 

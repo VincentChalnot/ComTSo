@@ -2,47 +2,48 @@
 
 namespace App\Admin\Action;
 
-use Sidus\AdminBundle\Action\ActionInjectableInterface;
-use Sidus\AdminBundle\Action\ActionInjectableTrait;
-use Sidus\AdminBundle\DataGrid\DataGridHelper;
+use Sidus\AdminBundle\Action\ListAction as BaseListAction;
+use Sidus\AdminBundle\Model\Action;
 use Sidus\AdminBundle\Request\ActionResponseInterface;
-use Sidus\AdminBundle\Templating\TemplatingHelper;
 use Sidus\DataGridBundle\Model\DataGrid;
+use Sidus\DoctrineFilterBundle\Query\DoctrineQueryContext;
+use Sidus\DoctrineFilterBundle\Query\DoctrineQueryHandler;
+use Sidus\FilterBundle\Provider\QueryHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 
 /**
- * Every list of the admin panel (`controller_pattern` of config/packages/sidus.yaml): the bundle's ListAction plus one guard.
+ * Every list of the admin panel (`controller_pattern` of config/packages/sidus.yaml): the bundle's ListAction plus two hooks
+ * for a screen: {@see prepareQuery()} (the joins/selects of the columns it shows, so that there is no query per row) and
+ * {@see extraViewParameters()} (data of the page's rows loaded in one grouped query).
  *
- * The sort column of a datagrid travels in a hidden field (`form[sortable][config][column]`) that the filter bundle resolves to
- * a Doctrine attribute path WITHOUT checking it against the configured `sortable` list: any property of the entity (a
- * password hash, an e-mail address) could be used as ORDER BY, which leaks how the hidden values compare. Anything that
- * is not an allowed column is replaced here by the configured default sort (a request without any sort gets it explicitly too:
- * an absent column would mean no ORDER BY at all).
+ * The sort a request can ask for is structural (the sort input names a column key of the datagrid, never a property path),
+ * so unlike the old bundles nothing has to be re-checked here.
  */
 #[AsController]
-class ListAction implements ActionInjectableInterface
+readonly class ListAction extends BaseListAction
 {
-    use ActionInjectableTrait;
-
-    public function __construct(
-        private readonly DataGridHelper $dataGridHelper,
-        private readonly TemplatingHelper $templatingHelper,
-    ) {
-    }
-
-    public function __invoke(Request $request): ActionResponseInterface
+    public function __invoke(Request $request, Action $action): ActionResponseInterface
     {
-        $dataGrid = $this->dataGridHelper->buildDataGridForm($this->action, $request);
-        $this->prepareQuery($dataGrid);
-        $this->restrictSortColumn($request, $dataGrid);
-        $dataGrid->handleRequest($request);
+        $dataGrid = $this->dataGridFactory->create(
+            $this->getDataGridCode($action),
+            $request,
+            ['action' => $this->routingHelper->getCurrentUri($action, $request)],
+            fn (QueryHandlerInterface $handler): QueryHandlerInterface => $this->customizeHandler($handler, $request, $action),
+        );
 
-        return $this->templatingHelper->renderListAction($this->action, $dataGrid, $this->extraViewParameters($dataGrid));
+        return $this->templatingHelper->renderListAction($action, $dataGrid, $this->extraViewParameters($dataGrid));
     }
 
-    /** Called before the request is applied: a screen adds the joins/selects of the columns it shows here (no query per row). */
-    protected function prepareQuery(DataGrid $dataGrid): void
+    protected function customizeHandler(QueryHandlerInterface $handler, Request $request, Action $action): QueryHandlerInterface
+    {
+        \assert($handler instanceof DoctrineQueryHandler);
+
+        return $handler->withCustomizer($this->prepareQuery(...));
+    }
+
+    /** Runs on the fresh query of the request, before the filters are applied. */
+    protected function prepareQuery(DoctrineQueryContext $query): void
     {
     }
 
@@ -54,27 +55,5 @@ class ListAction implements ActionInjectableInterface
     protected function extraViewParameters(DataGrid $dataGrid): array
     {
         return [];
-    }
-
-    private function restrictSortColumn(Request $request, DataGrid $dataGrid): void
-    {
-        $configuration = $dataGrid->getQueryHandler()->getConfiguration();
-        // The datagrid form is a named form (`form[sortable][config][column]`): everything lives under its name.
-        $name = $dataGrid->getForm()->getName();
-        $submitted = $request->query->all($name);
-        $sort = $submitted['sortable'] ?? [];
-        $config = \is_array($sort) ? ($sort['config'] ?? []) : [];
-        $column = \is_array($config) ? ($config['column'] ?? null) : null;
-        if (\is_string($column) && \in_array($column, $configuration->getSortable(), true)) {
-            return;
-        }
-
-        $default = $configuration->getDefaultSort();
-        $defaultColumn = array_key_first($default);
-        $submitted['sortable'] = [...(\is_array($sort) ? $sort : []), 'config' => null === $defaultColumn ? [] : [
-            'column' => (string) $defaultColumn,
-            'direction' => 'desc' === strtolower((string) $default[$defaultColumn]) ? '1' : '0',
-        ]];
-        $request->query->set($name, $submitted);
     }
 }

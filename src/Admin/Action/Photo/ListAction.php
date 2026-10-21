@@ -8,10 +8,11 @@ use App\Entity\Photo;
 use App\Entity\PhotoTopic;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Sidus\AdminBundle\DataGrid\DataGridHelper;
+use Sidus\AdminBundle\Routing\RoutingHelper;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
+use Sidus\DataGridBundle\Factory\DataGridFactory;
 use Sidus\DataGridBundle\Model\DataGrid;
-use Sidus\FilterBundle\Query\Handler\Doctrine\DoctrineQueryHandlerInterface;
+use Sidus\DoctrineFilterBundle\Query\DoctrineQueryContext;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 
 /**
@@ -19,24 +20,21 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
  * comes from three grouped queries: `usage[photoId] = {topics, comments, avatars}`.
  */
 #[AsController]
-class ListAction extends BaseListAction
+readonly class ListAction extends BaseListAction
 {
-    public function __construct(DataGridHelper $dataGridHelper, TemplatingHelper $templatingHelper, private readonly EntityManagerInterface $em)
+    public function __construct(DataGridFactory $dataGridFactory, TemplatingHelper $templatingHelper, RoutingHelper $routingHelper, private EntityManagerInterface $em)
     {
-        parent::__construct($dataGridHelper, $templatingHelper);
+        parent::__construct($dataGridFactory, $templatingHelper, $routingHelper);
     }
 
-    protected function prepareQuery(DataGrid $dataGrid): void
+    protected function prepareQuery(DoctrineQueryContext $query): void
     {
-        $handler = $dataGrid->getQueryHandler();
-        \assert($handler instanceof DoctrineQueryHandlerInterface);
-
-        $handler->getQueryBuilder()->addSelect('rowAuthor')->leftJoin($handler->getAlias().'.author', 'rowAuthor');
+        $query->queryBuilder()->addSelect($query->joins()->aliasFor('author'));
     }
 
     protected function extraViewParameters(DataGrid $dataGrid): array
     {
-        $ids = array_map(static fn (Photo $photo) => $photo->getId(), iterator_to_array($dataGrid->getQueryHandler()->getPager()->getCurrentPageResults()));
+        $ids = array_map(static fn (Photo $photo) => $photo->getId(), $dataGrid->result->items());
         $usage = array_fill_keys($ids, ['topics' => 0, 'comments' => 0, 'avatars' => 0]);
         if ([] === $ids) {
             return ['usage' => $usage];

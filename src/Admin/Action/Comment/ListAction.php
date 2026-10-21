@@ -6,10 +6,11 @@ use App\Admin\Action\ListAction as BaseListAction;
 use App\Entity\Comment;
 use App\Entity\CommentPhoto;
 use Doctrine\ORM\EntityManagerInterface;
-use Sidus\AdminBundle\DataGrid\DataGridHelper;
+use Sidus\AdminBundle\Routing\RoutingHelper;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
+use Sidus\DataGridBundle\Factory\DataGridFactory;
 use Sidus\DataGridBundle\Model\DataGrid;
-use Sidus\FilterBundle\Query\Handler\Doctrine\DoctrineQueryHandlerInterface;
+use Sidus\DoctrineFilterBundle\Query\DoctrineQueryContext;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 
 /**
@@ -17,27 +18,21 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
  * page comes from ONE grouped query (`usage[commentId]`): no query per row.
  */
 #[AsController]
-class ListAction extends BaseListAction
+readonly class ListAction extends BaseListAction
 {
-    public function __construct(DataGridHelper $dataGridHelper, TemplatingHelper $templatingHelper, private readonly EntityManagerInterface $em)
+    public function __construct(DataGridFactory $dataGridFactory, TemplatingHelper $templatingHelper, RoutingHelper $routingHelper, private EntityManagerInterface $em)
     {
-        parent::__construct($dataGridHelper, $templatingHelper);
+        parent::__construct($dataGridFactory, $templatingHelper, $routingHelper);
     }
 
-    protected function prepareQuery(DataGrid $dataGrid): void
+    protected function prepareQuery(DoctrineQueryContext $query): void
     {
-        $handler = $dataGrid->getQueryHandler();
-        \assert($handler instanceof DoctrineQueryHandlerInterface);
-
-        $handler->getQueryBuilder()
-            ->addSelect('rowTopic', 'rowAuthor')
-            ->leftJoin($handler->getAlias().'.topic', 'rowTopic')
-            ->leftJoin($handler->getAlias().'.author', 'rowAuthor');
+        $query->queryBuilder()->addSelect($query->joins()->aliasFor('topic'), $query->joins()->aliasFor('author'));
     }
 
     protected function extraViewParameters(DataGrid $dataGrid): array
     {
-        $ids = array_map(static fn (Comment $comment) => $comment->getId(), iterator_to_array($dataGrid->getQueryHandler()->getPager()->getCurrentPageResults()));
+        $ids = array_map(static fn (Comment $comment) => $comment->getId(), $dataGrid->result->items());
         if ([] === $ids) {
             return ['usage' => []];
         }

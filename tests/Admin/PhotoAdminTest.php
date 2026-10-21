@@ -73,8 +73,8 @@ class PhotoAdminTest extends AdminWebTestCase
         $this->em()->flush();
 
         $names = fn (Crawler $crawler) => $crawler->filter('table.table tbody tr td:nth-child(2) a')->each(fn (Crawler $a) => trim($a->text()));
-        self::assertSame(['Plage'], $names($this->client->request('GET', '/admin/photos/', ['form' => ['filters' => ['name' => 'plag']]])));
-        self::assertSame(['Plage'], $names($this->client->request('GET', '/admin/photos/', ['form' => ['filters' => ['author' => 'roo']]])));
+        self::assertSame(['Plage'], $names($this->client->request('GET', '/admin/photos/', ['filters' => ['name' => 'plag']])));
+        self::assertSame(['Plage'], $names($this->client->request('GET', '/admin/photos/', ['filters' => ['author' => 'roo']])));
     }
 
     public function testAdminDeletionRemovesTheRowTheFilesAndTheAvatarLinkOfAUsedPhoto(): void

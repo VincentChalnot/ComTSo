@@ -1,6 +1,6 @@
 # Admin panel (/admin, ROLE_ADMIN only): sidus/admin-bundle (screens, routes), sidus/datagrid-bundle (lists) and
-# sidus/filter-bundle (the filters and sorting of a list: configured INLINE under `query_handler`, there is no separate
-# `sidus_filter` block). See "Admin panel" in AGENTS.md before adding a screen.
+# sidus/filter-bundle + sidus/doctrine-filter-bundle (the filters and sorting of a list: configured INLINE under `list`
+# of each datagrid, there is no separate `sidus_filter` block). See "Admin panel" in AGENTS.md before adding a screen.
 #
 # Conventions of every screen below:
 #  - `permissions: [ROLE_ADMIN]` (on top of `access_control: ^/admin` in security.yaml);
@@ -8,8 +8,8 @@
 #    audit of tests/Security/CsrfTest.php. Pages that only read are GET; forms and confirmation pages are GET + POST;
 #  - destructive actions never go through the bundle's raw `DeleteAction` (EntityManager::remove): they are the custom
 #    actions of src/Admin/Action (confirmation page on GET, removal on POST with the form token);
-#  - `sortable` and the filter `attributes` are explicit allow-lists of properties (App\Admin\Action\ListAction also
-#    refuses any other sort column coming from the request).
+#  - the sortable columns and the filter `attributes` are explicit allow-lists of properties (the sort input names a column
+#    key, never a property path, so a request can only sort on what a column declares).
 sidus_admin:
     base_template: admin/base.html.twig
     configurations:
@@ -18,9 +18,8 @@ sidus_admin:
         user:
             entity: App\Entity\User
             prefix: /users
-            # first match wins: custom action of this screen, the guarded list, then the bundle's own
+            # first match wins: custom action of this screen, the app's shared one, then the bundle's own
             controller_pattern: &controllers ['App\Admin\Action\{{Admin}}\{{Action}}Action', 'App\Admin\Action\{{Action}}Action', 'Sidus\AdminBundle\Action\{{Action}}Action']
-            template_pattern: &templates ['@SidusAdmin/Action/{{action}}.{{format}}.twig']
             permissions: &permissions [ROLE_ADMIN]
             form_type: App\Form\Admin\UserAdminType
             options: { subject: username }
@@ -34,7 +33,6 @@ sidus_admin:
             entity: App\Entity\Forum
             prefix: /forums
             controller_pattern: *controllers
-            template_pattern: *templates
             permissions: *permissions
             form_type: App\Form\Admin\ForumAdminType
             options: { subject: title }
@@ -49,7 +47,6 @@ sidus_admin:
             entity: App\Entity\Topic
             prefix: /topics
             controller_pattern: *controllers
-            template_pattern: *templates
             permissions: *permissions
             actions:
                 list: { path: /, methods: [GET] }
@@ -60,7 +57,6 @@ sidus_admin:
             entity: App\Entity\Comment
             prefix: /comments
             controller_pattern: *controllers
-            template_pattern: *templates
             permissions: *permissions
             options: { subject: id }
             actions:
@@ -72,7 +68,6 @@ sidus_admin:
             entity: App\Entity\Photo
             prefix: /photos
             controller_pattern: *controllers
-            template_pattern: *templates
             permissions: *permissions
             options: { subject: originalFilename }
             actions:
@@ -84,7 +79,6 @@ sidus_admin:
             entity: App\Entity\Quote
             prefix: /quotes
             controller_pattern: *controllers
-            template_pattern: *templates
             permissions: *permissions
             form_type: App\Form\Admin\QuoteAdminType
             actions:
@@ -94,146 +88,159 @@ sidus_admin:
                 delete: { path: '/{id}/delete', requirements: { id: '\d+' }, methods: [GET, POST] }
 
 sidus_data_grid:
-    default_datagrid_template: admin/datagrid.html.twig
+    # The admin lists share one template (design system: filter bar, `.table`, `.pager`); it extends the bundle's base layout.
+    default_theme: admin/datagrid.html.twig
+    # Each datagrid is `columns` (what is shown, `sortable` = the column is a sort key: true or the attribute path to sort by),
+    # `default_sort` and an inline `list` (the filters, the page size) on the Doctrine provider. The sort filter is generated.
     configurations:
         user:
-            query_handler:
-                provider: doctrine
-                options: { entity: App\Entity\User }
-                results_per_page: 25
-                sortable: [username, email, enabled, registeredAt, lastActivity, lastLogin]
-                default_sort: { username: ASC }
-                filters:
-                    username: { type: text, label: admin.user.filter.username }
-                    email: { type: text, label: admin.user.filter.email }
-                    enabled:
-                        type: choice
-                        label: admin.user.filter.enabled
-                        form_options:
-                            placeholder: admin.list.all
-                            choices: { admin.user.status.enabled: true, admin.user.status.disabled: false }
-                    role:
-                        type: admin_role
-                        attributes: [roles]
-                        label: admin.user.filter.role
-                        form_options:
-                            placeholder: admin.list.all
-                            choices: { admin.user.role.admin_plural: admin, admin.user.role.member_plural: member }
-                    lastActivity: { type: date_range, label: admin.user.filter.last_activity }
+            default_sort: [{ column: username, direction: asc }]
             columns:
-                username: { template: admin/cells/edit_link.html.twig, template_vars: { badge_self: true } }
-                email: { attributes: { class: nowrap } }
+                username: { sortable: true, template: admin/cells/edit_link.html.twig, template_vars: { badge_self: true } }
+                email: { sortable: true, attributes: { class: nowrap } }
                 enabled:
+                    sortable: true
                     template: admin/cells/badge.html.twig
                     template_vars: { on: admin.user.status.enabled, off: admin.user.status.disabled, on_class: badge-ok, off_class: badge-muted }
                 admin: { property_path: roles, template: admin/user/_role_cell.html.twig }
-                registeredAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y }, attributes: { class: nowrap } }
-                lastActivity: { template: admin/cells/date.html.twig, attributes: { class: nowrap } }
-                lastLogin: { template: admin/cells/date.html.twig, attributes: { class: nowrap } }
+                registeredAt: { sortable: true, template: admin/cells/date.html.twig, template_vars: { format: d/m/Y }, attributes: { class: nowrap } }
+                lastActivity: { sortable: true, template: admin/cells/date.html.twig, attributes: { class: nowrap } }
+                lastLogin: { sortable: true, template: admin/cells/date.html.twig, attributes: { class: nowrap } }
                 actions:
                     property_path: id
                     template: admin/cells/actions.html.twig
                     template_vars: { actions: [edit, delete], subject: username, skip_for_self: [delete] }
                     attributes: { class: table-actions }
-        forum:
-            query_handler:
+            list:
                 provider: doctrine
-                options: { entity: App\Entity\Forum }
-                results_per_page: 50
-                sortable: [order, title, createdAt]
-                default_sort: { order: ASC }
+                options: { entity: App\Entity\User }
+                pagination: { per_page: 25 }
                 filters:
-                    title: { type: text, label: admin.forum.filter.title }
+                    username: { type: text, form: { label: admin.user.filter.username } }
+                    email: { type: text, form: { label: admin.user.filter.email } }
+                    enabled:
+                        type: choice
+                        options: { choices: { admin.user.status.enabled: 1, admin.user.status.disabled: 0 } }
+                        form: { label: admin.user.filter.enabled, options: { placeholder: admin.list.all } }
+                    role:
+                        type: admin_role
+                        attributes: [roles]
+                        form:
+                            label: admin.user.filter.role
+                            options:
+                                placeholder: admin.list.all
+                                choices: { admin.user.role.admin_plural: admin, admin.user.role.member_plural: member }
+                    lastActivity:
+                        type: date_range
+                        options: { timezone: Europe/Paris }
+                        form: { label: admin.user.filter.last_activity }
+        forum:
+            default_sort: [{ column: order, direction: asc }]
             columns:
-                order: ~
-                title: { template: admin/cells/edit_link.html.twig }
+                order: { sortable: true }
+                title: { sortable: true, template: admin/cells/edit_link.html.twig }
                 id: { template: admin/cells/code.html.twig }
                 topics: { property_path: id, template: admin/forum/_topics_cell.html.twig }
-                createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
+                createdAt: { sortable: true, template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
                 actions:
                     property_path: id
                     template: admin/cells/actions.html.twig
                     template_vars: { actions: [edit, delete], subject: title }
                     attributes: { class: table-actions }
+            list:
+                provider: doctrine
+                options: { entity: App\Entity\Forum }
+                pagination: { per_page: 50 }
+                filters:
+                    title: { type: text, form: { label: admin.forum.filter.title } }
         topic:
-            query_handler:
+            default_sort: [{ column: lastActivityAt, direction: desc }]
+            columns:
+                title: { sortable: true, template: admin/topic/_title_cell.html.twig }
+                forum: { property_path: forum.title, sortable: forum.title }
+                author: { property_path: "author?.username", sortable: author.username, template: admin/cells/author.html.twig }
+                commentCount: { sortable: true, attributes: { class: num } }
+                createdAt: { sortable: true, template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
+                lastActivityAt: { sortable: true, template: admin/cells/date.html.twig }
+                actions: { property_path: id, template: admin/topic/_actions_cell.html.twig, attributes: { class: table-actions } }
+            list:
                 provider: doctrine
                 options: { entity: App\Entity\Topic }
-                results_per_page: 25
-                sortable: [title, forum.title, author.username, commentCount, createdAt, lastActivityAt]
-                default_sort: { lastActivityAt: DESC }
+                pagination: { per_page: 25 }
                 filters:
-                    title: { type: text, label: admin.topic.filter.title }
+                    title: { type: text, form: { label: admin.topic.filter.title } }
+                    # Neither `relation` nor `forum.id`: the forum id is a slug and the Doctrine provider compiles an equality on a string
+                    # foreign key to SIDUS_BINARY(root.forum) on MariaDB, which DQL refuses ("Must be a StateFieldPathExpression").
+                    # The title (the slug is derived from it) goes through the shared join and compiles fine.
                     forum:
-                        type: entity
-                        label: admin.topic.filter.forum
-                        form_options: { placeholder: admin.list.all_forums }
-                    author: { type: text, attributes: [author.username], label: admin.topic.filter.author }
-            columns:
-                title: { template: admin/topic/_title_cell.html.twig }
-                forum: { property_path: forum.title, sort_column: forum.title }
-                author: { property_path: "author?.username", sort_column: author.username, template: admin/cells/author.html.twig }
-                commentCount: { attributes: { class: num } }
-                createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
-                lastActivityAt: { template: admin/cells/date.html.twig }
-                actions: { property_path: id, template: admin/topic/_actions_cell.html.twig, attributes: { class: table-actions } }
+                        type: choice
+                        attributes: [forum.title]
+                        form:
+                            label: admin.topic.filter.forum
+                            type: Symfony\Bridge\Doctrine\Form\Type\EntityType
+                            options: { class: App\Entity\Forum, choice_label: title, choice_value: title, placeholder: admin.list.all_forums }
+                    author: { type: text, attributes: [author.username], form: { label: admin.topic.filter.author } }
         comment:
-            query_handler:
-                provider: doctrine
-                options: { entity: App\Entity\Comment }
-                results_per_page: 25
-                sortable: [id, author.username, topic.title, createdAt]
-                default_sort: { createdAt: DESC }
-                filters:
-                    content: { type: text, label: admin.comment.filter.content }
-                    author: { type: text, attributes: [author.username], label: admin.comment.filter.author }
-                    topic: { type: text, attributes: [topic.title], label: admin.comment.filter.topic }
-                    createdAt: { type: date_range, label: admin.comment.filter.created_at }
+            default_sort: [{ column: createdAt, direction: desc }]
             columns:
-                id: { attributes: { class: num } }
-                createdAt: { template: admin/cells/date.html.twig, attributes: { class: nowrap } }
-                author: { property_path: "author?.username", sort_column: author.username, template: admin/cells/author.html.twig }
-                topic: { property_path: topic.title, sort_column: topic.title, template: admin/comment/_topic_cell.html.twig }
+                id: { sortable: true, attributes: { class: num } }
+                createdAt: { sortable: true, template: admin/cells/date.html.twig, attributes: { class: nowrap } }
+                author: { property_path: "author?.username", sortable: author.username, template: admin/cells/author.html.twig }
+                topic: { property_path: topic.title, sortable: topic.title, template: admin/comment/_topic_cell.html.twig }
                 content: { template: admin/comment/_excerpt_cell.html.twig }
                 photos: { property_path: id, template: admin/comment/_photos_cell.html.twig, attributes: { class: num } }
                 actions: { property_path: id, template: admin/comment/_actions_cell.html.twig, attributes: { class: table-actions } }
-        photo:
-            query_handler:
+            list:
                 provider: doctrine
-                options: { entity: App\Entity\Photo }
-                results_per_page: 25
-                sortable: [originalFilename, author.username, fileSize, takenAt, createdAt]
-                default_sort: { createdAt: DESC }
+                options: { entity: App\Entity\Comment }
+                pagination: { per_page: 25 }
                 filters:
-                    name: { type: text, attributes: [title, originalFilename], label: admin.photo.filter.name }
-                    author: { type: text, attributes: [author.username], label: admin.photo.filter.author }
-                    takenAt: { type: date_range, label: admin.photo.filter.taken_at }
+                    content: { type: text, form: { label: admin.comment.filter.content } }
+                    author: { type: text, attributes: [author.username], form: { label: admin.comment.filter.author } }
+                    topic: { type: text, attributes: [topic.title], form: { label: admin.comment.filter.topic } }
+                    createdAt:
+                        type: date_range
+                        options: { timezone: Europe/Paris }
+                        form: { label: admin.comment.filter.created_at }
+        photo:
+            default_sort: [{ column: createdAt, direction: desc }]
             columns:
                 thumb: { property_path: id, template: admin/photo/_thumb_cell.html.twig }
-                originalFilename: { template: admin/photo/_name_cell.html.twig }
-                author: { property_path: "author?.username", sort_column: author.username, template: admin/cells/author.html.twig }
-                fileSize: { template: admin/photo/_size_cell.html.twig, attributes: { class: num } }
+                originalFilename: { sortable: true, template: admin/photo/_name_cell.html.twig }
+                author: { property_path: "author?.username", sortable: author.username, template: admin/cells/author.html.twig }
+                fileSize: { sortable: true, template: admin/photo/_size_cell.html.twig, attributes: { class: num } }
                 dimensions: { property_path: id, template: admin/photo/_dimensions_cell.html.twig, attributes: { class: num } }
-                takenAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
-                createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
+                takenAt: { sortable: true, template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
+                createdAt: { sortable: true, template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
                 usage: { property_path: id, template: admin/photo/_usage_cell.html.twig }
                 actions: { property_path: id, template: admin/photo/_actions_cell.html.twig, attributes: { class: table-actions } }
-        quote:
-            query_handler:
+            list:
                 provider: doctrine
-                options: { entity: App\Entity\Quote }
-                results_per_page: 25
-                sortable: [id, originalAuthor, createdAt]
-                default_sort: { id: DESC }
+                options: { entity: App\Entity\Photo }
+                pagination: { per_page: 25 }
                 filters:
-                    text: { type: text, attributes: [content, originalAuthor], label: admin.quote.filter.text }
+                    name: { type: text, attributes: [title, originalFilename], form: { label: admin.photo.filter.name } }
+                    author: { type: text, attributes: [author.username], form: { label: admin.photo.filter.author } }
+                    takenAt:
+                        type: date_range
+                        options: { timezone: Europe/Paris }
+                        form: { label: admin.photo.filter.taken_at }
+        quote:
+            default_sort: [{ column: id, direction: desc }]
             columns:
                 content: { template: admin/cells/excerpt.html.twig, template_vars: { link: true, length: 140 } }
-                originalAuthor: ~
+                originalAuthor: { sortable: true }
                 author: { property_path: "author?.username", template: admin/cells/author.html.twig }
-                createdAt: { template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
+                createdAt: { sortable: true, template: admin/cells/date.html.twig, template_vars: { format: d/m/Y } }
+                id: { sortable: true, attributes: { class: num } }
                 actions:
                     property_path: id
                     template: admin/cells/actions.html.twig
                     template_vars: { actions: [edit, delete] }
                     attributes: { class: table-actions }
+            list:
+                provider: doctrine
+                options: { entity: App\Entity\Quote }
+                pagination: { per_page: 25 }
+                filters:
+                    text: { type: text, attributes: [content, originalAuthor], form: { label: admin.quote.filter.text } }

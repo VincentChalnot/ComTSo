@@ -13,14 +13,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** Deletes an empty forum; a forum that still has topics is refused with a message that says how many. */
 #[AsController]
-class DeleteAction extends AbstractRemovalAction
+readonly class DeleteAction extends AbstractRemovalAction
 {
     public function __construct(
         FormHelper $formHelper,
         TemplatingHelper $templatingHelper,
         FlashHelper $flashHelper,
-        private readonly ForumRemover $remover,
-        private readonly TranslatorInterface $translator,
+        private ForumRemover $remover,
+        private TranslatorInterface $translator,
     ) {
         parent::__construct($formHelper, $templatingHelper, $flashHelper);
     }

@@ -13,14 +13,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** The moderation removal of a whole topic ({@see TopicRemover}, same as the button of the topic page), from the admin list. */
 #[AsController]
-class DeleteAction extends AbstractRemovalAction
+readonly class DeleteAction extends AbstractRemovalAction
 {
     public function __construct(
         FormHelper $formHelper,
         TemplatingHelper $templatingHelper,
         FlashHelper $flashHelper,
-        private readonly TopicRemover $remover,
-        private readonly TranslatorInterface $translator,
+        private TopicRemover $remover,
+        private TranslatorInterface $translator,
     ) {
         parent::__construct($formHelper, $templatingHelper, $flashHelper);
     }

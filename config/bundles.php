@@ -18,4 +18,5 @@ return [
     Sidus\FilterBundle\SidusFilterBundle::class => ['all' => true],
     Sidus\DataGridBundle\SidusDataGridBundle::class => ['all' => true],
     Sidus\AdminBundle\SidusAdminBundle::class => ['all' => true],
+    Sidus\DoctrineFilterBundle\SidusDoctrineFilterBundle::class => ['all' => true],
 ];

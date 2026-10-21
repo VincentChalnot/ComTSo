@@ -6,23 +6,24 @@ use App\Admin\Action\ListAction as BaseListAction;
 use App\Entity\Forum;
 use App\Entity\Topic;
 use Doctrine\ORM\EntityManagerInterface;
-use Sidus\AdminBundle\DataGrid\DataGridHelper;
+use Sidus\AdminBundle\Routing\RoutingHelper;
 use Sidus\AdminBundle\Templating\TemplatingHelper;
+use Sidus\DataGridBundle\Factory\DataGridFactory;
 use Sidus\DataGridBundle\Model\DataGrid;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 
 /** The forum list, with the topic count of every forum of the page in ONE grouped query (`usage`, keyed by forum id). */
 #[AsController]
-class ListAction extends BaseListAction
+readonly class ListAction extends BaseListAction
 {
-    public function __construct(DataGridHelper $dataGridHelper, TemplatingHelper $templatingHelper, private readonly EntityManagerInterface $em)
+    public function __construct(DataGridFactory $dataGridFactory, TemplatingHelper $templatingHelper, RoutingHelper $routingHelper, private EntityManagerInterface $em)
     {
-        parent::__construct($dataGridHelper, $templatingHelper);
+        parent::__construct($dataGridFactory, $templatingHelper, $routingHelper);
     }
 
     protected function extraViewParameters(DataGrid $dataGrid): array
     {
-        $forums = iterator_to_array($dataGrid->getQueryHandler()->getPager()->getCurrentPageResults());
+        $forums = $dataGrid->result->items();
         if ([] === $forums) {
             return ['usage' => []];
         }

@@ -14,7 +14,6 @@ Done and removed from this list (details in `docs/decisions.md`): GitHub/CI hard
 
 - **Git**: sign/rebase the local commits and push (`git log --oneline origin/master..HEAD` lists them); then apply the recommended branch protection after the force-push and check the first Dependabot pull requests (`docs/operations.md` "GitHub repository, CI and ghcr").
 - **Delete the 6 orphaned `sha-*` ghcr tags** (command in `docs/operations.md`).
-- **Sidus registries state defect** (`DataGridRegistry` / `QueryHandlerRegistry` cache stateful objects and are not reset between requests): fix upstream; then delete the request-scoped registries workaround (`AGENTS.md` "Admin panel", `App\Admin\Registry\RequestScoped*`, `RequestScopedDatagridPass`).
 - **NAS**: delete the two old `photos-*.tar.gz` once the rsync mirror is trusted; optionally stop shipping the server's own photos tarball (now redundant, `docs/operations.md` "Backups").
 - **Keres CSP**: check the Keres app still works with its own CSP (the shared Traefik no longer sets one).
 - **DMARC**: read `dmarc=pass` once in the header of a received mail. Optional: add `rua=` reports (`docs/operations.md`); `p=none` is fine for this forum.

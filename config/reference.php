@@ -1702,84 +1702,121 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     },
  * }
  * @psalm-type SidusFilterConfig = array{
- *     configurations?: list<array{ // Default: []
- *         provider?: scalar|Param|null,
- *         results_per_page?: int|Param, // Default: 15
- *         sortable?: list<scalar|Param|null>,
- *         default_sort?: list<scalar|Param|null>,
- *         options?: mixed, // Default: []
- *         filters?: list<array{ // Default: []
- *             type?: scalar|Param|null, // Default: "text"
- *             label?: scalar|Param|null, // Default: null
- *             form_type?: scalar|Param|null, // Default: null
- *             attributes?: list<scalar|Param|null>,
+ *     lists?: array<string, array{ // Default: []
+ *         provider?: scalar|Param|null, // A parameter is fine, an env var is not: the provider must be known at compile time
+ *         options?: mixed, // Validated by the provider // Default: []
+ *         pagination?: array{
+ *             per_page?: int|Param, // Default: 15
+ *             max_per_page?: int|Param, // Default: 100
+ *         },
+ *         count?: scalar|Param|null, // auto, none, or the id of a CountStrategyInterface service // Default: "auto"
+ *         filters?: array<string, array{ // Default: []
+ *             type?: scalar|Param|null,
+ *             name?: scalar|Param|null, // Public input name, defaults to the key // Default: null
+ *             attributes?: list<mixed>,
+ *             providers?: list<scalar|Param|null>,
+ *             options?: mixed, // Validated by the filter type // Default: []
+ *             provider_options?: mixed, // Per provider name, validated by that provider // Default: []
+ *             locked?: bool|Param, // The value is the default, never read from the input // Default: false
  *             default?: mixed, // Default: null
- *             options?: mixed, // Default: []
- *             form_options?: mixed, // Default: []
+ *             form?: mixed, // Read by the form adapter only // Default: []
  *         }>,
  *     }>,
+ *     http?: array{ // The request parser and response factory (Http adapter)
+ *         filters_key?: scalar|Param|null, // Query/body key holding the filters; empty = every top-level parameter but the reserved ones // Default: "filters"
+ *         sort_key?: scalar|Param|null, // Default: "sort"
+ *         page_key?: scalar|Param|null, // Default: "page"
+ *         per_page_key?: scalar|Param|null, // Default: "per_page"
+ *         strict?: bool|Param, // Violations answer 400 (problem+json) instead of 200 with the defaults applied // Default: true
+ *     },
  * }
  * @psalm-type SidusDataGridConfig = array{
- *     default_form_theme?: scalar|Param|null, // Default: null
- *     default_datagrid_template?: scalar|Param|null, // Default: "@SidusDataGrid/DataGrid/bootstrap4.html.twig"
- *     default_column_value_renderer?: mixed, // Default: {}
- *     default_column_label_renderer?: mixed, // Default: {}
- *     actions?: mixed, // Default: []
+ *     default_theme?: scalar|Param|null, // bootstrap_6, bulma_1 or the path of a custom template (ending with ".twig") // Default: "bootstrap_6"
+ *     default_column_value_renderer?: scalar|Param|null, // The id of a ColumnValueRendererInterface service // Default: "Sidus\\DataGridBundle\\Renderer\\ColumnValueRendererInterface"
+ *     default_column_label_renderer?: scalar|Param|null, // The id of a ColumnLabelRendererInterface service // Default: "Sidus\\DataGridBundle\\Renderer\\ColumnLabelRendererInterface"
  *     configurations?: array<string, array{ // Default: []
- *         query_handler?: mixed,
- *         form_theme?: scalar|Param|null,
- *         form_options?: mixed,
- *         template?: scalar|Param|null,
+ *         parent?: scalar|Param|null, // The code of a datagrid whose keys are inherited (a key set here replaces the parent's)
+ *         list?: mixed, // The code of a sidus_filter.lists entry, or an inline list definition (same shape as a sidus_filter list)
+ *         theme?: scalar|Param|null,
  *         template_vars?: mixed,
- *         parent?: scalar|Param|null,
- *         column_value_renderer?: mixed,
- *         column_label_renderer?: mixed,
- *         actions?: mixed,
- *         submit_button?: mixed,
- *         reset_button?: mixed,
- *         attributes?: list<scalar|Param|null>,
- *         columns?: list<array{ // Default: []
- *             template?: scalar|Param|null,
- *             template_vars?: mixed,
- *             sort_column?: scalar|Param|null,
- *             property_path?: scalar|Param|null,
+ *         form_options?: mixed,
+ *         attributes?: list<mixed>,
+ *         column_value_renderer?: scalar|Param|null, // The id of a ColumnValueRendererInterface service
+ *         column_label_renderer?: scalar|Param|null, // The id of a ColumnLabelRendererInterface service
+ *         default_sort?: list<Param|string|array{ // Default: []
+ *             column?: scalar|Param|null,
+ *             direction?: "asc"|"desc"|Param, // Default: "asc"
+ *         }>,
+ *         actions?: array<string, array{ // Default: []
+ *             type?: "link"|"submit"|"button"|Param, // Default: "link"
  *             label?: scalar|Param|null,
- *             label_renderer?: mixed,
- *             value_renderer?: mixed,
+ *             route?: scalar|Param|null,
+ *             route_parameters?: mixed, // Default: []
+ *             uri?: scalar|Param|null,
+ *             attr?: mixed, // Default: []
+ *             disabled?: bool|Param, // Default: false
+ *             options?: mixed, // Custom keys, read by action resolvers // Default: []
+ *         }>,
+ *         submit_button?: array{
+ *             label?: scalar|Param|null,
+ *             attr?: mixed, // Default: []
+ *             disabled?: bool|Param, // Default: false
+ *             options?: mixed, // Custom keys, read by action resolvers // Default: []
+ *         },
+ *         reset_button?: array{
+ *             label?: scalar|Param|null,
+ *             route?: scalar|Param|null,
+ *             route_parameters?: mixed, // Default: []
+ *             uri?: scalar|Param|null,
+ *             attr?: mixed, // Default: []
+ *             disabled?: bool|Param, // Default: false
+ *             options?: mixed, // Custom keys, read by action resolvers // Default: []
+ *         },
+ *         columns?: array<string, array{ // Default: []
+ *             label?: scalar|Param|null, // A label or a translation key; defaults to datagrid.<datagrid>.<column> when translated, else the humanized code
+ *             property_path?: scalar|Param|null, // Defaults to the column code
+ *             sortable?: mixed, // true: sorted by the attribute named like the column; a string: the attribute path to sort by
+ *             template?: scalar|Param|null, // A template that renders the cell
+ *             template_vars?: mixed,
  *             formatting_options?: mixed,
- *             attributes?: list<scalar|Param|null>,
+ *             value_renderer?: scalar|Param|null, // The id of a ColumnValueRendererInterface service
+ *             label_renderer?: scalar|Param|null, // The id of a ColumnLabelRendererInterface service
+ *             attributes?: list<mixed>,
  *         }>,
  *     }>,
  * }
  * @psalm-type SidusAdminConfig = array{
- *     base_template?: scalar|Param|null, // Default: "@SidusAdmin/base.html.twig"
- *     admin_class?: scalar|Param|null, // Default: "Sidus\\AdminBundle\\Model\\Admin"
- *     action_class?: scalar|Param|null, // Default: "Sidus\\AdminBundle\\Model\\Action"
+ *     theme?: null|"bulma_1"|Param, // Opt-in set of action templates: null (default) is neutral, framework-agnostic HTML. Available: bulma_1 // Default: null
+ *     base_template?: scalar|Param|null, // The layout of all the actions, it must define the "container" block. Defaults to "@SidusAdmin/base.html.twig" (the one of the theme when there is one) // Default: null
+ *     action_link?: array{ // Default options of action_link() and of the action_link form type
+ *         icon?: bool|Param, // Render an icon with the label by default // Default: false
+ *         icon_template?: scalar|Param|null, // Raw HTML, {icon} is replaced by the icon name // Default: "<span data-icon=\"{icon}\" aria-hidden=\"true\"></span>"
+ *         class?: scalar|Param|null, // CSS class of the link // Default: null
+ *     },
  *     configurations?: array<string, array{ // Default: []
- *         controller?: scalar|Param|null, // Default: null
+ *         entity: scalar|Param|null, // Class (or interface) name of the entity
+ *         prefix: scalar|Param|null, // Routing prefix of all the actions
  *         controller_pattern?: list<scalar|Param|null>,
- *         base_template?: scalar|Param|null, // Default: null
  *         template_pattern?: list<scalar|Param|null>,
- *         prefix: scalar|Param|null,
- *         entity: scalar|Param|null,
- *         action_class?: scalar|Param|null,
- *         form_type?: scalar|Param|null, // Default: null
- *         options?: mixed, // Default: []
- *         permissions?: mixed, // Default: []
+ *         base_template?: scalar|Param|null, // Overrides the global base_template for this admin // Default: null
+ *         form_type?: scalar|Param|null, // Form type class of the actions without form_type // Default: null
+ *         options?: mixed, // Anything you need, read with Admin::getOption() // Default: []
+ *         permissions?: list<scalar|Param|null>,
  *         actions?: array<string, array{ // Default: []
- *             form_type?: scalar|Param|null, // Default: null
- *             form_options?: mixed, // Default: []
- *             base_template?: scalar|Param|null, // Default: null
- *             template?: scalar|Param|null, // Default: null
- *             template_parameters?: mixed, // Default: []
- *             permissions?: mixed, // Default: []
- *             path: scalar|Param|null,
- *             defaults?: mixed, // Default: []
- *             requirements?: mixed, // Default: []
- *             options?: mixed, // Default: []
+ *             path: scalar|Param|null, // Route path, relative to the prefix of the admin, starting with a slash
+ *             form_type?: scalar|Param|null, // Defaults to the form type of the admin // Default: null
+ *             form_options?: mixed, // Static form options // Default: []
+ *             base_template?: scalar|Param|null, // Defaults to the one of the admin // Default: null
+ *             template?: scalar|Param|null, // Fixed template, the template_pattern of the admin is used when null // Default: null
+ *             template_parameters?: mixed, // Extra variables of the template // Default: []
+ *             permissions?: list<scalar|Param|null>,
+ *             options?: mixed, // Anything you need, read with Action::getOption(). Not related to the route, see route_options // Default: []
+ *             defaults?: mixed, // Route defaults, e.g. _controller or _controller_pattern (overrides the one of the admin) // Default: []
+ *             requirements?: mixed, // Route requirements // Default: []
+ *             route_options?: mixed, // Route options // Default: []
  *             host?: scalar|Param|null, // Default: ""
- *             schemes?: mixed, // Default: []
- *             methods?: mixed, // Default: []
+ *             schemes?: list<scalar|Param|null>,
+ *             methods?: list<scalar|Param|null>,
  *             condition?: scalar|Param|null, // Default: null
  *         }>,
  *     }>,

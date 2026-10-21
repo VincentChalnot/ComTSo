@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7304073f28e379212fc5e25b6eeedeb2",
+    "content-hash": "fdfedb14a0eabd1a6e1bb3237e835104",
     "packages": [
         {
             "name": "doctrine/collections",
@@ -1925,17 +1925,17 @@
             "time": "2026-09-29T19:21:12+00:00"
         },
         {
-            "name": "pagerfanta/pagerfanta",
+            "name": "pagerfanta/core",
             "version": "v4.10.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/BabDev/Pagerfanta.git",
-                "reference": "f6502280a6211d1ad2d10313585b9b46adfc868e"
+                "url": "https://github.com/Pagerfanta/core.git",
+                "reference": "5fceafafedf5a78080c4ee82ab36e32c6d614b8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BabDev/Pagerfanta/zipball/f6502280a6211d1ad2d10313585b9b46adfc868e",
-                "reference": "f6502280a6211d1ad2d10313585b9b46adfc868e",
+                "url": "https://api.github.com/repos/Pagerfanta/core/zipball/5fceafafedf5a78080c4ee82ab36e32c6d614b8e",
+                "reference": "5fceafafedf5a78080c4ee82ab36e32c6d614b8e",
                 "shasum": ""
             },
             "require": {
@@ -1943,87 +1943,30 @@
                 "php": "^8.1",
                 "symfony/deprecation-contracts": "^2.1 || ^3.0"
             },
-            "conflict": {
-                "doctrine/collections": "<1.8",
-                "doctrine/dbal": "<3.5",
-                "doctrine/mongodb-odm": "<2.4",
-                "doctrine/orm": "<2.14",
-                "doctrine/phpcr-odm": "<1.7",
-                "ruflin/elastica": "<7.3",
-                "solarium/solarium": "<6.2",
-                "twig/twig": "<2.13"
-            },
-            "replace": {
-                "pagerfanta/core": "self.version",
-                "pagerfanta/doctrine-collections-adapter": "self.version",
-                "pagerfanta/doctrine-dbal-adapter": "self.version",
-                "pagerfanta/doctrine-mongodb-odm-adapter": "self.version",
-                "pagerfanta/doctrine-orm-adapter": "self.version",
-                "pagerfanta/doctrine-phpcr-odm-adapter": "self.version",
-                "pagerfanta/elastica-adapter": "self.version",
-                "pagerfanta/solarium-adapter": "self.version",
-                "pagerfanta/twig": "self.version"
-            },
             "require-dev": {
-                "dg/bypass-finals": "^1.9",
-                "doctrine/collections": "^1.8 || ^2.0 || ^3.0",
-                "doctrine/dbal": "^3.5 || ^4.0",
-                "doctrine/mongodb-odm": "^2.4",
-                "doctrine/orm": "^2.14 || ^3.0",
-                "doctrine/phpcr-odm": "^1.7 || ^2.0",
-                "jackalope/jackalope-doctrine-dbal": "^1.9 || ^2.0",
-                "phpstan/extension-installer": "^1.4",
-                "phpstan/phpstan": "2.3.1",
-                "phpstan/phpstan-phpunit": "2.1.1",
-                "phpunit/phpunit": "10.5.66",
-                "rector/rector": "2.7.0",
-                "ruflin/elastica": "^7.3 || ^8.0 || ^9.0",
-                "solarium/solarium": "^6.2",
-                "symfony/cache": "^5.4 || ^6.4 || ^7.4 || ^8.1",
-                "twig/twig": "^2.13 || ^3.0"
-            },
-            "suggest": {
-                "twig/twig": "To integrate Pagerfanta with Twig"
+                "phpunit/phpunit": "^10.5"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Pagerfanta\\": "lib/Core/",
-                    "Pagerfanta\\Twig\\": "lib/Twig/",
-                    "Pagerfanta\\Elastica\\": "lib/Adapter/Elastica/",
-                    "Pagerfanta\\Solarium\\": "lib/Adapter/Solarium/",
-                    "Pagerfanta\\Doctrine\\ORM\\": "lib/Adapter/Doctrine/ORM/",
-                    "Pagerfanta\\Doctrine\\DBAL\\": "lib/Adapter/Doctrine/DBAL/",
-                    "Pagerfanta\\Doctrine\\PHPCRODM\\": "lib/Adapter/Doctrine/PHPCRODM/",
-                    "Pagerfanta\\Doctrine\\MongoDBODM\\": "lib/Adapter/Doctrine/MongoDBODM/",
-                    "Pagerfanta\\Doctrine\\Collections\\": "lib/Adapter/Doctrine/Collections/"
+                    "Pagerfanta\\": "./"
                 },
                 "exclude-from-classmap": [
-                    "lib/**/Tests/"
+                    "Tests/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
-            "description": "Pagination for PHP",
+            "description": "Core Pagerfanta API",
             "keywords": [
-                "page",
-                "pagination",
-                "paginator",
-                "paging"
+                "pagerfanta"
             ],
             "support": {
-                "issues": "https://github.com/BabDev/Pagerfanta/issues",
-                "source": "https://github.com/BabDev/Pagerfanta/tree/v4.10.0"
+                "source": "https://github.com/Pagerfanta/core/tree/v4.10.0"
             },
-            "funding": [
-                {
-                    "url": "https://github.com/mbabker",
-                    "type": "github"
-                }
-            ],
-            "time": "2026-10-09T12:42:45+00:00"
+            "time": "2026-10-09T12:41:36+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -2867,36 +2810,70 @@
         },
         {
             "name": "sidus/admin-bundle",
-            "version": "v5.0.7",
+            "version": "v6.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/VincentChalnot/SidusAdminBundle.git",
-                "reference": "47cf84e2e698caac4130bf61819fde0d5487130f"
+                "reference": "935c8a806ae7cec836a57c8a16df424ebad356e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VincentChalnot/SidusAdminBundle/zipball/47cf84e2e698caac4130bf61819fde0d5487130f",
-                "reference": "47cf84e2e698caac4130bf61819fde0d5487130f",
+                "url": "https://api.github.com/repos/VincentChalnot/SidusAdminBundle/zipball/935c8a806ae7cec836a57c8a16df424ebad356e9",
+                "reference": "935c8a806ae7cec836a57c8a16df424ebad356e9",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1",
-                "sidus/datagrid-bundle": "~4.0",
-                "symfony/event-dispatcher": ">=6.3",
-                "symfony/form": ">=6.3",
-                "symfony/http-foundation": ">=6.3",
-                "symfony/http-kernel": ">=6.3",
-                "symfony/routing": ">=6.3",
-                "symfony/security-core": ">=6.3",
-                "symfony/translation-contracts": ">=3.0",
-                "symfony/yaml": ">=6.3",
-                "twig/twig": ">=3.0"
+                "php": ">=8.4",
+                "psr/log": "^3.0",
+                "sidus/datagrid-bundle": "^5.0",
+                "sidus/filter-bundle": "^7.0",
+                "symfony/config": "^8.1",
+                "symfony/dependency-injection": "^8.1",
+                "symfony/event-dispatcher": "^8.1",
+                "symfony/form": "^8.1",
+                "symfony/framework-bundle": "^8.1",
+                "symfony/http-foundation": "^8.1",
+                "symfony/http-kernel": "^8.1",
+                "symfony/options-resolver": "^8.1",
+                "symfony/property-access": "^8.1",
+                "symfony/routing": "^8.1",
+                "symfony/security-bundle": "^8.1",
+                "symfony/security-core": "^8.1",
+                "symfony/translation": "^8.1",
+                "symfony/translation-contracts": "^3.6",
+                "symfony/twig-bundle": "^8.1",
+                "symfony/yaml": "^8.1",
+                "twig/twig": "^3.21"
             },
-            "type": "library",
+            "require-dev": {
+                "doctrine/dbal": "^4.0",
+                "doctrine/doctrine-bundle": "^3.0",
+                "doctrine/orm": "^3.3",
+                "doctrine/persistence": "^3.3 || ^4.0",
+                "phpunit/phpunit": "^12.0",
+                "sidus/doctrine-filter-bundle": "^1.0",
+                "symfony/browser-kit": "^8.1",
+                "symfony/css-selector": "^8.1",
+                "symfony/dom-crawler": "^8.1",
+                "symfony/error-handler": "^8.1.4",
+                "symfony/event-dispatcher-contracts": "^3.6",
+                "symfony/filesystem": "^8.1",
+                "symfony/validator": "^8.1"
+            },
+            "suggest": {
+                "doctrine/doctrine-bundle": "Required by the built-in Read, Create, Edit, Clone and Delete actions and by the admin entity value resolver (Doctrine ORM entities)",
+                "doctrine/orm": "Required by the built-in Read, Create, Edit, Clone and Delete actions (Doctrine ORM entities)",
+                "sidus/doctrine-filter-bundle": "Doctrine provider for the lists rendered by the built-in List action",
+                "symfony/validator": "Validation of the admin forms"
+            },
+            "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
-                    "Sidus\\AdminBundle\\": ""
-                }
+                    "Sidus\\AdminBundle\\": "src/"
+                },
+                "exclude-from-classmap": [
+                    "/tests/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2917,42 +2894,59 @@
             ],
             "support": {
                 "issues": "https://github.com/VincentChalnot/SidusAdminBundle/issues",
-                "source": "https://github.com/VincentChalnot/SidusAdminBundle/tree/v5.0.7"
+                "source": "https://github.com/VincentChalnot/SidusAdminBundle"
             },
-            "time": "2026-10-19T17:37:08+00:00"
+            "time": "2026-10-21T12:34:36+00:00"
         },
         {
             "name": "sidus/datagrid-bundle",
-            "version": "v4.0.2",
+            "version": "v5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/VincentChalnot/SidusDataGridBundle.git",
-                "reference": "18d9b463e9c6dbfa15a83cb19bb551b585ae8a99"
+                "reference": "bda8636e5fbeb4fa2848f331572e9dc0c799743f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VincentChalnot/SidusDataGridBundle/zipball/18d9b463e9c6dbfa15a83cb19bb551b585ae8a99",
-                "reference": "18d9b463e9c6dbfa15a83cb19bb551b585ae8a99",
+                "url": "https://api.github.com/repos/VincentChalnot/SidusDataGridBundle/zipball/bda8636e5fbeb4fa2848f331572e9dc0c799743f",
+                "reference": "bda8636e5fbeb4fa2848f331572e9dc0c799743f",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1",
-                "sidus/filter-bundle": ">=4.0",
-                "symfony/config": ">=6.3",
-                "symfony/dependency-injection": ">=6.3",
-                "symfony/form": ">=6.3",
-                "symfony/http-foundation": ">=6.3",
-                "symfony/options-resolver": ">=6.3",
-                "symfony/property-access": ">=6.3",
-                "symfony/routing": ">=6.3",
-                "symfony/translation": ">=6.3",
-                "twig/twig": ">=3.0"
+                "ext-intl": "*",
+                "pagerfanta/core": "^4.0",
+                "php": ">=8.4",
+                "sidus/filter-bundle": "^7.0",
+                "symfony/config": "^8.1",
+                "symfony/dependency-injection": "^8.1",
+                "symfony/form": "^8.1",
+                "symfony/framework-bundle": "^8.1",
+                "symfony/http-foundation": "^8.1",
+                "symfony/http-kernel": "^8.1",
+                "symfony/options-resolver": "^8.1",
+                "symfony/property-access": "^8.1",
+                "symfony/routing": "^8.1",
+                "symfony/translation": "^8.1",
+                "symfony/translation-contracts": "^3.6",
+                "symfony/twig-bridge": "^8.1",
+                "symfony/twig-bundle": "^8.1",
+                "twig/twig": "^3.21"
             },
-            "type": "library",
+            "require-dev": {
+                "phpunit/phpunit": "^12.0",
+                "symfony/error-handler": "^8.1.4",
+                "symfony/event-dispatcher-contracts": "^3.6",
+                "symfony/string": "^8.1",
+                "symfony/yaml": "^8.1"
+            },
+            "type": "symfony-bundle",
             "autoload": {
                 "psr-4": {
-                    "Sidus\\DataGridBundle\\": ""
-                }
+                    "Sidus\\DataGridBundle\\": "src/"
+                },
+                "exclude-from-classmap": [
+                    "/tests/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2973,43 +2967,140 @@
             ],
             "support": {
                 "issues": "https://github.com/VincentChalnot/SidusDataGridBundle/issues",
-                "source": "https://github.com/VincentChalnot/SidusDataGridBundle/tree/v4.0.2"
+                "source": "https://github.com/VincentChalnot/SidusDataGridBundle"
             },
-            "time": "2026-07-21T20:36:58+00:00"
+            "time": "2026-10-21T11:40:10+00:00"
         },
         {
-            "name": "sidus/filter-bundle",
-            "version": "v6.0.4",
+            "name": "sidus/doctrine-filter-bundle",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/VincentChalnot/SidusFilterBundle.git",
-                "reference": "7ce44c44773b767d021a33252b9fc52eee219772"
+                "url": "https://github.com/VincentChalnot/SidusDoctrineFilterBundle.git",
+                "reference": "67e9724bd0bb73710d3f9eb35a50d452356aa150"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VincentChalnot/SidusFilterBundle/zipball/7ce44c44773b767d021a33252b9fc52eee219772",
-                "reference": "7ce44c44773b767d021a33252b9fc52eee219772",
+                "url": "https://api.github.com/repos/VincentChalnot/SidusDoctrineFilterBundle/zipball/67e9724bd0bb73710d3f9eb35a50d452356aa150",
+                "reference": "67e9724bd0bb73710d3f9eb35a50d452356aa150",
                 "shasum": ""
             },
             "require": {
-                "doctrine/dbal": ">=3.0",
-                "doctrine/orm": ">=2.14",
-                "pagerfanta/pagerfanta": ">=2.7",
-                "php": ">=8.1",
-                "symfony/dependency-injection": "^6.4 || ^7.4 || ^8.0",
-                "symfony/form": "^6.4 || ^7.4 || ^8.0",
-                "symfony/http-foundation": "^6.4 || ^7.4 || ^8.0",
-                "symfony/options-resolver": "^6.4 || ^7.4 || ^8.0",
-                "symfony/property-access": "^6.4 || ^7.4 || ^8.0"
+                "doctrine/dbal": "^4.0",
+                "doctrine/doctrine-bundle": "^3.0",
+                "doctrine/orm": "^3.3",
+                "doctrine/persistence": "^3.3 || ^4.0",
+                "php": ">=8.4",
+                "sidus/filter-bundle": "^7.0",
+                "symfony/config": "^8.1",
+                "symfony/dependency-injection": "^8.1",
+                "symfony/http-kernel": "^8.1",
+                "symfony/options-resolver": "^8.1"
+            },
+            "require-dev": {
+                "martin-georgiev/postgresql-for-doctrine": "^4.9",
+                "phpunit/phpunit": "^12.0",
+                "symfony/console": "^8.1",
+                "symfony/doctrine-bridge": "^8.1",
+                "symfony/filesystem": "^8.1",
+                "symfony/form": "^8.1",
+                "symfony/framework-bundle": "^8.1",
+                "symfony/yaml": "^8.1"
             },
             "suggest": {
-                "doctrine/doctrine-bundle": "Without Doctrine ORM, this bundle won't do anything out of the box"
+                "martin-georgiev/postgresql-for-doctrine": "JSON path filtering and sorting on PostgreSQL (json/jsonb columns)",
+                "symfony/console": "Enables the lint:sidus-filter command",
+                "symfony/doctrine-bridge": "EntityType, for the form mapper of the relation filter",
+                "symfony/form": "Form adapter of sidus/filter-bundle (relation filter mapper)"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Sidus\\DoctrineFilterBundle\\": "src/"
+                },
+                "exclude-from-classmap": [
+                    "/tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vincent Chalnot",
+                    "email": "vincent@sidus.fr",
+                    "homepage": "https://sidus.fr",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Doctrine ORM provider for sidus/filter-bundle: criteria compiled to deterministic DQL",
+            "homepage": "https://github.com/VincentChalnot/SidusDoctrineFilterBundle",
+            "keywords": [
+                "doctrine",
+                "dql",
+                "filter",
+                "orm",
+                "pagination",
+                "sort"
+            ],
+            "support": {
+                "issues": "https://github.com/VincentChalnot/SidusDoctrineFilterBundle/issues",
+                "source": "https://github.com/VincentChalnot/SidusDoctrineFilterBundle"
+            },
+            "time": "2026-10-21T11:38:42+00:00"
+        },
+        {
+            "name": "sidus/filter-bundle",
+            "version": "v7.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/VincentChalnot/SidusFilterBundle.git",
+                "reference": "02c2feffac08933206f92d0b8d7b5624d7e73ae4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/VincentChalnot/SidusFilterBundle/zipball/02c2feffac08933206f92d0b8d7b5624d7e73ae4",
+                "reference": "02c2feffac08933206f92d0b8d7b5624d7e73ae4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4",
+                "symfony/config": "^8.1",
+                "symfony/dependency-injection": "^8.1",
+                "symfony/http-kernel": "^8.1",
+                "symfony/options-resolver": "^8.1",
+                "symfony/property-access": "^8.1"
+            },
+            "require-dev": {
+                "pagerfanta/core": "^4.0",
+                "phpunit/phpunit": "^12.0",
+                "symfony/console": "^8.1",
+                "symfony/error-handler": "^8.1.4",
+                "symfony/event-dispatcher-contracts": "^3.6",
+                "symfony/form": "^8.1",
+                "symfony/framework-bundle": "^8.1",
+                "symfony/http-foundation": "^8.1",
+                "symfony/translation": "^8.1",
+                "symfony/twig-bridge": "^8.1",
+                "symfony/yaml": "^8.1"
+            },
+            "suggest": {
+                "pagerfanta/core": "Optional Pagerfanta adapter",
+                "symfony/console": "Enables the debug:sidus-filter command",
+                "symfony/form": "Optional HTML form adapter",
+                "symfony/http-foundation": "Optional HTTP request parser and result normalizer",
+                "symfony/translation": "Translated form labels (en, fr shipped)",
+                "symfony/twig-bridge": "Form themes"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Sidus\\FilterBundle\\": ""
-                }
+                    "Sidus\\FilterBundle\\": "src/"
+                },
+                "exclude-from-classmap": [
+                    "/tests/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -3029,19 +3120,20 @@
                     "role": "Developer"
                 }
             ],
-            "description": "Simple yml-configuration-based filtering with Doctrine ORM abstraction",
+            "description": "Provider-agnostic list filtering, sorting and pagination: immutable definitions, per-request query handlers",
             "homepage": "https://github.com/VincentChalnot/SidusFilterBundle",
             "keywords": [
                 "datagrid",
-                "doctrine",
                 "filter",
+                "list",
+                "pagination",
                 "sort"
             ],
             "support": {
                 "issues": "https://github.com/VincentChalnot/SidusFilterBundle/issues",
-                "source": "https://github.com/VincentChalnot/SidusFilterBundle/tree/v6.0.4"
+                "source": "https://github.com/VincentChalnot/SidusFilterBundle/tree/v7.0.2"
             },
-            "time": "2026-10-19T17:37:20+00:00"
+            "time": "2026-10-21T11:37:40+00:00"
         },
         {
             "name": "stof/doctrine-extensions-bundle",

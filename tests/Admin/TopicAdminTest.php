@@ -31,9 +31,9 @@ class TopicAdminTest extends AdminWebTestCase
         $this->createTopic($music, $alice, 'Concerts');
         $this->createTopic($music, $bob, 'Vinyles');
 
-        self::assertSame(['Vacances'], $this->titles($this->client->request('GET', '/admin/topics/', ['form' => ['filters' => ['title' => 'vac']]])));
-        self::assertSame(['Vinyles'], $this->titles($this->client->request('GET', '/admin/topics/', ['form' => ['filters' => ['author' => 'bo']]])));
-        $crawler = $this->client->request('GET', '/admin/topics/', ['form' => ['filters' => ['forum' => 'musique']]]);
+        self::assertSame(['Vacances'], $this->titles($this->client->request('GET', '/admin/topics/', ['filters' => ['title' => 'vac']])));
+        self::assertSame(['Vinyles'], $this->titles($this->client->request('GET', '/admin/topics/', ['filters' => ['author' => 'bo']])));
+        $crawler = $this->client->request('GET', '/admin/topics/', ['filters' => ['forum' => 'Musique']]);
         self::assertEqualsCanonicalizing(['Concerts', 'Vinyles'], $this->titles($crawler));
     }
 
@@ -46,8 +46,8 @@ class TopicAdminTest extends AdminWebTestCase
         $this->createTopic($z, $alice, 'Chez Z');
         $this->createTopic($a, $zed, 'Chez A');
 
-        foreach (['forum.title' => ['Chez A', 'Chez Z'], 'author.username' => ['Chez Z', 'Chez A']] as $column => $expected) {
-            $crawler = $this->client->request('GET', '/admin/topics/', ['form' => ['sortable' => ['config' => ['column' => $column, 'direction' => '0']]]]);
+        foreach (['forum' => ['Chez A', 'Chez Z'], 'author' => ['Chez Z', 'Chez A']] as $column => $expected) {
+            $crawler = $this->client->request('GET', '/admin/topics/', ['sort' => $column]);
 
             self::assertResponseIsSuccessful($column);
             self::assertSame($expected, $this->titles($crawler), $column);

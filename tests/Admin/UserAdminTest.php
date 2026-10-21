@@ -33,9 +33,9 @@ class UserAdminTest extends AdminWebTestCase
         $this->createUser('bob')->setEmail('aaa-first@example.test');
         $this->em()->flush();
 
-        self::assertSame(['zoe'], $this->pseudos($this->client->request('GET', '/admin/users/', ['form' => ['filters' => ['email' => 'zoe@']]])));
-        self::assertSame(['bob', 'anna', 'root', 'zoe'], $this->pseudos($this->client->request('GET', '/admin/users/', ['form' => ['sortable' => ['config' => ['column' => 'email', 'direction' => '0']]]])));
-        self::assertSame(['zoe', 'root', 'anna', 'bob'], $this->pseudos($this->client->request('GET', '/admin/users/', ['form' => ['sortable' => ['config' => ['column' => 'email', 'direction' => '1']]]])));
+        self::assertSame(['zoe'], $this->pseudos($this->client->request('GET', '/admin/users/', ['filters' => ['email' => 'zoe@']])));
+        self::assertSame(['bob', 'anna', 'root', 'zoe'], $this->pseudos($this->client->request('GET', '/admin/users/', ['sort' => 'email'])));
+        self::assertSame(['zoe', 'root', 'anna', 'bob'], $this->pseudos($this->client->request('GET', '/admin/users/', ['sort' => '-email'])));
     }
 
     public function testFiltersNarrowTheList(): void
@@ -50,11 +50,11 @@ class UserAdminTest extends AdminWebTestCase
         $old->setLastActivity(new \DateTime('2020-01-01 12:00'));
         $this->em()->flush();
 
-        self::assertSame(['camille'], $this->pseudos($this->client->request('GET', '/admin/users/', ['form' => ['filters' => ['username' => 'cam']]])));
-        self::assertSame(['inactif'], $this->pseudos($this->client->request('GET', '/admin/users/', ['form' => ['filters' => ['enabled' => '0']]])));
-        self::assertSame(['root'], $this->pseudos($this->client->request('GET', '/admin/users/', ['form' => ['filters' => ['role' => 'admin']]])));
-        self::assertSame(['ancien', 'camille', 'inactif', 'recent'], $this->pseudos($this->client->request('GET', '/admin/users/', ['form' => ['filters' => ['role' => 'member']]])));
-        self::assertSame(['recent'], $this->pseudos($this->client->request('GET', '/admin/users/', ['form' => ['filters' => ['lastActivity' => ['startDate' => (new \DateTime('-30 days'))->format('Y-m-d'), 'endDate' => (new \DateTime('-10 days'))->format('Y-m-d')]]]])));
+        self::assertSame(['camille'], $this->pseudos($this->client->request('GET', '/admin/users/', ['filters' => ['username' => 'cam']])));
+        self::assertSame(['inactif'], $this->pseudos($this->client->request('GET', '/admin/users/', ['filters' => ['enabled' => '0']])));
+        self::assertSame(['root'], $this->pseudos($this->client->request('GET', '/admin/users/', ['filters' => ['role' => 'admin']])));
+        self::assertSame(['ancien', 'camille', 'inactif', 'recent'], $this->pseudos($this->client->request('GET', '/admin/users/', ['filters' => ['role' => 'member']])));
+        self::assertSame(['recent'], $this->pseudos($this->client->request('GET', '/admin/users/', ['filters' => ['lastActivity' => ['from' => (new \DateTime('-30 days'))->format('Y-m-d'), 'to' => (new \DateTime('-10 days'))->format('Y-m-d')]]])));
     }
 
     public function testASortColumnThatIsNotConfiguredIsIgnored(): void
@@ -67,7 +67,7 @@ class UserAdminTest extends AdminWebTestCase
         $this->em()->flush();
 
         foreach (['password', 'nope.nope', 'username'] as $column) {
-            $crawler = $this->client->request('GET', '/admin/users/', ['form' => ['sortable' => ['config' => ['column' => $column, 'direction' => '1']]]]);
+            $crawler = $this->client->request('GET', '/admin/users/', ['sort' => '-'.$column]);
 
             self::assertResponseIsSuccessful($column);
             $expected = 'username' === $column ? ['root', 'carl', 'bob', 'alice'] : ['alice', 'bob', 'carl', 'root'];
@@ -83,7 +83,8 @@ class UserAdminTest extends AdminWebTestCase
         $crawler = $this->client->request('GET', '/admin/users/');
         self::assertSame('ascending', $crawler->filter('th[aria-sort]')->attr('aria-sort'));
 
-        $crawler = $this->client->submit($crawler->filter('button.table-sort')->first()->form());
+        // A browser sends the hidden current sort then the pressed button (same name): the last value wins.
+        $crawler = $this->client->request('GET', '/admin/users/', ['sort' => $crawler->filter('button.table-sort')->first()->attr('value')]);
 
         self::assertSame(['root', 'alice'], $this->pseudos($crawler));
         self::assertSame('descending', $crawler->filter('th[aria-sort]')->attr('aria-sort'));
@@ -96,14 +97,13 @@ class UserAdminTest extends AdminWebTestCase
             $this->createUser('m'.$i);
         }
 
-        $crawler = $this->client->request('GET', '/admin/users/', ['form' => ['filters' => ['role' => 'member'], 'sortable' => ['config' => ['column' => 'username', 'direction' => '1']]]]);
+        $crawler = $this->client->request('GET', '/admin/users/', ['filters' => ['role' => 'member'], 'sort' => '-username']);
         self::assertCount(25, $this->pseudos($crawler));
         $next = $crawler->filter('.pager a[rel="next"]')->attr('href');
         parse_str((string) parse_url($next, \PHP_URL_QUERY), $query);
 
-        self::assertSame('member', $query['form']['filters']['role']);
-        self::assertSame('1', $query['form']['sortable']['config']['direction']);
-        self::assertArrayNotHasKey('0', $query['form']['sortable'], 'a page link must not press a sort button');
+        self::assertSame('member', $query['filters']['role']);
+        self::assertSame('-username', $query['sort'], 'the page link keeps the current sort');
         $crawler = $this->client->request('GET', $next);
         self::assertSame(['m14', 'm13', 'm12', 'm11', 'm10'], $this->pseudos($crawler));
     }

@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Sidus\AdminBundle\Configuration\AdminRegistry;
+use Sidus\AdminBundle\Registry\AdminRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,7 +20,7 @@ class AdminController extends AbstractController
     public function __invoke(AdminRegistry $admins, ManagerRegistry $doctrine): Response
     {
         $screens = [];
-        foreach ($admins->getAdmins() as $admin) {
+        foreach ($admins->all() as $admin) {
             $screens[] = [
                 'admin' => $admin,
                 'count' => $doctrine->getRepository((string) $admin->getEntity())->count([]),

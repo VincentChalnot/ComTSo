@@ -14,15 +14,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** Removes a member and what they wrote through {@see UserRemover} (the same code as `app:cutover:prepare --delete-user`). */
 #[AsController]
-class DeleteAction extends AbstractRemovalAction
+readonly class DeleteAction extends AbstractRemovalAction
 {
     public function __construct(
         FormHelper $formHelper,
         TemplatingHelper $templatingHelper,
         FlashHelper $flashHelper,
-        private readonly UserRemover $remover,
-        private readonly AdminAccountGuard $guard,
-        private readonly TranslatorInterface $translator,
+        private UserRemover $remover,
+        private AdminAccountGuard $guard,
+        private TranslatorInterface $translator,
     ) {
         parent::__construct($formHelper, $templatingHelper, $flashHelper);
     }
