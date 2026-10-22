@@ -5,10 +5,7 @@
 {% import '_ui/avatar.html.twig' as av %}
 <div class="digest-actions">
     <a href="{{ topicUrl }}" class="btn btn-sm btn-primary">{{ ui.icon('arrow-right', 'size-3.5') }} Voir le sujet</a>
-<details>, works without JavaScript) that unfolds the SAME form as the
-   topic page (rich text + photos). Posts to topic_reply, which comes back to the home page. Params: topic, replyForm (FormView) #}
-{% import '_ui/icons.html.twig' as ui %}
-{% import '_ui/avatar.html.twig' as av %}
+
 <details class="reply-fold">
     <summary class="btn btn-sm">{{ ui.icon('message-square', 'size-3.5') }} Répondre</summary>
     {{ form_start(replyForm) }}

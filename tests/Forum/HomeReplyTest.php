@@ -183,6 +183,19 @@ class HomeReplyTest extends AppWebTestCase
         self::assertCount(0, $home->filter('.digest-foot'), 'no second "Voir le sujet" footer');
     }
 
+    public function testNoTemplateCommentLeaksIntoTheCardAndTheSummaryIsLabelled(): void
+    {
+        $home = $this->home();
+        $html = $this->client->getResponse()->getContent();
+
+        self::assertStringNotContainsString('works without JavaScript', $html);
+        self::assertStringNotContainsString('#}', $html);
+        self::assertStringNotContainsString('{#', $html);
+        self::assertCount(1, $home->filter('.digest-actions details'), 'exactly one details per card');
+        self::assertSame('Répondre', trim(preg_replace('/\s+/', ' ', $home->filter('.digest-actions summary')->text())));
+        self::assertCount(1, $home->filter('.digest-actions > details.reply-fold > summary.btn.btn-sm'));
+    }
+
     public function testEveryTopicCardHasItsOwnForum(): void
     {
         $other = $this->createTopic($this->em()->getRepository(\App\Entity\Forum::class)->find('general'), $this->alice, 'Deuxième', new \DateTime('2026-03-11'));
