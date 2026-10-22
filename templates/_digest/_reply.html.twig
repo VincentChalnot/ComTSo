@@ -1,16 +1,21 @@
-{# Compact reply of a digest card (posts to topic_reply, comes back to the home page). Params: topic, replyForm (FormView) #}
+{# Reply of a digest card: a "Répondre" button (native <details>, works without JavaScript) that unfolds the SAME form as the
+   topic page (rich text + photos). Posts to topic_reply, which comes back to the home page. Params: topic, replyForm (FormView) #}
 {% import '_ui/icons.html.twig' as ui %}
 {% import '_ui/avatar.html.twig' as av %}
-{{ form_start(replyForm) }}
-    <section class="reply is-compact" aria-labelledby="reply-{{ topic.id }}">
-        <span class="reply-avatar">{{ av.avatar(app.user, 'sm') }}</span>
-        <div class="reply-body">
-            <h4 id="reply-{{ topic.id }}" class="sr-only">Répondre à « {{ topic.title }} »</h4>
-            {{ form_errors(replyForm) }}
-            {{ form_row(replyForm.content) }}
-        </div>
-        <div class="reply-actions">
-            <button type="submit" class="btn btn-primary btn-sm">{{ ui.icon('send', 'size-3.5') }} Répondre</button>
-        </div>
-    </section>
-{{ form_end(replyForm) }}
+<details class="reply-fold">
+    <summary class="btn btn-sm">{{ ui.icon('send', 'size-3.5') }} Répondre</summary>
+    {{ form_start(replyForm) }}
+        <section class="reply mt-3" aria-labelledby="reply-{{ topic.id }}">
+            <span class="reply-avatar">{{ av.avatar(app.user, 'md') }}</span>
+            <div class="reply-body">
+                <h4 id="reply-{{ topic.id }}" class="card-title mb-2">Répondre à « {{ topic.title }} »</h4>
+                {{ form_errors(replyForm) }}
+                {{ form_row(replyForm.content) }}
+                {{ form_row(replyForm.photos) }}
+            </div>
+            <div class="reply-actions">
+                <button type="submit" class="btn btn-primary">{{ ui.icon('send', 'size-4') }} Envoyer</button>
+            </div>
+        </section>
+    {{ form_end(replyForm) }}
+</details>

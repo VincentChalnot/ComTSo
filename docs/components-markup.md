@@ -106,18 +106,17 @@ The `<form>` wraps the section (so editor, widget and submit button belong to th
 </form>
 ```
 
-### Compact reply of the home digest (`templates/_digest/_reply.html.twig`)
+### Reply of a home digest card (`templates/_digest/_reply.html.twig`)
 
 ```html
-<form name="reply_{topicId}" method="post" action="/forum/{f}/{t}/reply?since=…&page=…">
-  <section class="reply is-compact" aria-labelledby="reply-{topicId}">
-    <span class="reply-avatar">{small avatar}</span>
-    <div class="reply-body"><h4 id="reply-{topicId}" class="sr-only">Répondre à « {title} »</h4> {compact RichEditor} </div>
-    <div class="reply-actions"><button type="submit" class="btn btn-primary btn-sm">{icon} Répondre</button></div>
-  </section>
-</form>
+<details class="reply-fold">                                         <!-- native, closed by default, no JavaScript needed -->
+  <summary class="btn btn-sm">{icon} Répondre</summary>
+  <form name="reply_{topicId}" method="post" action="/forum/{f}/{t}/reply?since=…&page=…" enctype="multipart/form-data">
+    <section class="reply mt-3" aria-labelledby="reply-{topicId}"> … exactly the reply form above (editor + photos), h4.card-title … </section>
+  </form>
+</details>
 ```
-One per `.digest` card (`topic_card.html.twig`): after `.digest-posts` when the member's order is `asc`, before it when `desc`. The form is named `reply_<topicId>` (unique ids and CSRF token per card), no photos; the POST (`topic_reply`) redirects to the home page on the card's anchor.
+One per `.digest` card (`topic_card.html.twig`): after `.digest-posts` when the member's order is `asc`, before it when `desc`. The form is the topic page's `CommentType`, named `reply_<topicId>` (unique ids and CSRF token per card); the POST (`topic_reply`) redirects to the home page on the card's anchor.
 
 ## Attach widget (`templates/form/photo_upload.html.twig` + `assets/vue/components/AttachPhotos.vue`)
 

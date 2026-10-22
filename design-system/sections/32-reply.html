@@ -310,21 +310,33 @@
     </div>
   </div>
 
-  <div class="ds-demo" data-title="Compact (accueil : sous le dernier message, au-dessus en ordre décroissant)">
-    <p class="ds-note"><code>.reply.is-compact</code> : même grille, petit avatar, marges serrées, titre masqué (<code>sr-only</code>), éditeur compact sans photos. Un par carte du fil d'activité, il renvoie vers l'accueil.</p>
+  <div class="ds-demo" data-title="Accueil : bouton « Répondre » replié, puis déplié (<code>details.reply-fold</code>)">
+    <p class="ds-note">Sur chaque carte du fil d'activité : un bouton, et au clic le MÊME formulaire que sur la page du sujet (éditeur et photos). Natif (<code>&lt;details&gt;</code>), sans JavaScript.</p>
     <div class="ds-stage">
-<form onsubmit="return false" style="max-width:52rem">
-      <section class="reply is-compact" aria-labelledby="reply-c1">
-        <span class="reply-avatar"><span class="avatar avatar-sm avatar-initial" style="--avatar-hue: 340">C</span></span>
-        <div class="reply-body">
-          <h4 id="reply-c1" class="sr-only">Répondre à « Week-end de la Toussaint »</h4>
-          <div class="field mb-5"><div data-vue-component="RichEditor" data-props='{"name": "reply_compact", "id": "reply_compact", "value": "", "placeholder": "Répondre à ce sujet…", "ariaLabel": "Votre réponse", "compact": true, "minHeight": "4rem", "required": false}' class="rich-text-field"><textarea id="reply_compact_ta" name="reply_compact" class="input" rows="3" placeholder="Répondre à ce sujet…"></textarea></div></div>
-        </div>
-        <div class="reply-actions">
-          <button type="submit" class="btn btn-primary btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-3.5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Répondre</button>
-        </div>
-      </section>
-    </form>
+<div class="ds-col" style="max-width:52rem">
+      <details class="reply-fold"><summary class="btn btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-3.5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Répondre</summary></details>
+      <details class="reply-fold" open>
+        <summary class="btn btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-3.5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Répondre</summary>
+        <form onsubmit="return false">
+          <section class="reply mt-3" aria-labelledby="reply-f1">
+            <span class="reply-avatar"><span class="avatar avatar-initial" style="--avatar-hue: 340">CL</span></span>
+            <div class="reply-body">
+              <h4 id="reply-f1" class="card-title mb-2">Répondre à « Week-end de la Toussaint »</h4>
+              <div class="field mb-5"><p class="text-sm text-muted">(éditeur)</p></div>
+              <div class="field mb-5"><label class="label" for="rp_f">Ajouter des photos</label> <div class="attach" data-vue-component="AttachPhotos" data-vue-mounted="1-static">
+      <div class="attach-zone">
+        <input type="file" id="rp_f" name="comment[photos][]" multiple class="attach-input" accept="image/jpeg,image/png,image/gif,image/webp">
+        <p class="attach-hint">Jusqu'à 10 photos (JPEG, PNG, GIF ou WebP, 25 Mo maximum chacune).</p>
+      </div>
+    </div></div>
+            </div>
+            <div class="reply-actions">
+              <button type="submit" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-4"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Envoyer</button>
+            </div>
+          </section>
+        </form>
+      </details>
+    </div>
     </div>
   </div>
 </section>

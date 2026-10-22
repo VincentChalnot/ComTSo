@@ -6,23 +6,33 @@ use App\Entity\Comment;
 use App\Entity\Topic;
 use App\Entity\User;
 use App\Tests\Support\AppWebTestCase;
+use App\Tests\Support\PhotoFilesTrait;
 use Symfony\Component\DomCrawler\Crawler;
 
 /** Replying to a topic straight from the home page: same write path as the topic page, but the member stays on the home page. */
 class HomeReplyTest extends AppWebTestCase
 {
+    use PhotoFilesTrait;
+
     private User $alice;
     private Topic $topic;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->preparePhotoDirectory();
         $this->alice = $this->createUser('alice');
         $bob = $this->createUser('bob');
         $this->topic = $this->createTopic($this->createForum(), $bob, 'Sujet animé', new \DateTime('2026-01-01'));
         $this->createComment($this->topic, $bob, '<p>dernier mot de bob</p>', new \DateTime('2026-03-10 10:00'));
         $this->topic->setLastActivityAt(new \DateTime('2026-03-10 10:00'));
         $this->em()->flush();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->cleanPhotoDirectory();
+        parent::tearDown();
     }
 
     private function formName(): string
@@ -65,6 +75,55 @@ class HomeReplyTest extends AppWebTestCase
         $this->client->followRedirect();
         self::assertSelectorTextContains('main', 'Je suis partant');
         self::assertSelectorExists('.alert-ok');
+    }
+
+    public function testTheFormIsTheTopicPageFormFoldedBehindAButton(): void
+    {
+        $home = $this->home();
+
+        self::assertCount(1, $home->filter('details.reply-fold:not([open]) > summary'), 'folded by default, native details');
+        $form = $home->filter('details.reply-fold form[name="'.$this->formName().'"]');
+        self::assertSame('multipart/form-data', $form->attr('enctype'));
+        self::assertCount(1, $form->filter('input[type=file][name="'.$this->formName().'[photos][]"]'), 'photo upload like the topic page');
+        self::assertCount(1, $form->filter('textarea[name="'.$this->formName().'[content]"]'));
+    }
+
+    public function testAReplyWithPhotosIsStoredAndTheMemberStaysOnTheHomePage(): void
+    {
+        $home = $this->home();
+        $form = $home->filter('form[name="'.$this->formName().'"]')->form([$this->formName().'[content]' => '<p>Voir photo</p>']);
+
+        $this->client->request('POST', $form->getUri(), $form->getPhpValues(), [$this->formName() => ['photos' => [$this->jpegUpload('p.jpg', 40, 30)]]]);
+
+        self::assertResponseRedirects('/?since=2026-03-01#topic-'.$this->topic->getId());
+        $this->em()->clear();
+        $reply = $this->em()->getRepository(Comment::class)->findOneBy(['author' => $this->alice]);
+        self::assertCount(1, $reply->getPhotos());
+        self::assertCount(1, $this->storedFiles());
+    }
+
+    public function testARefusedPhotoRefusesTheWholeReply(): void
+    {
+        $home = $this->home();
+        $form = $home->filter('form[name="'.$this->formName().'"]')->form([$this->formName().'[content]' => '<p>Voir photo</p>']);
+
+        $this->client->request('POST', $form->getUri(), $form->getPhpValues(), [$this->formName() => ['photos' => [$this->fakeImageUpload()]]]);
+
+        self::assertResponseRedirects('/?since=2026-03-01#topic-'.$this->topic->getId());
+        self::assertSame(0, $this->replyCount());
+        self::assertSame([], $this->storedFiles());
+        $this->client->followRedirect();
+        self::assertSelectorExists('.alert-danger');
+    }
+
+    public function testAPhotoAloneIsAValidReply(): void
+    {
+        $home = $this->home();
+        $form = $home->filter('form[name="'.$this->formName().'"]')->form();
+
+        $this->client->request('POST', $form->getUri(), $form->getPhpValues(), [$this->formName() => ['photos' => [$this->jpegUpload('p.jpg', 40, 30)]]]);
+
+        self::assertSame(1, $this->replyCount());
     }
 
     public function testTheReplyIsSanitizedLikeEveryOtherMessage(): void
@@ -172,5 +231,29 @@ class HomeReplyTest extends AppWebTestCase
         $cacheControl = $this->client->getResponse()->headers->get('Cache-Control');
         self::assertStringContainsString('private', $cacheControl);
         self::assertStringContainsString('no-store', $cacheControl);
+    }
+
+    public function testTheReplyFormsAddNoQueryPerCard(): void
+    {
+        $count = function (): int {
+            $this->home();
+            $this->client->enableProfiler();
+            $this->client->request('GET', '/?since=2026-03-01');
+
+            return $this->client->getProfile()->getCollector('db')->getQueryCount();
+        };
+        $perCard = [];
+        $previous = $count();
+        for ($i = 0; $i < 3; ++$i) {
+            $this->alice = $this->em()->find(User::class, $this->alice->getId());
+            $topic = $this->createTopic($this->em()->find(\App\Entity\Forum::class, 'general'), $this->alice, 'Autre '.$i, new \DateTime('2026-03-12'));
+            $this->createComment($topic, $this->alice, '<p>x</p>', new \DateTime('2026-03-12'));
+            $now = $count();
+            $perCard[] = $now - $previous;
+            $previous = $now;
+        }
+
+        // 3 per card are the digest's own queries (new count, latest messages, topic photos); the forms must add none.
+        self::assertSame([3, 3, 3], $perCard);
     }
 }

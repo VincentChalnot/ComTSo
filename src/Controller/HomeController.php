@@ -2,8 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\User;
-use App\Form\QuickReplyType;
+use App\Form\CommentType;
 use App\Pagination\Pager;
 use App\Photo\FeaturedPhotoProvider;
 use App\Repository\CommentPhotoRepository;
@@ -56,7 +57,7 @@ class HomeController extends AbstractController
                 'hidden' => max(0, $newMessages - \count($latest)),
                 'photos' => $photoTopics->findSince($topic, $since),
                 'created' => $topic->getCreatedAt() >= $since,
-                'replyForm' => $forms->createNamed(CommentController::quickReplyFormName($topic), QuickReplyType::class, null, [
+                'replyForm' => $forms->createNamed(CommentController::replyFormName($topic), CommentType::class, new Comment(), [
                     'action' => $this->generateUrl('topic_reply', ['forumId' => $topic->getForum()->getId(), 'id' => $topic->getId()] + $homeQuery),
                 ])->createView(),
                 'order' => $order,
