@@ -48,21 +48,6 @@
         </template>
       </div>
 
-      <div v-if="popover === 'smilies'" class="rich-editor-popover" role="group" aria-label="Smileys" @keydown.esc.stop.prevent="closePopover(true)">
-        <button
-          v-for="smiley in SMILIES"
-          :key="smiley.file"
-          type="button"
-          class="rich-editor-smiley"
-          :title="`${smiley.label} ${smiley.code}`"
-          :aria-label="`${smiley.label} ${smiley.code}`"
-          @mousedown.prevent
-          @click="insertSmiley(smiley)"
-        >
-          <img :src="`/smilies/${smiley.file}`" :alt="smiley.code" width="20" height="20" />
-        </button>
-      </div>
-
       <div v-if="popover === 'emojis'" class="rich-editor-popover rich-editor-emoji-popover" role="group" aria-label="Émojis" @keydown.esc.stop.prevent="closePopover(true)">
         <div class="rich-editor-emoji-tabs" role="group" aria-label="Catégories d’émojis">
           <button
@@ -130,7 +115,6 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue';
 import { ICONS } from '../editor/icons.js';
 import { EMOJI_GROUPS } from '../editor/emojis.js';
-import { SMILIES } from '../editor/smilies.js';
 import { youtubeEmbedUrl } from '../editor/youtube.js';
 
 const props = defineProps({
@@ -166,7 +150,7 @@ const editor = shallowRef(null);
 /** Bumped on every editor transaction so that toolbar states are recomputed. */
 const tick = ref(0);
 const html = ref(props.value);
-/** Which toolbar popover is open: `smilies`, `emojis` or null. */
+/** Which toolbar popover is open: `emojis` or null. */
 const popover = ref(null);
 const emojiGroupId = ref(EMOJI_GROUPS[0].id);
 const emojiGroup = computed(() => EMOJI_GROUPS.find((group) => group.id === emojiGroupId.value) ?? EMOJI_GROUPS[0]);
@@ -229,7 +213,6 @@ const definitions = [
     tool('unlink', 'unlink', 'Supprimer le lien', () => chain().extendMarkRange('link').unsetLink().run(), { disabled: () => !ed().isActive('link') }),
     tool('image', 'image', 'Insérer une image (adresse)', () => openPrompt('image')),
     tool('youtube', 'youtube', 'Insérer une vidéo YouTube', () => openPrompt('youtube')),
-    tool('smilies', 'smile', 'Smileys', () => togglePopover('smilies'), { popover: 'smilies' }),
     tool('emojis', 'laugh', 'Émojis', () => togglePopover('emojis'), { popover: 'emojis' }),
   ],
   [
@@ -288,7 +271,7 @@ function onToolbarKeydown(event) {
   }
 }
 
-// ---- smilies and emojis ----
+// ---- emojis ----
 function togglePopover(name) {
   prompt.value = null;
   popover.value = popover.value === name ? null : name;
@@ -299,17 +282,7 @@ function closePopover(refocus = false) {
   if (refocus) ed().commands.focus();
 }
 
-function insertSmiley(smiley) {
-  chain()
-    .insertContent([
-      { type: 'image', attrs: { src: `/smilies/${smiley.file}`, alt: smiley.code } },
-      { type: 'text', text: ' ' },
-    ])
-    .run();
-  popover.value = null;
-}
-
-/** Emojis are plain Unicode text (stored as is, utf8mb4), unlike the gif smilies which are images. */
+/** Emojis are plain Unicode text (stored as is, utf8mb4). */
 function insertEmoji(emoji) {
   chain().insertContent({ type: 'text', text: emoji.char }).run();
   popover.value = null;

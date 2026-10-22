@@ -177,9 +177,9 @@ private messages), `tests/Photos`, `tests/Chat`, `tests/Content` (sanitizer), `t
   by `App\Content\ContentSanitizer`, an allow-list defined in `config/packages/html_sanitizer.yaml` plus `App\Content\AttributeSanitizer\*`: inline CSS is reduced to
   `text-align`/`text-decoration`, links are `http(s)/mailto` with forced `rel`/`target`, images `http(s)` or site-relative, and the **only iframe allowed is a YouTube player**,
   rewritten to `https://www.youtube-nocookie.com/embed/<id>` (`App\Content\YouTube`, mirrored in `assets/vue/editor/youtube.js`); a paragraph holding only a YouTube link
-  becomes the player. Adding a smiley = drop the gif in `public/smilies/` **and** list it in `assets/vue/editor/smilies.js` (a test enforces it).
-  **Emojis** are plain Unicode text (astral characters pass the sanitizer untouched, chat messages and private messages included): the editor's second popover ("Émojis", `assets/vue/editor/emojis.js`,
-  curated groups with French labels, Unicode 12 or older, inserted as text, no dependency) sits next to the gif smilies. Adding an emoji = one line in `emojis.js`; `tests/Content/EmojiPickerTest.php` checks every entry survives the sanitizer, `EmojiStorageTest` that each write path stores and shows them back.
+  becomes the player. The editor has NO smiley picker anymore (removed): `public/smilies/*.gif`, the sanitizer's support for `/smilies/` images and their inline styling are KEPT because ~8000 stored messages reference them (`tests/Content/SmiliesListTest.php` checks every gif survives the sanitizer).
+  **Emojis** are plain Unicode text (astral characters pass the sanitizer untouched, chat messages and private messages included): the editor's popover ("Émojis", `assets/vue/editor/emojis.js`,
+  curated groups with French labels, Unicode 12 or older, inserted as text, no dependency) is the only picker. Adding an emoji = one line in `emojis.js`; `tests/Content/EmojiPickerTest.php` checks every entry survives the sanitizer, `EmojiStorageTest` that each write path stores and shows them back.
   After changing the allow-list run `bin/console app:content:sanitize --dry-run` then without `--dry-run` (idempotent, batched, plain SQL, leaves `updated_at` alone).
 
 - **Authentication hardening** (`config/packages/security.yaml`, `framework.yaml`): `login_throttling` = 5 attempts / 15 min per username + IP (25 per IP), counters in the filesystem pool `limiter.cache`

@@ -133,7 +133,7 @@
     }
   }
 
-  // ---- popovers (smileys, emojis) ---------------------------------------------------------------------------------------
+  // ---- popovers (emojis) ---------------------------------------------------------------------------------------
   .rich-editor-popover {
     @include texture-host;
     @include texture-tone("paper", "overlay");
@@ -158,7 +158,6 @@
       max-width: 28rem;
     }
   }
-  .rich-editor-smiley,
   .rich-editor-emoji {
     display: inline-flex;
     height: 2.25rem;
@@ -385,7 +384,7 @@
           0 0 0 1px var(--c-line),
           0 2px 6px -2px color-mix(in srgb, var(--c-shadow) 22%, transparent);
       }
-      // smileys stay inline text-sized
+      // legacy gif smilies stay inline text-sized
       img[src^="/smilies/"] {
         display: inline;
         width: auto;

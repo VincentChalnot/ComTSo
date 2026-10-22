@@ -1,4 +1,4 @@
-// Curated Unicode emojis offered by the editor's emoji picker (the classic gif smilies stay in smilies.js). Grouped by
+// Curated Unicode emojis offered by the editor's emoji picker. Grouped by
 // category; `icon` is the glyph of the category button, `label` the French accessible name (also the tooltip).
 // Only emojis from Unicode 12 or older (every current system font draws them). tests/Content/EmojiPickerTest.php checks
 // that each entry survives the sanitizer and the database unchanged, so an entry that needs a variation selector
