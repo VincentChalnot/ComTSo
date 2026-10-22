@@ -309,4 +309,22 @@
     </form></div>
     </div>
   </div>
+
+  <div class="ds-demo" data-title="Compact (accueil : sous le dernier message, au-dessus en ordre décroissant)">
+    <p class="ds-note"><code>.reply.is-compact</code> : même grille, petit avatar, marges serrées, titre masqué (<code>sr-only</code>), éditeur compact sans photos. Un par carte du fil d'activité, il renvoie vers l'accueil.</p>
+    <div class="ds-stage">
+<form onsubmit="return false" style="max-width:52rem">
+      <section class="reply is-compact" aria-labelledby="reply-c1">
+        <span class="reply-avatar"><span class="avatar avatar-sm avatar-initial" style="--avatar-hue: 340">C</span></span>
+        <div class="reply-body">
+          <h4 id="reply-c1" class="sr-only">Répondre à « Week-end de la Toussaint »</h4>
+          <div class="field mb-5"><div data-vue-component="RichEditor" data-props='{"name": "reply_compact", "id": "reply_compact", "value": "", "placeholder": "Répondre à ce sujet…", "ariaLabel": "Votre réponse", "compact": true, "minHeight": "4rem", "required": false}' class="rich-text-field"><textarea id="reply_compact_ta" name="reply_compact" class="input" rows="3" placeholder="Répondre à ce sujet…"></textarea></div></div>
+        </div>
+        <div class="reply-actions">
+          <button type="submit" class="btn btn-primary btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-3.5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Répondre</button>
+        </div>
+      </section>
+    </form>
+    </div>
+  </div>
 </section>

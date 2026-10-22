@@ -6,6 +6,7 @@ use App\Entity\Comment;
 use App\Entity\Topic;
 use App\Entity\User;
 use App\Form\CommentType;
+use App\Form\QuickReplyType;
 use App\Forum\CommentRemover;
 use App\Forum\TopicPageBuilder;
 use App\Pagination\Pager;
@@ -16,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -71,13 +73,50 @@ class CommentController extends AbstractController
             return $this->render('topic/show.html.twig', $page->build($request, $topic, $user) + ['commentForm' => $form], new Response(status: Response::HTTP_UNPROCESSABLE_ENTITY));
         }
 
-        $comment->setCreatedAt($now = new \DateTime())->setUpdatedAt($now);
-        $topic->registerNewComment($now);
-        $em->persist($comment);
+        $this->publish($comment, $em);
         $postPhotos->attachToComment($comment, $photos, $user);
         $em->flush();
 
         return $this->redirect($this->topicUrlOf($comment, $user, $comments));
+    }
+
+    /**
+     * The compact reply of the home page (`QuickReplyType`, one form per topic card): same write path as {@see create()}
+     * (sanitized rich text, Symfony form token, topic counters) but the member goes back to the home page, on the card of
+     * the topic, with the window (`since`, `page`) they were browsing. A refused reply (empty text, expired token) is a
+     * flash message and the same redirect: the home page is a list of many forms, there is no single bound form to show again.
+     */
+    #[Route('/forum/{forumId}/{id}/reply', name: 'topic_reply', requirements: ['forumId' => '[a-z0-9-]+', 'id' => '\d+'], methods: ['POST'])]
+    public function reply(
+        Request $request,
+        #[MapEntity(id: 'id')] Topic $topic,
+        #[CurrentUser] User $user,
+        EntityManagerInterface $em,
+        FormFactoryInterface $forms,
+    ): Response {
+        $comment = (new Comment())->setTopic($topic)->setAuthor($user);
+        $form = $forms->createNamed(self::quickReplyFormName($topic), QuickReplyType::class, $comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->publish($comment, $em);
+            $em->flush();
+            $this->addFlash('success', 'Votre réponse a été publiée.');
+        } else {
+            $this->addFlash('error', $form->isSubmitted() && \count($form->get('content')->getErrors()) > 0
+                ? 'Votre réponse n\'a pas été envoyée : le message ne peut pas être vide.'
+                : 'Votre réponse n\'a pas été envoyée : la page a expiré, merci de réessayer.');
+        }
+
+        $query = [];
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $request->query->getString('since'))) {
+            $query['since'] = $request->query->getString('since');
+        }
+        if (($page = $request->query->getInt('page')) > 1) {
+            $query['page'] = $page;
+        }
+
+        return $this->redirect($this->generateUrl('app_home', $query).'#topic-'.$topic->getId());
     }
 
     #[Route('/comment/{id}/edit', name: 'comment_edit', requirements: ['id' => '\d+'])]
@@ -130,6 +169,20 @@ class CommentController extends AbstractController
         $this->addFlash('success', 'Le message a été supprimé.');
 
         return $this->redirectToRoute('topic_show', ['forumId' => $topic->getForum()->getId(), 'id' => $topic->getId()]);
+    }
+
+    /** Name of the home page reply form of a topic (unique per card: field ids and CSRF token). */
+    public static function quickReplyFormName(Topic $topic): string
+    {
+        return 'reply_'.$topic->getId();
+    }
+
+    /** Stamps the new message and the topic's counters, and queues the message (the caller flushes). */
+    private function publish(Comment $comment, EntityManagerInterface $em): void
+    {
+        $comment->setCreatedAt($now = new \DateTime())->setUpdatedAt($now);
+        $comment->getTopic()->registerNewComment($now);
+        $em->persist($comment);
     }
 
     private function denyUnlessCanManage(Comment $comment): void

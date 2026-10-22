@@ -1,5 +1,5 @@
 {# A topic as a magazine entry: forum kicker, display title + favourite toggle, new description / photos, the new messages.
-   Params: topic, comments, photos, created (bool), hidden (int) #}
+   Params: topic, comments, photos, created (bool), hidden (int), replyForm (FormView), order ('asc'|'desc': the reply sits where the next message will appear) #}
 {% import '_ui/photo.html.twig' as ph %}
 {% set starred = app.user.starredTopics.contains(topic) %}
 {% set topicUrl = path('topic_show', {forumId: topic.forum.id, id: topic.id}) %}
@@ -32,12 +32,20 @@
         </p>
     {% endif %}
 
+    {% if 'desc' == order %}
+        {% include '_digest/_reply.html.twig' with {topic: topic, replyForm: replyForm} only %}
+    {% endif %}
+
     {% if comments %}
         <div class="digest-posts">
             {% for comment in comments %}
                 {% include '_post/message.html.twig' %}
             {% endfor %}
         </div>
+    {% endif %}
+
+    {% if 'asc' == order %}
+        {% include '_digest/_reply.html.twig' with {topic: topic, replyForm: replyForm} only %}
     {% endif %}
 
     <footer class="digest-foot">

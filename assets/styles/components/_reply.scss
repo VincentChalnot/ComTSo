@@ -2,6 +2,8 @@
 // the send button underneath on the right (full width on phones).
 //
 //   section.reply > span.reply-avatar + div.reply-body + div.reply-actions      (actions are a SIBLING of the body)
+//   .reply.is-compact: the one-line reply of a home page digest card (small avatar, tighter padding, visually hidden title,
+//   compact editor, no photos). Same grid, so the actions stay a sibling of the body.
 @use "../abstracts" as *;
 
 @layer components {
@@ -50,6 +52,16 @@
     &:focus-within,
     &.is-focus {
       box-shadow: var(--shadow-lift);
+    }
+
+    &.is-compact {
+      gap: 0.5rem;
+      padding: 1rem 0.75rem 0.75rem;
+
+      @include up(sm) {
+        column-gap: 0.9rem;
+        padding: 1.1rem 1rem 0.85rem;
+      }
     }
   }
 

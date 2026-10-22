@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\QuickReplyType;
 use App\Pagination\Pager;
 use App\Photo\FeaturedPhotoProvider;
 use App\Repository\CommentPhotoRepository;
@@ -10,6 +11,7 @@ use App\Repository\CommentRepository;
 use App\Repository\PhotoTopicRepository;
 use App\Repository\TopicRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -30,11 +32,20 @@ class HomeController extends AbstractController
         PhotoTopicRepository $photoTopics,
         FeaturedPhotoProvider $featuredPhoto,
         CommentPhotoRepository $commentPhotos,
+        FormFactoryInterface $forms,
     ): Response {
         $since = $this->resolveSince($request, $user);
         $order = $user->getMessageOrder();
 
         $pager = new Pager($topics->countActiveSince($since), self::TOPICS_PER_PAGE, $request->query->getInt('page', 1));
+        // The reply forms send the member back to the same window of the digest (an explicit date, the page).
+        $homeQuery = [];
+        if ($request->query->has('since') || isset($request->query->all('form')['since'])) {
+            $homeQuery['since'] = $since->format('Y-m-d');
+        }
+        if ($pager->page > 1) {
+            $homeQuery['page'] = $pager->page;
+        }
         $cards = [];
         foreach ($topics->findActiveSince($since, $pager->offset(), $pager->perPage) as $topic) {
             $newMessages = $comments->countSince($topic, $since);
@@ -45,6 +56,10 @@ class HomeController extends AbstractController
                 'hidden' => max(0, $newMessages - \count($latest)),
                 'photos' => $photoTopics->findSince($topic, $since),
                 'created' => $topic->getCreatedAt() >= $since,
+                'replyForm' => $forms->createNamed(CommentController::quickReplyFormName($topic), QuickReplyType::class, null, [
+                    'action' => $this->generateUrl('topic_reply', ['forumId' => $topic->getForum()->getId(), 'id' => $topic->getId()] + $homeQuery),
+                ])->createView(),
+                'order' => $order,
             ];
         }
         $commentPhotos->preload(array_merge(...array_column($cards, 'comments')));
