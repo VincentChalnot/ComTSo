@@ -33,7 +33,7 @@
     {% endif %}
 
     {% if 'desc' == order %}
-        {% include '_digest/_reply.html.twig' with {topic: topic, replyForm: replyForm} only %}
+        {% include '_digest/_actions.html.twig' with {topic: topic, topicUrl: topicUrl, replyForm: replyForm} only %}
     {% endif %}
 
     {% if comments %}
@@ -45,10 +45,6 @@
     {% endif %}
 
     {% if 'asc' == order %}
-        {% include '_digest/_reply.html.twig' with {topic: topic, replyForm: replyForm} only %}
+        {% include '_digest/_actions.html.twig' with {topic: topic, topicUrl: topicUrl, replyForm: replyForm} only %}
     {% endif %}
-
-    <footer class="digest-foot">
-        <a href="{{ topicUrl }}" class="btn btn-primary">Voir le sujet</a>
-    </footer>
 </section>

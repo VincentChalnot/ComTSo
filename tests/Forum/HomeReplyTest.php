@@ -156,7 +156,7 @@ class HomeReplyTest extends AppWebTestCase
     public function testTheFormFollowsTheMessageOrder(): void
     {
         $posts = '//div[contains(@class, "digest-posts")]';
-        $form = '//form[@name="'.$this->formName().'"]';
+        $form = '//div[contains(@class, "digest-actions")]';
 
         $asc = $this->home();
         self::assertSame(1, $asc->filterXPath($posts.'/following::'.substr($form, 2))->count(), 'oldest first: the form is under the latest messages');
@@ -167,6 +167,20 @@ class HomeReplyTest extends AppWebTestCase
         $desc = $this->client->request('GET', '/?since=2026-03-01');
         self::assertSame(1, $desc->filterXPath($form.'/following::'.substr($posts, 2))->count(), 'most recent first: the form is above the latest messages');
         self::assertSame(0, $desc->filterXPath($posts.'/following::'.substr($form, 2))->count());
+    }
+
+    public function testTheTwoButtonsShareOneRowOfTheSameSize(): void
+    {
+        $home = $this->home();
+
+        $row = $home->filter('.digest-actions');
+        self::assertCount(1, $row);
+        self::assertCount(1, $row->filter('a.btn.btn-sm[href$="/forum/general/'.$this->topic->getId().'"]'));
+        self::assertStringContainsString('Voir le sujet', $row->filter('a.btn-primary')->text());
+        self::assertCount(1, $row->filter('details.reply-fold > summary.btn.btn-sm'));
+        self::assertStringContainsString('Répondre', $row->filter('summary')->text());
+        self::assertCount(1, $row->filter('form[name="'.$this->formName().'"]'), 'the form lives in the details, under the row');
+        self::assertCount(0, $home->filter('.digest-foot'), 'no second "Voir le sujet" footer');
     }
 
     public function testEveryTopicCardHasItsOwnForum(): void

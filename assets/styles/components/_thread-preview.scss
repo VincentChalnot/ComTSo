@@ -471,7 +471,7 @@ $icon-chevron: icon("%3Cpath d='m6 9 6 6 6-6'/%3E");
 
   // ---- digest: a topic as a magazine entry on the home page (templates/_digest/topic_card.html.twig) -------------------
   //   .digest-list > section.digest > header.digest-head ( .kicker  .digest-title-row ( h3.digest-title  form[star] ) )
-  //                                   .post-body.is-lead  ul.post-photos  p.digest-note  .digest-posts > .post…  footer.digest-foot
+  //                                   .post-body.is-lead  ul.post-photos  p.digest-note  .digest-posts > .post…  .digest-actions
   .digest-list {
     margin: 0;
   }
@@ -558,10 +558,21 @@ $icon-chevron: icon("%3Cpath d='m6 9 6 6 6-6'/%3E");
       border-top-color: var(--c-line-soft);
     }
   }
-  .digest-foot {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+  // "Voir le sujet" + the "Répondre" <details> on one line (above or under the posts, following the member's order). The link
+  // floats so that the summary stays next to it; the unfolded form is cleared below, full width.
+  .digest-actions {
+    display: flow-root;
+
+    > .btn {
+      float: left;
+      margin-right: 0.5rem;
+    }
+    > .reply-fold > summary {
+      vertical-align: top;
+    }
+    > .reply-fold > form {
+      clear: both;
+    }
   }
 
   // ---- forum table of contents (templates/forum/index.html.twig) ----------------------------------------------------

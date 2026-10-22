@@ -106,17 +106,20 @@ The `<form>` wraps the section (so editor, widget and submit button belong to th
 </form>
 ```
 
-### Reply of a home digest card (`templates/_digest/_reply.html.twig`)
+### Button row and reply of a home digest card (`templates/_digest/_actions.html.twig`)
 
 ```html
-<details class="reply-fold">                                         <!-- native, closed by default, no JavaScript needed -->
-  <summary class="btn btn-sm">{icon} Répondre</summary>
-  <form name="reply_{topicId}" method="post" action="/forum/{f}/{t}/reply?since=…&page=…" enctype="multipart/form-data">
-    <section class="reply mt-3" aria-labelledby="reply-{topicId}"> … exactly the reply form above (editor + photos), h4.card-title … </section>
-  </form>
-</details>
+<div class="digest-actions">                                        <!-- ONE line, both buttons .btn-sm -->
+  <a class="btn btn-sm btn-primary" href="/forum/{f}/{t}">{arrow-right} Voir le sujet</a>
+  <details class="reply-fold">                                       <!-- native, closed by default, no JavaScript needed -->
+    <summary class="btn btn-sm">{message-square} Répondre</summary>
+    <form name="reply_{topicId}" method="post" action="/forum/{f}/{t}/reply?since=…&page=…" enctype="multipart/form-data">
+      <section class="reply mt-3" aria-labelledby="reply-{topicId}"> … exactly the reply form above (editor + photos), h4.card-title … </section>
+    </form>
+  </details>
+</div>
 ```
-One per `.digest` card (`topic_card.html.twig`): after `.digest-posts` when the member's order is `asc`, before it when `desc`. The form is the topic page's `CommentType`, named `reply_<topicId>` (unique ids and CSRF token per card); the POST (`topic_reply`) redirects to the home page on the card's anchor.
+One row per `.digest` card (`topic_card.html.twig`): after `.digest-posts` when the member's order is `asc`, before it when `desc`. The link floats left so the summary stays beside it; the unfolded form is `clear: both`, i.e. full width under the row. The form is the topic page's `CommentType`, named `reply_<topicId>` (unique ids and CSRF token per card); the POST (`topic_reply`) redirects to the home page on the card's anchor.
 
 ## Attach widget (`templates/form/photo_upload.html.twig` + `assets/vue/components/AttachPhotos.vue`)
 
@@ -310,7 +313,7 @@ Tailwind utilities left in the new markup (layout glue): `sr-only`, `space-y-6`,
     <ul class="post-photos [is-wide]">…</ul>                          <!-- is-wide above 6 photos (auto-fill squares) -->
     <p class="digest-note">N messages plus anciens non affichés — <a>voir le sujet</a></p>
     <div class="digest-posts"> article.post … </div>
-    <footer class="digest-foot"><a class="btn btn-primary">Voir le sujet</a></footer>
+    <div class="digest-actions">…</div>                                <!-- buttons row, see below -->
   </section>
 </div>
 

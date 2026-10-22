@@ -310,13 +310,14 @@
     </div>
   </div>
 
-  <div class="ds-demo" data-title="Accueil : bouton « Répondre » replié, puis déplié (<code>details.reply-fold</code>)">
-    <p class="ds-note">Sur chaque carte du fil d'activité : un bouton, et au clic le MÊME formulaire que sur la page du sujet (éditeur et photos). Natif (<code>&lt;details&gt;</code>), sans JavaScript.</p>
+  <div class="ds-demo" data-title="Accueil : « Voir le sujet » + « Répondre » sur une ligne, replié puis déplié (<code>.digest-actions</code>)">
+    <p class="ds-note">Sur chaque carte du fil d'activité : deux boutons de même taille sur une ligne (au-dessus ou sous les messages selon l'ordre du membre) ; au clic sur « Répondre », le MÊME formulaire que sur la page du sujet (éditeur et photos). S'ouvre en pleine largeur sous la ligne. Natif (<code>&lt;details&gt;</code>), sans JavaScript.</p>
     <div class="ds-stage">
 <div class="ds-col" style="max-width:52rem">
-      <details class="reply-fold"><summary class="btn btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-3.5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Répondre</summary></details>
+      <div class="digest-actions"><a href="#" class="btn btn-sm btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-3.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> Voir le sujet</a><details class="reply-fold"><summary class="btn btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-3.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Répondre</summary></details></div>
+      <div class="digest-actions"><a href="#" class="btn btn-sm btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-3.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> Voir le sujet</a>
       <details class="reply-fold" open>
-        <summary class="btn btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-3.5"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Répondre</summary>
+        <summary class="btn btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="size-3.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Répondre</summary>
         <form onsubmit="return false">
           <section class="reply mt-3" aria-labelledby="reply-f1">
             <span class="reply-avatar"><span class="avatar avatar-initial" style="--avatar-hue: 340">CL</span></span>
@@ -335,7 +336,7 @@
             </div>
           </section>
         </form>
-      </details>
+      </details></div>
     </div>
     </div>
   </div>
