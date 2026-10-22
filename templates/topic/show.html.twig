@@ -1,7 +1,6 @@
 {% extends 'base.html.twig' %}
 {% import '_ui/icons.html.twig' as ui %}
 {% import '_ui/photo.html.twig' as ph %}
-{% import '_ui/avatar.html.twig' as av %}
 
 {% block title %}{{ topic.title }} · ComTSo{% endblock %}
 
@@ -49,6 +48,11 @@
     </section>
 {% endif %}
 
+{# Most recent first: the reply goes where the newest message will appear, above the list; oldest first: it ends the thread. #}
+{% if 'desc' == order %}
+    {% include 'topic/_reply.html.twig' with {top: true} %}
+{% endif %}
+
 {% include '_layout/pagination.html.twig' with {pager: pager, route: 'topic_show', params: {forumId: topic.forum.id, id: topic.id}} %}
 
 <section aria-label="Messages" class="my-6 border-b border-line">
@@ -61,18 +65,7 @@
 
 {% include '_layout/pagination.html.twig' with {pager: pager, route: 'topic_show', params: {forumId: topic.forum.id, id: topic.id}} %}
 
-{{ form_start(commentForm) }}
-    <section class="reply mt-8" aria-labelledby="reply">
-        <span class="reply-avatar">{{ av.avatar(app.user, 'md') }}</span>
-        <div class="reply-body">
-            <h2 id="reply" class="card-title mb-2">Répondre</h2>
-            {{ form_errors(commentForm) }}
-            {{ form_row(commentForm.content) }}
-            {{ form_row(commentForm.photos) }}
-        </div>
-        <div class="reply-actions">
-            <button type="submit" class="btn btn-primary">{{ ui.icon('send', 'size-4') }} Envoyer</button>
-        </div>
-    </section>
-{{ form_end(commentForm) }}
+{% if 'asc' == order %}
+    {% include 'topic/_reply.html.twig' with {top: false} %}
+{% endif %}
 {% endblock %}

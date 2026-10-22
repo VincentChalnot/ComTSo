@@ -1,0 +1,17 @@
+{# The reply form of the topic page. Params: commentForm, top (bool: shown above the messages, member's order is "desc") #}
+{% import '_ui/icons.html.twig' as ui %}
+{% import '_ui/avatar.html.twig' as av %}
+{{ form_start(commentForm) }}
+    <section class="reply {{ top ? 'mb-8' : 'mt-8' }}" aria-labelledby="reply">
+        <span class="reply-avatar">{{ av.avatar(app.user, 'md') }}</span>
+        <div class="reply-body">
+            <h2 id="reply" class="card-title mb-2">Répondre</h2>
+            {{ form_errors(commentForm) }}
+            {{ form_row(commentForm.content) }}
+            {{ form_row(commentForm.photos) }}
+        </div>
+        <div class="reply-actions">
+            <button type="submit" class="btn btn-primary">{{ ui.icon('send', 'size-4') }} Envoyer</button>
+        </div>
+    </section>
+{{ form_end(commentForm) }}

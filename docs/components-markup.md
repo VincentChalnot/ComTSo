@@ -85,7 +85,9 @@ Content of `.thread-preview-more` (all generated):
 ```
 The thumbnail link is the existing macro `templates/_ui/photo.html.twig` (`ph.thumb(photo, group, size)`); the lightbox group is the message (`post-{commentId}`).
 
-## Reply form (`templates/topic/show.html.twig`)
+## Reply form (`templates/topic/_reply.html.twig`, included by `topic/show.html.twig`)
+
+Placed under the messages when the member's order is `asc` (`.reply.mt-8`), above them, before the top pager, when it is `desc` (`.reply.mb-8`): it always sits where the next message will appear.
 
 The `<form>` wraps the section (so editor, widget and submit button belong to the same form):
 
