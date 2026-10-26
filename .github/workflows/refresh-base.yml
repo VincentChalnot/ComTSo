@@ -38,7 +38,7 @@ jobs:
 
       # Same hash tag as normal runs (they keep skipping the build when it exists) plus a dated tag for rollback.
       - name: Rebuild the base image (pull, no cache)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: php_base
@@ -61,7 +61,7 @@ jobs:
             type=raw,value={{date 'YYYYMMDD'}}
 
       - name: Rebuild and push the production image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: frankenphp_prod

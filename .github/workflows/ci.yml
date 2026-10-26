@@ -72,7 +72,7 @@ jobs:
       # Without push rights the build only warms the gha cache, which the other jobs read to build the stage locally.
       - name: Build the base image
         if: steps.ref.outputs.exists == 'false'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: php_base
@@ -120,7 +120,7 @@ jobs:
       # Same image as `docker compose up` (target frankenphp_dev) on top of the published base, loaded into the local Docker daemon
       # under the name compose.yaml expects. The gha cache holds the thin layers (and the base stage when it had to be built locally).
       - name: Build the dev image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: frankenphp_dev
@@ -246,7 +246,7 @@ jobs:
 
       # `load: true` keeps the image in the runner's Docker daemon (under a local-only tag) for the smoke test below; nothing is pushed.
       - name: Build the production image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: frankenphp_prod
@@ -337,7 +337,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Push the production image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: frankenphp_prod
