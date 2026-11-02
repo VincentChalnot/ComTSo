@@ -47,7 +47,7 @@ jobs:
       - name: Check the pinned base tag
         run: docker/base-hash.sh --check
 
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -72,7 +72,7 @@ jobs:
       # Without push rights the build only warms the gha cache, which the other jobs read to build the stage locally.
       - name: Build the base image
         if: steps.ref.outputs.exists == 'false'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: php_base
@@ -108,7 +108,7 @@ jobs:
           docker compose -f deploy/compose.yaml -f deploy/compose.traefik.yaml --env-file deploy/.env.example config -q
           docker compose -f deploy/compose.yaml -f deploy/compose.traefik.yaml -f deploy/compose.www-redirect.yaml --env-file deploy/.env.example config -q
 
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         if: needs.base.outputs.ref != 'php_base'
         with:
           registry: ghcr.io
@@ -120,7 +120,7 @@ jobs:
       # Same image as `docker compose up` (target frankenphp_dev) on top of the published base, loaded into the local Docker daemon
       # under the name compose.yaml expects. The gha cache holds the thin layers (and the base stage when it had to be built locally).
       - name: Build the dev image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: frankenphp_dev
@@ -235,7 +235,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         if: needs.base.outputs.ref != 'php_base'
         with:
           registry: ghcr.io
@@ -246,7 +246,7 @@ jobs:
 
       # `load: true` keeps the image in the runner's Docker daemon (under a local-only tag) for the smoke test below; nothing is pushed.
       - name: Build the production image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: frankenphp_prod
@@ -317,7 +317,7 @@ jobs:
       - uses: docker/setup-buildx-action@v4
 
       - name: Log in to ghcr.io
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -326,7 +326,7 @@ jobs:
       # latest = default branch; sha-<short> = every pushed build; 1.2.3 / 1.2 = git tag v1.2.3
       - name: Image metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository }}
           flavor: latest=false
@@ -337,7 +337,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Push the production image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: frankenphp_prod
