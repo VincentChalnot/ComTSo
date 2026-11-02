@@ -14,7 +14,7 @@
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.3",
         "imagine/imagine": "^1.5",
-        "phpdocumentor/reflection-docblock": "^5.6",
+        "phpdocumentor/reflection-docblock": "^6.0",
         "phpstan/phpdoc-parser": "^2.0",
         "sentry/sentry-symfony": "^5.14",
         "sidus/admin-bundle": "^6.0",
