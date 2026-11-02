@@ -12,7 +12,7 @@ use App\Tests\Support\AppWebTestCase;
  */
 class LoginThrottlingTest extends AppWebTestCase
 {
-    private function attempt(string $username, string $password): void
+    private function submitLogin(string $username, string $password): void
     {
         $this->client->request('GET', '/login');
         $this->client->submitForm('Se connecter', ['_username' => $username, '_password' => $password], serverParameters: ['HTTP_ORIGIN' => 'http://localhost']);
@@ -21,7 +21,7 @@ class LoginThrottlingTest extends AppWebTestCase
     private function failTimes(string $username, int $times): void
     {
         for ($i = 0; $i < $times; ++$i) {
-            $this->attempt($username, 'wrong-password');
+            $this->submitLogin($username, 'wrong-password');
             self::assertResponseRedirects('/login');
         }
     }
@@ -38,7 +38,7 @@ class LoginThrottlingTest extends AppWebTestCase
         $this->client->disableReboot();
 
         $this->failTimes('alice', 5);
-        $this->attempt('alice', 'Correct-horse-1');
+        $this->submitLogin('alice', 'Correct-horse-1');
 
         self::assertResponseRedirects('/login');
         $this->client->followRedirect();
@@ -53,7 +53,7 @@ class LoginThrottlingTest extends AppWebTestCase
         $this->client->disableReboot();
 
         $this->failTimes('alice', 4);
-        $this->attempt('alice', 'Correct-horse-1');
+        $this->submitLogin('alice', 'Correct-horse-1');
 
         self::assertResponseRedirects('/');
         $this->assertLoggedIn(true);
@@ -66,7 +66,7 @@ class LoginThrottlingTest extends AppWebTestCase
         $this->client->disableReboot();
 
         $this->failTimes('alice', 6);
-        $this->attempt('bob', 'Another-horse-2');
+        $this->submitLogin('bob', 'Another-horse-2');
 
         self::assertResponseRedirects('/');
     }
@@ -77,12 +77,12 @@ class LoginThrottlingTest extends AppWebTestCase
         $this->client->disableReboot();
 
         $this->failTimes('alice', 4);
-        $this->attempt('alice', 'Correct-horse-1');
+        $this->submitLogin('alice', 'Correct-horse-1');
         self::assertResponseRedirects('/');
         $this->logOut();
 
         $this->failTimes('alice', 4);
-        $this->attempt('alice', 'Correct-horse-1');
+        $this->submitLogin('alice', 'Correct-horse-1');
 
         self::assertResponseRedirects('/');
     }
@@ -101,7 +101,7 @@ class LoginThrottlingTest extends AppWebTestCase
         $this->client->disableReboot();
 
         $this->failTimes('marie', 3);
-        $this->attempt('marie', 'Old-pass-1');
+        $this->submitLogin('marie', 'Old-pass-1');
 
         self::assertResponseRedirects('/');
         $this->em()->clear();
