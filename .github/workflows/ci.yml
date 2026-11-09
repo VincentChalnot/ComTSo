@@ -176,7 +176,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
           cache: npm
@@ -215,7 +215,7 @@ jobs:
         continue-on-error: true
         run: docker run --rm -v "$PWD:/app" -w /app composer:2 audit --locked
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
 
